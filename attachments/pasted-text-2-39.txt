@@ -1,0 +1,25 @@
+Fix the desktop navigation layout shown in the attached screenshot.
+
+Problem:
+The primary navigation items (Home, Chat, Live, Albums, More) are appearing vertically stacked in the center of the desktop screen. This is incorrect and wastes a large amount of horizontal space.
+
+Required fix:
+
+1. Restore the previous desktop navigation layout: all five items in one horizontal row.
+2. Keep the navigation centered horizontally, with consistent spacing and alignment.
+3. Keep icons above their labels if that was the previous desktop design.
+4. Remove the unnecessary vertical stacking and excessive empty space.
+5. Ensure the navigation does not overlap the wedding content or header.
+6. Preserve the existing navigation behavior, active indicators, animations, and swipe/navigation functionality.
+7. Do not change the mobile navigation layout.
+
+Implementation requirements:
+
+- Inspect the actual desktop navigation component and its responsive CSS.
+- Identify the exact breakpoint, flex/grid, width, or positioning rule causing this regression.
+- Fix the underlying layout rather than applying arbitrary margins or absolute positioning.
+- Test desktop, tablet, and mobile widths.
+- Compare the result against the previous horizontal desktop navigation.
+- Check that all five navigation items remain visible and evenly distributed.
+
+Do not redesign the navigation or modify unrelated sections. Report the root cause and files changed after implementing and testing.

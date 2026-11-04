@@ -1,0 +1,49 @@
+The Wedding Circle — Add Shagun & Paath Ceremony Cover Images
+
+Implement a targeted update to the existing Wedding Circle project using the two supplied images.
+
+1. Map Each Image to the Correct Ceremony
+
+Image 1 — Shagun
+
+- Use the first supplied image, featuring a traditional wedding shagun thali, red and gold gift boxes, ceremonial offerings, flowers, and warm golden lighting.
+- Assign it exclusively to the Shagun ceremony bar.
+
+Image 2 — Paath
+
+- Use the second supplied image, featuring the sacred scripture on an ornate golden stand, a white ceremonial whisk, floral decorations, and the Khanda symbol.
+- Assign it exclusively to the Paath ceremony bar.
+
+Do not swap the images or use either image as a generic background for other ceremonies.
+
+2. Ceremony Bar Presentation
+
+Use both images as cinematic background cover images for their respective ceremony bars on the Wedding Home page.
+
+- Preserve the original wide landscape aspect ratio and composition.
+- Keep the left side of each image relatively quiet and uncluttered so ceremony names, dates, and other text remain readable.
+- Keep the main ceremonial objects visible on the right.
+- Use "cover" sizing with carefully controlled positioning to avoid cutting off the important objects.
+- Apply a subtle, theme-compatible darkening or gradient overlay only where necessary for text readability. Do not obscure the images.
+- Ensure the images blend naturally with the selected wedding theme, including light, dark, and custom themes.
+- On mobile screens, adjust background positioning responsively to retain the most important ceremonial details.
+- Maintain the existing premium wedding aesthetic with smooth, restrained transitions.
+
+3. Scope and Isolation
+
+- Shagun must always use its own assigned image.
+- Paath must always use its own assigned image.
+- Store the image assignments separately from other ceremony image settings.
+- Changing, dragging, replacing, or editing another ceremony's image must not affect Shagun or Paath.
+- If the app supports custom ceremony covers, preserve that functionality and ensure each ceremony's settings remain independent.
+- Do not alter the global wedding page background, landing page background, other ceremony covers, or unrelated theme assets.
+
+4. Implementation Requirements
+
+- Inspect the existing ceremony configuration and image-rendering components before editing.
+- Reuse the two supplied image files and integrate them into the project's existing asset-management approach.
+- Preserve image quality; do not unnecessarily compress, blur, crop, or regenerate the images.
+- Ensure both images load correctly in the deployed Grok Build application.
+- Test the ceremony bars in multiple themes and on mobile and desktop.
+
+Strict instruction: Make only the Shagun and Paath image-assignment and presentation changes described above. Preserve all existing wedding features, data, layouts, and functionality. Report which files were changed and confirm that each image is isolated to its intended ceremony.

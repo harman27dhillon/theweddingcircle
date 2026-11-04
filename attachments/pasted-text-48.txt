@@ -1,0 +1,52 @@
+THE WEDDING CIRCLE — TWO TARGETED FIXES ONLY
+
+Make the following two changes in the existing project. Do not modify unrelated features or redesign the interface.
+
+FIX 1 — REMOVE THE INCORRECT BLURRY BACKGROUND ON DESKTOP WEDDING PAGES
+
+Problem: Inside an opened wedding on desktop, a large blurry pink background with pale circular/flower-like shapes remains visible behind the Chat and More panels. It looks unrelated to the selected theme. The same background appears across different themes.
+
+Required fix:
+
+1. Inspect the desktop wedding layout and identify the exact CSS rule, background image, pseudo-element, overlay, or fixed-position decorative layer responsible for this repeated blurry background.
+2. Remove or correct that specific unwanted layer. Do not simply reduce its opacity or add another overlay over it.
+3. Make the desktop wedding background follow the currently selected theme's original background configuration, including its intended colors, images, gradients, and decorative effects.
+4. Ensure switching between Preset themes and Classic themes updates the wedding background correctly. No single unrelated pink/blurred background should persist across all themes.
+5. Check both the Chat panel and More panel, including the area behind their content.
+6. Preserve intentional theme-specific decorations and any effects that are genuinely part of the selected theme.
+
+Important: The screenshot shows the unwanted background on desktop. Fix the desktop-specific source of the problem. Do not change the mobile wedding layout unless the same root cause demonstrably affects it.
+
+FIX 2 — ADD MY ROSE-FLOWER IMAGE TO THE MOBILE LANDING BACKGROUND OPTIONS
+
+Use the uploaded image containing dense pink, blush, and ivory roses as a new selectable background option in the existing Developer → Background Change section.
+
+Image: Use the actual uploaded rose-flower image as the asset. Do not generate a replacement or use a remote image URL.
+
+Requirements:
+
+1. Add the image to the project's local public/assets directory and reference it using the project's existing asset conventions.
+2. In Developer → Background Change, add a clearly labelled option such as Rose Garden with an image preview and a selection/apply control.
+3. This option must affect only the mobile landing-page background. It must not change individual wedding backgrounds, wedding themes, ceremony backgrounds, Chat, or More.
+4. Preserve existing mobile background choices and the existing background-change functionality.
+5. Display the image cleanly across mobile screen sizes using appropriate "cover" sizing and positioning without stretching it.
+6. Persist the developer-selected mobile landing background using the existing configuration/persistence mechanism so it remains selected after refreshing the app.
+7. Keep the existing developer permissions and do not expose developer-only controls to ordinary users.
+8. Do not change the desktop landing-page background through this new option.
+
+STRICT CHANGE LIMITS
+
+- Do not change button positions, card dimensions, typography, colors, theme definitions, navigation, authentication, database schemas, or other features unless strictly necessary for these two tasks.
+- Do not replace the theme system or add global CSS overrides that affect unrelated components.
+- Do not delete the uploaded image after adding it to the project.
+- Make the smallest targeted changes and review the diff for unrelated modifications.
+
+VERIFICATION
+
+- Test the desktop wedding background with multiple Preset themes and Classic themes.
+- Confirm the repeated blurry background no longer overrides the selected theme.
+- Test the mobile Developer → Background Change option, apply Rose Garden, refresh the page, and confirm the background persists.
+- Confirm the new mobile background does not affect desktop or individual weddings.
+- Run the available build and relevant tests. Report the actual files changed and any checks that could not be performed.
+
+Success criteria: Desktop wedding interiors display the correct selected theme background instead of the repeated blurry pink background, and Rose Garden becomes a persistent, selectable option exclusively for the mobile landing-page background.

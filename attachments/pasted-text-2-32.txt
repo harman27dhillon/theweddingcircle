@@ -1,0 +1,148 @@
+Wedding Circle — Landing Page Loading Speed and Early Wedding Bar Rendering
+
+The Wedding Circle landing page is currently opening very slowly. Another major problem is that the page appears first, but wedding bars load noticeably later.
+
+I want the landing page to open quickly and wedding bars to appear as early as possible, ideally as part of the initial page rendering.
+
+CRITICAL RULE: Inspect the existing source code before creating anything.
+
+There may already be landing-page performance optimizations implemented in the code but not properly connected, activated, or deployed. Find out why they are not working.
+
+Do not create a duplicate optimization system if suitable code already exists.
+
+1. Audit the existing landing-page loading system
+
+Inspect:
+
+- Landing page component and its rendering lifecycle.
+- Wedding list and wedding bar data-fetching logic.
+- Authentication and session restoration.
+- Supabase queries and Realtime subscriptions.
+- API requests and their dependencies.
+- Saved wedding/circle restoration.
+- Image and cover-photo loading.
+- Fonts, animations and other render-blocking resources.
+- Existing caching, prefetching, lazy-loading and loading-state implementations.
+- Whether unnecessary requests or repeated renders delay the page.
+
+Identify exactly why the landing page opens slowly and why wedding bars appear only after the page is already visible.
+
+Check whether existing optimization functions are:
+
+- Implemented but never called.
+- Called too late.
+- Waiting for unrelated requests.
+- Blocked by authentication or session restoration.
+- Fetching unnecessary data.
+- Replaced or disconnected by later code changes.
+
+2. Make the landing page render immediately
+
+If the required optimization is missing or incomplete, implement it.
+
+Target behaviour:
+
+- Render the landing page shell immediately.
+- Restore the user's saved wedding bars from safe existing local cached data, where available.
+- Do not wait for every API request before displaying the page.
+- Fetch updated wedding data in the background.
+- Display available wedding bars immediately, then update them when fresh data arrives.
+- Avoid a blank page or long loading screen.
+- Use lightweight placeholders only when no usable data is available.
+
+Cached data must never grant access to a wedding. Always verify current membership and permissions through the server.
+
+3. Optimize wedding bar loading
+
+Wedding bars are a critical part of the landing page, not optional content that should appear much later.
+
+- Fetch the minimum required wedding-bar information first.
+- Prioritize cover image, couple names, wedding identity and other essential display information.
+- Avoid waiting for full wedding details, albums, chat history or unrelated data.
+- Load nonessential information after the bars become visible.
+- Avoid duplicate requests for the same wedding.
+- Prevent unnecessary component remounts and layout shifts.
+- Use appropriately sized cover thumbnails rather than full-resolution images.
+- Preserve the existing wedding-bar design and aspect ratios.
+
+4. Optimize network and database requests
+
+Inspect actual request waterfalls and database queries.
+
+- Identify slow API calls and expensive Supabase queries.
+- Parallelize independent requests.
+- Remove unnecessary sequential dependencies.
+- Select only required database columns.
+- Avoid fetching the same data multiple times.
+- Avoid blocking the landing page on Realtime subscription setup.
+- Prevent repeated authentication/session checks.
+- Reuse existing valid cached data safely.
+
+Do not introduce excessive polling or unnecessary database traffic.
+
+5. Optimize frontend rendering
+
+Inspect and improve:
+
+- JavaScript bundle loading.
+- Unnecessary component re-renders.
+- Heavy animations during initial page opening.
+- Render-blocking fonts and assets.
+- Large images loaded above the fold.
+- Nonessential components loaded before they are needed.
+
+Keep the existing premium Wedding Circle design and animations. Do not remove important visual elements just to make the page appear faster.
+
+6. Performance measurement
+
+Measure the current implementation before and after changes.
+
+Report:
+
+- Time until the landing page shell appears.
+- Time until the first wedding bar appears.
+- Time until all initially visible wedding bars appear.
+- Number of network requests during initial loading.
+- Slowest API/database requests.
+- Whether repeat visits are faster.
+- Whether loading works on a slower mobile connection.
+
+Use actual measurements from tests or browser performance tools. Do not invent performance improvements.
+
+7. Compatibility and safety
+
+- Preserve existing authentication and wedding membership security.
+- Do not expose private wedding data in local storage.
+- Do not weaken access permissions to make loading faster.
+- Do not break wedding creation, joining, editing or removal.
+- Preserve all existing landing-page functionality.
+- Test Android Chrome and desktop browser behaviour where possible.
+
+8. Implementation rules
+
+If an existing optimization system is present but disconnected or incorrectly implemented, fix that system.
+
+Only if the required optimization is genuinely missing should you create a new implementation.
+
+Do not redesign the landing page.
+Do not change unrelated features.
+Do not change the storage provider or CDN/DNS configuration.
+Do not perform unrelated database migrations.
+Do not deploy or publish without my approval.
+
+9. Final report
+
+Provide:
+
+1. Why the landing page was slow.
+2. Why wedding bars appeared late.
+3. Which optimization code already existed.
+4. Which existing code was disconnected, incorrectly configured or not deployed.
+5. What you reused.
+6. What you fixed or newly implemented.
+7. Before-and-after performance measurements.
+8. Tests passed and tests still requiring real-device verification.
+
+Clearly distinguish code implemented, tests passed and changes actually deployed.
+
+Do not simply report that the landing page is optimized. Verify the actual rendering and loading behaviour.

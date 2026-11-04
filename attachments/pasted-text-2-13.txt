@@ -1,0 +1,132 @@
+Wedding Circle — Make Developer-Uploaded Images Permanent Application Assets
+
+Modify my existing Wedding Circle project directly. Restructure the image-upload and image-selection options inside the Developer section so that images added, uploaded, or selected by the developer become permanent assets included in the application's source code and production build.
+
+1. Core Requirement
+
+Whenever an authorized developer uploads or sets an image through Developer options, the application must provide a reliable way to make that image a permanent, version-controlled application asset.
+
+This applies to all developer-managed image settings, including:
+
+- Mobile landing-page background.
+- Desktop landing-page background.
+- Mobile wedding-card/bar artwork.
+- Desktop wedding-card/bar artwork.
+- Classic Theme Maker backgrounds and card images.
+- Other image slots managed by Developer options.
+
+Do not treat an image as permanently integrated merely because it appears in a preview or its URL has been saved to a database.
+
+2. Store Images as Real Project Assets
+
+For the existing Vite/React project, use a suitable asset directory, for example:
+
+"public/assets/developer/"
+
+Organize images into clear subfolders where useful, such as:
+
+- "landing/mobile/"
+- "landing/desktop/"
+- "wedding-bar/mobile/"
+- "wedding-bar/desktop/"
+- "classic-themes/"
+
+Choose the final structure after inspecting the existing project. Reuse existing asset conventions where appropriate instead of creating duplicate systems.
+
+When the developer confirms an image:
+
+1. Validate the file type and size.
+2. Give the image a unique, stable filename.
+3. Copy or import the actual image file into the appropriate project asset location.
+4. Update the relevant source configuration to reference that bundled asset.
+5. Include the image in the next production build.
+6. Ensure the image continues to work after deployment, refreshes, and cache clearing.
+
+Use appropriate image formats and compression without visibly degrading the original artwork.
+
+3. Developer Upload Workflow
+
+Inside every relevant Developer image-setting panel, provide:
+
+- Choose Image.
+- Preview.
+- Replace Image.
+- Save as App Asset.
+- Cancel.
+- Restore Default.
+
+Clearly distinguish between an image that has only been selected for preview and one that has been successfully integrated into the project source.
+
+Display a useful status such as:
+
+- Preview only — not yet integrated.
+- Saved to project assets.
+- Included in the latest production build, only when that has actually been verified.
+
+Never display a success status before the operation has completed successfully.
+
+4. Respect the Build and Hosting Architecture
+
+Important: A deployed website cannot normally write new files into its own Vite source directory. Do not pretend that a normal browser upload automatically changes the Git repository or source code.
+
+Inspect the current hosting, build, deployment, and source-control workflow first.
+
+Implement the correct architecture for the existing project:
+
+- If a trusted server-side development or asset-management workflow can safely write project assets and update the source repository, use it with proper authentication and validation.
+- Otherwise, provide a secure asset-export or download workflow that produces the image files and updated asset manifest/configuration for integration into the project source.
+- If GitHub integration is available and authorized, support committing the new assets and configuration through the existing repository workflow.
+- Do not expose repository credentials, deployment tokens, or other secrets in client-side code.
+- Do not attempt to write to a read-only production deployment filesystem.
+- Do not require a manual source-code edit for every image if the existing project can support a safe, automated asset-import workflow.
+
+If an uploaded image is only stored in remote storage, clearly explain that it is not yet bundled into the application source.
+
+5. Dynamic Settings vs. Bundled Assets
+
+Keep these two concepts separate:
+
+Bundled app assets: Images included in the source repository and production build. They should remain available without depending on a user's browser cache or an external image URL.
+
+Developer configuration: The setting that determines which bundled image is used for a particular background, card, or theme.
+
+When a developer changes an image:
+
+- Preserve the old asset until the replacement has been successfully integrated and the build passes.
+- Update the configuration to point to the new asset.
+- Ensure the previous image is not deleted if another theme or screen still references it.
+- Remove obsolete assets only when it is safe and their references have been checked.
+- Ensure the app can fall back to a valid default image if an asset is missing.
+
+Do not bundle ordinary user-uploaded wedding photos, guest photos, chat media, or personal albums into the application source. This requirement applies only to images intentionally configured by an authorized developer as application-wide assets.
+
+6. Classic Theme Maker Integration
+
+Integrate this asset workflow into the existing Classic Theme Maker.
+
+Every desktop and mobile background or wedding-bar image must have an explicit asset-management state.
+
+When saving a custom theme, preserve its configuration and its references to the appropriate bundled assets. If the developer chooses to bundle a newly uploaded image, ensure that the actual image file is included—not merely its filename or remote URL.
+
+Custom theme configurations must continue to support the existing database and application architecture. Do not create duplicate theme registries or break existing built-in themes.
+
+7. Validation and Testing
+
+Before reporting completion:
+
+1. Upload a test image through Developer options.
+2. Verify that the actual file is present in the expected project asset directory or exported asset package.
+3. Verify that the asset reference is updated correctly.
+4. Run the production build.
+5. Confirm that the generated build contains the image.
+6. Verify that the image loads after deployment and a fresh browser session.
+7. Confirm that replacing one image does not break other themes or screens.
+8. Verify that unauthorized users cannot upload or replace developer assets.
+9. Confirm that failed uploads or failed builds do not overwrite working assets.
+10. Report the actual source-control and deployment steps required for the image to become part of the live production app.
+
+Do not claim that an image has been committed to GitHub, bundled into production, or deployed unless that action was actually completed and verified.
+
+Final Goal
+
+Make Developer image management reliable and production-ready: when the developer adds a new application-wide image, the project should have a clear, safe workflow to integrate the real file into the app's source assets, update the correct configuration, build the app, and deploy the result without breaking existing functionality.

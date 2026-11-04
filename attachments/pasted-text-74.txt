@@ -1,0 +1,214 @@
+THE WEDDING CIRCLE — DESKTOP RESTORATION & TARGETED FIXES
+
+You are working on the existing Wedding Circle production project.
+
+This is a repair and controlled improvement task, NOT a redesign or a rebuild of the entire application.
+
+I am providing three screenshots:
+
+SCREENSHOT 1 — OLD DESKTOP REFERENCE
+The earlier desktop landing-page layout. This is the authoritative reference for restoring the desktop arrangement.
+
+SCREENSHOT 2 — CURRENT WEDDING HOME PAGE
+Shows the Families section that must be removed from both mobile and desktop.
+
+SCREENSHOT 3 — CURRENT MOBILE LANDING PAGE
+Shows the existing Leaderboard header button and three-dot options menu that need improvement.
+
+Study each screenshot carefully and use it only for its specified purpose.
+
+PRIORITY 1 — RESTORE THE ORIGINAL DESKTOP LAYOUT
+
+The desktop layout has become broken. Restore the arrangement shown in Screenshot 1.
+
+The reference structure:
+
+- Centered main content container.
+- Large wedding invitation card on the left.
+- Right sidebar containing Create New Wedding, Join a Wedding, Discover, Leaderboard and developer feedback.
+- Appropriate column proportions and spacing.
+- Original blush/ivory background with floral corner decorations.
+- Original typography, card dimensions, alignments, borders and rounded corners.
+
+Requirements:
+
+- Reconstruct the actual desktop layout using the existing components wherever possible.
+- Use proper responsive grid/flexbox architecture.
+- Do not simply enlarge the mobile layout.
+- Prevent overlapping, horizontal scrolling, incorrect wrapping and excessive empty space.
+- Maintain the original visual proportions.
+- Support different desktop and tablet widths.
+
+Use Screenshot 1 as the visual target, not an invitation to redesign the interface.
+
+PRIORITY 2 — REMOVE THE FAMILIES SECTION
+
+Completely remove the Families section shown in Screenshot 2.
+
+Apply to:
+
+- Mobile wedding home page.
+- Desktop wedding home page.
+
+Remove the complete visible section, including its background image, heading, family names and Edit Family Details button.
+
+The next ceremony/event section should move naturally into its place without unwanted blank space.
+
+Important:
+
+- Do not delete family information from the database.
+- Do not remove family management features elsewhere.
+- Do not affect ceremony cards, event information or other wedding functionality.
+
+PRIORITY 3 — IMPROVE THE LEADERBOARD BUTTON
+
+Screenshot 3 shows the current mobile landing-page Leaderboard button.
+
+Modify that button as follows:
+
+- Make it slightly smaller.
+- Use thinner, refined typography.
+- Reduce unnecessary horizontal padding.
+- Place a small champagne-gold crown icon ABOVE the word "Leaderboard".
+- Both crown and text must remain inside the same button.
+- Center-align the crown and text.
+- Preserve the premium wedding aesthetic.
+- Maintain correct alignment with the logo and three-dot menu.
+
+Desktop restriction: Screenshot 1 shows a Leaderboard panel in the right sidebar. Preserve that original desktop presentation. Do not replace it with the mobile header-button design or disturb the restored desktop structure.
+
+PRIORITY 4 — FIX THE ₹499 THEME ACCESS PROBLEM
+
+When I log in as Host and attempt to change the wedding theme, the app asks me to upgrade for ₹499 even though I already have the ₹499 plan.
+
+Investigate the actual payment and entitlement implementation.
+
+Inspect:
+
+- Existing payment records.
+- Purchased plan information.
+- Payment verification status.
+- Theme-changing entitlement checks.
+- Host and wedding ownership relationships.
+- Frontend and backend entitlement validation.
+- Plan IDs and any inconsistent mappings.
+
+Expected result:
+
+1. A valid existing ₹499 purchase must grant the theme access included in that plan.
+2. A Host with the correct entitlement must not be asked to purchase the same plan again.
+3. Verify entitlement against the correct user, wedding and payment records.
+4. Preserve the intended payment rules for unpaid, failed or expired purchases, according to the existing billing design.
+5. Never bypass payment verification.
+6. Never create duplicate payments or subscriptions.
+
+Do not assume whether the ₹499 plan is recurring or a one-time purchase. Inspect the existing implementation and follow its actual billing model.
+
+Test the real Host theme-changing workflow after fixing the problem.
+
+PRIORITY 5 — FIX THE THREE-DOT MENU
+
+The landing-page three-dot options button currently opens very slowly and sometimes misses taps.
+
+Find and fix the actual cause.
+
+Investigate:
+
+- Touch and click event handling.
+- Overlapping elements.
+- Z-index and pointer-events.
+- Event propagation.
+- Unnecessary rendering.
+- Expensive menu-opening operations.
+- Unnecessary API calls.
+- Conflicting gesture handlers.
+
+Expected behaviour:
+
+- Open promptly on the first tap.
+- Respond reliably on Android, iPhone and desktop.
+- Provide an appropriate mobile touch target.
+- Do not require repeated tapping.
+- Preserve all existing menu options and their functionality.
+- Keep the existing menu design.
+
+Do not hide the problem by introducing artificial delays or replacing the menu with a non-functional mockup.
+
+PRIORITY 6 — UI SHIELD & REGRESSION PROTECTION
+
+Preserve and enforce the UI Shield requirement for the entire application, including public pages, landing pages and wedding pages.
+
+Inspect the existing implementation first.
+
+The objective is to prevent future changes from accidentally breaking approved layouts.
+
+Implement practical protection through:
+
+- Isolated component styling.
+- Controlled responsive breakpoints.
+- Protection against unintended global CSS overrides.
+- Layout regression tests or visual checks where practical.
+- Preservation of existing theme-specific styles.
+- Separate verification of mobile and desktop behaviour.
+
+Do not introduce blanket CSS restrictions that prevent legitimate future improvements.
+
+STRICT CHANGE CONTROL
+
+Make only the changes required by this task.
+
+Do not:
+
+- Redesign unrelated pages.
+- Change approved theme colours or typography.
+- Replace wedding cover images.
+- Modify mobile navigation.
+- Change existing backend or database architecture unnecessarily.
+- Remove unrelated features.
+- Replace working components with mockups.
+- Modify payment rules to grant unverified access.
+- Make unrelated changes during desktop restoration.
+
+Preserve existing functionality and data.
+
+IMPLEMENTATION AND VERIFICATION
+
+Before editing:
+
+1. Inspect the existing source code.
+2. Identify the exact components and CSS responsible for the broken desktop layout.
+3. Trace the theme-payment entitlement flow.
+4. Identify the cause of the three-dot menu performance problem.
+5. Check the current UI Shield implementation.
+
+Then implement the fixes directly in the source code.
+
+After editing, verify:
+
+- Desktop layout against Screenshot 1.
+- Families section absent from both mobile and desktop.
+- Remaining wedding sections display correctly.
+- Leaderboard button matches the requested design on mobile.
+- Desktop Leaderboard remains in its original sidebar position.
+- Existing valid ₹499 plan grants the correct theme access.
+- Invalid or unpaid purchases do not receive premium access.
+- Three-dot menu opens reliably on the first tap.
+- Mobile, tablet and desktop layouts remain responsive.
+- No unrelated features have regressed.
+- Production build succeeds.
+
+FINAL REPORT
+
+Report:
+
+1. Root cause of the broken desktop layout.
+2. Files actually modified.
+3. Changes implemented.
+4. Payment entitlement findings.
+5. Menu performance findings.
+6. Tests performed and their actual results.
+7. Any remaining blockers.
+
+Do not claim that something is fixed merely because code was changed. Verify the running application wherever possible.
+
+FINAL INSTRUCTION: Restore the approved interface first. Implement the requested feature fixes with minimal changes. Preserve everything that is already working.

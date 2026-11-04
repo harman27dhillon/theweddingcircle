@@ -1,0 +1,74 @@
+The Wedding Circle — Light Performance Optimization
+
+Perform a careful, low-risk performance optimization pass across the existing application.
+
+Objective: Make the app feel faster, smoother, and more responsive without changing its design, features, behavior, or existing infrastructure.
+
+1. Inspect first
+
+Review the existing source code and identify small, measurable performance improvements.
+
+Focus on:
+
+- Unnecessary component re-renders.
+- Expensive calculations repeated during rendering.
+- Unnecessary API calls and duplicate requests.
+- Inefficient state updates and effects.
+- Images loading unnecessarily or at excessive sizes.
+- Unnecessary JavaScript execution on initial page load.
+- Slow navigation and avoidable loading delays.
+- Memory leaks and improperly cleaned-up event listeners.
+- Inefficient list rendering and scrolling.
+
+2. Make only safe improvements
+
+- Use memoization only where it provides a real benefit.
+- Avoid duplicate network requests where safe.
+- Lazy-load non-critical components and media where appropriate.
+- Improve image loading behavior without reducing visible quality.
+- Avoid loading below-the-fold content prematurely.
+- Reduce unnecessary rendering and expensive operations.
+- Preserve smooth animations and transitions.
+- Keep mobile performance a priority.
+
+3. Strict restrictions
+
+Do NOT:
+
+- Redesign any screen or change the UI.
+- Remove, disable, or simplify existing features.
+- Change navigation, workflows, or user interactions.
+- Change Supabase, Firebase, Better Auth, Cloudflare R2, CDN, or livestream configuration.
+- Change database schemas, authentication, wedding membership, or privacy rules.
+- Change upload/download behavior or media authorization.
+- Introduce new libraries unless absolutely necessary.
+- Perform aggressive code restructuring.
+- Change production settings or deploy anything automatically.
+
+4. Verification
+
+After implementation:
+
+- Run TypeScript checks.
+- Run relevant unit tests.
+- Run the production build.
+- Check for broken imports and console errors.
+- Verify that existing functionality remains intact.
+- Check mobile and desktop layouts for unintended changes.
+
+Compare performance before and after wherever measurable. Do not invent performance improvements or claim speed gains without evidence.
+
+5. Final report
+
+Provide:
+
+1. Files inspected.
+2. Actual bottlenecks found.
+3. Files changed.
+4. Improvements implemented.
+5. Tests and build results.
+6. Any remaining performance concerns.
+
+Separate completed improvements from recommendations that were not implemented.
+
+Final rule: Make small, evidence-based optimizations only. If a change risks affecting existing functionality, leave it untouched and report the issue instead.

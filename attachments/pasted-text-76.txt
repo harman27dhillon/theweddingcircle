@@ -1,0 +1,172 @@
+TASK: BUILD FUNCTIONAL CLOUD INTEGRATION CONFIGURATION
+
+Location: Developer Settings → Infrastructure
+
+Modify the EXISTING Infrastructure section inside Developer Settings of The Wedding Circle.
+
+Do not create a new page, new navigation item or separate dashboard.
+
+The current Infrastructure section already displays integration cards for:
+
+1. Firebase / Google Cloud
+2. Cloudflare R2
+3. Livestream Provider
+4. Google Play Billing
+5. Push Notifications
+
+Currently, these cards display missing configuration values but do not provide proper input fields to enter and save them.
+
+1. ADD CONFIGURATION INPUT FIELDS
+
+Add expandable configuration forms inside each existing integration card.
+
+Firebase / Google Cloud
+
+- FIREBASE_API_KEY
+- FIREBASE_AUTH_DOMAIN
+- FIREBASE_PROJECT_ID
+- FIREBASE_APP_ID
+- Firebase service account JSON
+- Authentication and email verification configuration
+
+Cloudflare R2
+
+- R2_ACCOUNT_ID
+- R2_BUCKET
+- R2_ACCESS_KEY_ID
+- R2_SECRET_ACCESS_KEY
+- Optional custom media domain
+
+Livestream Provider
+
+- LIVESTREAM_PROVIDER
+- Required Cloudflare Stream API credentials/token, determined from the existing backend implementation.
+
+Keep the existing in-app camera separate from Cloudflare Stream.
+
+Google Play Billing
+
+- GOOGLE_PLAY_PACKAGE_NAME
+- GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+- Real Play product IDs (PLAY_PRODUCT_*)
+
+Push Notifications
+
+- FIREBASE_VAPID_KEY
+- FIREBASE_MESSAGING_SENDER_ID
+- FIREBASE_APP_ID
+- FIREBASE_SERVICE_ACCOUNT_JSON
+
+Inspect the existing implementation to identify any additional required fields. Do not invent credential names or product IDs.
+
+2. CONFIGURATION FORM DESIGN
+
+Inside each existing integration card, provide:
+
+- Clearly labelled input fields.
+- Appropriate text or password input types.
+- Multiline JSON editor for service account credentials.
+- Show/hide password option.
+- Save Configuration button.
+- Test Connection button.
+- Edit Configuration option.
+- Clear status indicators.
+
+Use the existing Infrastructure design language and theme.
+
+Keep the forms compact and organized. Allow each integration card to expand and collapse independently.
+
+3. SECURE CONFIGURATION STORAGE
+
+This is critical.
+
+- Never expose secret credentials in frontend JavaScript.
+- Never store service account private keys or secret access keys in localStorage or sessionStorage.
+- Store secrets securely on the server.
+- Use encrypted persistent storage or a secure server-side secrets manager appropriate to the existing architecture.
+- Do not rely on temporary server memory.
+- Ensure saved credentials survive application restarts and deployments.
+- Never return secret values through frontend APIs.
+- Mask previously saved secrets when reopening forms.
+- Never log credentials or private keys.
+- Validate JSON credentials before saving.
+
+Firebase web configuration values should be handled according to Firebase's intended public configuration model, while privileged service account credentials remain server-side.
+
+4. CONNECTION TESTING
+
+Each integration must have an independent Test Connection action.
+
+The test must actually communicate with the relevant service using the saved credentials.
+
+Display:
+
+- Connection successful.
+- Connection failed.
+- Missing credentials.
+- Invalid credentials.
+- Insufficient permissions.
+- Specific actionable error messages without exposing secrets.
+
+Do not show successful status merely because fields contain text.
+
+5. ACTIVATION CONTROLS
+
+Preserve the existing Activation section and its switches.
+
+An integration can only be activated after:
+
+1. Required configuration is complete.
+2. Credentials are validated.
+3. The actual server-side connection test succeeds.
+
+Each integration must have independent activation.
+
+Turning off one integration must not affect other integrations or existing wedding functionality.
+
+6. SAFE OPERATION
+
+- Do not automatically migrate wedding photos or videos.
+- Do not automatically change the current livestream provider.
+- Do not enable Google Play Billing without verified Play Console configuration.
+- Do not change existing authentication methods when configuring Firebase.
+- Do not alter existing database records.
+- Do not request unnecessary permissions.
+- Preserve current functionality until an integration is deliberately activated.
+
+7. IMPLEMENTATION
+
+Inspect the existing source code, backend API structure, database and Infrastructure components before editing.
+
+Reuse the existing architecture wherever possible.
+
+Implement secure backend endpoints for saving, retrieving configuration status, testing connections, updating and activating integrations.
+
+Use server-side validation and proper authorization. Only authorized developer/admin accounts may access these controls.
+
+8. VERIFICATION
+
+Test each integration independently.
+
+Verify:
+
+- Credentials save successfully.
+- Saved configurations persist after page reload and deployment.
+- Secret values remain masked.
+- Invalid credentials are rejected.
+- Connection testing reports actual results.
+- Activation is blocked when configuration is incomplete.
+- Existing Infrastructure status displays remain accurate.
+- Other Wedding Circle features continue working.
+
+Do not use mock connection results or hardcoded successful responses.
+
+STRICT RESTRICTION
+
+Do not redesign Developer Settings.
+
+Modify only the existing Developer Settings → Infrastructure section and the backend functionality required to support it.
+
+Implement the actual working configuration system, not just visual input fields.
+
+Report modified files, database changes, security measures and actual test results.

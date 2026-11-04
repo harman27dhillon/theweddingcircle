@@ -1,0 +1,370 @@
+Update the EXISTING The Wedding Circle application.
+
+BATCH 2: CAMERA CAPTURE AND VOICE NOTES
+
+Implement real, working camera capture and voice-note functionality
+within the existing Feed composer.
+
+This is a focused implementation task. Do not start Batch 3
+or modify the live-streaming architecture.
+
+==================================================
+IMPORTANT DEVELOPMENT RULES
+==================================================
+
+1. Inspect the existing camera, upload, Feed composer, message model,
+   authentication, storage, and media-upload implementations first.
+
+2. Reuse the existing architecture wherever possible.
+
+3. Preserve all existing user data, wedding memberships, authentication,
+   authorization, themes, Side Color preferences, and Feed functionality.
+
+4. Do not replace working functionality with mockups or placeholders.
+
+5. Do not introduce a new backend or storage provider unless the current
+   implementation genuinely cannot support the requirements.
+
+6. Do not create a separate messaging system. Voice notes must integrate
+   with the existing Feed conversation and message storage.
+
+7. Avoid unnecessary dependencies and heavy UI effects.
+
+8. Prioritize reliability, mobile compatibility, responsive controls,
+   and efficient media uploads.
+
+9. Do not begin Batch 3, including four-stream concurrency or
+   YouTube Live integration.
+
+10. Do not declare a feature complete merely because its UI exists
+    or TypeScript compiles.
+
+==================================================
+PART A — FIX THE FEED CAMERA
+==================================================
+
+CURRENT PROBLEM:
+The Camera action in the Feed does not work correctly.
+
+Trace the existing camera action from the plus (+) menu through
+the event handler and into the actual media-capture implementation.
+
+Identify and fix the underlying cause.
+
+REQUIRED BEHAVIOR:
+
+1. When the user selects Camera from the Feed's plus menu,
+   open a real camera-capture interface.
+
+2. On supported mobile devices, open the camera in portrait orientation
+   where the platform permits it.
+
+3. Prefer the rear-facing camera by default.
+
+4. Provide a camera-switch control when supported.
+
+5. Allow the user to capture a photograph.
+
+6. If video recording is already supported by the existing camera
+   workflow, preserve and repair it. Do not unnecessarily remove it.
+
+7. Display the captured media in a preview before uploading.
+
+8. Provide clear actions:
+   - Retake
+   - Cancel
+   - Use Photo / Continue
+
+9. After confirmation, pass the captured media into the EXISTING
+   upload and publishing workflow.
+
+10. Do not automatically publish media before user confirmation.
+
+11. Preserve the existing upload progress, error handling, and
+    publication behavior.
+
+12. Close the camera cleanly when the user cancels, finishes, or
+    navigates away.
+
+13. Release camera tracks and other media resources when no longer used.
+
+14. Handle camera permission denial, unavailable hardware, unsupported
+    browser APIs, and capture failures gracefully.
+
+15. Do not display a permanently loading camera if access fails.
+    Show a useful error and a way to return to Feed.
+
+TECHNICAL INVESTIGATION:
+
+Check:
+- Whether the application runs in a browser, installed PWA, or WebView.
+- Whether camera access uses getUserMedia, file input with capture,
+  or an existing native bridge.
+- Whether the current environment supports the selected capture method.
+- Whether permissions, HTTPS requirements, or event-handler errors
+  prevent camera initialization.
+- Whether navigation unmounts the camera before initialization finishes.
+- Whether captured media uses a compatible format for the existing
+  upload pipeline.
+
+Choose the most reliable supported capture method for the current
+application environment.
+
+Do not assume a browser camera API works in every Android WebView.
+
+If the environment cannot provide the requested camera behavior,
+implement the best supported fallback and clearly document the limitation.
+
+==================================================
+PART B — ADD REAL VOICE NOTES
+==================================================
+
+Add a microphone button to the existing Feed composer.
+
+The composer should remain compact and consistent with the existing
+The Wedding Circle design.
+
+LAYOUT:
+
+- Plus (+) button for Upload and Camera.
+- Message input.
+- Microphone button for voice notes.
+- Existing Send button behavior when text is entered.
+
+Adapt the layout to narrow screens without overlapping the keyboard
+or making the message input unusably small.
+
+Do not add a separate permanent recording panel that consumes
+unnecessary screen space.
+
+==================================================
+PART C — VOICE RECORDING INTERACTION
+==================================================
+
+When the user taps the microphone button:
+
+1. Request microphone permission if permission has not already been granted.
+
+2. Begin actual audio recording after permission is granted.
+
+3. Display a clear recording indicator and elapsed duration.
+
+4. Provide an obvious Cancel action.
+
+5. Provide an obvious Stop/Finish action.
+
+6. Prevent accidental duplicate recording sessions.
+
+7. Stop recording if the user explicitly cancels or leaves the recording
+   interface.
+
+8. Release microphone resources after recording finishes or is canceled.
+
+9. Handle permission denial, unsupported recording APIs, interrupted
+   recordings, and microphone failures without crashing the Feed.
+
+10. Do not automatically send audio merely because recording stops.
+
+The user must have control over whether a recording is sent.
+
+==================================================
+PART D — PREVIEW BEFORE SENDING
+==================================================
+
+After recording finishes, provide a compact preview interface.
+
+Required controls:
+- Play/Pause.
+- Recording duration.
+- Record again.
+- Delete/Cancel.
+- Send voice note.
+
+Requirements:
+- Let the user listen before sending.
+- Do not upload discarded recordings.
+- Do not send a recording until the user confirms.
+- Prevent accidental duplicate submissions.
+- Show an upload-progress state when the voice note is sent.
+- Show a recoverable error if the upload fails.
+- Preserve the recording temporarily when a retry is possible.
+
+Keep this interface simple and responsive.
+
+Do not create a decorative waveform that falsely suggests audio
+is available when no valid recording exists.
+
+A lightweight waveform or audio-level visualization is optional,
+not required.
+
+==================================================
+PART E — AUDIO STORAGE AND MESSAGE INTEGRATION
+==================================================
+
+Inspect the existing Feed message model and media storage pipeline.
+
+Integrate voice notes into the same authorized wedding conversation
+system used by existing messages.
+
+Each voice-note message should store the appropriate metadata, such as:
+
+- Unique message ID.
+- Wedding ID.
+- Sender ID.
+- Creation timestamp.
+- Message type identifying it as audio.
+- Audio storage reference or authorized media URL.
+- Audio duration.
+- Upload or processing status where required.
+
+Reuse the existing field conventions and data model wherever possible.
+
+Do not store large audio blobs directly inside database documents
+or ordinary message records.
+
+Store audio files using the existing supported media-storage mechanism.
+
+Persist the message record only according to the existing application's
+reliable upload-and-publish flow.
+
+Handle failures carefully:
+- If audio upload fails, do not publish a broken playable message.
+- If message creation fails after upload, avoid creating permanent
+  orphaned files where cleanup is supported.
+- If retries occur, avoid creating duplicate messages.
+- Never expose private storage credentials or privileged service keys
+  to the client.
+
+Preserve wedding membership checks and access permissions.
+
+Only authorized members of the relevant wedding should be able to
+access its private voice notes.
+
+Do not accidentally make private wedding audio publicly accessible
+by removing or weakening existing storage policies.
+
+==================================================
+PART F — VOICE NOTE PLAYBACK
+==================================================
+
+Display sent voice notes as compact audio-message bubbles within Feed.
+
+The interface should include:
+- Play/Pause control.
+- Audio duration.
+- Playback progress.
+- Appropriate loading and error states.
+
+Requirements:
+- Play the actual uploaded recording.
+- Allow pausing and resuming.
+- Avoid playing multiple voice notes simultaneously unless the existing
+  product explicitly supports that behavior.
+- Stop or pause playback appropriately when navigating away.
+- Handle unavailable media, expired URLs, network errors, and deleted
+  recordings gracefully.
+- Preserve chronological message order.
+- Do not interfere with existing text messages, photo posts, or videos.
+
+Support both light and dark modes and preserve the current wedding theme
+and Side Color selection.
+
+Keep the interface lightweight.
+
+==================================================
+PART G — MOBILE COMPATIBILITY
+==================================================
+
+Test the camera and microphone workflows on the application's
+actual target environment.
+
+Pay particular attention to Android devices and the installed
+application/PWA experience.
+
+Check:
+- Camera and microphone permission requests.
+- HTTPS and WebView restrictions.
+- Recording format support.
+- Audio playback compatibility.
+- File upload compatibility.
+- Keyboard interaction with the Feed composer.
+- Correct cleanup after navigation.
+- Behavior when the app is backgrounded or interrupted.
+
+Do not promise that recording continues when the operating system
+suspends or terminates the app.
+
+If an interrupted recording cannot be recovered, handle it clearly
+rather than leaving a false recording state.
+
+==================================================
+PART H — TESTING
+==================================================
+
+Run the applicable checks in the existing project.
+
+At minimum, verify:
+
+CAMERA:
+1. Open Feed.
+2. Open the plus menu.
+3. Select Camera.
+4. Grant camera permission.
+5. Capture a photo.
+6. Preview the photo.
+7. Retake the photo.
+8. Capture again and confirm.
+9. Verify the existing upload flow receives the correct file.
+10. Cancel and confirm camera resources are released.
+11. Test permission denial and unavailable-camera errors.
+
+VOICE NOTES:
+1. Tap the microphone.
+2. Grant microphone permission.
+3. Record a short voice note.
+4. Stop recording.
+5. Play the preview.
+6. Pause and resume.
+7. Record again.
+8. Cancel a recording and confirm it is not sent.
+9. Send a voice note.
+10. Verify the uploaded audio and message persist after refresh.
+11. Play the sent recording from the Feed.
+12. Verify another authorized wedding member can access and play it.
+13. Verify an unauthorized user cannot access the private recording.
+14. Test an upload failure and a retry.
+15. Confirm repeated taps do not create duplicate recordings or messages.
+
+REGRESSION TESTS:
+- Text messages still work.
+- Image and video uploads still work.
+- Side Color remains unchanged.
+- Existing wedding data and memberships remain intact.
+- Feed chronological order remains correct.
+- The composer remains usable with the mobile keyboard open.
+- Camera and microphone resources are released correctly.
+
+Run the available type checks, lint checks, and automated tests.
+
+Clearly distinguish automated tests from tests performed on a real device
+or with multiple authenticated users.
+
+==================================================
+FINAL REPORT
+==================================================
+
+When finished, report:
+
+1. Root cause of the original camera failure.
+2. Files changed.
+3. Camera implementation and supported capture method.
+4. Voice-note recording and storage implementation.
+5. Any database or storage-policy changes.
+6. Tests actually executed and their results.
+7. Known device/browser limitations.
+8. Any remaining unverified behavior.
+
+Do not begin Batch 3.
+
+Start by inspecting the existing implementation, then implement and
+verify the smallest reliable solution.

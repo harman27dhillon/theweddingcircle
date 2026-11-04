@@ -1,0 +1,20 @@
+Fix Ceremony Cover Images Across ALL Classic Themes
+
+The ceremony cover images were applied only to Classic Default and Classic Ivory. This is incomplete. Fix the implementation so the same default ceremony image mappings work across every theme whose name or theme category identifies it as a Classic theme, including any existing and future Classic theme variants.
+
+- Nikah: use the first attached ceremony image.
+- Anand Karaj: use the second attached ceremony image.
+- Doli: use the third attached ceremony image.
+- Mehndi/Henna and recognized cultural equivalents: use the previously configured Mehndi image.
+
+Implementation requirements:
+
+1. Identify the shared ceremony-bar rendering component and theme-independent ceremony image mapping. Apply the defaults through shared logic rather than hardcoding them only into Classic Default and Classic Ivory.
+2. Cover all existing Classic variants, including Classic Default, Classic Ivory, and any other Classic themes already registered in the application.
+3. Ensure the images appear automatically on existing and newly created weddings using any Classic theme, wherever those ceremony bars are displayed.
+4. Do not change the visual design, colors, typography, or backgrounds of individual themes. Each image must blend naturally with its selected theme.
+5. Keep custom user-selected ceremony covers intact and provide the existing option to restore the appropriate default.
+6. Do not modify non-Classic themes or unrelated features.
+7. Avoid duplicating ceremony records or image mappings for individual themes. Use one centralized, reusable mapping system.
+
+Verify before finishing: Switch through every existing Classic theme and confirm that all four ceremony image mappings work correctly. Do not consider the task complete merely because the images appear in Classic Default and Classic Ivory. Fix the actual shared implementation, not just the preview.

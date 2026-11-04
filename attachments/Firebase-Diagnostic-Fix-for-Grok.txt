@@ -1,0 +1,109 @@
+FIREBASE DIAGNOSTIC FIX — INSTRUCTIONS FOR GROK BUILD
+
+Apply ONLY the source-code patch below to src/lib/developer/cloud.ts in this existing project. It is based on the updated source archive supplied on 3 November 2026. If the file differs, merge these two changes into interpretFirebaseProject(); do not overwrite unrelated work or apply the older broad fix package.
+
+PRESERVE ALL EXISTING CREDENTIALS AND CONFIGURATION
+- Do not change, delete, replace, regenerate or rotate any API key, service-account JSON, private key, token, password, signing secret or vault encryption key.
+- Do not overwrite hosting environment variables or saved database/vault settings.
+- Do not change Firebase project settings, API restrictions, authorized domains, IAM permissions, Authentication providers, DNS or Cloudflare settings.
+- Do not clear the vault, re-save credential forms, run configuration reset commands or migrate data.
+- Do not print credential values, request URLs containing keys, raw Google response bodies, or arbitrary provider metadata in logs or UI.
+
+WHY THIS PATCH IS NEEDED
+interpretFirebaseProject currently shortens Google's response to 240 characters through redactCloud(), THEN looks for restriction reasons. A reason appearing later is lost, leading to the misleading generic "Firebase rejected the web API key" message. This was reproduced using synthetic data, not production credentials.
+
+WHAT TO CHANGE
+1. Classify restrictions using the full response body, without displaying that body.
+2. For HTTP 400/401/403, return only a recognized, allowlisted Google error code and a fixed safe explanation. Never echo arbitrary provider text. Existing successful-response/project matching logic and the needs_setup handling remain in place.
+
+VALIDATE BEFORE PUBLISHING
+- Add/run regression tests for a restriction reason appearing after character 240, API_KEY_SERVICE_BLOCKED, API_KEY_INVALID, generic PERMISSION_DENIED, malformed response JSON and HTTP 401.
+- Confirm fake secrets placed in response metadata do not appear in returned diagnostic messages.
+- Run the project's type check and build. Report failures rather than silently changing unrelated files.
+- Publish the updated app through the normal Grok Build process. Do not change credentials as part of publishing. Normal existing build checks may run; this patch requires no new migration.
+- After publishing, ask the owner to press Test connection again. Display the NEW check timestamp and diagnostic so an older stored error is not mistaken for a new response. Do not erase stored checks automatically.
+- The current Firebase test performs more than the initial web-key request and may fall back to a synthetic password sign-in probe. Do not automatically run live provider tests merely to validate this code patch.
+
+IMPORTANT LIMIT
+This patch improves diagnosis. It does not guarantee that Firebase connectivity or email/password login works. If the next result identifies a genuine provider configuration problem, report it and wait for the owner's direction before changing account settings or credentials.
+
+EXACT UNIFIED DIFF TO APPLY
+==========================
+--- a/src/lib/developer/cloud.ts
++++ b/src/lib/developer/cloud.ts
+@@ -214,8 +214,8 @@
+ }
+ 
+ export function interpretFirebaseProject(status: number, body: string, projectId: string, secrets: string[], authDomain = "", projectNumber = "") {
+-  const safe = redactCloud(body, secrets);
+-  const refusal = firebaseWebRefusal(safe);
++  // Inspect the complete response before shortening it. Never expose the raw body.
++  const refusal = firebaseWebRefusal(body);
+   const wanted = normalizeProjectId(projectId);
+   if (status === 200) {
+     const id = firebaseProjectId(body);
+@@ -260,8 +260,62 @@
+   if (refusal === "disabled") {
+     return { state: "needs_setup" as const, detail: "The Identity Toolkit API is not enabled for this Google Cloud project. Enable identitytoolkit.googleapis.com, then run the test again. Nothing was switched." };
+   }
+-  if (status === 400 || status === 403) {
+-    return { state: "error" as const, detail: "Google API error: Firebase rejected the web API key. Check that it is the web apiKey, that Identity Toolkit is allowed, and that a service-account private key was not used. Email/Password was not checked." };
++  if (status === 400 || status === 401 || status === 403) {
++    const messages: Record<string, string> = {
++      API_KEY_INVALID:
++        "Google reports an invalid web API key. Check FIREBASE_API_KEY against the Firebase web app configuration.",
++      API_KEY_SERVICE_BLOCKED:
++        "This key's API restrictions block the requested service. Check that Identity Toolkit is allowed. Firebase Authentication also needs Token Service API.",
++      API_KEY_HTTP_REFERRER_BLOCKED:
++        "Google blocked this server-side check because of the key's website restrictions. This does not prove browser sign-in is broken. Keep the restrictions; check Authentication using the service account.",
++      API_KEY_IP_ADDRESS_BLOCKED:
++        "Google blocked this server's IP address under the key's application restrictions.",
++      SERVICE_DISABLED:
++        "Google reports that the requested API is disabled. Check Identity Toolkit in this Firebase project's Google Cloud console.",
++      PERMISSION_DENIED:
++        "Google denied this configuration check. This response alone does not prove the web API key is invalid.",
++      INVALID_ARGUMENT:
++        "Google rejected a request parameter. Check the saved web configuration and the configuration-check request.",
++      UNAUTHENTICATED:
++        "Google could not authenticate this configuration-check request.",
++    };
++
++    let reason = "";
++    try {
++      const parsed = JSON.parse(body) as {
++        error?: {
++          status?: unknown;
++          message?: unknown;
++          details?: Array<{ reason?: unknown } | null>;
++        };
++      };
++      const error = parsed.error;
++      const candidates: unknown[] = [
++        ...(Array.isArray(error?.details)
++          ? error.details.map((item) => item?.reason)
++          : []),
++        error?.message,
++        error?.status,
++      ];
++      reason = candidates.find(
++        (value): value is string =>
++          typeof value === "string" &&
++          Object.prototype.hasOwnProperty.call(messages, value),
++      ) || "";
++    } catch {
++      // Never expose unstructured provider responses.
++    }
++
++    const explanation = reason
++      ? messages[reason]
++      : "Google refused the configuration check without a recognized error code. The key has not been proven invalid.";
++    return {
++      state: "error" as const,
++      detail:
++        `Firebase configuration check failed (HTTP ${status}` +
++        `${reason ? `; ${reason}` : ""}). ` + explanation +
++        " Email/Password was not checked.",
++    };
+   }
+   return { state: "error" as const, detail: `Google API error: Firebase project check failed (HTTP ${status}). Email/Password was not checked.` };
+ }

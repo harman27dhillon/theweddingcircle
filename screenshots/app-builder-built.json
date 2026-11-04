@@ -1,0 +1,41 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Wedding Circle",
+      "hasCanvas": false,
+      "bodyTextLen": 477,
+      "bodyTextHash": "32215c87073253b12fd5392a1acffe8fa7b940d7d9ef033a4fd5402bdb96b29a",
+      "bodyTextPrefix": "The Wedding Circle Nico & Lila Chat Live 14 November 2026 | Ceda",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Wedding Circle",
+      "hasCanvas": false,
+      "bodyTextLen": 351,
+      "bodyTextHash": "03c3be76fecff061ea3d5ff049db7eb713ddee87cfac2cb6d1e5737c9b4c3f74",
+      "bodyTextPrefix": "The Wedding Circle Leaderboard Nico & Lila Chat Live 14 November",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: body text changed (426 -> 477 chars, hash mismatch)",
+    "mobile: body text changed (300 -> 351 chars, hash mismatch)"
+  ]
+}

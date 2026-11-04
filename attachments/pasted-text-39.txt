@@ -1,0 +1,58 @@
+Update the existing Wedding Circle application to use the wedding's cover image as a shared, elegant, blurred background across every page inside that wedding.
+
+1. Background implementation
+
+- Use the existing wedding cover image as the background source.
+- Apply it consistently to Home, Chat, Live, Album, More, Host Control, and other pages within the same wedding.
+- Keep the background fixed and continuous while navigating between pages, where technically appropriate.
+- Use "background-size: cover", centered positioning, and responsive behavior.
+- Do not stretch or distort the original image.
+- Use a shared background component or existing app architecture rather than duplicating background logic on every page.
+
+2. Premium blurred appearance
+
+- Apply a tasteful blur to the background image so it adds atmosphere without competing with content.
+- Add a theme-aware overlay above the image, using the active theme's colors and suitable opacity.
+- Ensure text, icons, chat messages, cards, buttons, forms, and navigation remain crisp and readable.
+- Keep important interactive elements on their existing layers above the background.
+- Avoid excessive blur, darkening, or visual noise.
+
+3. Theme compatibility
+
+The background must work with every existing Wedding Circle theme, including burgundy, sage green, royal blue, midnight emerald, pastel blush, classic ivory, and dark themes.
+
+- Preserve the original cover image's natural colors where visible.
+- Automatically adapt the overlay to the currently selected theme.
+- Do not hardcode a single navy, grey, or cream background.
+- Do not generate separate background images for individual themes.
+- Maintain sufficient contrast in both light and dark modes.
+
+4. Layout and performance
+
+- Preserve all existing page layouts, dimensions, spacing, typography, animations, navigation, and functionality.
+- Keep the bottom navigation and status-bar areas visually consistent with the active theme.
+- Avoid background flickering or reloading during page transitions.
+- Use appropriate image optimization, caching, and loading placeholders.
+- Respect mobile performance and reduced-motion/accessibility preferences.
+- Prevent the background from blocking scrolling, clicks, gestures, or camera/live-stream interactions.
+
+5. Wedding-specific behavior
+
+- Each wedding must display its own cover image as its shared background.
+- If no cover image exists, fall back gracefully to the existing theme background.
+- If the host changes the wedding cover image, update the background without breaking the current session.
+- Keep existing permissions: only authorized users should be able to change the cover image or theme.
+
+6. Implementation safeguards
+
+- Inspect the existing code and identify the actual shared layout, theme system, wedding data model, and background-image source before making changes.
+- Reuse existing components and data wherever possible.
+- Do not introduce duplicate state, unnecessary dependencies, or a new storage system.
+- Do not change the ceremony cards, ceremony-specific images, or their text and buttons as part of this task.
+- Do not remove or rewrite existing features.
+
+7. Verification
+
+Test all major pages, multiple themes, mobile screen sizes, page transitions, and weddings with and without cover images. Confirm that text remains readable and that chat, live streaming, album gestures, and navigation continue working.
+
+Implement the changes in the existing project, then report which files were changed and any remaining limitations.

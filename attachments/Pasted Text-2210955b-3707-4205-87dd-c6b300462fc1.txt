@@ -1,0 +1,50 @@
+Update the existing Wedding Circle app to fix the following UI issues. Inspect the current components and camera flow first, then make targeted changes. Preserve existing wedding data, authentication, permissions, navigation, and working features.
+
+1. REMOVE THE “YOU’RE HOSTING THIS WEDDING” PANEL FROM THE LANDING PAGE
+- Remove the hosting-status panel currently displayed directly beneath a wedding card.
+- Do not replace it with another banner or blank placeholder.
+- Keep host status and host-only controls accessible in the appropriate existing Host Control/account area.
+- Do not remove the user's actual host role or change authorization logic.
+- Ensure the next wedding card moves up naturally, with consistent spacing.
+
+2. FIX THE RETAKE BUTTON LABEL
+- In the camera photo-review/preview screen, the Retake button is visible but its text label is missing or unreadable.
+- Inspect the real button's styles, contrast, sizing, clipping, opacity, and stacking.
+- Fix the underlying cause so “Retake” is clearly readable, with adequate contrast and a comfortable tap target.
+- Keep its existing retake action and photo-review flow. Do not add duplicate overlay text or a fake button.
+
+3. LIVE-STREAM CAMERA CONTROLS: FLOATING ROUND BUTTONS OVER THE PREVIEW
+- Apply this layout both before starting a live stream (camera setup/preview) and after the stream is live.
+- Place the existing bottom-row option controls directly ON TOP OF the camera preview, aligned along its lower edge.
+- Make all 4 or 5 existing option buttons identical in size, circular, touch-friendly floating buttons.
+- Use clear icons and accessible labels/tooltips as appropriate.
+- Do not create a separate toolbar background, panel, opaque strip, or new background behind these buttons. The buttons should float over the camera image itself.
+- Use subtle outlines/shadows only if needed for readability, while keeping the preview visible behind and around them.
+- Keep the buttons evenly spaced, within screen safe areas, and prevent them from covering important faces or content more than necessary.
+- Preserve each button’s existing action. Do not invent new controls or remove existing options.
+- Make sure controls remain usable in portrait mode and on narrow Android screens.
+- The same visual treatment and positioning should remain consistent before going live and while live, while preserving any state-dependent actions/availability.
+
+4. OPEN CAMERA PREVIEW FULL-SCREEN BY DEFAULT, WITH USER-SELECTABLE ASPECT RATIO
+- When the user opens the camera, make the camera preview occupy the full available screen area by default, edge-to-edge within the app’s safe areas.
+- Remove unintended blank margins, empty padding, or unused surrounding space. Do not stretch or distort the camera feed.
+- Provide an aspect-ratio selector before taking a photo. Offer practical options such as:
+  • 9:16 portrait
+  • 3:4 portrait
+  • 1:1 square
+  • 4:3 landscape
+  • 16:9 landscape
+- Clearly indicate the currently selected ratio and update the framing preview when the user changes it.
+- Treat aspect ratio as a framing/crop choice; do not assume the camera hardware can natively output every ratio.
+- Preserve the correct upright live-preview orientation. Do not introduce a fixed rotation that could recreate the sideways-preview bug.
+- Apply the selected framing consistently to the captured photo, using a correct crop rather than stretching.
+- If video recording uses the same camera UI, ensure the selected ratio behaves appropriately for video too, or clearly limit the ratio selector to photo mode if the current recording pipeline cannot support it safely.
+- Keep capture, retake, camera switching, and existing permissions working.
+
+IMPLEMENTATION AND TESTING
+- Inspect the current code and identify the root cause of the Retake label issue and any layout constraints affecting the camera.
+- Reuse existing camera and live-stream components; do not create parallel implementations.
+- Make the smallest reliable changes and avoid unrelated redesigns.
+- Test the landing page on mobile, Retake label visibility, camera preview full-screen behavior, each available aspect ratio, and the floating controls both before and during a live stream.
+- Test on the affected Android device if possible. If physical-device testing is unavailable, state that clearly.
+- Report what changed, what was actually tested, and any remaining limitations. Do not claim a fix is verified unless it was tested.

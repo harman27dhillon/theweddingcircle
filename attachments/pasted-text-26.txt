@@ -1,0 +1,62 @@
+Fix Shared Theme Contrast and Bottom Navigation Bar Across All Wedding Themes
+
+Inspect the attached video and the actual Wedding Circle code. The theme and navigation problems affect all themes, not just Royal Burgundy. Implement the fixes directly.
+
+1. Fix the bottom navigation bar — highest priority
+
+The bottom navigation bar containing Home, Chat, Live, Album, and More is not behaving consistently. In the Album section, it disappears in some states and leaves a large blank area below the album content.
+
+Investigate the actual cause, including:
+
+- Conditional rendering that hides the navigation on particular routes or tabs.
+- Incorrect positioning, height calculations, or overflow rules.
+- Conflicts between "100vh", "100dvh", mobile browser viewport sizing, and the Android system navigation bar.
+- Nested scrolling containers or page wrappers that push the navigation off-screen.
+- Theme-specific CSS that changes visibility, stacking order, positioning, or background colors.
+- Component remounts and navigation state changes that cause the bar to disappear temporarily.
+
+Required behavior:
+
+- Keep the bottom navigation visible and fixed to the bottom of the wedding app viewport across Home, Chat, Live, Album, and More.
+- Account correctly for mobile safe areas and Android system navigation controls so the app navigation is not covered or pushed off-screen.
+- Reserve enough content space above the bar so the last photo, message, or card can still be reached by scrolling.
+- Ensure the bar does not overlap the chat composer, Live controls, Album photos, or other interactive elements.
+- Keep the active-tab indicator synchronized with the current section.
+- Preserve swipe navigation, tap navigation, and all existing functionality.
+- Prevent the bar from disappearing during tab changes, theme changes, refreshes, or component rerenders.
+- On desktop, retain the existing intended layout rather than forcing a mobile-only bottom bar if the desktop design uses different navigation.
+
+2. Fix theme contrast globally
+
+The low-contrast heading and text issues shown in the Album are symptoms of the shared theme styling. Inspect every existing theme and fix the underlying theme-token or component-level issue.
+
+- Make page headings, descriptions, labels, icons, buttons, and navigation indicators readable against their actual backgrounds.
+- Ensure theme-specific text colors are applied to all wedding sections, including Home, Chat, Live, Album, More, Host Control, dialogs, and overlays.
+- Avoid hardcoding one dark text color for every theme. Use appropriate foreground colors for light and dark backgrounds.
+- Preserve each theme's individual visual identity, floral decorations, artwork, typography, and animations.
+- Do not solve contrast issues by removing all theme decoration or replacing the design with a generic palette.
+
+3. Album heading cleanup
+
+- Remove “The album”, its introductory description, and “The rest of the day”.
+- Display only one heading: “Album”.
+- Use a clearly readable, theme-appropriate foreground color.
+- Keep the existing photo grid, photo count, Save buttons, and media functionality unchanged.
+- Remove excess spacing left by the deleted text.
+
+4. Verify the actual fix
+
+Test all five navigation sections across the existing themes on Android mobile and desktop.
+
+Specifically verify:
+
+1. The bottom navigation remains visible when opening Album.
+2. Scrolling to the last album photo does not hide the navigation or leave an unexplained blank region.
+3. Switching between Home, Chat, Live, Album, and More does not make the bar disappear.
+4. Switching themes does not alter navigation visibility or position.
+5. Chat input and Live controls remain accessible above the navigation bar.
+6. Headings and controls remain readable in light and dark themes.
+
+Run the available build and type checks. Report the root cause and the files changed.
+
+Scope: Fix the shared navigation and theme-rendering problems. Do not redesign the app, change wedding data, or remove existing features.

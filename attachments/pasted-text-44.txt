@@ -1,0 +1,185 @@
+Wedding Circle — Host Control UI & Wedding Bar Customization Fixes
+
+Modify the existing Wedding Circle project directly. Inspect the current code and component structure before making changes. Preserve all existing working functionality, wedding data, permissions, themes, animations, and responsive behavior unless a change is explicitly requested below.
+
+1. Host Control — Square Buttons with Soft Edges
+
+Redesign the Host Control main menu. Every existing feature visible in the supplied Host Control screenshot must have its own individual button.
+
+- Replace the current long, full-width accordion rows with a clean grid of square or near-square buttons with softly rounded corners.
+- Use a premium, elegant wedding-app appearance with balanced spacing, subtle borders, restrained shadows, and the existing theme colors.
+- Keep button dimensions consistent and text legible.
+- Each button must have its own appropriate title and, if suitable, a small existing icon.
+- Arrange buttons in a responsive grid: multiple columns on desktop and an appropriate number on mobile.
+- Ensure every feature remains accessible. Long titles must wrap cleanly without clipping or overflowing.
+- Clicking a button must open its corresponding existing settings panel. Do not remove or disable any existing Host Control functionality.
+- Keep all existing permission checks intact.
+
+Include a separate Wedding Bar button as described in Section 4.
+
+2. Theme & Appearance — Separate Preset Themes and Classic Themes
+
+Inside the existing Theme & Appearance button, create two clearly separated sections:
+
+Section A: Preset Themes
+
+Display all existing themes that do not have the word “Classic” in their name.
+
+Section B: Classic Themes
+
+Display every existing theme whose name contains the word “Classic”, including Classic Default and Classic Ivory.
+
+Requirements:
+
+- Classify themes using their actual names; do not manually duplicate themes between sections.
+- Preserve all existing theme names, artwork, palettes, effects, music mappings, and theme-selection behavior.
+- Selecting a theme must still apply it correctly across the entire wedding experience, not just one screen.
+- Keep the existing selected-theme indicator and make both sections easy to distinguish.
+- Do not delete, rename, recreate, or replace any existing themes.
+
+3. Move Background Controls and Remove the Guest Button
+
+Background
+
+Move the existing Background button and its functionality from More into the Developer section.
+
+- Preserve its current behavior and settings.
+- Ensure only appropriately authorized developer accounts can access it.
+- Remove the old Background entry from More after moving it so there is only one entry.
+
+Guest
+
+Remove the existing Guest button from the More section.
+
+- Remove only that button from the More interface.
+- Do not break guest access, invitation codes, family membership, permissions, or any backend functionality that other parts of the application rely on.
+- Do not delete unrelated guest-management features in Host Control.
+
+4. Add a Dedicated “Wedding Bar” Button to Host Control
+
+Create a new Host Control button named exactly Wedding Bar.
+
+This must open a dedicated configuration panel where authorized hosts and co-hosts can customize the wedding cover bar, regardless of whether the wedding uses a Preset theme or a Classic theme.
+
+A. Change the cover photo
+
+Allow hosts and co-hosts to:
+
+- Upload or select a replacement cover photo using the project's existing image-selection and storage mechanisms.
+- Preview the image before applying it.
+- Save the new cover photo and see it reflected in the wedding bar.
+- Replace the photo again later.
+
+The cover photo must remain customizable independently of the selected theme. Changing the theme must not silently overwrite the host's chosen cover photo.
+
+Preserve existing photo validation, upload limits, storage behavior, and error handling. Do not introduce a new paid storage service or hard-code image URLs.
+
+B. Freely position the couple's names
+
+Allow hosts and co-hosts to reposition the couple's name text anywhere within the wedding bar.
+
+- Provide a straightforward visual positioning interface, preferably drag-and-drop directly on a live preview.
+- Keep the names within the wedding-bar boundaries.
+- Save horizontal and vertical positions in a responsive way so they remain sensible on mobile and desktop.
+- Preserve the existing typography, font choices, colors, text effects, and line breaks unless the host explicitly changes them.
+- Do not force names into a fixed left, center, or right alignment.
+
+C. Freely position the wedding date
+
+Provide the same independent positioning controls for the wedding date.
+
+- Hosts and co-hosts must be able to move it anywhere within the wedding bar.
+- The date must remain visible and must not be clipped by the bar's edges.
+- Save and restore its position correctly.
+
+D. Freely position the wedding location
+
+Provide the same independent positioning controls for the wedding location.
+
+- Hosts and co-hosts must be able to move it anywhere within the wedding bar.
+- Keep it independently positionable from the names and date.
+- Save and restore its position correctly.
+
+E. Preview, save, and reset
+
+- Show an accurate live preview of the actual wedding bar while editing.
+- Make it clear which element is currently selected.
+- Provide Save and Cancel controls.
+- Provide a reset-to-default-position option for each text element.
+- Save the configuration persistently using the project's existing database and API architecture, not just component state or local storage.
+- Ensure changes survive refreshes, sign-outs, and visits from other authorized devices.
+- Ensure hosts and co-hosts can edit only weddings they are authorized to manage.
+- Guests and ordinary members must not be able to modify the cover photo or positioning by calling the API directly.
+- If a theme changes, retain the saved cover photo and element positions unless the user explicitly resets them.
+
+Do not implement fake controls or a preview that looks editable but does not save.
+
+5. Developer Controls — Pinned Wedding Bar Aspect Ratio
+
+Inside the existing Developer section, locate the current developer-only control for configuring the wedding-bar aspect ratio.
+
+Add a separate option named exactly:
+
+Pinned Wedding Bar Aspect Ratio
+
+Requirements:
+
+- This setting must independently control the aspect ratio of the wedding bar when it is pinned.
+- Keep the existing general wedding-bar aspect-ratio setting unchanged.
+- Allow the developer to configure and save the pinned-bar ratio independently.
+- Apply the setting only to pinned wedding bars; do not unintentionally resize regular wedding bars.
+- Preserve the existing pinned-wedding behavior and layout.
+- Ensure the ratio behaves correctly on mobile and desktop without distortion or unexpected cropping.
+- Persist the setting through the existing developer-settings mechanism.
+- Restrict editing to authorized developers, with server-side authorization checks.
+
+If the project already has a pinned-card or pinned-bar layout system, integrate with it rather than creating a competing implementation.
+
+6. Critical Desktop Fix — Restore the Slightly Cropped Left Floral Artwork
+
+Use the supplied screenshots to inspect the desktop wedding cover bar. In the close-up screenshot, the pointer identifies a small section of the floral artwork near the left side of the couple's names that appears slightly cropped or clipped.
+
+Fix only the actual clipping problem. Do not redesign or regenerate the flowers.
+
+Requirements:
+
+- Inspect the existing image asset, its container, CSS sizing, "object-fit" or "background-size", positioning, overflow rules, masks, clipping paths, border radius, and responsive styles.
+- Identify the precise cause of the clipping before changing anything.
+- Correct the relevant desktop positioning or clipping rule with the smallest safe change.
+- Preserve the exact existing floral artwork, colors, scale, composition, texture, transparency, and rendering style.
+- Do not add empty padding or margins around the wedding bar.
+- Do not shrink the floral artwork to make it appear less cropped.
+- Do not move the couple's names or alter their typography.
+- Do not change the wedding bar's overall dimensions or aspect ratio.
+- Do not affect the right floral corner, other corners, or mobile layout while fixing this specific left-side issue.
+- Keep the current visual composition intact.
+
+The goal is to restore the missing visible portion of the existing artwork while keeping everything else visually unchanged.
+
+7. Regression Checks and Acceptance Criteria
+
+After implementation, verify the following:
+
+1. Every existing Host Control feature appears as its own soft-cornered square or near-square button and opens the correct settings.
+2. Preset and Classic themes are separated correctly using the actual theme names.
+3. All existing themes and their functionality continue to work.
+4. Background appears in Developer, not More.
+5. The Guest button is removed from More without breaking guest access.
+6. The Wedding Bar editor supports cover-photo changes and independent positioning of names, date, and location.
+7. Wedding Bar settings persist after refreshing and signing in on another authorized device.
+8. Unauthorized users cannot modify wedding-bar settings through direct API requests.
+9. The pinned wedding-bar aspect ratio is independent of the regular aspect ratio.
+10. The left floral clipping issue is corrected on desktop without changing the artwork's rendering or adding empty corner space.
+11. Test the relevant changes on desktop and mobile at multiple viewport widths.
+12. Run the project's available type checks, tests, and production build. Fix regressions caused by these changes.
+
+Implementation rules
+
+- Work within the existing codebase and reuse existing components, theme definitions, APIs, database tables, and authorization mechanisms wherever possible.
+- Do not create duplicate settings systems or duplicate theme registries.
+- Do not remove unrelated functionality or overwrite existing user data.
+- Do not report a feature as complete unless it has actually been implemented and verified.
+- If a requested feature depends on a missing database field or API endpoint, implement the necessary migration and server-side validation using the existing architecture.
+- At the end, provide a concise report of the files changed, features completed, tests run, and anything that could not be verified.
+
+Implement these changes directly in the existing Wedding Circle project.

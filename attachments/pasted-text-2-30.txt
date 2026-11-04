@@ -1,0 +1,159 @@
+THE WEDDING CIRCLE — CHROME AND ANDROID BROWSER MEDIA UPLOAD FIX
+
+Investigate and fix the media selection, preparation, upload and retry failures occurring in Google Chrome on Android.
+
+IMPORTANT CONTEXT:
+
+- Multiple photo uploads work successfully in Samsung Internet.
+- The same workflow has failed in Google Chrome on Android.
+- The app uses private Cloudflare R2 storage and Supabase media metadata.
+- The current upload system includes file previews, preparation states, byte-transfer progress, retry and cancellation.
+- Do not assume this is an R2 problem. Identify the actual failure stage first.
+
+1. INVESTIGATE THE CHROME FAILURE
+
+Inspect the complete media lifecycle:
+
+1. Android file picker selection.
+2. File object acquisition.
+3. File reference and Blob availability.
+4. File type and MIME detection.
+5. Image/video preparation.
+6. Thumbnail generation.
+7. Upload request creation.
+8. Upload to private R2.
+9. Upload response handling.
+10. Supabase metadata creation.
+11. Private media retrieval and preview.
+
+Compare the working Samsung Internet flow with Chrome Android.
+
+Identify the exact reason Chrome fails. Do not apply random compatibility workarounds.
+
+2. ANDROID FILE HANDLING
+
+Inspect possible Chrome-specific issues involving:
+
+- File objects becoming unavailable after selection.
+- File references becoming invalid during asynchronous preparation.
+- Incorrect use of FileReader, Blob or object URLs.
+- Incorrect input element lifecycle or premature clearing.
+- MIME types missing or reported differently.
+- HEIC/HEIF image handling.
+- Large-file memory pressure.
+- File handles being accessed after their valid lifecycle.
+- Multiple selected files being processed concurrently.
+- Browser-specific permission and file-provider behaviour.
+
+Ensure the application retains valid file data throughout the complete upload lifecycle.
+
+Do not assume a selected file remains readable indefinitely without checking its actual availability.
+
+3. MULTIPLE FILE UPLOAD RELIABILITY
+
+Test selecting 2, 3, 4 and 10 files together in Chrome Android.
+
+Requirements:
+
+- Every selected file must retain its own valid reference.
+- Preparing one file must not invalidate another.
+- One failed file must not stop other uploads.
+- Retry must correctly reacquire or reuse the original available file data.
+- Upload progress must reflect actual transferred bytes.
+- Avoid duplicate uploads.
+- Do not mark a file uploaded until private storage confirms success.
+- Avoid loading all large files into memory simultaneously.
+
+Use controlled concurrency appropriate for mobile devices.
+
+4. IMAGE AND VIDEO COMPATIBILITY
+
+Test:
+
+- JPEG
+- PNG
+- WebP
+- HEIC/HEIF where supported
+- MP4
+- Large photos
+- Large videos
+- Mixed photo/video selections
+
+Preserve original media and MIME correctness.
+
+Do not accidentally treat videos as images or break existing optimization.
+
+5. PRIVATE STORAGE AND AUTHORIZATION
+
+Preserve existing:
+
+- Private R2 bucket.
+- Upload authorization.
+- Download tickets.
+- Supabase metadata.
+- CDN security and fallback.
+- Existing upload endpoint contracts.
+
+Do not make the R2 bucket public.
+
+Do not expose R2 credentials to the browser.
+
+Do not replace the working upload architecture merely to fix Chrome.
+
+6. ERROR HANDLING
+
+Provide meaningful error messages identifying the failed stage:
+
+- File selection/read failure.
+- Preparation failure.
+- Upload failure.
+- Authorization failure.
+- Metadata failure.
+- Preview/download failure.
+
+Retry should work without requiring the user to select every file again, whenever the browser still provides valid access to the original file.
+
+7. TESTING REQUIREMENTS
+
+Run automated tests and, where possible, real-device tests.
+
+Test the same files in:
+
+- Chrome Android.
+- Samsung Internet.
+- Desktop Chrome.
+
+Compare results.
+
+Specifically verify:
+
+- Multiple selection.
+- Preview generation.
+- Upload completion.
+- Retry.
+- Partial failure.
+- Mixed photo/video selection.
+- Private media retrieval.
+
+Do not claim Chrome is fixed based only on desktop tests or a successful production build.
+
+If physical Chrome Android testing is unavailable, state that clearly and provide a precise manual test checklist.
+
+8. SCOPE AND SAFETY
+
+Only fix browser compatibility and media handling.
+
+Do not redesign unrelated UI in this task.
+Do not change working Samsung Internet behaviour.
+Do not change database schemas without a demonstrated need.
+Do not publish or deploy.
+
+Inspect source code first, identify the root cause, implement a focused fix, run tests and report the actual results.
+
+Report separately:
+
+- Root cause identified.
+- Code changes made.
+- Automated tests passed.
+- Physical-device tests completed or still pending.
+- Remaining limitations.

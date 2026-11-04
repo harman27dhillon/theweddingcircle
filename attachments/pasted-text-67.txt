@@ -1,0 +1,105 @@
+GROK BUILD IMPLEMENTATION PROMPT
+SEEK: NON-AI MULTILINGUAL GROUP COMPANION — CHAT, CODE AND DATABASE ARCHITECTURE
+
+PROJECT
+Inspect my existing wedding app repository before editing anything. It has group chat, a companion named Seek, and Handoff tasks/reminders. Extend the existing Seek implementation; preserve all working features, visual styles, permissions, notifications, and data. Do not create a second chat system.
+
+NON-NEGOTIABLE: SEEK IS NOT AI
+No LLM, Grok/OpenAI/Gemini API, AI embeddings, translation API, or AI-based moderation/vision. Use deterministic TypeScript/JavaScript logic, dictionaries, phrase patterns, fuzzy matching, state machines, database queries, and curated multilingual response templates. Seek may feel personable but must be clearly labeled 'Automated companion' in its profile. It must never pretend to be human.
+
+TARGET BEHAVIOR
+Seek has its own stable system identity in each group (or a global system account with group membership) and appears in the SAME group message timeline as members. Users invoke @seek for commands, and opt-in Social/Party modes allow occasional unprompted comments. Seek can answer Handoff status questions from authoritative data, recognize supported English/Hindi/Punjabi/Hinglish/Roman Punjabi expressions, search authorized group messages, and send varied but prewritten social replies. It must never hallucinate information or claim it visually inspected a photo.
+
+1. REPOSITORY DISCOVERY FIRST
+Find the framework, auth provider, chat send pipeline, message schema, group membership/roles, realtime subscriptions, Handoff/task schema, push-notification path, scheduler, database migrations, and tests. Reuse existing services and conventions. Before coding, summarize relevant existing modules and propose the smallest compatible changes. Do not assume Supabase, Firebase, Prisma, or Next.js unless present.
+
+2. SERVER-SIDE EVENT FLOW
+Implement a single canonical pipeline:
+(a) Authenticated member submits a message through the existing chat API/service.
+(b) Server validates membership, writes the message, and emits a durable message-created event AFTER commit (outbox or existing reliable queue/event mechanism). Never trigger Seek solely from a browser component.
+(c) Seek event handler receives {eventId, groupId, messageId}, deduplicates by eventId/messageId, loads the committed message and permissions, and ignores Seek-authored messages, private/Whisper messages, deleted/expired messages, unsupported attachments, and messages from blocked/opted-out contexts.
+(d) Route explicit @seek mentions/commands first; otherwise evaluate eligible social triggers only when group mode and member preferences permit.
+(e) Parse text via normalizer -> language cues -> intent recognizer -> entity resolver -> conversation state -> authorized tool/service calls -> response template selector.
+(f) For commands that mutate data, present an interactive confirmation to the requesting user and perform the action ONLY after authenticated confirmation. Store confirmation intent with expiry and idempotency key.
+(g) Persist Seek's response using the SAME server-side message creation service as regular chat, with senderType='system_companion' or equivalent and senderId=Seek. Publish through the existing realtime channel. Mark origin to prevent loops. Do not fabricate client-only bubbles.
+(h) Ensure event retries cannot create duplicate Seek replies, tasks, reminders, or announcements. Persist processing outcome and correlate response to trigger message.
+(i) If the app currently lacks a durable queue, use its existing reliable background job/event mechanism; if none exists, implement a minimal transactional outbox + worker/cron processing compatible with deployment. Never rely on a persistent in-memory process or browser tab.
+
+3. RECOMMENDED CODE MODULE BOUNDARIES (ADAPT NAMES TO REPO)
+seek/event-handler: durable chat event consumer and eligibility checks.
+seek/normalizer: Unicode-safe, script-aware tokenization; normalize common romanized spellings while preserving original text, names, and message content.
+seek/dictionaries: editable versioned multilingual phrase dictionaries for English, Hindi/Devanagari, Punjabi/Gurmukhi, Hinglish, Roman Punjabi.
+seek/intent-router: deterministic weighted matching, thresholds, negative patterns, entity extraction, confidence, and explicit UNKNOWN outcome.
+seek/context-store: short-lived per-group/per-user interaction state and clarification state, with expiry.
+seek/handoff-tools: authorization-aware read/status/assignment/completion integration with existing Handoff services.
+seek/search-tools: permission-filtered keyword/date/sender/media search; no semantic-search claims without an actual implementation.
+seek/social-policy: group mode, per-member opt-out, topic eligibility, cooldowns, group rate caps, and duplicate suppression.
+seek/response-templates: curated natural language variants with weighted selection and anti-repetition.
+seek/message-publisher: server-authorized insertion into existing chat/realtime system.
+seek/observability: event processing, latency, outcomes, rule matches, failures; minimize logged personal message content.
+Keep pure parsing logic separate from I/O for easy tests.
+
+4. DATABASE / DATA MODEL (MAP TO EXISTING SCHEMA; MIGRATE SAFELY)
+Reuse existing users, groups, group_members, chat_messages, handoff_tasks, notifications, and reminder jobs. Add only necessary fields/tables, with indexes, foreign keys, row-level/access rules if supported:
+- seek_group_settings(group_id PK, mode QUIET|SOCIAL|PARTY, allow_completion_announcements, max_spontaneous_per_hour, updated_at).
+- seek_member_preferences(group_id, user_id composite key, allow_spontaneous_replies, allow_photo_comment_triggers, preferred_reply_language nullable, muted_seek, updated_at).
+- seek_conversation_state(group_id, user_id, topic, intent, referenced_message_id, referenced_task_id, pending_clarification JSON with strict validation, expires_at, updated_at); keep minimal and expire automatically.
+- seek_processed_events(event_id unique, group_id, trigger_message_id, status, response_message_id nullable, processed_at, error_code nullable); used for exactly-once EFFECTS despite at-least-once delivery.
+- seek_pending_actions(id, group_id, requester_id, action_type, validated_payload, expires_at, status, idempotency_key unique, created_at); actions require confirmation.
+- seek_response_history(group_id, user_id nullable, template_id, category, created_at) for repetition avoidance; retention limit.
+- Existing chat messages must identify Seek as a system companion; optionally include trigger_message_id and metadata for links/cards.
+- Existing Handoff tasks remain the SOLE SOURCE OF TRUTH for status, assignee, completion timestamp, reminders, and task ownership. Do not duplicate task state in Seek tables.
+- Use existing database migration and access-control conventions; do not expose Seek's elevated write privileges to clients. Include retention/cleanup for ephemeral data.
+
+5. LANGUAGE UNDERSTANDING WITHOUT AI
+Support English, Hindi (Devanagari), Punjabi (Gurmukhi), Hinglish and Roman Punjabi, including mixed-language messages. Normalize punctuation/spacing, Unicode, common shortcuts and misspellings; protect names and quoted text. Use versioned synonym maps, phrase patterns, regex where appropriate, and cautious edit-distance fuzzy matching. Identify supported intents:
+GREETING, ASK_APPEARANCE, REQUEST_COMPLIMENT, PLAYFUL_REPLY, THANK_YOU, GOODBYE, CHECK_TASK_STATUS, LIST_COMPLETED_TASKS, LIST_PENDING_TASKS, CREATE_HANDOFF, SET_REMINDER, SEARCH_MESSAGES, SEARCH_MEDIA, ASK_EVENT_DETAILS, UNKNOWN.
+Examples equivalent to CHECK_TASK_STATUS:
+'Did Aman finish decorations?'
+'Aman ne decoration ka kaam kar diya?'
+'ਅਮਨ ਨੇ ਸਜਾਵਟ ਦਾ ਕੰਮ ਕਰ ਦਿੱਤਾ?'
+'Aman ne decoration da kamm krditta?'
+'अमन ने डेकोरेशन का काम पूरा किया?'
+Return typed {intent, confidence, languageStyle, entities, clarificationNeeded}. A low-confidence match must ask a clarifying question; no risky actions based on weak guesses. Translate neither the entire message nor every unknown word; only recognize defined intents and expressions. Use language-matched templates and allow per-user language override.
+
+6. CHAT UX
+@seek autocomplete uses the real Seek system identity. A mention or command should be parsed even when @seek appears mid-message. Replies are distinct but in the ordinary chat timeline, clearly marked Automated Companion. Link answers to the original message/task where relevant. Show pending action cards privately to requester when supported by existing visibility model; otherwise use a safe confirmation UI without broadcasting private draft actions. Users may explicitly share suitable Seek results with the group. Never leak Whisper content or even private-message existence. Seek's own messages must not retrigger Seek. If offline, clients receive saved messages through normal sync.
+
+7. HANDOFF TASK QUERIES AND COMPLETION
+For '@seek did Aman complete decorations?' resolve group member Aman, then relevant Handoff task by authorized group/task data; disambiguate duplicate names/tasks. Query live DB status, do not infer from chat. Respond accurately for awaiting acceptance, accepted, in progress, completed, declined, overdue, not found, or ambiguous. Example: 'Yes — Aman marked decorations completed at 7:42 PM. ✅' Say 'marked complete', not 'verified complete'. Support summaries like 'what did Aman finish this week?' using real database filters.
+Green tick in Handoff card OR supported notification action calls the authenticated existing Handoff completion endpoint. Verify assignee/admin permission, update authoritative status and completed_at in transaction, cancel outstanding reminders, publish task/card update, and optionally send a rate-limited Seek congratulation. Do not mark completed from casual messages. Avoid duplicate completion or announcement events. Do not have Seek overwrite task records itself when merely answering questions.
+
+8. HANDOFF CREATION AND REMINDERS
+Example '@seek assign decoration to Aman and remind him at 8pm'. Parse task, assignee, due/reminder time and timezone; resolve member and date ambiguities. Show confirmation, then invoke existing authorized Handoff service. Await assignee acceptance if that is current workflow. Schedule reminders through durable backend jobs; no browser timers. Cancel on completion, ensure retries and idempotency. Keep current push notification and green-tick functionality intact.
+
+9. SOCIAL TRIGGERS WITHOUT @seek
+Social mode is opt-in per group; QUIET replies only to explicit @seek. SOCIAL allows occasional relevant responses; PARTY allows somewhat more but remains capped. For photo + 'How am I looking?', 'kiddan lag reha', 'kaisi lag rahi', etc., check attachment presence, member opt-in, and cooldown, then choose a GENERAL compliment from templates. Without computer vision, do NOT describe actual clothing, color, face, or appearance. Build templates for jokes, praise, greetings, appreciation and brief follow-ups. Respect per-user opt-out, group caps, and serious/sensitive-context exclusion rules; if uncertain, stay silent. Do not automatically read or analyze photo bytes. Seek should never claim to be human. Do not spam the group or reply to every message.
+
+10. CONVERSATION CONTEXT
+Maintain minimal expiring state for short follow-ups (e.g. appearance compliment -> 'bas bas' -> playful reply) keyed by group and user, with thread/reply association when available. Never use context from a different group, deleted content, expired Whispers, or other users' private interactions. Expire after a short configurable window, e.g. 3 minutes. Use state transitions rather than free-form 'memory'.
+
+11. SEARCH
+For '@seek find decoration messages' or supported Roman Punjabi/Hinglish variants, use existing database full-text/keyword indexes and structured filters for date/sender/group. Return actual authorized message IDs and deep links. For media, search metadata, uploader, dates, captions, and tags that genuinely exist. Do not claim image-content understanding or semantic search unless non-AI mechanisms actually support the request. Enforce group access at query time. Never search Whispers or deleted/expired content.
+
+12. SECURITY, RELIABILITY AND DEPLOYMENT
+Enforce authorization server-side for every read/write. Guard against forged Seek sender IDs, event replay, race conditions, prompt-like text tricks (treat text as data), notification action forgery, duplicate queue delivery, and cross-group leaks. Apply per-group and per-user rate limits. Ensure compatibility with serverless hosting (e.g. Vercel if applicable); use persistent database and background scheduling, not always-on memory. Gracefully handle DB downtime with retry/backoff/dead-letter logging. Provide observability and minimal retention. Avoid unnecessary paid APIs.
+
+13. TESTS AND ACCEPTANCE SCENARIOS
+Automated unit/integration tests must cover:
+- All five language styles, mixed phrases, typos, Gurmukhi/Devanagari Unicode.
+- Explicit @seek invocation and opt-in spontaneous photo-trigger replies.
+- Quiet/Social/Party settings and individual opt-out.
+- Follow-up context expiration and anti-repetition.
+- True completed task, pending task, overdue task, multiple matching tasks, no task.
+- Green tick from card and notification, reminder cancellation, realtime update.
+- Completion announcement only when enabled and within limits.
+- Confirmation required before assignments/reminders; retries never duplicate effects.
+- Seek message loop prevention, queue replay, multiple workers, out-of-order events.
+- Cross-group access denied, Whisper/deleted content excluded, spoofed Seek identity denied.
+- No AI/translation network calls or API keys.
+
+14. DELIVERABLES
+Implement the actual code and safe migrations in this repository, not just a proposal. First identify current architecture and show the integration points. Follow existing style, types, migrations, and tests. Run available lint, typecheck, unit/integration tests, and production build. Report changed files, migrations, tests/results, supported command examples, admin/user settings, and honest limitations. If any infrastructure requirement cannot be completed with existing services, state the exact blocker rather than inventing a working system.
+
+FINAL STANDARD
+Seek is a friendly, multilingual, RULE-BASED automated group member. It is integrated with the existing chat event pipeline, authoritative Handoff database, realtime updates, and durable notifications. It does not require AI, Google Translate, or any LLM API. It responds naturally only within supported intents, and it never guesses private data or task facts.

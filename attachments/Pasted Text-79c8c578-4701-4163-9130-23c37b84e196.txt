@@ -1,0 +1,112 @@
+Wedding Circle — Album Swipe Fix + Wedding Invitation Home Page
+
+Update the existing Wedding Circle project. Implement both changes below without rebuilding the app or breaking existing features.
+
+TASK 1 — Fix Album Section Swipe Navigation
+
+Swipe navigation is working well in the other sections, but it gets stuck in Album and cannot reliably navigate to Live or More.
+
+Required behavior
+
+- Swipe right from Album to navigate to Live.
+- Swipe left from Album to navigate to More.
+- Maintain the correct five-section order: Home, Feed, Live, Album, More.
+- Preserve the existing global swipe behavior everywhere else.
+
+Investigate and fix the actual cause
+
+- Inspect Album-specific touch handlers, image galleries, carousels, nested scrolling containers, pointer events and event propagation.
+- Identify why the Album component consumes or blocks the global horizontal swipe gesture.
+- Resolve conflicts between gallery gestures and section navigation without disabling normal album interactions.
+- Ensure a valid horizontal swipe triggers exactly one navigation event.
+- Preserve vertical scrolling, photo browsing, image zooming and any existing gallery interactions wherever applicable.
+- Keep the bottom navigation working normally.
+- Do not replace the working global swipe implementation unnecessarily.
+
+Test swiping from Album to both neighboring sections, including swipes starting in empty space and around album content. Verify that repeated swipes do not become stuck.
+
+TASK 2 — Redesign the Home Page Inside Every Created Wedding as a Digital Marriage Invitation
+
+Transform the existing Home page inside a created Wedding Circle into an elegant, animated digital marriage invitation card.
+
+Important distinction: This applies to the Home page inside an individual created wedding, not the main landing page where users log in or browse sample weddings.
+
+A. Invitation-card appearance
+
+Make the existing wedding Home page feel like opening a beautifully designed Indian marriage invitation.
+
+Use a refined, premium invitation aesthetic with:
+
+- Elegant ornamental borders and subtle decorative motifs.
+- A tasteful wedding-inspired color palette, such as ivory, champagne gold, blush, or the existing wedding theme colors.
+- Beautiful typography combining decorative headings with highly readable body text.
+- Balanced spacing and a clear visual hierarchy.
+- Subtle floral, ornamental or traditional Indian-inspired details where they suit the existing theme.
+- A polished, mobile-first layout that feels like an invitation rather than a generic dashboard.
+
+Do not make the page excessively crowded, overly flashy or difficult to read.
+
+B. Preserve and reuse existing wedding details
+
+Inspect the existing Home page and wedding data model before changing the layout.
+
+Reuse the actual details already available for each wedding, such as:
+
+- Bride's name and groom's name.
+- Existing couple names and wedding title.
+- Wedding date and time.
+- Venue and location.
+- Existing wedding message or invitation text.
+- Other invitation details already collected by the app.
+
+Present the available details in a natural invitation format. Do not invent missing names, dates, venues or other personal information. If a field is unavailable, omit it gracefully or use the app's existing empty-state behavior.
+
+All details must remain dynamically linked to the correct wedding. Different weddings must display their own information.
+
+C. Preserve existing patterns and animation style
+
+Reuse the existing iPhone-unlock-style entrance animation and the established animation language already used in Wedding Circle.
+
+- Apply a graceful entrance animation to the invitation card and its visible elements.
+- Use subtle scaling, fading and staggered reveals where appropriate.
+- Keep the animation smooth, lightweight and consistent with the rest of the app.
+- Preserve existing animation timing and behavior wherever practical.
+- Do not replay the entire animation unnecessarily on every state update.
+- Respect reduced-motion accessibility settings.
+
+The invitation should feel as if a guest is opening a premium digital wedding invitation.
+
+D. Keep the existing wedding experience functional
+
+This is a visual transformation of the wedding Home page, not a replacement of the wedding application.
+
+- Preserve all existing wedding data and IDs.
+- Keep existing navigation to Feed, Live, Album and More.
+- Preserve host and co-host permissions, family privacy restrictions, guest access and authentication.
+- Keep existing invitation-related functionality and other working Home page actions.
+- Ensure any existing buttons or links remain accessible and functional.
+- Do not move or remove unrelated features unless a layout adjustment is necessary to accommodate the invitation design.
+- Do not modify the main login landing page or the sample wedding browsing page.
+
+E. Responsive behavior and performance
+
+- Optimize the invitation for mobile screens first.
+- Ensure the invitation fits naturally on different screen sizes and does not cause horizontal overflow.
+- Keep important details readable without excessive scrolling.
+- Avoid large assets, heavy rendering or animations that delay page interaction.
+- Ensure the redesign does not worsen the app's existing latency or interfere with swipe navigation.
+
+F. Verification
+
+After implementation:
+
+1. Test Album swipes to Live and More.
+2. Test global swipe navigation in all five sections.
+3. Open multiple existing weddings and verify that each displays the correct names, dates, venue and available invitation details.
+4. Verify that host/co-host permissions and guest privacy remain unchanged.
+5. Test the invitation animation and layout on mobile screens.
+6. Confirm that existing wedding data has not been reset or overwritten.
+
+Report the changes actually implemented and any remaining issues.
+
+Strict instructions: Modify the existing project directly. Preserve all existing data, wedding-specific details, navigation and working features. Do not rebuild the app or redesign the main landing page. Focus on fixing Album gesture conflicts and transforming only the Home page inside each created wedding into an elegant digital marriage invitation.

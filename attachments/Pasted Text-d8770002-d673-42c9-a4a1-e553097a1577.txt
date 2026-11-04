@@ -1,0 +1,100 @@
+FIX THE WEDDING CIRCLE CHAT MESSAGE ALIGNMENT AND LAYOUT.
+
+The current Chat screen is disorganised. Inspect the existing Chat implementation and fix the message alignment correctly.
+
+IMPORTANT: This task is ONLY about repairing Chat. Do not modify the theme system, other screens, or unrelated functionality.
+
+1. CORRECT MESSAGE ALIGNMENT
+
+Every participant viewing the same chat must see:
+
+- Messages sent by OTHER participants aligned to the LEFT.
+- Messages sent by the CURRENT logged-in user aligned to the RIGHT.
+- The alignment must be calculated relative to the identity of the person currently viewing the chat.
+
+For example:
+If Alice sends a message, Alice sees it on the right.
+Bob sees Alice's same message on the left.
+If Bob replies, Bob sees his reply on the right, while Alice sees that reply on the left.
+
+Never determine alignment using a fixed sender name, display name, host role, or developer role.
+
+Use the authenticated user's stable ID and the message sender's stable user ID to determine whether a message belongs to the current user.
+
+Do not compare display names because different users can have identical names.
+
+If the existing message data does not expose the correct sender ID, inspect and repair the existing data flow without replacing real messages with mock data.
+
+2. RESTORE A CLEAN CHAT LAYOUT
+
+- Keep incoming messages on the left and outgoing messages on the right.
+- Use compact, rounded message bubbles.
+- Allow bubbles to grow according to their content, subject to a reasonable maximum width.
+- Long messages must wrap naturally.
+- Prevent long unbroken text from causing horizontal overflow.
+- Keep consistent spacing between messages.
+- Display the sender's name above incoming messages where appropriate.
+- Keep timestamps readable and correctly associated with their messages.
+- Avoid unnecessary full-width bubbles.
+- Ensure consecutive messages from the same sender remain visually grouped where appropriate.
+
+3. FIX THE MESSAGE LIST
+
+- The message list must use the available screen space.
+- Preserve chronological message ordering.
+- Keep scrolling smooth.
+- Ensure the latest messages can be reached.
+- Do not let the composer overlap the messages.
+- Make the layout work on phone-sized screens and when the Android keyboard is open.
+
+4. PRESERVE THE EXISTING COMPOSER
+
+Keep the existing Message input, plus menu, camera/photo controls, microphone/voice-note functionality, and Post button.
+
+Restore their correct alignment, spacing, and positioning if they were affected by the layout problem.
+
+Do not remove, replace, or disable existing controls.
+
+5. PRESERVE EXISTING FUNCTIONALITY
+
+Do not break:
+- Message sending and receiving.
+- Real-time updates, if implemented.
+- Message history and timestamps.
+- Authentication and wedding membership.
+- Message privacy and permissions.
+- Attachments, camera, and voice notes.
+- Existing navigation and backend integration.
+
+Do not change the theme system or redesign other screens.
+
+6. INVESTIGATE THE ACTUAL CAUSE
+
+Inspect the existing Chat component, CSS, message rendering, and sender identity logic.
+
+Identify why messages are currently aligned incorrectly and why the layout became disorganised.
+
+Fix the underlying cause rather than applying arbitrary margins or hard-coded alignment.
+
+7. VERIFY BOTH SIDES
+
+Test with at least two different authenticated users.
+
+Test A:
+- Alice sends a message.
+- Alice sees it on the right.
+- Bob sees it on the left.
+
+Test B:
+- Bob replies.
+- Bob sees his reply on the right.
+- Alice sees Bob's reply on the left.
+
+Also verify long messages, timestamps, scrolling, and the bottom composer.
+
+Do not claim the two-user behaviour was tested unless it was actually tested.
+
+Make the changes directly in the existing project. Do not merely explain the solution.
+
+FINAL REQUIREMENT:
+The current user must always see their own messages on the RIGHT and messages from other participants on the LEFT. This must work dynamically for every user in the wedding chat.

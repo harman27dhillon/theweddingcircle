@@ -1,0 +1,205 @@
+THE WEDDING CIRCLE — COMPLETE THEME BUG AUDIT AND RESTORE THE ORIGINAL PREMIUM DESIGN QUALITY
+
+Objective
+
+The current theme system has multiple visual and functional bugs. Some themes look incomplete, some components retain colours from other themes, previews are missing or inaccurate, and the original themes no longer have the same richness and detail they had when first created.
+
+Fix the underlying problems throughout the existing theme system. Restore the original premium design quality of Royal Burgundy and the other original themes, and bring the newer themes to the same level of polish.
+
+This is a repair and restoration task, not a theme redesign or a theme-registration task.
+
+Do not merely analyse the issues and provide a report. Inspect the source, implement fixes, and verify them.
+
+1. Inspect the original implementation first
+
+Before editing anything:
+
+1. Inspect the current theme registry, theme provider/context, theme tokens, CSS variables, theme selector, preview components, persistence logic, and every screen that consumes theme values.
+2. Inspect Git history, earlier commits, existing branches, or recoverable previous files for the original Royal Burgundy, Pastel Blush, Sage Green, Royal Blue, Classic Ivory, Midnight Emerald, Terracotta Sunset, and Lavender Dream implementations.
+3. Compare the original theme definitions and working components with the current implementation to determine exactly where visual details, styling rules, preview rendering, or theme application regressed.
+4. Identify all existing theme IDs, including Classic Default, Blossom Pink, Sky Blue, Rose Romance, Peach Garden, and the newer themes already being applied.
+5. Create a concise internal bug inventory, then fix the actual causes rather than adding arbitrary CSS overrides.
+
+Use the original implementation as the reference wherever recoverable. If exact historical code is unavailable, reconstruct the design from the original theme definitions and saved showcase reference. Do not pretend that unavailable code was recovered.
+
+2. Restore the original premium theme design language
+
+The original themes must look like complete, carefully art-directed wedding experiences.
+
+Royal Burgundy — quality reference
+
+Restore the intended combination of:
+
+- Deep burgundy and wine-coloured backgrounds.
+- Champagne-gold borders, dividers, and fine ornamental detailing.
+- Warm ivory surfaces and readable cream typography.
+- Elegant serif typography for couple names and important headings, paired with clean body typography.
+- Refined floral corners, restrained botanical artwork, delicate wedding ornaments, and layered surfaces.
+- Premium buttons, matching icons, decorative cards, and subtle transitions.
+- Consistent burgundy-and-gold styling across Home, Chat, Live, Album, More, Host Control, navigation, and dialogs.
+
+Do not reduce this to a plain burgundy background with gold buttons.
+
+Preserve the individual identity of every other theme
+
+- Pastel Blush: layered blush, soft cream, muted coral, delicate floral details, and romantic typography.
+- Sage Green: sage and forest-green tones, cream surfaces, subtle botanical motifs, and restrained gold.
+- Royal Blue: rich royal blue and navy, gold detailing, ivory typography, and elegant geometric or ornamental accents.
+- Classic Ivory: timeless ivory and cream surfaces, warm gold, restrained brown typography, and refined editorial styling.
+- Midnight Emerald: deep emerald surfaces, sophisticated contrast, botanical details, and brushed-gold accents.
+- Terracotta Sunset: warm clay, terracotta, peach, cream, sunlit tones, and delicate petal details.
+- Lavender Dream: layered lilac and lavender, soft ivory, graceful floral details, and dreamy but readable styling.
+- Blossom Pink: delicate pink tones, soft floral details, and coordinated rose accents.
+- Sky Blue: airy blue, pearl-white surfaces, gentle blue accents, and light visual layering.
+- Rose Romance: sophisticated rose tones, warm cream, subtle romantic ornaments, and coordinated borders.
+- Peach Garden: warm peach, cream, botanical or floral details, and refined golden accents.
+
+Preserve the identities and current intended designs of all newer themes as well. Do not make them identical to Royal Burgundy or force all themes into a single palette.
+
+Classic Default is a separate theme. Never confuse it with Classic Ivory.
+
+3. Fix theme application across the whole wedding
+
+Audit every themed surface and component, including:
+
+- Wedding Home and ceremony cards.
+- Chat background, incoming and outgoing bubbles, message text, avatars, composer, attachment controls, and voice notes.
+- Live page background, preview, live controls, comments, player surfaces, and buttons.
+- Album background, media frames, toolbar, and controls.
+- More menu, Host Control, settings, popups, confirmation dialogs, and dropdowns.
+- Bottom navigation, selected and unselected tabs, icons, borders, and labels.
+- Wedding header, cards, buttons, inputs, scroll areas, overlays, and empty states.
+
+For each component, verify the background, foreground, secondary text, accent, border, shadow, icon, hover, pressed, selected, disabled, and focus states.
+
+Fix the root cause: components should consume the active theme tokens rather than retaining hardcoded colours or inheriting colours from a previous theme.
+
+Switching themes must update the complete wedding interface consistently, without a mixture of old and new colours.
+
+Preserve each component’s existing layout and functionality unless a targeted correction is required for the theme to render properly.
+
+4. Fix the theme selector and missing thumbnails
+
+The theme selector previously displayed miniature chat previews. Some previews are now missing, incomplete, or do not accurately represent the selected theme.
+
+Restore them using the existing preview component wherever possible.
+
+Each theme thumbnail must show a convincing miniature of that theme, including:
+
+- Correct background and surface colours.
+- Correct incoming and outgoing message bubbles.
+- Matching typography and readable text.
+- Appropriate accents, borders, and icons.
+- A correctly styled miniature composer and controls.
+- Any restrained decorative details that distinguish the theme.
+
+Requirements:
+
+- Every registered theme must have a visible preview.
+- The preview must use the actual theme definition, not a generic fallback palette.
+- The selected theme must display the correct selected border and existing “Applied” indicator.
+- Switching themes must update the preview and active interface together.
+- Preserve the existing responsive grid, spacing, card proportions, and typography.
+- Check whether CSS visibility, overflow, missing preview data, component errors, or incorrect theme IDs are causing thumbnails to disappear.
+- Fix the underlying cause instead of hiding the issue with new CSS.
+- Keep preview rendering lightweight and avoid loading unnecessary full-resolution assets.
+
+5. Audit theme definitions and visual tokens
+
+For each theme, inspect the complete token definition and verify that it includes the values required by the actual application.
+
+Where the existing architecture supports them, ensure consistent tokens for:
+
+- Main background and secondary background.
+- Surface and elevated card surfaces.
+- Primary and secondary text.
+- Primary, secondary, and muted accents.
+- Borders and decorative details.
+- Buttons and interactive states.
+- Chat incoming and outgoing bubbles.
+- Composer, navigation, overlays, and dialogs.
+- Shadows and decorative effects.
+- Typography and theme-specific artwork.
+
+Do not add a parallel theme system if the current architecture already supports these values.
+
+If different components currently use inconsistent variable names, fix the mapping centrally and migrate consumers carefully without breaking existing screens.
+
+Verify adequate contrast for text, icons, and interactive controls in every theme, including dark themes and both light/dark application modes where supported.
+
+6. Fix theme switching and persistence bugs
+
+Verify that:
+
+- Selecting a theme applies it immediately.
+- The correct selected theme survives navigation between Home, Chat, Live, Album, and More.
+- The selection persists after refresh and subsequent visits using the existing persistence mechanism.
+- Reloading the app restores the correct theme without a flash of the wrong palette where reasonably achievable.
+- Switching themes does not leave stale styles, broken controls, or old preview selections behind.
+- Existing wedding-specific theme preferences remain associated with the correct wedding.
+- Different weddings do not accidentally overwrite each other’s theme settings.
+- Existing host/co-host permissions for changing themes remain unchanged.
+- Older saved theme IDs and missing or invalid values are handled safely, using the existing intended fallback behaviour.
+
+Do not clear local storage, reset preferences, migrate users unnecessarily, or overwrite saved wedding settings.
+
+7. Restore decorative detail without hurting performance
+
+The original theme concept included delicate floral corners, ornamental dividers, elegant typography, refined cards, and subtle petals or sparkles.
+
+Restore these details only where appropriate to the individual theme.
+
+- Use existing artwork and assets wherever possible.
+- Prefer lightweight CSS or SVG decoration when suitable.
+- Avoid repetitive generic ornaments across every theme.
+- Keep text, controls, and message content readable.
+- Avoid excessive particles, large animations, flashing effects, or unnecessary re-renders.
+- Respect reduced-motion preferences.
+- Keep scrolling smooth on mobile devices and avoid large layout shifts.
+- Ensure decorative layers never block taps, keyboard input, scrolling, or navigation.
+
+8. Strict preservation rules
+
+- Do not recreate or register themes that already exist.
+- Do not rename theme IDs or delete existing themes.
+- Do not change theme names, intended palettes, or established identities without necessity.
+- Do not rewrite the entire app, replace the theme provider, or duplicate the theme registry.
+- Do not replace real components with mockups or hardcoded demonstrations.
+- Do not change wedding data, accounts, memberships, access codes, permissions, settings, or backend state.
+- Do not modify the Leaderboard.
+- Do not introduce unrelated redesigns or new features.
+- Do not remove or disable tests.
+- Do not overwrite files wholesale when a targeted repair is possible.
+
+9. Test the fixes systematically
+
+Test every registered theme against the same real application screens, not just a theme demo.
+
+Verify:
+
+1. All theme previews render.
+2. Selecting each theme applies its correct palette and identity.
+3. No screen retains stale colours from a previous theme.
+4. Chat bubbles, composer, Live controls, Album, navigation, dialogs, and Host Control all match the active theme.
+5. Classic Default remains distinct from Classic Ivory.
+6. Existing theme selections and wedding-specific preferences survive navigation and reloads.
+7. Light and dark modes work where supported.
+8. Text and controls remain readable and accessible.
+9. Mobile and desktop layouts remain intact.
+10. No new console errors, missing assets, broken interactions, or major performance regressions appear.
+
+Run the existing relevant tests, type checks, and production build. Fix regressions introduced by these changes.
+
+10. Final report
+
+After implementing the fixes, provide a concise report containing:
+
+- The root causes found.
+- The files and components changed.
+- Which original visual details were restored.
+- Which themes and screens were verified.
+- Whether theme thumbnails now work.
+- Tests, type checks, and build results actually obtained.
+- Any remaining defects that could not be fixed safely.
+
+Implement the fixes now. Prioritise restoring the original theme quality and repairing shared theme infrastructure. Do not stop after producing an audit or a proposed plan.

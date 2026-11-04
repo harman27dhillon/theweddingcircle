@@ -1,0 +1,48 @@
+# GROK BUILD IMPLEMENTATION PROMPT — WHISPER
+## Disappearing private replies inside existing wedding group chat
+
+Implement a production-ready Whisper feature in my existing wedding app. First inspect the repository, chat message model, authentication, authorization, database, real-time transport, notifications, and UI design system. Reuse existing architecture and components. Do not rebuild chat or break public messages, voice rooms, polls, scrolling, pagination, or existing features.
+
+### Core experience
+1. Long-press a PUBLIC group chat message to show two actions: “Reply” and “🔴 Whisper”. Keep the existing public reply behavior unchanged.
+2. Selecting Whisper opens a clearly labeled red-accented Whisper composer addressed to the author of the selected message. Show “Only you and [recipient] can see this.” Do not allow sending to oneself. Preserve the original group/message context.
+3. Sending creates a private inline reply linked to the parent group message. Only its sender and recipient can see the Whisper in their own group-chat timelines; every other member sees nothing at all—not even a placeholder, count, gap, or system event. The Whisper must not affect public unread counts or public message ordering for other members.
+4. Style Whispers with a subtle red border/background and lock icon, clearly differentiated from public messages. For the recipient, initially render a collapsed card: “🔴 Whisper from [sender] — Tap to reveal”. The sender can see the sent content and an “Unopened” status. Never expose content in push notification previews.
+5. When the recipient explicitly taps Reveal, atomically record first_revealed_at on the server and set expires_at = first_revealed_at + 60 seconds. Start a visible countdown (e.g., 0:59). Merely receiving, scrolling past, opening the chat, or displaying the collapsed card must NOT start the timer.
+6. The 60-second timer is server-authoritative, not a client-only timer. It continues if either person leaves the chat, loses connection, refreshes, or closes the app. Reopening shows the correct remaining time; it never resets. Repeated Reveal taps and concurrent sessions must not extend expiration.
+7. At expiry, remove the Whisper from BOTH participants’ timelines and make its content inaccessible through APIs, subscriptions, caches, and history. Delete message content and associated attachments from persistent storage using a reliable background cleanup process; server-side reads must enforce expiry immediately even if cleanup is delayed. Do not claim deletion of recipients’ screenshots, device backups, or external copies.
+8. Allow sender to delete a Whisper for both participants before expiry. Handle expiry/delete races safely and idempotently.
+9. A reply to a Whisper should itself be a private Whisper to the same other participant, with its OWN 60-second timer starting only when that reply is revealed. Do not allow public reply/forward/quote actions to inadvertently expose private content. If the original public message is deleted, keep the Whisper's privacy and expiry behavior intact without leaking context.
+10. Provide a lightweight “Whispers” filter within a group chat to view that user's own currently available Whispers, with original message context when authorized. Do not create a separate DM conversation.
+
+### Data model and permissions
+- Model group_id, parent_message_id, sender_id, recipient_id, body, created_at, first_revealed_at (nullable), expires_at (nullable), deleted_at/status as appropriate, using existing conventions.
+- Only authenticated current members of the group may send Whispers, and the recipient must be a valid group member and the author of the selected public message.
+- Enforce sender/recipient-only access at the database/API and real-time layers, not just through frontend filtering. If using row-level security, add and test explicit policies. No other group member, including ordinary group admins, should receive private payloads merely due to their role.
+- The Reveal endpoint must authenticate the recipient and atomically set the first reveal timestamp once; sender opening the message does not start expiry.
+- Enforce server timestamps, validation, size limits, rate limits, and abuse/reporting safeguards. Do not leak Whisper existence or contents in global message counts, public subscriptions, search, exports, analytics, or notifications.
+- If attachments are not already safely supported for ephemeral private messages, launch text-only Whispers rather than shipping insecure attachment handling.
+
+### UI / UX
+- Match the existing wedding app theme and responsive layout on desktop and mobile.
+- The red style must remain readable and accessible; do not rely on color alone to signal privacy.
+- Show clear recipient identity before sending, especially in busy group chats.
+- Show “Unopened” before recipient reveals and a synced 60-second countdown after reveal; expired messages vanish without disrupting scroll position.
+- The recipient can deliberately reveal the message; do not auto-reveal on viewport intersection.
+- Notifications may say “[Name] sent you a Whisper” but must not include the message body. Clicking opens the correct group and card if still available.
+- Make sure an unopened Whisper remains accessible until revealed or manually deleted (unless the app has a separate documented retention policy).
+
+### Realtime and reliability
+- Deliver Whisper create/reveal/delete/expire events only to authorized participants using private channels or equivalent secure targeting.
+- Handle multiple devices, reconnections, rapid messages, concurrent reveals, and clock skew.
+- Prevent stale cached content from reappearing after expiry; use secure cache-control where appropriate.
+- Do not send Whisper contents through public group broadcast events and merely hide them on the client.
+- Use existing backend jobs or a reliable scheduled cleanup mechanism for permanent deletion. Explain any retention limitations honestly.
+
+### Tests and acceptance criteria
+Test at least: public reply unchanged; private reply created inline; sender/recipient can see it; a third group member cannot see or fetch it (including API, real-time, search, notifications); recipient does not trigger timer by scrolling; first explicit reveal starts exactly one server timer; sender viewing does not start timer; timer survives refresh/offline/multiple devices; 60-second expiry makes message immediately unreadable and removes it for both; server cleanup; early deletion; reply gets independent timer; no accidental public quoting; correct behavior when parent is deleted or group membership changes; responsive mobile/desktop UI; existing chat, polls, and voice features still work.
+
+### Delivery requirements
+Implement actual working code and any necessary migrations, not a mockup. Before changing code, inspect existing project patterns. After changes, report files modified, migrations, authorization rules, cleanup strategy, test results, any required deployment steps, and known limitations. If a security requirement cannot be fulfilled with current infrastructure, explain the blocker rather than shipping a UI-only privacy illusion.
+
+PRIMARY GOAL: Long-press a public group message → Whisper → a red, private inline Whisper visible only to sender and recipient → recipient taps to reveal → 60 seconds later it disappears for both and becomes inaccessible server-side.

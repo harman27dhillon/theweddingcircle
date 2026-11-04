@@ -1,0 +1,558 @@
+THE WEDDING CIRCLE — PREMIUM CHAT REDESIGN + TEMPORARY WEDDING GUEST PROFILES
+
+1. Main objective
+
+Upgrade the existing Chat section of The Wedding Circle into a premium, polished wedding-themed messaging experience.
+
+Implement everything specified in this prompt, including the new chat bubble styles, photo and audio attachment layouts, reactions, lightweight wedding animations, wedding-day atmosphere, and wedding-specific guest profiles with profile pictures.
+
+This is an enhancement to the existing application, NOT a new application or a complete redesign of The Wedding Circle.
+
+The intended result should feel like a premium wedding-oriented combination of WhatsApp-style messaging and a private wedding community, while retaining the application's existing identity and functionality.
+
+2. Mandatory inspection and preservation rules
+
+Before writing or changing code:
+
+1. Inspect the existing project structure, Chat page and components, current theme system, authentication, wedding memberships, user profiles, message storage, media storage, database schema, permissions, and existing tests.
+2. Identify the exact components responsible for rendering messages, profile pictures, attachments, the message composer, wedding header, and bottom navigation.
+3. Reuse the existing components and backend integrations wherever possible.
+4. Make the smallest targeted changes necessary to implement the requested features.
+5. Preserve all existing users, weddings, wedding memberships, guest access, host/co-host permissions, messages, photos, videos, audio files, settings, themes, and persistent backend data.
+6. Never reset, recreate, truncate, wipe, or replace existing databases, storage buckets, application state, test data, or production records.
+7. Do not introduce duplicate implementations of features that already exist.
+8. Do not replace working functionality with static mockups or hardcoded demonstration data.
+9. Do not remove existing working functionality merely because it is not mentioned in this prompt.
+10. Do not expose secrets, API keys, service-role credentials, or privileged database access in frontend code.
+11. If a database migration is necessary, make it additive, backward-compatible, and safe for existing records.
+12. Run appropriate tests, type checks, and build checks after implementation. Fix regressions introduced by these changes.
+
+If any requested feature conflicts with the existing architecture, first identify the smallest safe solution that preserves existing data and permissions.
+
+3. Preserve the current theme and color palette
+
+The existing screenshot uses a peach/blush background, burgundy-brown primary buttons, champagne-gold accents, ivory and cream surfaces, warm brown typography, and floral decorations.
+
+Keep this exact overall color direction.
+
+Do not redesign the theme, replace the palette with unrelated colors, or remove the existing floral background.
+
+Preserve the current theme selection and ensure the Chat section continues to work with the existing supported themes and light/dark mode behavior.
+
+Use the application's existing theme tokens wherever available. If a requested visual effect needs a color, derive it from the appropriate existing theme token rather than introducing a conflicting global palette.
+
+For the current peach wedding theme, the intended visual relationships are:
+
+- Background: existing soft peach/blush floral background.
+- Incoming message bubbles: soft ivory or warm cream.
+- Outgoing message bubbles: existing burgundy-brown primary color, with warm ivory text.
+- Primary buttons: existing burgundy-brown.
+- Special wedding accents: restrained champagne gold.
+- Secondary information: muted warm brown.
+- Attachment surfaces: soft ivory, without heavy borders.
+
+Preserve existing theme colors and theme-specific behavior throughout the application.
+
+4. Redesign text message bubbles
+
+The current white message boxes with prominent gold outlines look too heavy. Replace this appearance with softer, cleaner bubbles.
+
+Incoming messages
+
+- Align incoming messages to the left.
+- Use a soft ivory or cream fill.
+- Remove the visible gold outline from ordinary text bubbles.
+- Use generously rounded corners, with a subtly distinct upper-left corner where appropriate.
+- Add only a very subtle shadow if necessary to separate the message from the background.
+- Keep the message text comfortably readable.
+- Display the sender's wedding-specific profile name and profile picture where appropriate.
+- Group consecutive messages from the same sender to reduce clutter.
+
+Outgoing messages
+
+- Align the current user's messages to the right.
+- Use the existing burgundy-brown theme color for the bubble background.
+- Use warm ivory text and readable secondary metadata.
+- Remove the heavy border.
+- Retain delivery/read indicators if already supported by the application.
+- Avoid excessive gradients, outlines, or decorative effects.
+
+General message spacing
+
+- Reduce unnecessarily large vertical gaps between messages.
+- Group consecutive messages from the same person.
+- Keep sufficient spacing between different senders.
+- Display timestamps unobtrusively.
+- Keep date separators small and elegant.
+- Preserve the distinction between incoming and outgoing messages at a glance.
+
+The objective is to create a compact, premium conversation layout without losing readability.
+
+5. Profile pictures beside messages
+
+Use wedding-specific guest profile pictures beside messages where appropriate.
+
+- Show a small circular profile picture beside the first message in a consecutive group.
+- Do not repeat the same avatar unnecessarily for every consecutive message.
+- Display the sender's chosen wedding profile name above or near the first message in the group.
+- Show special bride/groom identification only when supported by the wedding's actual membership data or authorized host settings.
+- Use a graceful initials-based avatar when a guest has not uploaded a profile picture.
+- Optimize image dimensions and rendering so that avatars do not slow down chat scrolling.
+
+Do not use invented identities, hardcoded user pictures, or static demonstration profiles in the live application.
+
+6. Premium photo and video attachments
+
+Redesign the current photo card, which occupies too much space and has an overly prominent outlined container.
+
+Photo message appearance
+
+- Remove the thick gold outline around the entire photo card.
+- Use a soft ivory container, rounded corners, and a subtle shadow.
+- Make the actual image the primary visual element.
+- Display a small, unobtrusive caption such as "Shared a photo."
+- Place the timestamp and any existing delivery indicators in a compact metadata area.
+- Include a discreet download icon when downloading is supported.
+- Do not show a large empty white container around a small image.
+
+Image sizing and viewing
+
+- Display a reasonably sized image preview by default.
+- Prevent photos from taking over the entire chat screen.
+- Maintain the original aspect ratio and avoid unwanted cropping.
+- Allow a tap to open an immersive, full-screen image viewer.
+- Provide a clear way to close the viewer and return to the same chat position.
+- Preserve the existing download functionality and media access permissions.
+- Optimize preview loading while preserving the original uploaded media.
+
+Multiple images
+
+When a user shares several images together, present them in a compact, attractive gallery layout with a clear indication when additional images are available.
+
+Video attachments
+
+Use the same clean, borderless card language for videos, with a readable thumbnail and a play control. Preserve the existing playback functionality.
+
+Do not break album uploads, photo downloads, video playback, or any existing media-sharing functionality.
+
+7. Premium voice messages
+
+Redesign voice messages so they look compact and integrated into the conversation.
+
+- Use a pale-ivory bubble or attachment surface.
+- Use a burgundy play button.
+- Display a waveform instead of a generic long slider wherever technically appropriate.
+- Show the duration clearly, such as 0:05.
+- Allow the playback progress to update smoothly.
+- Keep the waveform and controls aligned and compact.
+- Provide a small timestamp outside or alongside the player.
+- Preserve existing audio upload, recording, playback, and permission behavior.
+
+Do not create a decorative waveform that misrepresents the real audio progress if actual playback data is available.
+
+Avoid oversized audio cards and excessive vertical spacing.
+
+8. Bride and groom signature accents
+
+Add a restrained, premium identity treatment for the bride and groom.
+
+- Give authorized bride/groom profiles a subtle champagne-gold accent around their avatar or another small, appropriate visual detail.
+- Optionally apply a very subtle gold shimmer to their message bubbles.
+- Keep the effect understated so it does not distract from message text.
+- Use a small crown or similarly discreet designation only when the person's bride/groom role is verified by the wedding's actual configuration.
+- Keep ordinary guest messages visually cleaner and free from unnecessary special effects.
+
+These accents must not change message content, permissions, or the existing theme palette.
+
+9. Reactions and double-tap heart
+
+Introduce a compact, polished reaction experience.
+
+- Allow users to double-tap a message to add a heart reaction.
+- Show a brief, subtle champagne sparkle when the heart reaction is added, if compatible with the existing interface.
+- Retain standard reactions and provide an accessible way to view or change reactions.
+- Display reaction counts in small floating chips beneath the appropriate message.
+- Avoid large bordered reaction panels.
+- Prevent duplicate reaction records from repeated taps by the same user when the intended behavior is a single reaction.
+- Respect the existing authentication and wedding-membership permission system.
+
+If a reaction system already exists, enhance and reuse it rather than building a second one.
+
+10. Lightweight floral animation
+
+Introduce small, occasional floating petals that complement the existing wedding theme.
+
+Use them only for appropriate moments, such as a wedding-day announcement or a successful photo-sharing moment.
+
+Requirements:
+
+- Show only two or three subtle petals at a time.
+- Let the animation finish quickly.
+- Do not keep petals continuously falling over the conversation.
+- Keep petals behind the messages and away from important controls.
+- Ensure animations never block taps, scrolling, or text selection.
+- Avoid triggering animations on every incoming message.
+- Keep performance smooth on ordinary Android phones and lower-powered devices.
+- Respect operating-system reduced-motion preferences and provide an animation-free experience when appropriate.
+
+Do not add heavy animation libraries when lightweight CSS or existing animation utilities can accomplish the same result.
+
+11. Elegant date separators
+
+Introduce small, centered date separators using the existing theme.
+
+Examples:
+
+- "Today"
+- "Wedding Day"
+- "Mehndi Ceremony"
+
+The exact separator should reflect real conversation dates or actual wedding-event information when available.
+
+Design guidelines:
+
+- Use restrained typography.
+- Add thin champagne-gold decorative lines or tiny existing floral ornaments.
+- Keep separators compact.
+- Avoid large cards or banners that waste space.
+
+Do not invent a ceremony name or mark a date as the wedding day without supporting wedding data or an explicit host setting.
+
+12. Wedding-day atmosphere
+
+Create a subtle change in the chat's atmosphere according to the wedding's real lifecycle, without changing the underlying theme.
+
+Before the wedding
+
+Retain the existing soft peach wedding atmosphere, floral decorations, and clean chat interface.
+
+On the wedding day
+
+When the actual wedding date and timezone indicate that it is the wedding day, display a small, elegant "Wedding Day" separator or contextual header accent.
+
+Optionally enable the subtle floral treatment described above.
+
+After the wedding
+
+A restrained "Memories forever" contextual heading may be displayed after the wedding, if appropriate.
+
+Rules:
+
+- Use the wedding's actual configured date and timezone.
+- If the wedding date is missing, do not assume that the wedding is happening today.
+- Keep existing messages and functionality available after the event.
+- Do not automatically delete content when the wedding ends.
+- Do not switch the global theme or overwrite the host's chosen theme.
+- Let the host disable these optional wedding-atmosphere effects.
+- Keep all ordinary chat functionality unchanged.
+
+13. Temporary wedding-specific guest profile system
+
+This is a major functional addition.
+
+Every guest or user joining a wedding must have access to creating a separate, wedding-specific profile, including a display name and an optional profile picture.
+
+A guest's wedding profile is not a replacement for their main account. It exists within that particular wedding circle.
+
+A single user may participate in several weddings and use a different display name and profile picture in each one.
+
+Profile creation flow
+
+When an authenticated user or invited guest enters a wedding circle without an existing profile for that wedding, provide an elegant onboarding flow.
+
+Suggested sequence:
+
+1. Welcome screen: "Join this Wedding."
+2. Profile photo selection.
+3. Display-name entry.
+4. Profile confirmation.
+5. Continue to chat.
+
+Use the existing app navigation, typography, theme, and styling.
+
+Welcome screen
+
+Show a short explanation such as:
+
+"Create your wedding profile to chat, share photos, and be part of the celebrations."
+
+Provide a prominent "Add Your Photo" action, a display-name field, and a clear Continue button.
+
+Profile picture selection
+
+Allow the guest to:
+
+- Take a new picture using the device camera, if supported.
+- Select an existing picture from the device gallery.
+- Crop or position the picture into a circular avatar.
+- Preview the result before saving.
+- Replace the picture later.
+
+An existing Google Photos integration may be offered as an additional selection source only if it already works safely in the application. Do not introduce an assumed Google Photos integration or new API credentials just to reproduce a mockup.
+
+The profile picture may be skipped. Show a neutral, attractive initials-based avatar until the guest chooses a photo.
+
+Provide useful loading, permission-denied, upload-failed, and retry states.
+
+Display name
+
+Require a non-empty display name for the wedding profile.
+
+- Allow the guest to choose a familiar name, such as "Harman" or "Simran (Cousin)".
+- Provide an editable text field and enforce a reasonable length limit.
+- Sanitize input and prevent invalid or malicious content.
+- Do not force a legal name or expose private account details.
+- Optional relationship labels may include Friend, Cousin, Family, Neighbour, or other appropriate labels.
+- Any relationship label must remain optional and editable.
+- Do not automatically assign a guest to the bride's or groom's side unless the guest chooses it or an authorized host assigns it.
+- Never infer or fabricate someone's relationship to the couple.
+
+The display name should be clearly associated with that wedding, rather than changing the user's global account name.
+
+Profile confirmation
+
+After saving, show a simple confirmation such as "Your temporary profile is ready."
+
+Then take the guest directly into the wedding's existing Chat section.
+
+Do not create a fake onboarding-only profile. The saved profile must actually be used by the chat, reactions, messages, and other relevant wedding features.
+
+14. Profile persistence and lifecycle
+
+The profile is temporary in scope but persistent in use.
+
+"Temporary" means wedding-specific, not that it disappears when a user closes the app.
+
+- Save the profile against the existing user's wedding membership or another correctly scoped membership identifier.
+- Persist the selected display name and profile-picture reference.
+- Restore the same wedding profile after refreshes, app restarts, and subsequent sign-ins.
+- Do not repeatedly ask the same guest to create a profile if one already exists for that wedding.
+- Let the guest edit their own display name and photo.
+- Let the guest leave the wedding through the existing membership flow.
+- Provide a clear profile deletion or removal path where compatible with the existing account and membership model.
+- If the guest changes their profile, update the relevant views consistently.
+- Do not delete messages, attachments, or unrelated account data merely because a profile is edited or removed.
+- Respect the existing content-retention rules for messages and media when a guest leaves or is removed.
+- Avoid orphaned profile records and storage files when safe cleanup is possible.
+
+Use the existing authentication and membership architecture. Do not create duplicate accounts for guests who already have valid accounts.
+
+If guest access currently supports people without conventional accounts, preserve that access and implement a durable guest-membership identity rather than forcing an incompatible account-registration process.
+
+15. Access control and privacy for wedding profiles
+
+Profiles must be scoped to the correct wedding.
+
+- Members may view the profiles of other authorized members of the same wedding.
+- Guests may edit only their own wedding profile.
+- Hosts or co-hosts may remove a guest from a wedding only within their existing authorized powers.
+- Hosts must not be able to access unrelated weddings or private account information merely through this feature.
+- Maintain server-side authorization and the existing database security policies.
+- Do not trust frontend-only permission checks.
+- Prevent users from modifying another guest's profile by changing a user ID or wedding ID in a request.
+- Follow existing visibility rules for private weddings and invited guests.
+
+If database changes are required, inspect the existing schema and use safe, additive migrations. Do not reset the database or recreate the authentication system.
+
+16. Profile-picture storage and performance
+
+Inspect the existing application's storage integrations before deciding where profile pictures should be stored.
+
+- Reuse the established storage backend and authentication model.
+- Store profile metadata in the appropriate existing database structure and image files in the appropriate existing media storage.
+- Do not store large binary images directly in a text field or unnecessarily inflate database records.
+- Resize and compress profile pictures before upload when appropriate.
+- Enforce sensible file-size and file-type limits.
+- Validate uploads and handle failures gracefully.
+- Use secure access controls appropriate to the wedding's privacy settings.
+- Avoid generating a new permanent public URL for private media unless that is appropriate to the existing security model.
+- Cache thumbnails safely and avoid repeated downloads.
+- Do not introduce another storage provider or new recurring expense without a demonstrated technical need.
+
+The feature must function with the application's actual configured backend. Do not pretend that storage or authentication is working when the required integration is missing.
+
+17. Compact message composer
+
+Preserve the current message composer and refine its appearance.
+
+The composer must contain:
+
+- A round plus button for existing attachment options.
+- A slim text input showing "Message your wedding circle..." or the appropriate existing localized placeholder.
+- A microphone button for existing voice-message functionality.
+- The existing Post/send action, styled as a compact burgundy pill.
+- Consistent sizing, spacing, and vertical alignment.
+
+The composer must remain fixed above the bottom navigation.
+
+When the keyboard opens:
+
+- Keep the active input visible.
+- Do not allow the keyboard to permanently cover the newest messages.
+- Ensure the conversation scrolls correctly.
+- Restore an appropriate chat viewport when the keyboard closes.
+
+Preserve existing attachment menus, camera functionality, upload handling, and sending behavior.
+
+18. Bottom navigation and chat header
+
+Keep the existing application navigation and its main layout.
+
+The wedding header should continue to support the existing elements shown in the current interface, including:
+
+- Wedding name, such as "Surajpal & Rekha."
+- Existing Circle developer or role information, where applicable.
+- Filter button.
+- Notification indicator and count.
+- Host entry point and existing host permissions.
+
+Keep the existing bottom navigation:
+
+- Home
+- Chat
+- Live
+- Album
+- More
+
+Do not rename unrelated sections or redesign other pages as part of this task.
+
+Preserve the current active-navigation styling and theme behavior.
+
+19. Responsive layout and performance
+
+Ensure the redesign works on mobile devices, especially Android phones.
+
+- Avoid horizontal overflow.
+- Keep text readable at supported font sizes.
+- Ensure profile photos and attachment previews fit smaller screens.
+- Preserve message order and scroll position.
+- Maintain smooth scrolling as older messages load.
+- Do not render all full-resolution images simultaneously.
+- Lazy-load attachment previews where appropriate.
+- Avoid unnecessary network requests and repeated database queries.
+- Keep the message composer and bottom navigation usable with the keyboard open.
+- Ensure attachment viewers and modals return to the correct conversation state.
+- Avoid long-running animations and expensive visual effects.
+
+The result must remain usable on slower connections and modest hardware.
+
+20. Accessibility and user feedback
+
+Provide appropriate labels for interactive icons, buttons, profile-picture controls, and attachment actions.
+
+Ensure acceptable text contrast and usable touch targets.
+
+Provide clear feedback for:
+
+- Profile saved.
+- Photo uploaded.
+- Photo upload failed.
+- Message sent or failed.
+- Reaction added.
+- Network connection lost or restored.
+- Permission denied.
+- Profile update completed.
+
+Do not display fake success messages before the server has confirmed a write.
+
+When an operation fails, preserve user input when safe and provide a useful retry option.
+
+Respect reduced-motion settings.
+
+21. Visual acceptance criteria
+
+The finished chat must satisfy all of the following:
+
+1. Existing peach/blush floral background is preserved.
+2. Existing burgundy-brown buttons and champagne-gold accents remain recognizable.
+3. Ordinary text bubbles have no prominent gold outline.
+4. Incoming messages use soft ivory fills and align left.
+5. Outgoing messages use the existing burgundy color and align right.
+6. Message spacing is compact and consecutive messages are grouped appropriately.
+7. Photo cards no longer have heavy outer gold borders.
+8. Photo previews are reasonably sized, rounded, and expandable.
+9. Voice notes use compact player styling with real playback progress.
+10. Bride/groom accents are subtle and only use verified wedding roles.
+11. Reactions are compact and a double-tap can add a heart.
+12. Floral animations are occasional, lightweight, and non-blocking.
+13. Date separators are refined and reflect real wedding information.
+14. The optional wedding-day atmosphere does not replace or modify the selected theme.
+15. Every guest can create a wedding-specific profile with a display name and optional photo.
+16. Saved guest profiles survive refreshes and app restarts.
+17. Different weddings can have different profiles for the same user.
+18. Guests cannot modify another guest's profile.
+19. Existing host/co-host permissions and private-wedding access remain intact.
+20. Existing messages, photos, videos, audio, and memberships remain intact.
+21. The message composer, keyboard behavior, and bottom navigation continue working.
+22. Existing supported themes, light/dark mode, authentication, and other wedding sections continue working.
+23. There are no fake profiles, hardcoded production messages, or mock-only functionality.
+24. The application builds successfully and relevant tests pass.
+
+22. Implementation and verification workflow
+
+Perform the work in these stages.
+
+Stage A — Inspect
+
+Identify the relevant files, components, theme tokens, database tables, storage integrations, membership identity, security policies, and current tests.
+
+Determine how the application currently distinguishes the logged-in user from the members of an individual wedding.
+
+Stage B — Design the smallest safe implementation
+
+Plan the chat styling changes and the wedding-specific profile model using the existing architecture.
+
+Identify any required database migration or storage configuration before making changes.
+
+Stage C — Implement
+
+Apply the chat bubble, attachment, voice-message, reaction, date-separator, and optional wedding-atmosphere improvements.
+
+Implement the persistent wedding-specific guest profile creation and editing flow, including profile-picture upload and authorization.
+
+Connect the real profile data to chat avatars, sender names, and other relevant views.
+
+Stage D — Verify
+
+Test at minimum:
+
+- Existing users opening the chat.
+- A guest joining a wedding for the first time.
+- A guest creating a profile without a photo.
+- A guest uploading or selecting a photo.
+- A guest editing their name or photo.
+- The same user participating in two different weddings.
+- Existing users refreshing or reopening the app.
+- Guests who have left or been removed from a wedding.
+- Unauthorized attempts to edit another person's profile.
+- Incoming and outgoing message layouts.
+- Text, photo, video, and audio messages.
+- Reactions and message scrolling.
+- Composer behavior with the keyboard open.
+- Existing theme selections and responsive layouts.
+- Offline or failed-upload behavior where supported.
+
+Run the available automated tests, type checks, and production build checks.
+
+Do not report a test as passed unless it was actually run successfully.
+
+Stage E — Final report
+
+After implementation, provide a concise report containing:
+
+- Features completed.
+- Files and components changed.
+- Database migrations or storage changes made.
+- Tests and build checks actually performed.
+- Any outstanding configuration or integration requirements.
+- Any limitations that could not be resolved safely.
+
+Do not claim that profiles persist, uploads work, or permissions are secure without verifying the implementation.
+
+Final instruction
+
+Prioritize a polished, premium result with subtle wedding personality and reliable real functionality.
+
+The chat should feel lighter, cleaner, and more personal while remaining unmistakably The Wedding Circle.
+
+Preserve the existing application, data, and theme identity. Make targeted changes, verify them, and leave unrelated working functionality untouched.

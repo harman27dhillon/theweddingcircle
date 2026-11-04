@@ -1,0 +1,41 @@
+CRITICAL: WEDDING CIRCLE LIVE STATE DISAPPEARS AFTER SECTION NAVIGATION
+
+I have confirmed another reproducible bug. When the host starts a live session, the guest may initially see the LIVE label and host information, but if the guest switches to Feed or another bottom-navigation section and then swipes back to Live, all live information disappears and the screen shows nothing. In addition, the actual guest video connection was previously unavailable.
+
+Fix BOTH problems in the existing application. Do not redesign the UI or create fake live-session cards.
+
+A. FIX LIVE SESSION STATE PERSISTENCE
+1. Trace the live-session lifecycle from host start through persistence, attendee discovery, section navigation, component unmount/remount, and host end.
+2. Identify why the active session disappears when leaving and returning to Live. Check whether session data exists only in component-local state, whether the component resets its state on mount, whether the active session query runs again, and whether subscriptions are lost or incorrectly filtered.
+3. Store authoritative live-session status in the existing persistent backend/session model. Keep transient UI state separate from authoritative session state.
+4. When Live becomes active or remounts, immediately restore or refetch the current wedding's actual active session and re-establish the necessary subscription. Do not depend on a component instance surviving navigation.
+5. Ensure changing sections does not accidentally stop the host's broadcast, close the guest's active connection unnecessarily, clear the session ID, or mark the session ended.
+6. Avoid duplicate subscriptions and stale callbacks. Clean up subscriptions correctly, but do not clear the active session merely because the Live screen unmounted.
+7. When the host genuinely ends the session, persist the ended state and ensure all viewers see that state. Do not allow a stale poll or reconnect response to restore an ended session as live.
+8. Scope every query and subscription to the correct wedding and authorized attendee. Never expose another wedding's live session.
+
+B. FIX ACTUAL VIDEO PLAYBACK
+The guest previously saw: “Circle developer is live. The video connection is not available from here.” Trace the actual streaming transport, host publishing, session/room IDs, signaling, remote tracks, guest player attachment, and required configuration. Determine the precise cause rather than guessing.
+
+If WebRTC is used, inspect offer/answer exchange, ICE candidate delivery, connection-state handling, and STUN/TURN connectivity where relevant. Ensure live-status polling continues independently of slow signaling. If a required provider, signaling service, TURN server, or credential is missing, report exactly what is required. Do not fake a successful connection or expose secrets.
+
+C. REPRODUCE THE EXACT NAVIGATION SEQUENCE
+Use two separate authenticated sessions belonging to the same wedding:
+1. Host starts broadcasting.
+2. Guest opens Live and sees the actual active session.
+3. Guest switches to Feed.
+4. Guest swipes back to Live.
+5. The same active session and its status are still visible.
+6. Guest can continue watching the actual stream or reconnect if the transport requires reconnection.
+7. Repeat by visiting Album and Home before returning to Live.
+8. Host ends the stream.
+9. Guest sees the ended state and does not remain stuck on “Connected” or incorrectly return to “LIVE”.
+10. Refresh or reopen the guest session and confirm the state matches the backend.
+
+D. REGRESSION SAFETY
+Preserve the existing Live UI, comments, YouTube Live section, host/co-host permissions, bottom navigation, swipe behavior, Feed, and Album. Do not reset wedding data or modify unrelated features. Avoid broad rewrites; fix the actual failing state and connection paths.
+
+E. REQUIRED EVIDENCE
+Identify the exact reason the session disappeared on navigation, the exact reason video playback failed if discoverable, the actual files/configuration changed, and the tests performed. Distinguish successful compilation from verified two-session playback. If the available environment cannot run two sessions or requires external configuration, state that limitation explicitly.
+
+Do not stop at making the LIVE badge reappear. The active session must survive section navigation, reflect the authoritative backend state, and allow authorized attendees to watch the actual stream.

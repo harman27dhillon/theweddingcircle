@@ -1,0 +1,170 @@
+THE WEDDING CIRCLE — INTRODUCE SEEK, THE CHAT GAME HOST
+
+Implement a new intelligent Chat bot named Seek that manages the complete "Who Said It?" game from inside the existing Wedding Circle Chat.
+
+This is a direct implementation task. Inspect the current project and modify the actual source code. Do not just provide a plan or summarize the requirements.
+
+1. Remove the trophy button completely
+
+- Remove the Who Said It? floating trophy button from the Chat screen.
+- Remove its associated click handlers and obsolete positioning logic.
+- Remove any Developer Section controls that exist exclusively to position or configure this trophy.
+- Do not remove the existing Chat plus button or affect the composer layout.
+- Do not remove the underlying game functionality. Seek will now manage it.
+
+2. Introduce Seek — the intelligent game host
+
+Create a Chat bot named Seek.
+
+Seek should behave like a system bot and game host, not like an ordinary human participant.
+
+Users can trigger Seek directly through the existing Chat message composer by typing:
+
+"@seek start who said it"
+
+When a participant sends this command:
+
+- Recognize the command and prevent it from appearing as an ordinary chat message.
+- Seek should respond inside the same Chat with a compact, visually distinct system message.
+- Seek should announce that a new Who Said It? round has started.
+- Start the 60-second submission timer.
+- Ensure only one active round can exist per wedding Chat.
+- Any eligible wedding Chat participant can start a round.
+
+Use a distinctive but understated Seek identity, such as a small Seek avatar/icon, the name "Seek", and subtle champagne-gold accents. Keep its messages consistent with the existing wedding theme.
+
+3. Submission stage — live Chat text bar
+
+Immediately after Seek starts a round:
+
+- A compact interactive message bar should appear inside the Chat conversation.
+- This should look and feel like a temporary Chat message, not a full-screen modal, separate page, or large game card.
+- Display a small live 60-second countdown above the message bar.
+- Every eligible participant EXCEPT the person who started the round can enter one anonymous statement.
+- The starter must see the timer and game progress, but must never receive a statement input field.
+- Participants can submit one short statement each.
+- After submission, disable their input and show a small confirmation.
+- Keep authors hidden from everyone until the reveal.
+- Persist submissions securely in the backend.
+
+4. Submission deadline — Seek posts the statements
+
+When the 60-second timer expires:
+
+- Automatically close submissions.
+- Shuffle all submitted statements.
+- Remove the temporary submission bar.
+- Seek posts one compact system Chat message containing all statements.
+- Display each statement as an individual, selectable Chat-style text bubble within Seek's message.
+- Do not reveal the authors.
+- Keep the statements in a readable, compact layout.
+
+5. Guessing stage — starter selects authors
+
+After posting the statements:
+
+- Start a 120-second guessing timer.
+- Only the person who started the round can make guesses.
+- Other participants can see the statements and the guessing progress, but cannot interact with the author selectors.
+- When the starter taps any statement, display a compact participant selector immediately below or beside that statement.
+- Show the eligible participants' profile pictures and names.
+- The starter selects the person they believe wrote that statement with one tap.
+- Save the selected author against that statement.
+- Allow the starter to change an answer before the deadline or early lock.
+- Clearly distinguish guessed and unguessed statements.
+
+Lock It: If the starter finishes early, display a small Lock It control within Seek's guessing message. Pressing it immediately locks all answers and starts the reveal.
+
+At the 120-second deadline, automatically lock all answers even if the starter has not completed guessing.
+
+6. Reveal stage — Seek posts results
+
+Once guessing is locked:
+
+- Seek posts the final results in the same Chat conversation.
+- Reuse the same statements and display their actual authors.
+- Correct guesses must be highlighted in green.
+- Incorrect guesses must be highlighted in red.
+- Unanswered statements must remain neutral.
+- Show the actual author's profile picture and name.
+- Award one point for each correct guess.
+- Display the starter's final score.
+- Make the results visible to everyone in the wedding Chat.
+
+The result message should look like a natural continuation of the Chat conversation, not a separate results page.
+
+7. Seek's behavior and command handling
+
+For this first implementation, support:
+
+"@seek start who said it"
+
+Also support a helpful response when someone types "@seek" without a valid command, explaining how to start the game.
+
+Seek must check:
+
+- Whether the sender is a member of that wedding.
+- Whether a round is already active.
+- Whether the command is valid.
+- Whether the user is authorized to perform the requested action.
+
+If a round is already active, Seek should reply that the current round must finish before another begins.
+
+Keep the architecture extensible so more Seek games and commands can be added later without rewriting the bot.
+
+8. Backend, security and persistence
+
+This must be a real working game, not a frontend-only simulation.
+
+- Inspect the existing Supabase schema and backend before implementing.
+- Reuse existing authentication, database, RLS policies and realtime infrastructure.
+- Persist round state, starter ID, submission deadline, statements, anonymous author mappings, guesses, locking status and final scores.
+- Enforce deadlines on the server, not just with browser countdowns.
+- Never expose statement authors before the reveal.
+- Prevent duplicate submissions, duplicate scoring and multiple simultaneous rounds within the same wedding.
+- Make submissions, guesses, locks and reveals concurrency-safe.
+- Preserve round state across refreshes, reconnects and device changes.
+- Ensure one wedding's game data cannot leak into another wedding.
+
+9. Visual design
+
+Seek should feel like a premium native part of Wedding Circle.
+
+- Use the existing Chat bubble style and current theme.
+- Keep all game messages compact.
+- Use subtle burgundy, champagne-gold and theme-compatible accents.
+- Use small countdown indicators.
+- Avoid oversized cards, full-screen overlays, unnecessary animations and separate game screens.
+- The submission bar should look like a temporary chat composer.
+- The statements and reveal should look like messages posted by Seek.
+
+10. Verification requirements
+
+Test the complete round using multiple participant accounts:
+
+1. Participant A sends "@seek start who said it".
+2. Seek starts the round and displays the 60-second submission bar.
+3. Participant A sees no statement input.
+4. Participants B, C and D can each submit one anonymous statement.
+5. Seek closes submissions at the deadline and shuffles statements.
+6. Participant A can select a statement and choose an author from the participant list.
+7. Other participants cannot make guesses.
+8. The 120-second deadline locks guesses automatically.
+9. Early Lock It also works.
+10. Seek reveals actual authors and correctly marks green, red and unanswered results.
+11. Scores are correct and never duplicated.
+12. Refreshing the page or switching devices does not destroy the round.
+
+11. Strict implementation instructions
+
+- Inspect the actual source before modifying anything.
+- Implement the complete feature directly.
+- Do not repeatedly summarize the task.
+- Do not create a fake bot that only responds with hardcoded messages.
+- Do not replace working Chat functionality.
+- Do not modify unrelated UI.
+- Do not claim a feature works simply because the project builds.
+- Run the production build and relevant tests.
+- Report the actual files changed, database changes, tests performed and any remaining blockers.
+
+The final result must be a working Seek bot that hosts Who Said It? entirely inside the existing Wedding Circle Chat, with no trophy button anywhere in the Chat interface.

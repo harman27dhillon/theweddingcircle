@@ -1,0 +1,208 @@
+The Wedding Circle — Implement a Real Responsive Desktop Layout
+
+Fix the existing desktop layout using actual code changes. The current published website still looks like a narrow mobile page on desktop. Do not simply increase the width of the existing mobile container.
+
+1. Inspect the existing code first
+
+Identify the main landing-page component, wedding dashboard/home component, shared layout wrappers, CSS files, and existing breakpoints. Reuse the current components and design tokens. Adapt the selectors and component names below to the actual codebase; do not create duplicate pages or competing CSS systems.
+
+2. Add responsive layout rules
+
+Use the following CSS as a starting point. Integrate it into the existing stylesheet and replace the example selectors with the real selectors where necessary.
+
+/* Global responsive foundations */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  min-width: 320px;
+}
+
+body {
+  width: 100%;
+  min-width: 320px;
+  margin: 0;
+}
+
+img,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+/* Main application shell */
+.app-shell,
+.page-shell,
+.landing-page {
+  width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+/* Mobile and small screens: preserve the existing composition */
+@media (max-width: 767px) {
+  .desktop-navigation {
+    display: none;
+  }
+
+  .responsive-content {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 16px;
+  }
+
+  .wedding-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Tablet layout */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .responsive-content {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 28px;
+  }
+
+  .wedding-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+/* Desktop and laptop layout */
+@media (min-width: 1100px) {
+  .responsive-content {
+    width: min(100% - 64px, 1440px);
+    margin-inline: auto;
+  }
+
+  .desktop-navigation {
+    display: flex;
+    align-items: center;
+  }
+
+  .wedding-card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, 320px), 1fr)
+    );
+    gap: 28px;
+    align-items: start;
+  }
+
+  .landing-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+    gap: 32px;
+    align-items: start;
+  }
+
+  .landing-main,
+  .landing-sidebar {
+    min-width: 0;
+  }
+
+  .wedding-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .page-section {
+    margin-bottom: 32px;
+  }
+}
+
+/* Large desktop monitors */
+@media (min-width: 1600px) {
+  .responsive-content {
+    width: min(100% - 96px, 1520px);
+  }
+}
+
+/* Prevent grid children from forcing horizontal overflow */
+.wedding-card-grid > *,
+.landing-layout > *,
+.responsive-content > * {
+  min-width: 0;
+}
+
+These selectors are examples, not a claim about the existing class names. Connect the rules to the real components and remove or override conflicting mobile-only constraints where appropriate.
+
+3. Fix the actual landing-page structure
+
+At desktop widths, arrange the existing landing page into a balanced composition:
+
+- Header and navigation across the available width.
+- Main wedding card or wedding-card collection in the primary content area.
+- Create New Wedding and Join a Wedding controls arranged neatly without becoming oversized.
+- Discover, leaderboard, and other existing sections placed in a secondary column or appropriate grid.
+- Maintain the current burgundy, ivory, champagne-gold, typography, card styling, and subtle animations.
+
+On phones, retain the existing single-column layout.
+
+4. Fix the wedding interface too
+
+Apply the same responsive principles to the wedding home, Chat, Live, Album, More, and Host Control screens. Do not apply the landing-page two-column layout blindly to every screen. Each screen should have a suitable desktop arrangement while preserving its existing behavior.
+
+For example:
+
+- Chat can use a wider conversation area with an appropriately sized sidebar only if the existing app supports one.
+- Album can use a responsive image grid.
+- Live can use a larger video area and properly arranged controls.
+- Navigation should remain usable without overflowing or shrinking to mobile-sized controls.
+
+Do not break portrait live-stream behavior on phones.
+
+5. Check the viewport and conflicting styles
+
+Verify that the HTML document contains the standard viewport declaration:
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+If the project uses a framework or shared document template, update the correct location rather than adding a duplicate declaration.
+
+Search for and fix actual causes such as:
+
+- A global "max-width" that restricts every screen to phone width.
+- Fixed-width containers or inline styles.
+- Mobile breakpoints applied to all screen sizes.
+- Parent wrappers preventing children from expanding.
+- Desktop navigation accidentally hidden at every breakpoint.
+- JavaScript device detection forcing mobile layout on desktop.
+
+Do not remove legitimate maximum widths from individual elements that should remain constrained, such as text fields or dialogue boxes.
+
+6. Verify using actual viewport sizes
+
+Test at 375px, 768px, 1024px, 1366px, and 1920px.
+
+Confirm that:
+
+- The 375px layout remains mobile-friendly.
+- Tablet uses an appropriate intermediate layout.
+- Desktop uses the available screen width rather than a narrow phone column.
+- No page has horizontal overflow.
+- All existing buttons, routes, themes, and wedding features continue working.
+
+Run the production build and inspect the actual rendered desktop page if browser testing is available. Do not claim the issue is fixed just because the CSS was added.
+
+Strict safeguards
+
+Make the smallest targeted changes possible. Preserve all existing user data, weddings, memberships, permissions, settings, APIs, database connections, and secrets. Do not modify Supabase/Neon migration or routing. Do not redesign unrelated features or replace existing components unnecessarily.
+
+At the end, report the root cause, changed files, actual viewport tests, build results, and whether the published deployment contains the fix.

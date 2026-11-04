@@ -1,0 +1,139 @@
+WEDDING CIRCLE — HOST CONTROL CENTER, DATA PERSISTENCE, NAVIGATION AND UI REFINEMENT
+
+Implement all 11 updates directly in the existing Wedding Circle application. Inspect the actual rendered components, routes, backend data models, permissions, and persistence logic before editing. Do not create mockups, duplicate components, reset data, or refactor unrelated features. Preserve existing wedding records and user settings.
+
+PRIORITY 1 — CEREMONY ACTION BUTTONS
+1. Remove the separate Edit option currently added to every ceremony on the wedding Home page.
+2. Rename each ceremony's existing “Open” button to “Edit”.
+3. The renamed button must open the existing ceremony-editing interface, allowing authorized hosts/co-hosts to correct the ceremony's date, time, location, and supported details. Do not leave it opening a read-only view.
+4. Enforce editing permissions using the existing authorization rules. Guests must not gain editing access by manipulating the UI or requests.
+
+PRIORITY 2 — PHONE BACK BUTTON CONFIRMATION
+When a user is inside an individual wedding's Home page and presses the Android/browser back button, interpret it as a request to return to the official landing page. Display a polished confirmation dialog asking whether they really want to exit to the landing page.
+- Provide clearly labeled Stay and Exit to landing page actions.
+- Stay closes the dialog and keeps the user in the wedding.
+- Exit returns to the existing landing page without signing the user out, leaving the wedding, or changing membership or data.
+- Handle the browser/Android back event correctly, without creating a back-button loop or breaking the operating-system navigation behavior elsewhere.
+- Do not show the dialog for unrelated pages unless their existing behavior explicitly requires it.
+
+PRIORITY 3 — COMPLETE WEDDING DELETION FOR THE HOST
+Give the authorized primary host an option to permanently delete their entire wedding from the app.
+- Place this destructive action inside the new Host Control section in More.
+- Require a clear warning, explicit confirmation, and preferably typing the wedding name before permanent deletion.
+- Enforce authorization on the backend, not just by hiding the button.
+- Clearly explain what will be deleted, including wedding details, ceremonies, memberships, Feed content, comments, and associated stored media as applicable.
+- Before deletion, offer an explicit choice to retain photos/videos or delete them too.
+- If retaining media is selected, detach or transfer the eligible media to a clearly defined retained-media area or ownership record without exposing it to unauthorized users. Explain any storage or ownership implications. Do not pretend deleted wedding records still provide normal access to retained media.
+- If deleting media is selected, delete only media belonging to that wedding and only after the user confirms.
+- Handle storage failures and partial deletion safely. Use a transaction or staged deletion where supported; never silently leave orphaned data or claim success if cleanup fails.
+- Co-hosts and ordinary guests must not receive permission to permanently delete the wedding unless an existing explicit policy authorizes it.
+
+PRIORITY 4 — CREATE A DEDICATED HOST CONTROL SECTION IN MORE
+Add a distinct Host Control section at the top of the More page, visually separated from ordinary options using a vibrant but tasteful accent color, clear heading, and compact card or panel styling.
+
+Only show host controls to authorized hosts. Co-hosts should see only the controls granted by their permissions. Guests should not see host-only actions.
+
+Consolidate existing host powers into this section, including:
+- Feed appearance or permitted side/color settings.
+- Wedding-wide BackgroundsN theme selection.
+- Invitation cover selection and upload.
+- Editing wedding details that were set during creation, such as names, date, location, tradition/theme, and other existing editable fields.
+- Managing ceremonies and their details.
+- Managing authorized co-hosts.
+- Other existing host-only controls that are currently scattered across the app.
+- The permanent wedding-deletion action from Priority 3, clearly separated as a destructive option.
+
+Requirements:
+- Audit the existing host controls first; move or link to the existing implementations instead of duplicating them.
+- Preserve existing saved values and editing flows.
+- Save changes persistently and apply them consistently to the correct wedding.
+- Show clear success/error states and validate changes.
+- Do not grant guests additional privileges.
+
+PRIORITY 5 — HOST CHOOSES CO-HOSTS
+Inside Host Control, provide a co-host management interface for the authorized primary host.
+- Show current authorized wedding members that can be selected as co-hosts.
+- Allow the host to assign and revoke co-host status with confirmation where appropriate.
+- Persist role changes in the actual membership/authorization data model.
+- Ensure changes are reflected in the relevant sessions and permissions without requiring users to recreate the wedding.
+- Only the authorized primary host can manage co-host assignments unless the existing role policy explicitly allows otherwise.
+- Verify co-hosts receive only the intended powers, and that revoked co-hosts immediately lose those powers.
+- Never allow someone to elevate their own role through client-side state or a direct request.
+
+PRIORITY 6 — PRESERVE ALL WEDDINGS AND USER SETTINGS AFTER REPUBLISHING
+There is a serious persistence bug: after updating and republishing the app, some weddings that users previously entered as guests disappear from the landing page.
+
+Investigate and fix the actual cause. Do not hide the problem with demo data or local-only workarounds.
+- Trace how weddings, memberships, guest access, and user preferences are stored and retrieved.
+- Determine whether republishing changes a storage key, database connection, environment variable, schema, initialization routine, cache, or query filter.
+- Ensure deployment or republishing does not reset, overwrite, recreate, or disconnect existing user data.
+- Keep the authoritative data in the persistent backend, not only in component state, browser storage, or a temporary deployment filesystem.
+- Preserve each user's existing wedding memberships, saved settings, roles, selected themes, cover images, and other persisted preferences across application versions.
+- Ensure landing-page queries return all weddings the user is authorized to see, including weddings joined as a guest. Do not show only weddings created by the current user.
+- If a database migration is needed, make it backward-compatible and non-destructive. Never drop or overwrite production data to fix the query.
+- Preserve privacy and ensure users see only weddings and information they are authorized to access.
+
+Test with an existing guest account that belongs to multiple weddings. Record its memberships before the update, deploy/republish a new version in the available test environment, sign in again, and verify that all previously accessible weddings remain visible and accessible. If a real deployment cannot be tested, state that limitation and provide a safe migration/deployment procedure.
+
+PRIORITY 7 — GOOGLE MAPS LOCATION URL FOR CEREMONIES
+Inside the ceremony location/directions editing interface, add a field labeled “Google Maps link”.
+- Allow hosts/co-hosts with editing permission to paste a Google Maps URL for the ceremony venue.
+- Validate that the input is a legitimate supported Google Maps link before saving. Do not blindly trust arbitrary URLs.
+- Save the link against the correct ceremony record and wedding ID.
+- When a valid link exists, show a clearly labeled “Open in Google Maps” button on that ceremony.
+- Open the actual saved link using the supported navigation behavior, with a safe external-link fallback when the Google Maps app is unavailable.
+- Preserve existing address/directions fields. If no map link is supplied, keep their current behavior.
+- Guests may open the link but must not be able to modify it.
+- Ensure the link persists after refresh and republishing.
+
+PRIORITY 8 — REDESIGN THE MORE SECTION WITH SQUARE ACTION BARS
+Redesign the More section so its ordinary action items are displayed in a clean grid of square, 1:1 tiles.
+- Use exactly three tiles per row when the viewport width allows; on narrow screens, adapt responsively rather than forcing overflow.
+- Each tile should have a consistent square aspect ratio, a centered icon, and a short readable label.
+- Use consistent gaps, padding, typography, and subtle theme-aware backgrounds.
+- Keep Host Control visually separate at the top with its distinct vibrant accent. It does not need to be forced into the ordinary tile grid.
+- Preserve all existing More actions, destinations, permissions, and functionality.
+- Apply the same subtle iPhone-style entrance animation used elsewhere in the app, with gentle fade/scale, staggered tile entry, and approximately 400–700 ms total entrance timing.
+- Do not replay the full animation on every re-render or block interaction while it runs.
+- Respect reduced-motion settings and maintain smooth performance on mobile.
+
+PRIORITY 9 — FIX THE MAIN LANDING-PAGE TITLE CLIPPING
+The main landing-page title “The wedding app” currently has the letter “g” partially hidden by the UI.
+- Inspect the actual heading container, line-height, overflow, clipping, font metrics, positioning, and safe-area spacing.
+- Fix the root cause so every letter renders fully at supported screen sizes and font scaling levels.
+- Do not simply shrink the text until it becomes too small.
+- Preserve the intended typography and visual hierarchy while allowing sufficient line-height and container space.
+
+PRIORITY 10 — REMOVE THE SAMPLE WEDDING BUTTON FOR SIGNED-OUT USERS
+On the official landing page, when a user is not signed in, remove the separate sample wedding button located near “Enter as guest”.
+- Remove only the sample wedding button and its redundant action.
+- Preserve the legitimate “Enter as guest” flow, login options, real wedding cards, and all other landing-page functionality.
+- Ensure no empty gap or broken layout remains where the sample button was located.
+- Do not delete actual weddings or their data when removing the sample entry point.
+
+PRIORITY 11 — SLIM DOWN FEEDBACK AND REMOVE UNNECESSARY BOTTOM SPACE
+The Feedback section is too large, and the page has excessive unused space near the bottom.
+- Reduce the Feedback panel's unnecessary padding, height, and oversized spacing while keeping its input and submit action comfortable to use.
+- Keep the section visually consistent with the rest of the app.
+- Inspect the actual layout to identify why the bottom gap exists. Correct excessive margins, fixed heights, empty containers, or incorrect viewport calculations rather than adding filler content just to occupy space.
+- If the remaining space is intentional because of the bottom navigation or safe area, preserve the necessary clearance. Otherwise remove the unnecessary gap.
+- Keep the feedback form functional, keyboard-accessible, and responsive on mobile.
+
+IMPLEMENTATION AND VERIFICATION
+Before editing, identify the actual components, routes, persistent data model, role authorization, ceremony schema, and deployment configuration involved. Reuse existing components and backend services wherever possible. Avoid unnecessary dependencies and broad rewrites.
+
+After implementation, verify:
+1. The ceremony Open button is replaced with Edit and opens the correct editor.
+2. The phone back button on wedding Home displays the confirmation dialog and both actions work.
+3. The primary host can delete the wedding using the protected confirmation flow and choose whether eligible media is retained.
+4. Host Control is at the top of More and contains the appropriate existing host powers.
+5. Co-host assignment and revocation persist and are enforced by the backend.
+6. Guest memberships and user preferences survive a safe update/republish test.
+7. A valid Google Maps URL is saved and the ceremony's Open in Google Maps button works.
+8. More uses a responsive three-column square-tile layout where space allows, with the entrance animation.
+9. The landing-page title is no longer clipped.
+10. The signed-out landing page no longer displays the sample wedding button.
+11. Feedback is more compact and unnecessary bottom space is removed.
+12. Existing Live, Feed, Album, wedding themes, covers, navigation, and privacy rules still work.
+
+Do not claim successful deployment or persistence without verification. Distinguish code compilation from actual backend and device testing. Report the actual files changed, tests performed, and any remaining limitations. Preserve production data throughout.

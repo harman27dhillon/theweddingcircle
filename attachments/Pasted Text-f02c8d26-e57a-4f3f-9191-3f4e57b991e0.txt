@@ -1,0 +1,74 @@
+Implement the 8 selectable wedding themes in The Wedding Circle. Use my attached screenshot as the exact visual reference for the wedding-card layout and the Feed/Chat and Live shortcut buttons.
+
+Before coding, inspect the existing wedding-card component, styling, theme handling, and navigation. Extend the existing implementation; do not rebuild the app or break working features.
+
+## THE 8 THEMES
+
+1. Royal Burgundy — deep burgundy, champagne gold, ivory, luxurious floral decoration.
+2. Pastel Blush — blush pink, warm cream, rose-gold accents, romantic florals.
+3. Sage Green — muted sage, ivory, botanical decoration, natural elegance.
+4. Royal Blue — rich royal/navy blue, ivory, restrained gold, formal elegance.
+5. Classic Ivory — ivory, cream, charcoal/soft brown, subtle gold, timeless minimalism.
+6. Midnight Emerald — deep emerald, antique gold, warm ivory, jewel-toned elegance.
+7. Terracotta Sunset — terracotta, peach, sand, soft bronze, warm earthy styling.
+8. Lavender Dream — lavender, lilac, pearl white, silver, delicate floral styling.
+
+## MATCH THE REFERENCE CARD DESIGN
+
+Each theme must retain the screenshot's recognizable card composition:
+
+- Large wedding card with rounded corners.
+- Rich, decorative wedding-card background/artwork.
+- Elegant, prominent couple names.
+- Wedding date and location near the bottom.
+- Two matching shortcut buttons INSIDE the card, near its lower-right area.
+- Keep the card proportions, content hierarchy, and shortcut placement consistent across all themes.
+- Make sure names, date/location, and shortcut buttons do not collide on narrow mobile screens or with long names.
+
+## SHORTCUT BUTTONS — IMPORTANT: MATCH THE SCREENSHOT
+
+The Feed/Chat and Live shortcut buttons must preserve the screenshot's distinctive appearance in EVERY theme.
+
+Do NOT replace them with small plain pills, generic icon buttons, or standard app toolbar controls.
+
+Use the same shared button design/component for both shortcuts:
+- Square/compact rounded-rectangle tile, matching the screenshot's size and proportions.
+- Prominent centered white or theme-appropriate high-contrast icon.
+- Clearly readable label beneath the icon: “Chat” (or the app's existing Feed/Chat label) and “Live”.
+- Decorative floral corner details, delicate illuminated/double border, and premium wedding-card finish, as shown in the screenshot.
+- Both buttons must have identical dimensions, border treatment, icon scale, label placement, and visual weight.
+- Keep them positioned inside the wedding card, aligned together near the lower-right, with comfortable spacing.
+- Adapt their colors, border accents, and corner florals to the selected theme, but preserve the same recognizable design and layout.
+- Ensure the icon and text remain legible against every theme's background.
+- Keep the existing working navigation/actions: Chat opens that wedding's chat/feed; Live opens that wedding's live area.
+
+For example, Royal Burgundy can use burgundy tiles with champagne-gold borders and ivory icons/text. Other themes should use their own palette while retaining the same ornamental tile style.
+
+## THEME PICKER
+
+Add a theme selector with eight clearly named preview choices. Each preview should show a miniature wedding card, including the decorative shortcut tiles—not just color swatches.
+
+Selecting a theme must apply it to the relevant wedding and persist after refresh/reopening. Reuse an existing theme setting/data field if present. Only existing authorized host/co-host roles may change the wedding theme.
+
+## APPLY THEMES THROUGHOUT THE WEDDING
+
+Apply the selected theme consistently to:
+- Wedding card and page background
+- Chat/Feed
+- Live screen and controls
+- Album
+- Navigation
+- Host Control
+- Buttons, borders, icons, and typography
+
+Keep layout and behavior consistent. Theme changes should be visual and must not alter permissions, wedding data, or feature functionality.
+
+## IMPLEMENTATION AND VERIFICATION
+
+- Reuse shared components and define the eight themes as explicit presets/design tokens.
+- Do not duplicate separate implementations of the shortcut buttons for each theme.
+- Preserve existing authentication, wedding data, membership, navigation, and media features.
+- Do not hard-code the example couple names, date, or location from the screenshot.
+- Test all eight themes on a narrow mobile viewport.
+- Verify the card layout, ornate shortcut buttons, legibility, navigation actions, theme persistence, and host/co-host authorization.
+- Report what was actually tested and any limitations. Do not claim the feature is verified unless it was tested.

@@ -1,0 +1,59 @@
+Fix Firebase Email/Password Provider Diagnostic — The Wedding Circle
+
+The Firebase connection test now succeeds. The Firebase Console confirms:
+
+- Email/Password: Enabled
+- Email link: Enabled
+- Firebase project ID and web configuration: verified
+- Messaging Sender ID: configured
+- Firebase service account: saved on the server
+
+However, The Wedding Circle still reports:
+
+“Not done — Email/Password provider has not been read yet.”
+
+Required work
+
+1. Inspect the complete Firebase diagnostic flow and identify exactly why the provider status is not being retrieved.
+2. Inspect the existing server-side Firebase Admin SDK and Identity Toolkit integration.
+3. Implement a reliable server-side read of the project's actual Email/Password provider configuration using the existing service account and supported Firebase Admin/Google API methods.
+4. Correctly distinguish:
+   - Email/Password enabled
+   - Email/Password disabled
+   - Provider status unavailable because of permissions
+   - API/network failure
+   - Invalid credentials
+5. Display the actual provider status and diagnostic timestamp in Developer → Infrastructure.
+6. Do not report "disabled" merely because the status could not be retrieved.
+7. Keep Firebase authentication configuration separate from the diagnostic. Do not change sign-in behavior.
+
+Strict restrictions
+
+- Do not replace or regenerate the Firebase API key.
+- Do not modify the service account or its private key.
+- Do not overwrite or delete saved credentials.
+- Do not change the Messaging Sender ID or VAPID configuration.
+- Do not switch authentication providers.
+- Do not alter Supabase membership logic.
+- Do not request notification permissions.
+- Never expose API keys, tokens, private keys, or service-account JSON in browser responses or logs.
+- Do not make unrelated UI or infrastructure changes.
+
+Verification
+
+- Add tests for enabled, disabled, permission-denied, unavailable, and malformed provider responses.
+- Run TypeScript checks, relevant tests, and the production build.
+- Inspect the actual diagnostic result rather than assuming the fix works.
+- Do not claim live verification unless a real Firebase project check succeeds.
+
+Final report
+
+Tell me:
+
+1. What caused the provider status to remain unread.
+2. What code was changed.
+3. Whether the live Firebase project now reports Email/Password as enabled.
+4. Which tests passed.
+5. Any remaining permission or configuration blocker.
+
+Implement the fix directly. Do not merely provide an explanation or proposed solution. Do not deploy without my approval.

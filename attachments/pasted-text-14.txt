@@ -1,0 +1,382 @@
+The Wedding Circle — Developer Mode Smart Database & AutoSync System
+
+Primary objective
+
+Upgrade the existing Developer Mode in The Wedding Circle to provide three independent, automated database management systems:
+
+1. Neon Manager
+2. Supabase Manager
+3. Firebase Manager
+
+Each provider must have its own configuration fields, connection tests, provider-specific diagnostics, data inspection, synchronization, transfer, recovery, and status information.
+
+All three managers must be integrated with a shared SmartSync and Recovery Engine. I should normally only need to enter the appropriate URL/configuration and credentials, then press Save Connection, Validate, or Transfer. Everything safe and routine should run automatically behind the interface.
+
+This is an implementation task, not just a UI mockup. Inspect the existing application and implement the functionality using the actual architecture, services, environment variables, authentication system, database schema, and deployment configuration already present.
+
+1. Mandatory safety and inspection rules
+
+Before changing anything:
+
+- Inspect the existing repository, Developer Mode, database clients, migrations, authentication system, environment configuration, sync implementation, local storage, and currently deployed database routing.
+- Identify the actual current production provider for each data service.
+- Reuse existing implementations where possible. Make the smallest coherent changes and avoid creating duplicate database clients, migration systems, or sync engines.
+- Preserve existing UI, functionality, user accounts, passwords, sessions, wedding records, wedding IDs, memberships, permissions, media references, chat history, invitations, settings, and local pending changes.
+- Never reset, wipe, truncate, overwrite, or recreate a production database to simplify migration.
+- Never remove destination-only records simply because they do not exist in the source.
+- Never silently replace an existing environment configuration or change production routing during an ordinary connection test.
+- Do not hardcode credentials, expose secrets in frontend code, print credentials into logs, or store privileged service credentials in browser storage.
+- Do not mark an integration as connected, synchronized, migrated, or active unless the corresponding operation has actually succeeded.
+- Do not disable existing tests or hide errors to make the implementation appear successful.
+
+First establish the current architecture and then implement the complete system incrementally, preserving a working application throughout the process.
+
+2. Developer Mode interface
+
+Create or improve a dedicated section called Database Manager & AutoSync inside the existing Developer Mode.
+
+Provide three separate provider panels or tabs:
+
+- Neon
+- Supabase
+- Firebase
+
+Each provider must have an independent configuration, status, validation, diagnostics, transfer history, and available actions. Configuration must not leak between providers.
+
+Each provider panel must contain the appropriate fields.
+
+Neon Manager
+
+Include:
+
+- Database connection URL / PostgreSQL connection string.
+- A masked credential field or secure server-side credential reference.
+- Connection validation.
+- Schema and table inspection.
+- Record counts and reconciliation.
+- Transfer, synchronization, recovery, and connection status.
+
+Support the existing Neon configuration and preserve any current Neon-based authentication or application functionality.
+
+Supabase Manager
+
+Include:
+
+- Project URL.
+- Appropriate API key.
+- Secure server-side database connection string or server-side credential reference where needed for database operations.
+- Separate status information for Supabase Postgres, Supabase Auth, and Supabase Storage when those services are used by the application.
+- Schema, tables, row counts, permissions, row-level security, reconciliation, transfer, and recovery checks.
+
+Do not confuse a successful Supabase Auth health check with a successful PostgreSQL connection, or vice versa.
+
+Firebase Manager
+
+Include the configuration relevant to the Firebase services actually supported by the application, including:
+
+- Firebase project ID.
+- Web app configuration fields such as API key, auth domain, project ID, app ID, and other required fields for the selected services.
+- Firestore or Realtime Database configuration, according to the service being used.
+- Firebase Authentication status if the application uses it.
+- Firebase Storage status if the application uses it.
+- Secure server-side Admin SDK credential configuration when privileged server operations are required.
+
+Do not present Firebase as if it were PostgreSQL. Implement provider-specific setup, data models, permissions, validation, and migration logic.
+
+Clearly distinguish public client configuration from privileged server credentials. Never request or expose service account private keys in ordinary frontend forms.
+
+For every provider, include:
+
+- Save Connection
+- Test Connection
+- Inspect Database
+- Transfer Data
+- Sync Now
+- View Details
+
+Only show actions that are applicable to the provider and the detected application architecture.
+
+Saving credentials must use the existing secure server-side configuration mechanism. If the deployment environment requires manually setting a secret, show precisely which variable or configuration is missing and provide the appropriate setup guidance. Never pretend a secret was saved if the application cannot persist it securely.
+
+3. Show which system the website is actually using
+
+At the top of Developer Mode, display an always-visible Current Production Data Routing dashboard.
+
+Do not merely display the provider selected in the configuration form. Detect and verify the actual runtime routing for the deployed application.
+
+Show the actual provider separately for each data category, when applicable:
+
+- User accounts and authentication.
+- Wedding core records and settings.
+- Memberships and access permissions.
+- Chat, posts, and wedding activity.
+- Invitations and couple access.
+- Media metadata and file storage.
+- Live-streaming and signaling services.
+- Local offline cache and pending changes.
+
+For each category, show:
+
+- Configured provider
+- Verified connection
+- Actual serving provider
+- Read/write status
+- Last successful operation
+- Last synchronization
+- Outstanding errors or pending changes
+
+Use honest, distinguishable states such as:
+
+- Not configured.
+- Configured, not tested.
+- Connected and verified.
+- Read-only connection.
+- Serving production traffic.
+- Sync in progress.
+- Partially synchronized.
+- Conflict detected.
+- Transfer blocked.
+- Healthy.
+
+If multiple providers are in use, display them as separate services. Do not force the entire application to be labelled as using a single provider when authentication, wedding data, and media storage are hosted separately.
+
+If actual live routing cannot be confirmed, show Unknown — runtime verification required instead of guessing.
+
+Connection success alone must never be treated as proof that the production application uses that provider.
+
+4. Smart automatic setup
+
+When I enter connection information and press Save Connection, automatically:
+
+1. Validate the input format.
+2. Verify that the required configuration is present.
+3. Test connectivity using the appropriate provider-specific method.
+4. Detect the provider, project, available services, permissions, and accessible schema or collections.
+5. Inspect the current application code to identify which data structures and services it actually requires.
+6. Detect missing tables, columns, indexes, collections, security rules, permissions, or required migrations.
+7. Detect unsupported configuration, incompatible schemas, missing credentials, permission errors, and connectivity failures.
+8. Show the exact findings and the safest next action.
+9. Save the validated configuration securely without changing production routing.
+10. Automatically apply only safe, approved, non-destructive setup steps supported by the existing architecture.
+
+Do not automatically make destructive schema changes, weaken security rules, disable row-level security, grant broad public access, delete records, or modify production routing.
+
+Use versioned, repeatable migrations. Record which migrations have completed so retrying an operation does not duplicate changes.
+
+5. Save, sync, and transfer must be separate operations
+
+Implement clear and distinct workflows.
+
+Save Connection
+
+Validates and securely saves provider configuration. It does not transfer data or switch production traffic.
+
+Sync Now
+
+Runs synchronization only where a valid sync relationship is configured. Shows the affected records, progress, conflicts, errors, and final verification result.
+
+Transfer Data
+
+Starts a controlled data migration between a selected source and destination. It must first inspect both systems and display a migration preview, including record counts, destination-only records, missing records, field conflicts, schema changes, and any unsupported data.
+
+Use stable identifiers and safe, resumable, idempotent operations. Preserve related records and foreign-key relationships. Do not assume that records with similar names represent the same wedding.
+
+Activate / Change Production Routing
+
+Keep activation separate from saving, validation, and data transfer.
+
+Only offer production activation when all required readiness checks pass. Require explicit confirmation before a production cutover. Keep rollback and the original source available until the new routing has been verified.
+
+Never silently cut over because a connection succeeded or a transfer started.
+
+6. Shared SmartSync Engine
+
+Implement a shared synchronization engine that works across supported provider combinations, including Neon-to-Supabase, Supabase-to-Neon, Firebase-to-Supabase, and other compatible combinations.
+
+Do not assume every data type can be transferred directly. Use provider-specific adapters and explicit field mappings.
+
+The engine must handle:
+
+- Stable user, wedding, membership, invitation, and record IDs.
+- Account-to-wedding membership indexing.
+- Wedding-level data reconciliation.
+- Incremental synchronization wherever supported.
+- Durable pending-operation queues.
+- Safe retries and duplicate prevention.
+- Interrupted transfer recovery.
+- Conflict detection and preservation.
+- Version tracking and change logging.
+- Relationship and integrity validation.
+- Source and destination record-count comparisons.
+- Transfer checkpoints and resumable jobs.
+- Recovery snapshots before risky changes.
+- Transfer history and audit events.
+
+Do not implement uncontrolled bidirectional writes in which two databases independently overwrite each other.
+
+Use one authoritative write path for live production data, together with a durable change log or outbox where appropriate. During a migration, track source and destination separately and reconcile changes deterministically.
+
+For conflicts, preserve both versions and their provenance, identify the conflicting fields, and apply a documented resolution policy. Automatically resolve only conflicts proven safe and non-destructive. Quarantine ambiguous conflicts for review rather than guessing.
+
+Protect against concurrent updates during transfer. Use a suitable change-capture or write-freeze strategy for the final reconciliation, depending on the existing architecture.
+
+7. Cross-device wedding synchronization and recovery
+
+Implement the previously discussed cross-device synchronization system.
+
+When a legitimate account signs in on a new device, the application should retrieve the weddings and records that account is authorized to access, regardless of which supported server provider holds those records.
+
+Requirements:
+
+- Use the established server-side authentication system and a stable account ID.
+- Verify current server-side wedding membership and permissions on every authorized data retrieval.
+- Do not rely on email matching alone, client-supplied wedding IDs, local ownership claims, or a local password as proof of identity.
+- Never store plaintext passwords or create a separate incompatible authentication system for each database.
+- Keep a reliable account-to-wedding index that points to the authoritative wedding records.
+- Load server-backed wedding data after authentication and restore eligible local offline changes.
+- Preserve chat history, wedding settings, guest membership, invitations, album metadata, host/co-host roles, and access controls.
+- Handle offline edits with a durable local pending queue, version identifiers, safe retries, and conflict detection.
+- Clearly distinguish locally saved changes, pending synchronization, synchronized records, and conflicts.
+- Ensure a device that has never held the account can recover server-backed data once online and authenticated.
+- Never promise recovery of data that exists only in another device's private browser storage and has never been uploaded or transferred.
+- Respect privacy, authorization, and deletion rules throughout synchronization.
+
+Local browser storage should be treated as a cache and offline queue, not as a global database accessible to every device.
+
+8. Automatic recovery and self-healing
+
+Implement a Recovery Centre that monitors provider health and sync operations.
+
+Automatically handle safe issues such as:
+
+- Temporary network failures.
+- Expired application sessions where the existing authentication flow supports refreshing them.
+- Interrupted transfers.
+- Retryable transaction failures.
+- Duplicate requests.
+- Missing non-destructive indexes or supported migrations.
+- Reconciliation of non-conflicting changes.
+- Stale local cache invalidation when it is safe.
+- Recoverable synchronization queue failures.
+
+Apply bounded retries with sensible backoff, not infinite retry loops. Avoid retry storms and prevent partially completed transfers from being reported as successful.
+
+Before any risky recovery operation, create an appropriate snapshot or recovery checkpoint and verify that it can be used. Do not claim a backup is restorable without evidence.
+
+Operations involving deletion, credentials, authorization policy changes, unresolved conflicts, and production routing require explicit approval.
+
+9. Detailed errors above the action buttons
+
+Place a prominent, expandable diagnostic panel immediately above the relevant Save, Sync, or Transfer button.
+
+The panel must explain:
+
+- What failed.
+- Which provider, service, table, collection, migration, or code path was involved.
+- The exact error code and relevant technical message, after removing secrets and personal information.
+- The likely root cause when supported by evidence.
+- Whether anything was changed or transferred.
+- Whether existing data is safe, partially changed, or awaiting verification.
+- What the application attempted automatically.
+- What it can safely fix itself.
+- What action, if any, I must take.
+- Whether retrying is safe.
+
+Where the error is caused by an application code defect, identify the affected file and function or operation, inspect the relevant code, and apply a minimal targeted repair only when a safe fix is supported by the evidence.
+
+After a repair, run the relevant test and retry the failed validation when safe. Do not claim the code is fixed merely because an error message disappeared.
+
+If the root cause is unclear, show the available evidence and next diagnostic step rather than fabricating a diagnosis.
+
+Provide expandable technical details for advanced debugging without overwhelming the main interface.
+
+10. Migration safety for the existing Neon/Supabase situation
+
+Pay special attention to the existing Neon/Supabase migration.
+
+Previously observed conditions include:
+
+- Neon as the established source of production data, pending verified cutover.
+- Five Supabase destination-only wedding-core-related rows that may represent legitimate data.
+- Six field-level conflicts involving wedding payloads and timestamps.
+- A destination-only wedding with slug "vicky-katrina-8ba2cb".
+- Confusing earlier status messages about Supabase routing and live read/write traffic.
+- A distinction between Supabase Postgres connectivity and Supabase Auth API health.
+
+Reinspect the live state and repository rather than blindly trusting these historical findings.
+
+Do not assume those extra records are accidental. Do not delete or archive them automatically. Inspect their relationships, provenance, permissions, and ownership where possible, while preserving their contents.
+
+Recheck the six historical conflicts against the actual current databases. Normalize JSON object key order and equivalent timestamp representations when appropriate, but do not normalize away meaningful differences in payload content or timestamps.
+
+Determine and report the actual live source, destination, per-service routing, permissions, and table/record counts. If production traffic cannot be observed or proven, explicitly mark it as unverified.
+
+Test both the database connection and required database operations. Verify that the backend's actual server role can perform the necessary operations under the intended security model.
+
+The previous readiness warnings must not be bypassed merely to make the migration appear complete. Do not perform the production cutover until the data reconciliation, permissions, routing, rollback, and application checks are satisfied.
+
+Keep authentication and database migration separate where necessary. If the application continues to use Neon for authentication while wedding data moves to Supabase or Firebase, preserve the established sign-in system and explicitly map authenticated accounts to wedding records.
+
+11. Automatic status and monitoring
+
+Show current health and recent activity for all configured providers.
+
+Track:
+
+- Connection checks.
+- Production routing verification.
+- Sync and transfer job status.
+- Source and destination counts.
+- Last successful synchronization.
+- Pending changes.
+- Conflicts.
+- Retry attempts.
+- Failed operations.
+- Backups and recovery checkpoints.
+- Recent configuration and routing changes.
+
+Use a concise activity log with expandable technical details, timestamps, job IDs, and redacted error information.
+
+Refresh status using the real available runtime and server information. Do not display fabricated live metrics or simulated progress in production.
+
+12. Testing requirements
+
+Add or update tests for:
+
+- Each provider's configuration validation.
+- Provider-specific connection failures.
+- Actual production routing identification.
+- Authentication and membership enforcement.
+- Duplicate-safe synchronization.
+- Record integrity and relationship preservation.
+- Source-only and destination-only records.
+- Conflicting field versions.
+- Interrupted and resumed transfers.
+- Recovery checkpoints and restoration where feasible.
+- Failed migrations and rollback.
+- Local offline changes and cross-device retrieval.
+- Missing credentials and insufficient permissions.
+- Credential redaction in logs and diagnostic displays.
+- Production activation being blocked when mandatory readiness checks fail.
+
+Use isolated test environments and fixtures. Do not use destructive test procedures against production data.
+
+Run the relevant tests, type checks, and build checks after implementation.
+
+13. Required completion report
+
+When the implementation is complete, report:
+
+1. Which files and components changed.
+2. Which Neon, Supabase, and Firebase functions are genuinely implemented.
+3. Which parts reuse the existing application versus newly added functionality.
+4. The actual production provider per data category, or clearly state what could not be verified.
+5. Which connections and operations were tested, and their real results.
+6. Which synchronization and recovery scenarios passed or failed.
+7. Any required deployment environment variables or secure server-side configuration.
+8. Outstanding errors, unsafe conditions, or manual steps that genuinely remain.
+9. Whether a production transfer or routing change occurred. Do not perform one unless the required safeguards and explicit approval are satisfied.
+
+Do not declare the project finished if only the interface was implemented.
+
+Final objective: I should have one Developer Mode area where I can configure Neon, Supabase, and Firebase independently, see exactly which systems the live website is using, and let a shared intelligent engine handle safe validation, synchronization, recovery, reconciliation, and transfer with clear error details and protection for existing data.

@@ -1,0 +1,71 @@
+The Wedding Circle — Discover HTML Image Import Infrastructure
+
+Prepare the existing Discover section to support importing wedding inspiration images from HTML pages that I create and host myself.
+
+This is the infrastructure preparation stage only. Do not redesign Discover or activate the complete feature yet.
+
+1. Inspect the existing project
+
+- Examine the current Discover section, frontend architecture, Express backend, routing and existing security configuration.
+- Identify the best way to add HTML-page image extraction without disrupting existing Discover functionality.
+- Reuse the existing architecture and dependencies wherever possible.
+
+2. Prepare HTML URL importing
+
+Create a modular backend service that can accept a URL to an HTML page and extract its usable image references.
+
+The service should:
+
+- Accept valid HTTP/HTTPS URLs.
+- Fetch HTML on the server, not directly from the browser.
+- Parse standard image elements, including "img" sources, "srcset", lazy-loaded image attributes and Open Graph image metadata where appropriate.
+- Resolve relative image paths against the source page URL.
+- Ignore tracking pixels, tiny decorative images, duplicate image URLs and invalid image references where practical.
+- Preserve the original image URLs and their source-page association.
+- Return structured image data suitable for rendering in Discover.
+- Handle unavailable pages, malformed HTML, timeouts and inaccessible images gracefully.
+
+3. Security requirements
+
+Because the backend will fetch user-provided URLs:
+
+- Prevent server-side request forgery (SSRF).
+- Block localhost, private networks, internal IP ranges and cloud metadata endpoints.
+- Validate DNS resolution and every redirect destination.
+- Restrict allowed protocols, response sizes, timeouts and content types.
+- Reject unsafe redirects and unsupported URL schemes.
+- Add reasonable rate limits and caching.
+- Never execute JavaScript from imported HTML.
+- Never insert imported HTML directly into the application's DOM.
+- Treat extracted image URLs and metadata as untrusted input.
+- Do not expose server credentials or internal network details.
+
+4. Prepare the integration interface
+
+Create a clean backend endpoint and reusable service module for future Discover integration.
+
+The response should include, where available:
+
+- Source page URL
+- Extracted image URL
+- Image alt text
+- Image dimensions, if safely available
+- A stable identifier for deduplication
+
+Do not store imported images permanently or copy them into cloud storage at this stage.
+
+5. Keep the current app safe
+
+- Do not change existing Discover UI yet.
+- Do not change authentication, themes, wedding creation or unrelated features.
+- Do not add fake image data or mock successful imports to production.
+- Do not introduce a new database or paid external service unless absolutely necessary.
+- Keep the service modular so image hosting or a manifest-based importer can be added later.
+
+6. Verification
+
+Add tests for valid HTML pages, relative image paths, duplicate images, missing images, malformed HTML, redirects, private-network URLs and oversized responses.
+
+Run the available tests and production build. Report which components were actually implemented and tested, the endpoint created, any remaining security limitations and the next step needed to connect the importer to Discover.
+
+Implement this preparation directly in the existing project rather than returning only a proposal.

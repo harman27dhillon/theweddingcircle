@@ -1,0 +1,149 @@
+CRITICAL BUG FIX: SUPABASE URL AND KEY SETTINGS CANNOT BE SAVED OR VERIFIED
+
+Fix the existing Supabase configuration section in The Wedding Circle Developer Center. This is a real implementation task. Inspect the current source code, identify the root cause, modify the actual files, and test the complete save-and-reload workflow.
+
+1. THE CURRENT PROBLEM
+
+In the Developer Center, the Supabase URL and key fields are not behaving correctly:
+
+- I enter the Supabase project URL and key.
+- I try to save them, but the settings do not appear to persist.
+- There is no clear indication that the values were saved successfully.
+- After saving or refreshing, I cannot reliably tell whether the stored configuration exists or whether the application is actually using it.
+
+Fix the underlying cause. Do not merely change the button text or display a fake success message.
+
+2. INVESTIGATE THE EXISTING IMPLEMENTATION
+
+Trace the complete settings workflow:
+
+- Frontend input fields and controlled form state.
+- Save button and form-submit handler.
+- API endpoint and request payload.
+- Server-side validation and persistence.
+- Environment-variable handling.
+- Database configuration storage, if applicable.
+- Response handling, errors, loading states, and UI updates.
+- Configuration retrieval after page refresh.
+- Actual database client initialization and connection testing.
+
+Inspect the existing architecture and determine whether the current settings are intended to be stored in server-side configuration, encrypted application settings, environment variables, or a database-backed configuration system.
+
+Identify exactly why saving currently fails. Check for mismatched field names, incorrect API routes, validation errors, rejected requests, missing persistence, stale state, environment-variable restrictions, and swallowed exceptions.
+
+Do not assume a particular root cause without evidence.
+
+3. IMPLEMENT A RELIABLE SAVE WORKFLOW
+
+Make the configuration form work end to end.
+
+- Accept a valid Supabase project URL and the appropriate key type for the existing architecture.
+- Validate the URL format and key presence before saving.
+- Display clear, field-specific validation errors.
+- Show a loading indicator while saving.
+- Disable duplicate submissions while a save request is in progress.
+- Display a success confirmation only after the server confirms that the configuration was persisted.
+- Display a meaningful error if the server rejects the save.
+- Prevent stale requests from overwriting newer settings.
+- Keep the saved state synchronized with the actual persisted configuration.
+- Reload the saved configuration correctly when the Developer Center is reopened or refreshed.
+
+Do not store credentials only in React state, localStorage, sessionStorage, or another browser-only location and then claim the server configuration has been saved.
+
+4. SHOW CLEAR CONFIGURATION STATUS
+
+Add a persistent status area in the existing Supabase settings section.
+
+It must clearly distinguish these states:
+
+Not configured
+No valid saved configuration is available.
+
+Unsaved changes
+The form contains edits that have not been persisted.
+
+Saving
+The save request is in progress.
+
+Saved
+The server has confirmed that the configuration was persisted.
+
+Connection verified
+The application successfully tested the saved configuration against the intended Supabase service.
+
+Connection failed
+The connection test failed, with a useful explanation that does not expose secrets.
+
+Show a last-saved timestamp when the backend can reliably provide one.
+
+On page reload, reconstruct the status from persisted server-side configuration. Do not rely on a temporary success flag in frontend state.
+
+A saved configuration and a working database connection are separate conditions. Display them separately.
+
+5. HANDLE KEYS AND SECRETS SECURELY
+
+Treat Supabase keys as sensitive configuration.
+
+- Never return the complete saved key to the browser after saving.
+- Never log the URL together with credentials, the key, or secret values.
+- Never expose a service-role key, secret key, or database password in client-side bundles.
+- Never put privileged credentials into public frontend configuration.
+- Use the appropriate server-side storage mechanism supported by the existing Grok runtime.
+- If the runtime only supports environment variables, implement the supported configuration flow and clearly explain whether those variables can be changed at runtime.
+- Do not pretend that changing a database row changes an environment variable.
+- Do not store secrets in plaintext in an ordinary application settings table.
+- If a secure, persistent secret-storage mechanism is unavailable, report the limitation and use the supported deployment configuration mechanism instead.
+
+Where the existing UI permits editing a saved secret, show a masked placeholder such as "Saved key configured". Do not populate the input with the real saved secret.
+
+Do not confuse the Supabase publishable/anonymous key with a privileged service-role or secret key. Use only the key type appropriate for each operation.
+
+6. ADD SAFE EDITING AND TESTING CONTROLS
+
+Provide clearly labeled controls for:
+
+- Save configuration.
+- Test saved connection.
+- Refresh configuration status.
+- Replace a saved key without revealing the existing key.
+
+The connection test must use the configuration that was actually saved on the server, not unsaved form values.
+
+If the database connection uses a server-only database URL while the authentication service uses a project URL and API key, show the required configuration fields accurately for the existing architecture. Do not incorrectly treat every key as interchangeable.
+
+A failed connection test must not delete or overwrite previously valid saved credentials.
+
+7. VERIFY THE FIX
+
+Test the complete workflow:
+
+1. Enter a valid project URL and key.
+2. Save the configuration.
+3. Confirm the backend reports successful persistence.
+4. Reload the Developer Center.
+5. Confirm the status still shows that the configuration is saved.
+6. Confirm the key remains masked.
+7. Test the saved connection.
+8. Submit invalid values and confirm meaningful validation errors appear.
+9. Simulate a failed save and confirm no false success message appears.
+10. Replace the saved key and verify the new value is used.
+11. Confirm no secrets appear in browser responses, frontend bundles, logs, or error messages.
+12. Confirm the developer login and existing Developer Center features still work.
+
+Use automated tests where practical and perform actual runtime verification where the environment permits.
+
+8. FINAL REPORT
+
+Report:
+
+- The exact root cause found.
+- The files modified.
+- How the configuration is now persisted.
+- Whether the URL and key survive a page refresh and a new session.
+- Whether the saved connection test passed.
+- Which checks were executed and which remain unverified.
+- Any manual Grok deployment settings I must configure.
+
+Do not mark the issue fixed just because the form accepts text or the save button responds.
+
+Acceptance criterion: I must be able to enter the Supabase configuration, save it, see a truthful saved-status indicator, reload the Developer Center and still see that the configuration is saved, and independently test the actual saved connection without exposing any secret.

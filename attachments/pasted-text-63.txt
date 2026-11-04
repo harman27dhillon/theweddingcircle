@@ -1,0 +1,423 @@
+IMPLEMENTATION PROMPT — THE WEDDING CIRCLE: REAL-TIME CHAT VOICE SYSTEM
+
+Implement a complete, production-oriented live voice chat feature inside my existing The Wedding Circle application. Replace the existing Music Track selector with a Mic control and add participant microphone-status indicators beside the existing Speaker control.
+
+This is an implementation task, not a design proposal. Inspect the existing source code, make the necessary changes directly in the project, build the infrastructure in code, integrate the frontend with the backend, and test the actual behavior.
+
+Do not stop after creating UI, mock buttons, placeholder APIs, or a demonstration.
+
+1. Non-negotiable requirements
+
+- Preserve the existing wedding Chat, messages, background images, themes, composer, plus button, Send button, profile button, filter, notifications, and bottom navigation.
+- Remove the Music Track selection functionality from the Chat floating controls and replace it with live voice chat.
+- Keep the existing Speaker button and its position.
+- Add a new floating Mic button in the former Music Track button's position.
+- Add a small arrow toggle and participant profile indicators immediately to the left of the Mic button.
+- Both Mic and Speaker must initialize OFF for every participant on every fresh voice-chat session.
+- Any authorized member of a wedding can participate in the voice conversation. Do not restrict it to hosts or co-hosts.
+- Participants who enable their microphones must be able to talk to one another in real time. Participants who enable their speakers must be able to hear other participants.
+- Participant indicators represent microphone-enabled status, not necessarily active speech.
+- Implement the actual audio transport, signaling, authorization, real-time presence, and cleanup.
+- Do not alter existing wedding data, authentication, membership roles, or unrelated features.
+
+2. Exact UI placement
+
+Use the supplied Chat screenshot as the layout reference.
+
+The existing Music Track and Speaker buttons appear in the upper-right area of the Chat conversation, over the wedding's themed background.
+
+Replace that arrangement with the following horizontal order, from left to right:
+
+[Participant profiles, when expanded] [Small arrow] [Mic] [Speaker]
+
+The Mic and Speaker remain anchored in the same upper-right location as the existing controls. The profile list grows toward the left side of the screen.
+
+Floating controls
+
+Mic button
+
+- Replace the music-note button.
+- Use the project's existing icon library, preferably Lucide React.
+- Show a microphone-off icon when muted and a microphone icon when enabled.
+- Provide clear but subtle visual feedback for ON and OFF states.
+- Request microphone permission only after the user deliberately enables the microphone.
+- If permission is denied, show a concise explanation without breaking Chat.
+
+Speaker button
+
+- Preserve its current location and general visual design.
+- OFF must prevent remote voice from being heard locally.
+- ON must allow remote voice to play, subject to device volume and browser permissions.
+- Do not confuse the speaker's local mute state with a participant disconnecting from voice chat.
+
+Arrow toggle
+
+- Place a small, unobtrusive chevron immediately to the left of the Mic button.
+- Its purpose is to expand or collapse the participant profile list.
+- Use an appropriate chevron direction for the current state.
+- It must not toggle the microphone, speaker, or voice connection.
+- The profile list is collapsed by default.
+
+Participant profiles
+
+- Each profile is a circular image using the participant's existing Wedding Circle profile picture.
+- Use the exact same rendered diameter as the Mic and Speaker buttons.
+- Keep consistent spacing, alignment, circular clipping, and touch targets.
+- When expanded, show the profiles of participants whose microphones are currently enabled in the same wedding Chat.
+- Update the list automatically as participants enable or disable their microphones, leave, disconnect, or reconnect.
+- Never display profiles belonging to participants in another wedding.
+- The profile list must not overlap or push the Mic and Speaker controls away from their anchored position.
+- If there are too many profiles, allow horizontal swiping to inspect the complete list.
+- Scrolling the profile strip must not scroll the message history or move the fixed controls.
+- Preserve usability on small Android screens, mobile Chrome, and desktop.
+- Do not add a permanent row of profiles when the list is collapsed.
+
+The collapsed state must be visually close to the current screenshot, with the Mic and Speaker buttons remaining in their existing floating position.
+
+3. Define the microphone and speaker behavior correctly
+
+Each participant has two independent local preferences:
+
+- "micEnabled": whether their microphone is transmitting audio.
+- "speakerEnabled": whether they hear remote participants.
+
+Initial state:
+
+- "micEnabled = false"
+- "speakerEnabled = false"
+
+These defaults must be enforced by the client and respected by the backend's session state. A new browser tab, fresh session, or new Chat entry must not automatically activate the microphone or speaker.
+
+Behavior matrix
+
+Mic| Speaker| Expected behavior
+OFF| OFF| Cannot transmit or hear remote voice
+ON| OFF| Can transmit voice; cannot hear others
+OFF| ON| Cannot transmit voice; can hear others
+ON| ON| Can transmit and hear other participants
+
+If a user disables the Mic, immediately stop transmitting their microphone audio. Prefer stopping and releasing the microphone track when appropriate, rather than merely hiding the microphone icon.
+
+If a user disables the Speaker, immediately mute all remote audio locally without disconnecting their microphone or changing other participants' states.
+
+When a user leaves Chat, changes weddings, logs out, or ends their voice session, clean up the audio resources and stop publishing audio. Never leave the microphone transmitting in the background.
+
+Use explicit button states and accessible labels. A muted icon alone is not sufficient feedback for permission failures, connecting, or connection errors.
+
+4. Implement genuine group voice infrastructure
+
+Inspect the complete existing application before selecting the architecture.
+
+The current application uses a React 19, Vite, TypeScript, Tailwind CSS v4 and Express backend. Reuse the existing authentication, wedding membership, database, and real-time infrastructure wherever it is appropriate.
+
+Do not introduce an unnecessary second database or replace the current authentication system.
+
+Audio transport
+
+Use a real-time audio architecture suitable for multiple simultaneous participants in the same wedding Chat.
+
+Preferred approach:
+
+1. If the project already has a configured and functional WebRTC SFU or managed group-audio provider, reuse it.
+2. Otherwise, implement a proper WebRTC-based group-audio integration using an SFU such as LiveKit, or an equivalent production-capable service.
+3. If the existing infrastructure is insufficient, add the required integration code, configuration, dependencies, server endpoints, event handling, and deployment documentation.
+
+Do not build a simplistic peer-to-peer mesh and claim it is production-ready for large wedding groups. A mesh can require a separate peer connection for every other participant and scales poorly as the group grows.
+
+The architecture must support multiple simultaneous speakers and listeners, with sensible bandwidth use and reconnect behavior.
+
+Required audio behavior
+
+- Publish microphone audio only when the user explicitly enables Mic.
+- Subscribe to eligible participants' audio only when local Speaker is enabled.
+- Mix/play multiple remote audio streams correctly.
+- Avoid audio feedback and accidental microphone loopback.
+- Handle browser autoplay restrictions by initiating audio playback from an appropriate user gesture and displaying a clear recovery action if playback is blocked.
+- Request microphone access only when needed.
+- Handle Bluetooth headsets and normal mobile audio-device changes as reliably as the browser APIs allow.
+- Handle microphone permission denial, device removal, network interruptions, tab visibility changes, and browser refreshes.
+- Never silently reactivate the microphone after a reconnect or page refresh.
+
+Use secure transport: HTTPS in production and the secure WebRTC transport mechanisms supported by the chosen provider.
+
+WebRTC signaling and credentials
+
+Implement the actual server-side signaling or provider-token flow.
+
+The backend must:
+
+- Authenticate every signaling/token request.
+- Verify the current user's membership in the requested wedding.
+- Scope voice rooms to the correct wedding.
+- Issue short-lived, appropriately scoped room credentials.
+- Grant audio-publish permission only as authorized for that participant.
+- Avoid granting room-admin privileges to ordinary participants.
+- Never expose provider API secrets, signing keys, database credentials, or privileged service keys in browser code.
+- Reject invalid wedding IDs, expired sessions, unauthorized participants, and forged identity claims.
+
+If using LiveKit or another SFU, create a provider abstraction so the application can maintain its current UI and state model if the provider changes later.
+
+Do not fabricate credentials or hardcode secret values. Add the required environment-variable references and deployment instructions. If external credentials or account setup are necessary, identify exactly what remains to be configured.
+
+5. Backend, database, and real-time presence
+
+Inspect the current database and real-time event system before designing new tables or collections.
+
+Implement the smallest appropriate persistent or ephemeral state model needed for this feature. Reuse existing user and wedding identifiers rather than creating duplicate identities.
+
+The model should represent, as appropriate:
+
+- Wedding or voice-room ID.
+- Authenticated participant ID.
+- Microphone-enabled state.
+- Voice-session connection status.
+- Provider participant/session ID where needed.
+- Server-generated join and heartbeat timestamps if needed.
+- Session expiration and cleanup metadata.
+
+Do not store raw audio recordings. This is a live conversation feature, not a recording feature.
+
+Authoritative microphone status
+
+The floating profile indicators must reflect the participant's actual server-authorized, active voice-session state.
+
+A participant's profile must not appear merely because someone changed a local React state variable or forged a WebSocket event.
+
+Use server-validated signaling and/or trusted provider participant events to update microphone status.
+
+When the Mic is OFF, the profile must disappear from the active microphone list.
+
+When the participant leaves, loses their session, or disconnects, clean up stale status after an appropriate timeout or authoritative disconnect event.
+
+If a network interruption occurs, distinguish a temporary reconnect from a confirmed departure without leaving a stale profile visible indefinitely.
+
+Real-time updates
+
+Broadcast participant presence and microphone-state changes to authorized members of the same wedding only.
+
+Use the existing real-time infrastructure if it supports this correctly. Otherwise, implement the minimum additional event transport required for reliable updates.
+
+Use a consistent event contract for events such as:
+
+- Participant joined voice.
+- Participant microphone enabled.
+- Participant microphone disabled.
+- Participant disconnected.
+- Participant reconnected.
+- Participant left voice.
+
+Validate all incoming events on the server. Do not trust client-supplied participant IDs or wedding IDs without verifying them against the authenticated session.
+
+Make state changes idempotent so reconnects and duplicate events do not create duplicate participants.
+
+If the project uses Supabase, Firebase, or another database, adapt this design to the actual configured provider. Do not assume a provider is working simply because its SDK is installed.
+
+Persistence
+
+Persist only what is necessary for reliable session management and debugging.
+
+Microphone and speaker preferences should default OFF on each new voice session. Do not restore a previous ON state automatically.
+
+If the user refreshes the page, the app must re-establish authentication and wedding membership, reconnect only after appropriate user action, and start with Mic and Speaker OFF.
+
+Do not persist a raw audio stream or retain unnecessary voice-presence history.
+
+6. Security, privacy, and authorization
+
+Implement all of the following:
+
+- Only authenticated users who are members of the selected wedding may enter that wedding's voice room.
+- Use the existing trusted user ID and wedding membership records.
+- Do not rely on display names, profile names, or client-supplied roles as proof of identity.
+- Do not allow one wedding's participants to see or hear another wedding's participants.
+- Prevent unauthorized publishing or subscribing through server-side checks and provider permissions.
+- Validate token expiry and room membership when generating credentials.
+- Apply appropriate rate limits to token issuance and signaling endpoints.
+- Clean up sessions when authentication expires or a participant leaves.
+- Do not expose private room credentials in logs, URLs, client error messages, or analytics.
+- Use existing secure database access policies where applicable.
+- Ensure a normal participant cannot modify another participant's microphone state.
+- Do not add recording, transcription, or permanent audio storage.
+
+The app must make it clear when the user has enabled their microphone. Do not activate the microphone without a deliberate user action.
+
+7. Frontend implementation and component structure
+
+Follow the existing component architecture and styling conventions.
+
+Create or update reusable components as appropriate, for example:
+
+- "ChatVoiceControls"
+- "VoiceParticipantStrip"
+- "VoiceParticipantAvatar"
+- "useWeddingVoiceChat"
+- A provider-specific audio client/service
+- Server-side voice-room and credential routes
+- A typed real-time event contract
+
+These names are suggestions. Reuse existing components if equivalent components already exist.
+
+Keep audio lifecycle management separate from visual rendering so UI rerenders do not create duplicate audio connections.
+
+Use proper React effect cleanup, stable participant identifiers, and connection lifecycle management.
+
+Prevent duplicate subscriptions, duplicate microphone tracks, duplicate event listeners, and repeated token requests during rerenders.
+
+Profile strip interaction
+
+- Collapsed by default.
+- Tapping the chevron expands the strip.
+- Tapping again collapses it.
+- Profiles are ordered consistently, with new participants inserted without unnecessary rearrangement.
+- When more profiles exist than fit on screen, allow horizontal swipe scrolling.
+- Keep the Mic, Speaker, and chevron anchored while profiles scroll.
+- Profile pictures should use existing account photos and a graceful fallback if a photo is unavailable.
+- Do not show decorative or fake participants.
+- Do not require the user to tap a profile to hear that participant; hearing is governed by the Speaker state and room subscription.
+- Do not accidentally enable another participant's microphone when tapping their profile.
+
+Keep the design consistent with The Wedding Circle's existing premium burgundy, blush, ivory, and gold themes. Respect the active wedding theme and both light and dark modes.
+
+Do not change unrelated theme tokens or the design of other screens.
+
+8. Replace the Music Track feature safely
+
+Inspect every place where the existing Music Track selector is used.
+
+Remove the selector from the Chat floating-control location and replace it with the Mic button.
+
+If music selection is used elsewhere, do not remove unrelated music functionality. Remove or disconnect only the Chat control and behavior that this change is intended to replace.
+
+Ensure that:
+
+- The old music-note control no longer appears in that position.
+- No obsolete track-selection handler is accidentally invoked by the new Mic button.
+- The existing Speaker button continues to occupy its original location.
+- No other Chat action, including plus, message sending, filtering, or bottom navigation, is broken.
+- No unnecessary floating control appears on the Live, Home, Album, or More screens.
+
+9. Mobile, desktop, and browser lifecycle
+
+Test the actual responsive layout.
+
+Mobile
+
+- Preserve the screenshot's floating-control placement.
+- Ensure the profile strip does not cover message text, the message composer, or bottom navigation.
+- Ensure horizontal swipes on the expanded profile strip do not interfere with scrolling the Chat history.
+- Avoid horizontal overflow on narrow Android devices.
+- Ensure microphone permission prompts and autoplay restrictions are handled.
+- Ensure backgrounding the browser or locking the screen cannot leave an unintended active microphone session.
+
+Desktop
+
+- Maintain the same visual ordering and fixed control behavior.
+- Ensure profile scrolling works with mouse, trackpad, and touch.
+- Keep the controls aligned with the existing Chat layout.
+
+Navigation and reconnect
+
+- Switching to another wedding must disconnect the old room before joining the new one.
+- Leaving Chat must stop microphone publishing and clean up the active voice session according to the app's intended lifecycle.
+- Logging out must disconnect voice immediately.
+- Reopening Chat must not silently reactivate the Mic or Speaker.
+- Handle expired provider tokens, temporary disconnections, and reconnect attempts without creating duplicate sessions.
+- Ensure reconnects do not accidentally publish audio when Mic is OFF.
+
+10. Performance and reliability
+
+- Avoid continuously polling if the existing real-time transport can provide presence updates.
+- Clean up listeners, timers, audio tracks, and peer connections on unmount.
+- Prevent repeated reconnect loops.
+- Use sensible retry/backoff behavior.
+- Avoid rerendering the entire message history when one participant toggles their microphone.
+- Avoid unnecessary database writes and high-frequency status updates.
+- Handle a participant abruptly closing their browser or losing network access.
+- Add useful server-side diagnostic logs without recording private audio or leaking secrets.
+
+The feature should be resilient to multiple participants joining and leaving at the same time.
+
+11. Tests that must be implemented and run
+
+Add appropriate unit, integration, and browser-level tests using the project's existing testing setup. Do not claim a test passed unless it actually ran.
+
+At minimum, verify:
+
+1. A newly opened Chat starts with Mic OFF and Speaker OFF.
+2. Tapping Mic requests permission and enables audio publishing only after permission is granted.
+3. Denying microphone permission leaves the user safely muted and shows a useful message.
+4. Tapping Mic OFF immediately stops outgoing audio and removes the user's profile from the active microphone list.
+5. Tapping Speaker OFF mutes incoming audio without disabling the microphone.
+6. A participant with Mic ON and Speaker OFF can transmit but cannot hear others.
+7. A participant with Mic OFF and Speaker ON can hear but cannot transmit.
+8. Two or more participants in the same wedding can communicate in both directions.
+9. Multiple participants can enable their microphones simultaneously.
+10. Profiles appear when microphones become enabled and disappear when disabled or disconnected.
+11. Profiles remain hidden when the list is collapsed and become visible when expanded.
+12. The arrow and profile strip do not move the Mic or Speaker controls.
+13. Horizontal profile scrolling does not scroll the Chat message history.
+14. Participants in separate weddings cannot hear each other or see each other's voice profiles.
+15. Nonmembers cannot obtain room credentials or join a voice room.
+16. Refreshing or reconnecting does not restore Mic or Speaker to ON.
+17. Logging out or changing weddings cleans up the previous audio session.
+18. Duplicate presence events do not create duplicate profile pictures or audio subscriptions.
+19. Existing Chat messages, plus button, Send button, theme backgrounds, and bottom navigation still work.
+20. The production build and relevant automated tests pass.
+
+For end-to-end multi-user audio testing, use separate authenticated browser sessions or equivalent test clients. Do not count mocked audio as proof of real audio transport.
+
+If external provider credentials or browser-device permissions prevent a test from running, document that limitation precisely rather than marking the test as passed.
+
+12. Deployment and configuration
+
+Inspect the actual current deployment setup. Do not assume the project is hosted on Vercel or any other platform without verifying the current configuration.
+
+Add all required code-side infrastructure, including:
+
+- Provider SDK dependencies.
+- Server-side credential/token generation.
+- Authenticated voice-session endpoints.
+- Real-time participant-state handling.
+- Database migrations or schema updates only if needed.
+- Provider configuration and environment-variable validation.
+- Connection cleanup and error handling.
+- Type definitions and tests.
+- A concise setup guide for the selected voice provider.
+
+Create an example environment configuration using placeholder values only. Never place real secrets in source code.
+
+Clearly distinguish variables that the app needs at runtime from external account setup that must be completed manually. If the provider requires an SFU deployment, managed service, TURN configuration, or additional network setup, explain what is required and how the current code connects to it.
+
+Do not introduce a paid service without identifying it and documenting the cost implications. Prefer a suitable existing provider if already configured. If a new provider is necessary, choose a practical production-capable option and implement a clean integration rather than leaving several half-configured alternatives.
+
+Do not add unrelated Vercel-specific code or infrastructure.
+
+13. Implementation order
+
+Follow this sequence:
+
+1. Inspect the current Chat component and locate the exact existing Music Track and Speaker controls.
+2. Inspect authentication, wedding membership, database, real-time events, environment configuration, deployment setup, and available testing tools.
+3. Decide on the audio architecture based on the real project configuration.
+4. Implement the server-side voice authorization and provider integration.
+5. Implement microphone publishing, speaker playback, and real-time participant status.
+6. Replace the Music Track control with Mic and add the collapsed-by-default profile strip toggle.
+7. Implement lifecycle cleanup, error handling, reconnection, and security checks.
+8. Add migrations, dependencies, configuration examples, and documentation where needed.
+9. Run the build, automated tests, and available browser-level tests.
+10. Fix regressions and report what is complete and what still requires external setup.
+
+14. Final acceptance report
+
+When finished, provide a concise implementation report containing:
+
+- Files created and modified.
+- The selected voice architecture and why it fits the project.
+- Backend routes and real-time events added.
+- Database changes, if any.
+- Required environment variables and external setup.
+- Security and membership checks implemented.
+- Build and test results, distinguishing passed tests from tests not run.
+- Any outstanding production blockers.
+
+Final instruction: Make the feature functional in the existing application. Do not overwrite existing wedding data, rebuild unrelated screens, fabricate successful audio connections, or leave mock functionality presented as production-ready. If something genuinely requires an external account, credential, or deployment action, implement the code that can be completed safely and clearly identify the remaining action.

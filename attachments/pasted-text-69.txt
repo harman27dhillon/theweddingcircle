@@ -1,0 +1,56 @@
+URGENT BUG: THE WEDDING CIRCLE WEBSITE HAS LOST ITS ENTIRE UI STYLING AFTER THE LATEST UPDATE.
+
+I opened the website on my phone after adding LiveKit credentials and applying the latest feature update. The website now displays almost entirely unstyled HTML.
+
+Symptoms visible in the screenshots:
+
+- Buttons have reverted to default browser buttons.
+- Text appears in default browser fonts and styles.
+- Navigation links are underlined and incorrectly arranged.
+- The original premium Wedding Circle layout has disappeared.
+- Decorative flower images are appearing in incorrect positions.
+- The application content still partially renders, but its original design is missing.
+
+IMPORTANT: Diagnose before changing anything
+
+Inspect the actual current project source and production build.
+
+1. Check whether the main CSS stylesheet is being loaded.
+2. Inspect the browser network errors for missing CSS, JavaScript, fonts and image assets.
+3. Check for 404 responses, incorrect asset paths, MIME-type errors and failed imports.
+4. Inspect the Vite production build output and confirm the generated CSS files exist.
+5. Check Tailwind CSS v4 configuration and ensure its styles are included in the production bundle.
+6. Inspect the latest changes to the React entry point, global CSS imports, HTML entry file and Vite configuration.
+7. Check whether the service worker is serving stale HTML with newer or missing CSS assets.
+8. Check whether the latest LiveKit and other feature changes accidentally modified the global stylesheet, application entry point or build configuration.
+
+Repair requirements
+
+- Restore the complete original Wedding Circle UI.
+- Restore the premium typography, colors, buttons, spacing, navigation, layouts, animations and responsive styling.
+- Restore the correct positioning and sizing of decorative images.
+- Preserve all existing themes and light/dark mode.
+- Preserve the new LiveKit group voice implementation.
+- Preserve Supabase connectivity and cross-device wedding synchronization.
+- Preserve existing Chat, Seek game development, authentication and wedding functionality.
+- Do not remove features to make the page render.
+- Do not replace the original UI with a new design.
+- Do not hardcode a visual workaround for individual screenshots.
+
+Verification
+
+After fixing:
+
+1. Run a clean production build.
+2. Confirm all required CSS and JS assets are generated.
+3. Test the production website on mobile and desktop.
+4. Check that the original Wedding Circle design is restored.
+5. Check that no CSS or JavaScript assets return 404 errors.
+6. Verify that LiveKit configuration remains intact.
+7. Check for stale service-worker caches and implement safe cache versioning if necessary.
+
+Report the exact root cause, files changed, build results and actual browser verification.
+
+Do not claim the UI is restored simply because the build passes. Verify the rendered website.
+
+Do not repeatedly summarize the task. Fix the actual problem directly and do not modify unrelated features.

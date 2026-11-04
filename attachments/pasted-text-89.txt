@@ -1,0 +1,155 @@
+THE WEDDING CIRCLE — CHAT MEDIA GRID REDESIGN
+
+Implement the following changes directly in the existing Wedding Circle source code. This is a focused UI and media-presentation improvement. Do not rewrite the chat system or disturb working upload, download, R2, Supabase, CDN, or media authorization functionality.
+
+1. STRICT SQUARE THUMBNAILS
+
+Every photo and video thumbnail displayed inside chat messages must use a consistent 1:1 square aspect ratio.
+
+Apply this across:
+
+- Individual wedding chat
+- Group chats
+- Pre-wedding chats
+
+Requirements:
+
+- Fixed square thumbnail dimensions.
+- Use "aspect-ratio: 1 / 1".
+- Use "object-fit: cover" for visual consistency.
+- Use consistent rounded corners and spacing.
+- Preserve original uploaded media without cropping or modifying the actual source file.
+- Videos must display a clear play indicator.
+
+2. MULTIPLE MEDIA GRID
+
+When multiple photos or videos are sent together, display them in a compact grouped square grid.
+
+Layout rules:
+
+- 1 file: one square thumbnail.
+- 2 files: two equal square thumbnails side by side.
+- 3 files: three equal square thumbnails in one row.
+- 4 files: a 2×2 square grid.
+- More than 4 files: show exactly four square tiles in a 2×2 grid.
+
+For more than four files:
+
+- The fourth tile must display a "+N" overlay.
+- N must equal the total number of additional files not displayed.
+- Example: 6 files = 3 visible media thumbnails and one "+3" tile.
+- Example: 10 files = 3 visible media thumbnails and one "+7" tile.
+- The fourth tile must retain the same square dimensions as the other thumbnails.
+
+Tapping any thumbnail or the +N tile must open the existing full-screen media viewer containing the complete media group in the correct order.
+
+3. UPLOAD PROGRESS INSIDE THE GRID
+
+When multiple files are selected and uploaded together, show the upload process directly inside the square thumbnail grid.
+
+Do not place a separate large upload-progress panel outside the grid.
+
+Each file must have its own independent state:
+
+- Preparing: show a spinner and the word "Preparing".
+- Uploading: show a centred progress overlay and the actual upload percentage, only when real byte-transfer progress is available.
+- Uploaded: show a success checkmark.
+- Failed: show a clear error indicator and Retry action.
+- Cancel: only available before the individual file starts uploading, preserving existing cancellation behaviour.
+
+The progress overlay must be centred within the relevant square thumbnail, with sufficient contrast against the preview image.
+
+The fourth tile must continue displaying the "+N" overlay when more than four files are selected.
+
+Do not invent upload percentages or mark files as uploaded before private storage confirms successful acceptance.
+
+When every file finishes uploading, remove the progress overlays and display the normal media grid.
+
+4. THEME-BASED MEDIA CONTAINER BACKGROUND
+
+The complete grouped-media message container must automatically inherit the currently active wedding theme.
+
+Do not hardcode burgundy or any single colour.
+
+Examples:
+
+- Pastel Blush: dusty rose.
+- Royal Burgundy: deep burgundy.
+- Sage Green: muted sage.
+- Classic Ivory: warm ivory.
+- Royal Blue: deep royal blue.
+- Midnight Emerald: dark emerald.
+- Terracotta Sunset: warm terracotta.
+- Lavender Dream: soft lavender.
+- Classic Default: its existing cream and brown palette.
+
+Important:
+
+- Read the actual active theme tokens from the existing theme system.
+- Support every existing wedding theme, including both Classic themes.
+- Do not create a separate theme implementation for media.
+- Theme changes must automatically update media-container styling.
+- Ensure upload overlays, success indicators, error states and +N text remain readable against every theme.
+- Preserve light and dark mode behaviour.
+
+5. DESIGN QUALITY
+
+The finished result should feel like a premium modern messaging application.
+
+Requirements:
+
+- Consistent thumbnail dimensions.
+- Clean grid alignment.
+- No awkward empty spaces.
+- No stretched images.
+- No overlapping download icons.
+- No narrow or collapsed error messages.
+- No unnecessary oversized message bubbles.
+- Consistent spacing between media tiles.
+- Smooth transitions between preparing, uploading, success and failure states.
+
+Keep download and retry actions accessible without cluttering every thumbnail.
+
+6. PRESERVE EXISTING FUNCTIONALITY
+
+Do not break or replace:
+
+- Private Cloudflare R2 uploads.
+- Supabase media metadata.
+- Existing private download-ticket authorization.
+- CDN fallback and secure delivery.
+- Existing media viewer.
+- Existing retry and cancellation logic.
+- Individual and group chat behaviour.
+- Existing video playback.
+- Message ordering and realtime delivery.
+
+Do not introduce duplicate media uploads or duplicate chat messages.
+
+7. REQUIRED SOURCE INSPECTION AND VERIFICATION
+
+Before changing code:
+
+1. Inspect the existing chat media components.
+2. Identify the shared component used by individual, group and pre-wedding chats.
+3. Inspect the existing upload-state handling.
+4. Inspect the current theme token system.
+5. Reuse existing components and infrastructure wherever possible.
+
+After implementation:
+
+1. Run TypeScript typecheck.
+2. Run the existing media tests.
+3. Run the production build.
+4. Test grids containing 1, 2, 3, 4, 5, 6 and 10 files.
+5. Test mixed photos and videos.
+6. Test independent upload progress, failure and retry.
+7. Test all existing wedding themes.
+8. Confirm the full-screen viewer opens all files in the correct order.
+9. Confirm no upload, download, authorization or CDN regression.
+
+Do not publish or deploy anything.
+
+Do not claim completion based only on a successful build. Report precisely what was implemented, which tests passed, and any remaining issues.
+
+SCOPE RESTRICTION: Only implement this chat media presentation and upload-progress redesign. Do not modify unrelated screens, features, navigation, database schemas or backend architecture.

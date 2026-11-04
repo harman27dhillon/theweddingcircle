@@ -1,0 +1,48 @@
+The Wedding Circle — Migrate Core Wedding Data from Neon Postgres to Supabase
+
+Inspect the existing application and implement a safe, explicit migration plan to move supported core wedding data from the current Neon Postgres database to the already-configured Supabase Postgres project.
+
+Intended final architecture
+
+- Supabase Postgres: Source of truth for wedding records, memberships, chat messages, wedding settings, and other supported core wedding data.
+- Authentication: Preserve the existing sign-in and account experience. Design a compatible migration or integration for user identities and sessions; do not assume moving database rows automatically migrates authentication.
+- Media storage: Keep the existing app library and published wedding media exactly as they are. Do not switch storage providers or move image/video files as part of this task.
+
+Requirements
+
+1. Inspect the current Neon schema, Supabase schema, authentication implementation, foreign keys, database queries, background jobs, and existing Row Level Security policies.
+2. Create a documented schema mapping and migration plan before modifying production data.
+3. Provide versioned, repeatable database migrations for the required Supabase tables, indexes, constraints, and security policies.
+4. Preserve stable IDs, account associations, wedding memberships, role assignments, invitations, chat history, timestamps, and relationships.
+5. Keep existing media URLs and storage paths unchanged.
+6. Copy existing records using a reliable, restartable migration with counts, validation, and error reporting. Never delete the Neon source data during migration.
+7. Keep Supabase and Neon from becoming conflicting sources of truth. Do not activate the cutover until the migration has been validated and the operator explicitly confirms it.
+8. Preserve authentication security. Do not copy password hashes or session data into Supabase without a verified compatible migration design. If authentication requires a separate step, explain and implement that step safely.
+9. Keep Row Level Security enabled where appropriate. Never expose a service-role key in frontend code, browser storage, or public database rows.
+10. Provide a dry-run mode, backup/rollback plan, record-count comparison, relationship validation, and a final explicit cutover confirmation.
+11. Update application data access to use Supabase only after the migration and validation succeed. Preserve all existing features and permissions.
+12. Keep media storage on the existing library and verify that existing photo and video links still work.
+
+Developer controls
+
+Add a dedicated Core Data Migration section in Developer → Cloud Connections, separate from Media storage.
+
+Show the current source database, Supabase connection status, migration readiness, schema status, record counts, validation results, and any unresolved authentication or security prerequisites.
+
+Provide separate actions for:
+
+- Inspect schema and prerequisites.
+- Prepare migrations.
+- Run dry run.
+- Run validated data migration.
+- Validate migrated records.
+- Explicitly confirm cutover.
+- Roll back application routing to Neon if necessary, without deleting either database.
+
+Do not expose database passwords or privileged keys in the browser. Use trusted server-side configuration for migration operations.
+
+Completion criteria
+
+Do not claim the migration is complete merely because the Supabase connection test succeeds. The app should report Supabase as the active wedding-data source only after the required migration, validation, authentication compatibility checks, and explicit cutover succeed.
+
+Report the schema changes, records migrated, validation results, authentication limitations, and any manual steps still required. Do not reset the database, delete existing records, change media storage, or silently switch production traffic.

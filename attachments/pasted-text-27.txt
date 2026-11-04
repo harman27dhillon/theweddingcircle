@@ -1,0 +1,76 @@
+The Wedding Circle — Safe Dead-Code and Unused-File Cleanup
+
+Inspect the entire existing source code of The Wedding Circle and clean up files and code that are genuinely no longer used by the application.
+
+The project has undergone many updates, so it may contain obsolete components, duplicate implementations, unused assets, abandoned experiments, and dependencies left over from earlier versions.
+
+Your task is to audit, verify, and then implement safe cleanup directly. Do not merely produce a report.
+
+1. Audit the complete project
+
+Inspect the repository structure, application entry points, routing, imports, lazy-loaded modules, dynamic imports, theme registry, asset references, package scripts, configuration, and deployment setup.
+
+Identify:
+
+- Components, pages, hooks, utilities, and stylesheets that are no longer reachable from the application.
+- Old theme implementations and duplicate theme registries that are no longer used.
+- Unreferenced images, fonts, audio tracks, icons, and other assets.
+- Abandoned experimental implementations and obsolete backup files inside the source tree.
+- Dependencies that are genuinely unused.
+- Duplicate functions, constants, styles, and components that can safely be consolidated.
+
+For each candidate, determine whether it is used directly, indirectly, dynamically, by configuration, or by a build/deployment script. Do not assume that a file is unused merely because a text search finds no imports.
+
+2. Remove only verified unused files
+
+- Remove files only after confirming they are not needed by any supported application route, feature, build process, test, script, or deployment.
+- Remove unused dependencies only after checking the project's actual framework and package scripts.
+- Consolidate duplicate code only when behavior can be preserved and regression risk is low.
+- Keep cleanup focused on genuinely obsolete material rather than rewriting working features.
+- If a file's purpose or usage is uncertain, leave it in place and list it for manual review.
+
+3. Protect all working features and data
+
+Do not delete or break:
+
+- Any active wedding theme, theme artwork, theme configuration, or theme music.
+- Wedding creation, authentication, permissions, host/co-host controls, chat, Live, Album, notifications, or media storage.
+- Database schemas, migrations, scheduled jobs, payment integrations, or backend functions.
+- Environment configuration, deployment files, domain settings, security policies, or required manifests.
+- Service workers, offline support, dynamically loaded modules, or files needed for mobile installation.
+- Files needed by Git, GitHub, Vercel, Netlify, or the project's existing build system.
+
+Never delete user data, clear production storage, reset databases, or expose secrets while cleaning the repository.
+
+4. Use a reversible cleanup process
+
+Before making changes:
+
+1. Check the current Git branch and working-tree status.
+2. Preserve existing uncommitted changes.
+3. Record the list of files proposed for deletion.
+4. Prefer a dedicated cleanup branch or a clearly separated set of changes.
+5. Do not overwrite or discard the user's existing work.
+
+After cleanup:
+
+- Review the complete deletion and modification diff.
+- Run the project's existing build, type checks, linting, and relevant tests where available.
+- Check for broken imports, missing assets, unresolved modules, and dependency errors.
+- Verify that the app still builds and that its critical features remain intact.
+- If a check fails because of the cleanup, fix the regression or restore the affected file.
+
+5. Final report
+
+Provide:
+
+- The number of files removed and the number of files modified.
+- The names and reasons for removing each file.
+- Any dependencies removed.
+- The build and test results.
+- Any uncertain files deliberately retained.
+- Any remaining cleanup opportunities that require manual confirmation.
+
+Do not claim the app is fully tested if only the build passed.
+
+Important: Optimize for a smaller, maintainable, working project—not the smallest possible file count. Preserve functionality and make every deletion explainable and reversible.

@@ -1,0 +1,79 @@
+Make ONLY the following updates to the wedding app. Do not change, remove, redesign, or break anything else.
+
+1. Fix old sample wedding cover flashing
+
+When I change the Sample Wedding's cover photo, the new photo is saved correctly, but after refreshing/reopening the app, the old sample cover briefly flashes.
+
+- Find and remove/invalidate any cached or persisted copy of the old sample cover.
+- Check browser cache, localStorage, IndexedDB, service-worker cache, and app-level image/state cache.
+- Never render the old cover, even temporarily.
+- Use the latest saved cover as the only source of truth.
+- If the correct cover is still loading, show a neutral placeholder.
+- Make sure the old cover cannot return after refresh/reopening.
+- Properly invalidate/update the cache whenever the cover changes.
+
+2. Reduce wasted space in wedding feed posts
+
+The wedding feed post bar/card has too much unnecessary empty vertical space.
+
+- Reduce excessive padding, margins, and unused height.
+- Make the post container fit its actual content naturally.
+- Keep comfortable spacing and readability.
+- Do NOT change the existing post design, typography, images, buttons, or functionality.
+
+3. Add "Create New Wedding" buttons
+
+The Create New Wedding button is currently missing.
+
+Add a clearly visible Create New Wedding button:
+
+- Directly under the Sample Wedding bar/card.
+- Directly under the already-created wedding bar/card/list.
+- Both buttons must open the existing Create New Wedding flow.
+- Use the existing app button style.
+- Do not create a duplicate wedding-creation system.
+
+4. Add in-app Wedding Go Live
+
+Allow these users to start a live stream inside their wedding:
+
+- Wedding Host
+- Wedding Co-Host
+- Approved Wedding Family Members
+
+Requirements:
+
+- Add a Go Live option for eligible users.
+- Stream directly inside the wedding space.
+- Wedding members/guests with access can watch it.
+- Clearly show LIVE while active.
+- Allow the streamer to end the stream.
+- Make joining/leaving smooth.
+
+Do NOT save the live stream:
+
+- Real-time only.
+- Do not record or permanently store the video.
+- Do not save it to the wedding gallery.
+- No replay after the stream ends.
+- Clean up temporary streaming resources/data after the stream ends.
+
+Only people with access to that specific wedding can watch the stream.
+
+5. Lock the role selected when entering a wedding
+
+If a person enters a wedding as a Guest, they must remain a Guest unless they have the required authorization code.
+
+- Once someone enters/selects Guest, they cannot switch themselves to Host, Co-Host, or Family Member.
+- Do not allow them to simply reopen the role selector and choose another role.
+- Hide/disable Host, Co-Host, and Family role switching after entering as Guest.
+- A Guest can change to another role only after entering the correct authorization/code through the existing role-verification mechanism.
+- Do not allow users to bypass this by refreshing, reopening the wedding, leaving/re-entering, or manipulating the UI.
+- Preserve the selected role persistently for that wedding/session.
+- Host, Co-Host, and Family permissions must remain protected by the existing authorization system.
+
+Critical instruction
+
+Do not touch anything else.
+
+Preserve all existing UI, navigation, wedding creation, gallery, feed, permissions, settings, and functionality. Implement only these five changes and make sure existing features continue working exactly as before.

@@ -1,0 +1,350 @@
+Update the EXISTING The Wedding Circle application.
+
+BATCH 3: LIVE STREAMING, MULTI-STREAM VIEWING, AND YOUTUBE LIVE
+
+The goal is to make the existing Live section reliable, easy to use,
+and capable of displaying up to four independent live streams.
+
+IMPORTANT:
+- Inspect the current streaming architecture before editing.
+- Reuse the existing backend and streaming provider wherever possible.
+- Do not replace working streaming functionality without a demonstrated
+  technical reason.
+- Preserve authentication, wedding membership, host permissions,
+  existing data, and current UI conventions.
+- Do not simulate streams with placeholder video or fake LIVE indicators.
+- Do not claim concurrency works unless independent streams are tested.
+- Do not begin another unrelated redesign.
+- Prioritize reliability, low latency, efficient bandwidth usage,
+  and mobile performance.
+- If a required external service or provider upgrade is necessary,
+  explain the reason and potential cost before introducing it.
+
+==================================================
+PART 1 — INVESTIGATE THE EXISTING STREAMING SYSTEM
+==================================================
+
+Before making changes, determine:
+
+1. How a host starts a live stream.
+2. How spectators discover active streams.
+3. How signaling and playback currently work.
+4. Whether the app uses WebRTC, a hosted streaming service,
+   YouTube embeds, or a combination.
+5. How stream status is stored and updated.
+6. Whether playback survives navigation between app sections.
+7. What causes existing streams to disconnect or display stale status.
+8. Which provider, connection, browser, or infrastructure limits
+   affect concurrent streaming.
+
+Identify the actual files and services involved.
+
+Write a short implementation plan based on the current architecture.
+
+Do not assume four independent streams can be achieved by changing
+only the frontend layout.
+
+==================================================
+PART 2 — PORTRAIT LIVE STREAMING
+==================================================
+
+Improve the spectator experience for portrait-oriented wedding streams.
+
+Requirements:
+- Use a portrait-friendly player layout by default.
+- Preserve the actual video's aspect ratio.
+- Avoid cropping faces and important visual content.
+- Use an appropriate contain/cover strategy based on the source.
+- Keep playback controls accessible without covering important content.
+- Display the stream host's identity and accurate stream status.
+- Show clear loading, buffering, reconnecting, ended, and error states.
+
+The player must use the real stream and its actual playback state.
+
+Do not display a LIVE indicator when the stream has ended or is unavailable.
+
+Support landscape devices and landscape video sources without breaking
+the portrait-first layout.
+
+==================================================
+PART 3 — MINIMIZABLE FLOATING LIVE PLAYER
+==================================================
+
+Allow spectators to minimize a playing stream and continue using
+the rest of The Wedding Circle.
+
+Expanded player:
+- Displays the selected stream prominently.
+- Includes a minimize control.
+- Preserves existing playback controls.
+
+Minimized player:
+- Appears as a compact floating video window.
+- Remains accessible while the user navigates Home, Feed, Album,
+  and More.
+- Does not obstruct the bottom navigation or essential controls.
+- Can be repositioned only if this can be implemented without
+  interfering with touch gestures.
+- Has a clear expand control.
+- Has a clear close/stop-watching control.
+
+Behavior:
+- Expanding restores the selected stream.
+- Minimizing must not unnecessarily terminate playback.
+- Navigation must not create duplicate media connections.
+- Closing the mini-player stops that spectator's playback cleanly.
+- Closing a spectator's player must not stop the host's broadcast
+  or other spectators' playback.
+- Handle browser autoplay and audio restrictions correctly.
+
+Keep the mini-player responsive on narrow mobile screens.
+
+If a browser or WebView limitation prevents playback from continuing
+while minimized, implement the best supported behavior and document it.
+
+==================================================
+PART 4 — SUPPORT FOUR INDEPENDENT LIVE STREAMS
+==================================================
+
+The Live section should support up to four simultaneous independent
+streams within the same wedding.
+
+Each stream must represent a real, distinct broadcast from a different
+authorized user or source.
+
+Requirements:
+- Support four distinct stream IDs.
+- Track the identity of each broadcaster.
+- Maintain separate playback and connection state for each stream.
+- Permit only authorized wedding members to start streams.
+- Enforce host and co-host permissions through the backend.
+- Prevent unauthorized stream creation or impersonation.
+- Ensure stopping one stream does not terminate another.
+- Reconcile stream status after refresh and navigation.
+- Remove stale streams when broadcasters disconnect or end their sessions.
+- Prevent duplicate stream sessions caused by repeated clicks.
+- Preserve the current single-stream functionality.
+
+Do not allow users to bypass the four-stream limit through concurrent
+requests or multiple tabs.
+
+If the existing architecture cannot support this reliably, explain
+the specific infrastructure limitation and the smallest viable solution.
+
+==================================================
+PART 5 — FOUR-STREAM SPECTATOR LAYOUT
+==================================================
+
+Display the active streams in a balanced layout.
+
+PORTRAIT MODE:
+- Prefer a two-by-two grid when four streams are active.
+- Give each stream equal visual priority.
+- Keep each tile large enough to identify the broadcast.
+- Avoid excessive labels and controls over the video.
+- Use a suitable one-column or two-column layout when fewer streams
+  are active.
+
+LANDSCAPE MODE:
+- Adapt the layout to the available viewport.
+- Use the available screen width efficiently.
+- Avoid stretching portrait video to fill landscape tiles.
+- Preserve the source aspect ratio.
+
+INTERACTION:
+- Tapping a stream opens it in the expanded player.
+- Provide a clear way to return to the multi-stream grid.
+- Integrate the minimize feature with the expanded player.
+- Make stream selection accessible to touch and keyboard users.
+
+The grid must not duplicate unnecessary connections to the same source.
+
+If four simultaneous decoders create excessive CPU or battery usage,
+implement a practical strategy that prioritizes the selected stream
+while keeping the remaining tiles usable.
+
+Do not sacrifice reliability merely to maintain four full-quality
+video decoders on low-end phones.
+
+==================================================
+PART 6 — HOST AND FAMILY MEMBER STREAM CONTROLS
+==================================================
+
+Provide appropriate controls for authorized users.
+
+Hosts and authorized co-hosts should be able to:
+- Start a stream when permitted.
+- View their current stream status.
+- End their own stream.
+- See which authorized members are broadcasting.
+- Identify disconnected or failed streams accurately.
+
+Ordinary family members may start their own streams only if the existing
+permissions or wedding policy authorize them to do so.
+
+Do not grant host powers to ordinary guests.
+
+If the current authorization model does not support family-member
+broadcasting, inspect the existing role system and explain the minimum
+required permission changes before implementing them.
+
+Enforce authorization on the backend, not only by hiding buttons.
+
+==================================================
+PART 7 — YOUTUBE LIVE INTEGRATION
+==================================================
+
+Allow an authorized host to provide a supported YouTube Live URL.
+
+Requirements:
+- Validate the URL.
+- Extract and normalize supported YouTube video identifiers.
+- Reject unsupported or malformed URLs with a clear error.
+- Use the official supported YouTube embed/player mechanism.
+- Respect YouTube playback restrictions and embed permissions.
+- Handle private, unavailable, region-restricted, and non-embeddable
+  streams gracefully.
+- Display useful loading and error states.
+- Do not falsely show a YouTube stream as live when playback is unavailable.
+
+Preserve the existing method for saving and managing the YouTube link.
+
+Do not expose API keys or privileged credentials in client code.
+
+Do not assume that every YouTube Live stream permits embedding.
+
+==================================================
+PART 8 — MIXED YOUTUBE AND PARTICIPANT STREAMS
+==================================================
+
+The spectator should be able to view an embeddable YouTube Live stream
+alongside participant streams in the same Live section.
+
+Requirements:
+- Treat the YouTube player as a distinct stream source.
+- Allow it to occupy one of the four viewing tiles.
+- Support combinations of one YouTube stream and participant streams.
+- Preserve portrait and landscape layouts.
+- Allow any tile to be selected for expanded playback.
+- Return to the multi-stream view without losing the other streams.
+- Avoid creating duplicate YouTube iframe instances unnecessarily.
+- Handle YouTube player errors without crashing the rest of the grid.
+
+If a particular combination is prohibited by YouTube or browser policy,
+explain the limitation and provide the closest supported alternative.
+
+==================================================
+PART 9 — BANDWIDTH AND PERFORMANCE
+==================================================
+
+The app must remain usable on typical mobile connections.
+
+Investigate:
+- Concurrent stream bandwidth.
+- Video bitrate and resolution.
+- Playback startup latency.
+- Number of simultaneous decoders.
+- Connection setup and reconnection overhead.
+- CPU, battery, and memory use on mobile devices.
+- Provider limits and potential costs.
+
+Requirements:
+- Use adaptive bitrate or suitable resolution selection when supported.
+- Avoid downloading full-quality media for streams that are not being viewed
+  when the provider supports efficient alternatives.
+- Do not continuously reconnect healthy streams.
+- Avoid repeated polling or duplicated subscriptions.
+- Clean up obsolete connections when appropriate.
+- Do not reload the entire Live section whenever stream status changes.
+- Keep status updates efficient and reliable.
+
+Do not promise unlimited concurrent streams or unlimited usage.
+
+==================================================
+PART 10 — LIVE SESSION RELIABILITY
+==================================================
+
+Fix stale LIVE indicators and incorrect stream status.
+
+Requirements:
+- The backend must remain the authoritative source for session state.
+- Distinguish starting, live, reconnecting, ended, and failed states.
+- Detect ended streams and remove them from active listings.
+- Avoid treating a failed connection as an active broadcast.
+- Recover correctly after navigation and refresh.
+- Ensure each stream has an independent lifecycle.
+- Avoid blocking stream-status updates while another stream is connecting.
+- Preserve legitimate active sessions when spectators navigate away.
+
+Do not use a frontend-only timer as proof that a stream is active.
+
+==================================================
+PART 11 — TESTING
+==================================================
+
+Run available type checks, lint checks, and relevant automated tests.
+
+Perform the following tests where infrastructure and credentials permit:
+
+TEST A — Single participant stream
+1. Start a stream from an authorized account.
+2. Open the Live section from a separate spectator account.
+3. Verify real video and audio playback.
+4. Minimize and restore playback.
+5. Navigate to Feed and back to Live.
+6. End the broadcast and verify the LIVE status disappears.
+
+TEST B — Four participant streams
+1. Start four independent streams from four authorized sources.
+2. Verify four distinct stream IDs and actual media.
+3. Display all four in the spectator grid.
+4. Select each stream for expanded playback.
+5. Minimize and restore a selected stream.
+6. End one stream and verify the other three continue.
+7. Refresh the spectator and verify accurate stream discovery.
+
+TEST C — YouTube Live
+1. Use a real embeddable YouTube Live URL.
+2. Verify playback and error handling.
+3. Test the URL alongside a participant stream.
+4. Verify portrait and landscape layouts.
+5. Test an unavailable or non-embeddable URL.
+
+TEST D — Permissions
+1. Verify authorized hosts can manage permitted streams.
+2. Verify ordinary guests cannot perform host-only actions.
+3. Verify stream ownership cannot be impersonated.
+4. Verify wedding members cannot access streams belonging to unrelated
+   private weddings without authorization.
+
+TEST E — Mobile performance
+1. Verify the player fits a portrait screen.
+2. Verify landscape layout.
+3. Test navigation while playing.
+4. Check for duplicate connections.
+5. Check for stale LIVE indicators.
+6. Check that playback errors do not break the entire app.
+
+If actual stream sources, credentials, multiple devices, or provider
+access are unavailable, state exactly which tests remain unverified.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Report:
+1. Existing streaming architecture discovered.
+2. Files and services changed.
+3. How the mini-player preserves playback.
+4. How four independent streams are supported.
+5. How YouTube Live is integrated.
+6. Backend, provider, or permission changes required.
+7. Actual tests executed and their results.
+8. Performance or cost concerns.
+9. Remaining unverified behaviors.
+
+Do not claim success for four-stream concurrency without testing
+four independent real streams.
+
+Start by inspecting the current implementation and identifying the
+smallest reliable path to these requirements.

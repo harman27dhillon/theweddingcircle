@@ -1,0 +1,102 @@
+# Restore the Original SEEK Game Feature — Recovery First
+
+The SEEK game feature in The Wedding Circle is currently not working. The website crashed recently, and several code changes were made afterward. The original implementation may have been damaged, disconnected, partially deleted, or overwritten.
+
+Your task is to **recover and restore the previously agreed SEEK feature**, not invent a different game.
+
+## 1. Inspect and recover before changing code
+
+First inspect:
+
+- The entire current codebase for `Seek`, `@seek`, `Who Said It`, game host, game state, and related components.
+- Chat message rendering and command handling.
+- Existing game-related components, hooks, services, database tables, and event listeners.
+- Git history, previous commits, branches, and available earlier versions.
+- Any existing trophy or game-launcher implementation.
+
+Determine exactly what is missing or broken.
+
+**Recovery priority:**
+1. Restore the original working implementation from Git history or existing source wherever possible.
+2. Repair broken connections or event handlers if the code still exists.
+3. Rebuild only the missing parts if genuine recovery is impossible.
+
+Do not delete existing code before confirming it is obsolete.
+
+## 2. Restore the exact SEEK game
+
+SEEK is a smart game-host bot inside Wedding Circle Chat.
+
+**Trigger command:**
+`@seek start who said it`
+
+Expected game flow:
+
+1. A participant types the trigger command in Chat.
+2. SEEK starts the game and displays a compact temporary game bar/message inside Chat.
+3. Participants submit their statements during a live 1-minute submission timer.
+4. SEEK displays the submitted statements without revealing who wrote each one.
+5. The person who started the game gets 2 minutes to match each statement with the correct live participant.
+6. The starter locks their answers.
+7. SEEK reveals the results:
+   - Correct matches: green.
+   - Incorrect matches: red.
+8. Display the final results clearly inside Chat.
+
+## 3. Essential behaviour
+
+- Only eligible participants currently in the wedding should participate.
+- Each statement must remain anonymous until the reveal.
+- The submission timer must be real and synchronized for all participants.
+- The 2-minute guessing timer must also be synchronized.
+- Prevent duplicate submissions and unauthorized answer changes.
+- Handle participants leaving or disconnecting during a game.
+- Prevent multiple simultaneous games from accidentally overwriting one another.
+- Support multiple users participating through the existing real-time architecture.
+- Game state must remain consistent across devices and reconnects.
+- Show clear messages when the game is unavailable, expired, or completed.
+
+## 4. Remove the old trophy launcher
+
+The agreed direction is for SEEK to replace the old trophy game launcher completely.
+
+- Remove the trophy option from Chat only after confirming its role and dependencies.
+- Do not leave two competing ways to start the same game.
+- Keep the game entirely inside Chat using temporary game messages.
+- Do not create a separate game page or unrelated game dashboard.
+
+## 5. Protect the rest of Wedding Circle
+
+- Do not redesign Chat.
+- Do not change unrelated features, themes, layouts, navigation, or wedding data.
+- Do not modify authentication, privacy rules, or database structure unless genuinely required.
+- Reuse the existing Supabase and real-time architecture.
+- Preserve existing R2 media functionality.
+- Do not expose participant identities before the reveal.
+
+## 6. Verify before claiming completion
+
+After implementation:
+
+- Test the exact `@seek start who said it` trigger.
+- Test the full game flow with multiple participants/devices.
+- Verify both timers and synchronized state.
+- Verify anonymous submissions and correct/incorrect reveal colours.
+- Test disconnect/reconnect and expired-game behaviour.
+- Run the project's relevant tests and production build.
+- Inspect the actual changed files and confirm the feature is connected to Chat.
+
+Do not claim the feature is restored merely because a component exists or the build succeeds.
+
+## 7. Final report
+
+Report clearly:
+
+1. What SEEK code was found.
+2. What was missing or broken.
+3. Whether the original code was recovered or parts had to be rebuilt.
+4. Which files were changed.
+5. What tests were actually run and their results.
+6. Any remaining blockers.
+
+**Important:** Inspect first, recover second, implement only what is missing, and verify. Do not give me a plan instead of doing the code work. Do not make unrelated changes or deploy/publish without my explicit approval.

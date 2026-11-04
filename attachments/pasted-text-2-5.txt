@@ -1,0 +1,119 @@
+ADDITIONAL THEME FIXES — WEDDING CARD THUMBNAILS, PAGE BACKGROUNDS, CEREMONIES AND LIVE STREAM
+
+Implement these fixes in the existing The Wedding Circle project alongside the 10 new theme designs. Inspect the actual components and theme application logic before editing. Do not merely change colour variables or provide a report.
+
+1. Fix theme thumbnails in Settings
+
+The theme selector in Settings must show miniature wedding Home cards, not miniature Chat interfaces.
+
+The current previews show chat bubbles and a message composer. Replace that preview content with a miniature version of the actual wedding landing card, matching the card design shown on the Home page.
+
+Each theme thumbnail must display a representative version of its wedding card, including:
+
+- The theme's actual background artwork, texture, and colours.
+- Its individual decorative frame, borders, floral ornaments, and visual effects.
+- Couple names in the correct typography and layout.
+- Theme-specific ampersand and divider styling.
+- Matching Chat and Live shortcut buttons.
+- The date and location row.
+- The same individual artistic identity as the full wedding card.
+
+Use the existing wedding-card renderer or a lightweight reusable card-preview component. Do not use the Chat component for these thumbnails.
+
+All registered themes must have visible, accurate previews. Preserve the existing theme selector layout, card dimensions, selected border, applied indicator, and responsive behaviour.
+
+Ensure that the preview reflects the actual theme implementation rather than a separate, inaccurate mockup.
+
+2. Fix theme application to every background page inside a wedding
+
+Many themes currently fail to apply their design to the backgrounds of pages inside the wedding. Audit the entire wedding interface and fix the underlying cause.
+
+The active theme must consistently affect the backgrounds, surfaces, borders, typography, accents, and decorative effects of:
+
+- Home.
+- Chat.
+- Live.
+- Album.
+- More.
+- Host Control.
+- Settings and theme-related dialogs.
+- Empty states, popups, overlays, and other themed panels.
+
+Pay particular attention to page-level background containers that remain plain, retain the previous theme's colours, or use hardcoded backgrounds.
+
+Use the existing theme provider and design tokens. Ensure that every page reads from the same active wedding theme and updates immediately when the theme changes.
+
+Do not force every page to have the same background. Each page should use a coordinated background treatment appropriate to its theme, with enough contrast to keep text and controls readable.
+
+Do not solve this with a single broad CSS override that breaks individual theme designs or dark mode.
+
+3. Apply full theme effects to Home ceremony cards
+
+The ceremony cards on the Home page currently fail to reflect the selected theme adequately.
+
+Upgrade the existing ceremony cards so they feel like part of the same premium wedding experience as the main wedding card.
+
+For every theme, ceremony cards must use appropriate:
+
+- Theme-specific backgrounds, textures, gradients, and surface treatments.
+- Borders, ornamental details, and corner decorations.
+- Typography and text colours.
+- Date, time, venue, and ceremony information styling.
+- Buttons, icons, separators, and accent colours.
+- Shadows, depth, and subtle theme-appropriate visual effects.
+
+The effects must be coordinated with the active theme's individual artistic identity. For example, Royal Burgundy should use rich burgundy and champagne-gold detailing, Midnight Emerald should use sophisticated emerald surfaces and gold accents, and Butterfly Romance should use delicate blush and butterfly-inspired details.
+
+Preserve each ceremony's existing information, order, dimensions, interactions, and navigation. Do not replace real ceremony data with placeholders.
+
+Apply the styling to all ceremony cards, including the featured ceremony and secondary ceremony cards, without breaking existing mobile or desktop layouts.
+
+4. Make Live Stream panels and bars fully theme-integrated
+
+The Live page currently contains bars and panels that look dull and disconnected from the selected theme.
+
+Audit and upgrade all visible Live page surfaces, including:
+
+- Live page background.
+- Wedding Circle Live header.
+- Live stream preview and player containers.
+- Stream selection cards and live-status indicators.
+- Start/Go Live controls.
+- Comment panels and comment input.
+- Toolbars, action bars, buttons, borders, and icons.
+- Supporting panels, empty states, and overlays.
+
+Apply rich, coordinated theme styling to these components. Use theme-specific surfaces, layered backgrounds, appropriate borders, subtle highlights, elegant shadows, and decorative details where suitable.
+
+For dark themes, use intentional contrast and luminous accents. For light themes, use refined surfaces, soft shadows, and clear accent colours. Avoid flat, default-looking bars and generic grey panels when the active theme provides a richer design direction.
+
+Preserve the existing live-streaming functionality, player behaviour, controls, permissions, comments, and layouts. Do not introduce visual effects that obscure video content, controls, or text.
+
+Keep effects lightweight and respect reduced-motion preferences.
+
+5. Use one consistent source of truth
+
+Investigate why theme application is inconsistent between the wedding card, page backgrounds, ceremony cards, Live components, and Settings previews.
+
+Fix the underlying token mapping, theme context, component styling, or asset-selection issue rather than layering unrelated CSS patches on top.
+
+The wedding-card thumbnail, full wedding card, ceremony cards, page backgrounds, and Live components must all derive from the same registered theme definition. They can use different component-specific layouts, but their styling and visual identity must remain coordinated.
+
+Do not create a second theme registry or duplicate theme definitions.
+
+6. Verify every theme and screen
+
+Test every registered theme, including the 10 newer themes:
+
+1. Settings displays a wedding-card thumbnail rather than a Chat preview.
+2. The thumbnail matches the full wedding card's theme and visual identity.
+3. All internal wedding pages receive the active theme.
+4. Home ceremony cards visibly reflect the selected theme.
+5. Live page bars, panels, buttons, and stream surfaces are fully theme-integrated.
+6. Switching themes updates all these components without stale colours.
+7. Existing data, ceremony order, permissions, theme IDs, and saved preferences remain intact.
+8. Mobile and desktop layouts continue to work.
+
+Run the existing tests, type checks, and production build where available. Fix regressions introduced by these changes.
+
+Implement the changes directly. Do not stop after writing a plan. Report the root causes found, the components changed, the themes verified, and the checks actually completed.

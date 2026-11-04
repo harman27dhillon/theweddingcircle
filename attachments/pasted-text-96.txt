@@ -1,0 +1,179 @@
+The Wedding Circle — Firebase Validation & Membership Security Audit and Fix
+
+Objective
+
+Inspect the existing source code and fix three connected areas:
+
+1. Firebase API key validation.
+2. Firebase Email/Password authentication validation.
+3. Supabase membership security, server-side authorization and security-rule status reporting.
+
+This is an existing production application. Audit and repair the current implementation. Do not rebuild or replace working systems.
+
+1. Firebase API Key — Inspect and Fix
+
+Inspect the complete Firebase configuration and validation flow.
+
+- Identify the exact environment variable names expected by the frontend and backend.
+- Verify that the Firebase Web API key is read from the correct variable.
+- Check that the Firebase Project ID, Auth Domain, App ID and API key all belong to the same Firebase project.
+- Inspect the actual validation endpoint and request implementation.
+- Verify that the validation method correctly distinguishes an invalid API key, API restrictions, disabled APIs, network errors and project/configuration mismatches.
+- Check whether the validation code incorrectly rejects a valid Firebase Web API key.
+- Ensure that public Firebase Web configuration is not confused with private service-account credentials.
+- Do not require a VITE_ prefix unless the existing frontend code actually reads that variable.
+- Never expose Firebase service-account credentials or private keys in frontend code.
+
+Fix the actual root cause. Do not simply change the status label to make the warning disappear.
+
+2. Firebase Email/Password Authentication — Inspect and Fix
+
+The Firebase console shows Email/Password authentication enabled, but The Wedding Circle Infrastructure page still reports that it is not enabled.
+
+Investigate this discrepancy.
+
+- Verify the exact Firebase project being checked.
+- Inspect the authentication-provider status validation endpoint and response parsing.
+- Confirm that the code checks the Email/Password provider, not Email Link or another authentication method.
+- Check whether the code is using an outdated, incorrect or unauthorized API endpoint.
+- Check required Google APIs, permissions and service-account configuration.
+- Verify that the code handles missing credentials, permission errors and API errors accurately.
+- Check whether the UI is reading stale configuration or cached validation results.
+- Make sure saving credentials and refreshing the Infrastructure page does not incorrectly reset a valid configuration.
+
+Do not enable or disable authentication providers automatically. Do not create test users or modify real user accounts.
+
+The final status must reflect the actual Firebase project configuration.
+
+3. Supabase — Membership and Authorization Security
+
+IMPORTANT: The Wedding Circle uses Supabase as its primary database.
+
+Preserve this architecture:
+
+- Firebase Authentication = user identity and authentication.
+- Supabase = sole source of truth for wedding records, memberships, roles and permissions.
+- Cloudflare R2 = private photo and video storage.
+- Cloudflare Stream = live video provider.
+
+Firebase must NOT become a second wedding-membership database.
+
+Implement or repair this authorization flow:
+
+1. User authenticates through Firebase.
+2. Backend verifies the Firebase ID token.
+3. Backend obtains the verified user identity.
+4. Backend checks the user's wedding membership and role in Supabase.
+5. Backend allows or denies the requested action based on Supabase membership and permissions.
+
+Audit all relevant backend routes and protected operations.
+
+Verify that:
+
+- Every protected wedding request checks membership server-side.
+- Guests cannot access weddings they do not belong to.
+- Hosts and administrators have only their permitted privileges.
+- Users cannot modify their own roles or membership permissions.
+- Private chat, albums, ceremony media and other wedding content are protected.
+- R2 signed URLs and media gateway access cannot bypass membership checks.
+- Frontend-only membership checks are never treated as sufficient authorization.
+- Supabase service-role credentials remain backend-only.
+- Database queries cannot expose another wedding's data.
+
+4. Supabase Database Security Rules
+
+Inspect the actual Supabase database schema, Row Level Security (RLS) policies and existing backend access patterns.
+
+- Identify tables with RLS disabled.
+- Identify missing, overly permissive or incorrect policies.
+- Verify access to wedding, membership, chat, album, media and related records.
+- Ensure users cannot read or modify another wedding's private records.
+- Ensure role-based permissions are enforced.
+- Check whether server-side service-role operations bypass RLS and, if so, confirm that equivalent authorization checks are performed by the backend.
+
+Do not blindly enable RLS on tables without checking existing application dependencies. Add or repair policies safely and test all affected operations.
+
+Firebase security rules should only be required for Firebase services that the application actually uses. If Firebase is used only for Authentication, do not report unused Firebase database or storage rules as an unfinished security requirement. Clearly mark them as not applicable.
+
+5. Infrastructure Status Accuracy
+
+Correct the Developer Infrastructure status system.
+
+Use distinct and truthful statuses:
+
+- Not configured
+- Credentials saved
+- Configuration incomplete
+- Connection failed
+- Connection test successful
+- Security audit required
+- Security operational
+- Not applicable
+
+Do not report security as complete just because credentials are valid.
+
+Do not report Firebase authentication as disabled merely because a separate API request failed.
+
+Clearly distinguish:
+
+- Firebase configuration errors.
+- Firebase authentication-provider status.
+- Supabase RLS configuration.
+- Server-side membership authorization.
+- R2 private-media authorization.
+
+6. Testing and Verification
+
+Run actual tests covering:
+
+- Valid and invalid Firebase API keys.
+- Correct and incorrect Firebase project IDs.
+- Email/Password enabled and disabled states.
+- Missing and invalid Firebase service-account credentials.
+- Valid and invalid Firebase ID tokens.
+- Supabase membership allowed and denied.
+- Guest versus host permissions.
+- Cross-wedding access attempts.
+- Unauthorized media access and expired signed URLs.
+- RLS policy behavior.
+- Existing login, registration and wedding access flows.
+
+Run typecheck, relevant tests and production build.
+
+Do not claim a test passed unless it was actually executed.
+
+Strict Restrictions
+
+- Do not replace Supabase with Firebase.
+- Do not move wedding memberships into Firebase.
+- Do not create duplicate membership systems.
+- Do not migrate existing user accounts or wedding data.
+- Do not regenerate, delete or overwrite existing secrets.
+- Do not request that private keys or service-account JSON be printed in logs.
+- Do not weaken security to make Infrastructure checks pass.
+- Do not change Cloudflare R2 bucket privacy or DNS.
+- Do not change Cloudflare Stream.
+- Do not deploy or publish without explicit approval.
+- Avoid unrelated UI changes and feature modifications.
+
+Final Report Required
+
+Provide a clear report with these sections:
+
+1. Firebase API key — root cause, code changes and test results.
+2. Email/Password — root cause, code changes and test results.
+3. Supabase membership security — existing gaps and fixes.
+4. RLS policies — tables inspected, policies repaired and remaining gaps.
+5. Firebase security rules — applicable or not applicable, with reasons.
+6. Tests — actual results.
+7. Remaining manual configuration — exact steps, if any.
+8. Deployment status — explicitly state that nothing was deployed.
+
+For every issue, distinguish between:
+
+- Implemented.
+- Tested successfully.
+- Requires manual configuration.
+- Not yet verified.
+
+Priority: Correct security and authorization first. Accurate Infrastructure status reporting second. Never hide a genuine security gap just to show a green status.

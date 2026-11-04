@@ -1,0 +1,382 @@
+IMPLEMENTATION TASK: FIX SUPABASE ACCOUNT/WEDDING SYNC ACROSS ALL DEVICES AND REDUCE UI STORAGE
+
+Project: The Wedding Circle
+
+Critical context
+
+Supabase is already connected to this project. Do not create a new Supabase project, replace the current database, or build a separate data-sync system unnecessarily.
+
+My problem is that weddings created on desktop using my account do not appear when I open the app on my phone using the same account.
+
+I also want to reduce unnecessary browser storage because the app stores too much data locally, making the browser and website slower.
+
+Your task is to inspect the existing Supabase integration, make account and wedding data consistently load from Supabase on every device, and optimize client-side UI storage. Implement the changes directly in the existing source code.
+
+The previous implementation attempts have sometimes resulted in summaries or claims of completion without working changes. Do not repeat that failure. Do not spend this task summarizing the conversation. Inspect, implement, and verify.
+
+PART 1 — INSPECT THE EXISTING SUPABASE INTEGRATION
+
+1. Trace the actual data flow
+
+Inspect the existing source code, database schema, Supabase client initialization, authentication flow, queries, mutations, real-time subscriptions, and browser storage.
+
+Identify:
+
+- The existing Supabase project URL and client configuration, without exposing secrets.
+- How authenticated users are identified.
+- Where user profiles are stored.
+- Which tables contain weddings and wedding-related data.
+- How wedding creators, hosts, co-hosts, and members are linked to weddings.
+- How the app retrieves a user's wedding list.
+- Whether wedding creation persists records to Supabase or only updates local React state/browser storage.
+- Whether mobile and desktop use the same Supabase project and expected environment configuration.
+- Whether Row Level Security (RLS) policies or incorrect joins exclude valid weddings.
+- Whether cached data overwrites newer database results.
+- Whether account initialization, route guards, or loading conditions prevent the phone from fetching the wedding list.
+
+Do not infer the cause. Follow the real flow from successful account sign-in and wedding creation through to the wedding list displayed on each device.
+
+2. Preserve the existing database
+
+Supabase is already configured. Reuse the existing tables, relationships, IDs, and policies wherever possible.
+
+Before changing the schema:
+
+- Inspect the actual current schema and existing migrations.
+- Identify whether required tables and relationships already exist.
+- Make only the necessary changes.
+- Do not create duplicate wedding, profile, membership, or settings tables if equivalent structures already exist.
+- Do not reset the database, drop tables, truncate records, or recreate user accounts.
+- Preserve all existing wedding data, ownership relationships, memberships, and permissions.
+- Do not modify production data destructively to make the tests pass.
+
+If a migration is needed, create a safe, versioned migration with appropriate constraints and indexes.
+
+PART 2 — MAKE SUPABASE THE SHARED SOURCE OF TRUTH
+
+3. User account data
+
+Ensure that account-related data is stored and retrieved consistently through the existing Supabase setup.
+
+Use the project's actual authentication provider and stable authenticated user ID.
+
+Persist and retrieve appropriate user profile fields, such as:
+
+- Stable user ID.
+- Display name and profile image reference.
+- User preferences that should follow the account across devices.
+- Other existing account metadata required by the application.
+
+Do not copy authentication secrets or access tokens into custom tables unnecessarily. Preserve the existing authentication provider's secure session-management behavior.
+
+Account profiles must be associated with the correct authenticated user, not a display name or a device-specific ID.
+
+4. Wedding creation and ownership
+
+Trace the full wedding creation process, including every supported creation path.
+
+Ensure that a successfully created wedding is persisted to Supabase with the required:
+
+- Wedding ID.
+- Creator/owner user ID.
+- Wedding name and existing metadata.
+- Host and membership relationships.
+- Theme and relevant wedding settings.
+- Creation and update timestamps, where appropriate.
+
+The wedding should not be treated as successfully created merely because a local component has updated its state.
+
+Use an appropriate database transaction or safe server-side operation where multiple records must be created together. If the current architecture cannot perform a transaction directly from the client, use the existing trusted backend or an appropriate Supabase database function.
+
+Prevent duplicate wedding records if a network retry occurs.
+
+Preserve the existing host, co-host, guest, and member roles. Do not grant ownership based on a mutable display name or trust a client-supplied user ID.
+
+5. Fetch weddings on every device
+
+Whenever an authenticated user signs in or opens the site, fetch their authorized wedding list from Supabase.
+
+Implement the correct flow:
+
+1. Initialize the existing Supabase client.
+2. Restore or establish the authenticated session.
+3. Wait until authentication initialization has completed.
+4. Retrieve the authoritative user profile and authorized wedding list.
+5. Retrieve the necessary membership and wedding metadata.
+6. Render the wedding list using the current server data.
+7. Update the UI when relevant database changes occur.
+
+The app should support the same account on:
+
+- Desktop browsers.
+- Mobile browsers.
+- Different supported devices.
+- Fresh sessions after signing in again.
+
+A wedding created on desktop must appear on the same account's phone without manually copying data, clearing browser storage, or recreating the wedding.
+
+Do not rely on desktop localStorage to supply the wedding list to the phone.
+
+If a wedding already exists in Supabase but does not appear on the phone, fix the query, ownership relationship, RLS policy, authentication initialization, or stale-cache behavior responsible for the problem.
+
+If a wedding exists only in legacy local storage, preserve it and implement a safe recovery/synchronization path. Do not silently discard or duplicate it.
+
+6. Background synchronization
+
+Use Supabase's existing real-time capabilities where they are appropriate and already configured.
+
+Synchronize relevant updates, including:
+
+- Wedding creation.
+- Wedding metadata changes.
+- Theme and settings updates.
+- Membership changes.
+- Other existing wedding changes that need cross-device consistency.
+
+If real-time subscriptions are unsuitable for a particular query, implement a lightweight refresh strategy, with reasonable retry/backoff behavior.
+
+Requirements:
+
+- Subscribe only to relevant records and authorized data.
+- Clean up subscriptions when the user signs out, changes accounts, changes weddings, or unmounts the relevant component.
+- Avoid duplicate subscriptions and duplicate event handlers.
+- Prevent stale requests from overwriting newer results.
+- Handle reconnects and temporary network failures.
+- Refresh relevant data when the app returns to the foreground.
+- Avoid aggressive polling that wastes bandwidth or database resources.
+- Do not show an endless loading screen if a background synchronization request fails.
+
+Treat Supabase as authoritative. Local cache data may improve initial loading, but it must not silently overwrite newer server records.
+
+Show an appropriate loading or stale-data indicator when necessary.
+
+7. Security and RLS
+
+Audit the existing Supabase Row Level Security policies for the relevant tables.
+
+Ensure:
+
+- Users can retrieve their own account profile and authorized wedding data.
+- Wedding creators and authorized members can access the appropriate wedding.
+- Users cannot retrieve private weddings belonging to unrelated accounts.
+- Client-supplied user IDs do not bypass ownership checks.
+- Membership changes are authorized.
+- Service-role keys and other privileged secrets are never exposed to frontend code.
+- Public/anonymous access is not enabled broadly as a workaround for missing records.
+
+If a policy needs adjustment, make it narrowly scoped and consistent with the existing roles.
+
+Test the queries using at least two separate test accounts where possible.
+
+PART 3 — REDUCE LOCAL BROWSER STORAGE
+
+8. Audit existing storage usage
+
+Inspect all application usage of:
+
+- localStorage.
+- sessionStorage.
+- IndexedDB.
+- Cache Storage and service-worker caches.
+- Large serialized JSON objects.
+- Duplicate wedding records and cached API responses.
+- Base64-encoded photos or videos.
+- Repeatedly persisted message histories and album metadata.
+
+Identify the biggest contributors to storage usage and unnecessary main-thread work.
+
+Do not delete storage indiscriminately. Determine which records are preferences, authoritative data, disposable caches, pending drafts, or unsynchronized changes.
+
+9. Use the right storage for each data type
+
+Supabase — authoritative shared data
+
+Store and retrieve:
+
+- Account profiles.
+- Weddings and ownership relationships.
+- Wedding settings and themes.
+- Memberships and permissions.
+- Chat messages and other existing server-backed content.
+- Album metadata and other appropriate structured records.
+
+Use existing tables and relationships where possible.
+
+Do not create a new database or duplicate the entire server dataset locally.
+
+IndexedDB — local cache
+
+Use IndexedDB for larger structured caches and offline data that genuinely improve the experience, such as:
+
+- Cached wedding summaries.
+- Bounded recent Chat history.
+- Small offline drafts and pending changes.
+- Cache metadata, versions, and timestamps.
+
+Use the existing IndexedDB abstraction if one exists. Otherwise, consider the "idb" library.
+
+Design appropriate indexes and query only the records needed by the current screen. Do not load the entire IndexedDB database into memory on every app launch.
+
+IndexedDB is local to a browser. It is not the source of truth for cross-device synchronization.
+
+localStorage — small preferences only
+
+Keep only small values that need synchronous access, such as selected UI preferences or a lightweight display setting.
+
+Avoid storing:
+
+- Complete wedding objects.
+- Full Chat histories.
+- Large album arrays.
+- Base64 photos or videos.
+- Repeated copies of Supabase query results.
+- Large serialized state snapshots.
+
+Preserve the existing authentication provider's session handling. Do not manually duplicate authentication tokens into custom storage.
+
+Media — avoid duplicated binary data
+
+Inspect the current photo/video storage configuration.
+
+If the application already uses Supabase Storage or another configured media provider, reuse it correctly.
+
+Store media references and metadata in the database instead of copying the entire media content into localStorage or IndexedDB unnecessarily.
+
+Do not download every wedding photo or video during startup.
+
+Use browser caching selectively for appropriate media, with bounded cache size and eviction rules.
+
+PART 4 — COMPRESSION AND DATA EFFICIENCY
+
+10. Compress selectively
+
+Reduce storage use through normalization, deduplication, and selective compression.
+
+For sufficiently large JSON/text cache records:
+
+- Evaluate the browser's native "CompressionStream" and "DecompressionStream" APIs.
+- Use a suitable compression format such as gzip where supported.
+- Feature-detect support and provide a safe fallback.
+- Store a format/version marker for compressed records.
+- Compress and decompress asynchronously when practical.
+- Measure whether the storage reduction justifies CPU and latency overhead.
+
+Do not compress every small record. Do not compress already-compressed JPEG, WebP, AVIF, MP4, or WebM media again.
+
+Prefer eliminating duplicate data over compressing redundant copies.
+
+Safe compatibility
+
+Ensure the app can:
+
+- Read legacy uncompressed records.
+- Migrate them safely.
+- Detect corrupt or unsupported cache records.
+- Resume an interrupted migration.
+- Rebuild disposable caches from Supabase.
+- Preserve locally created records and pending operations that have not reached the server.
+
+Do not remove old data until the new copy has been verified and any unsynchronized changes are safely reconciled.
+
+11. Cache limits and eviction
+
+Implement a sensible, documented cache policy.
+
+- Cache only data that meaningfully improves performance.
+- Use bounded recent history for Chat and Albums.
+- Load older content on demand.
+- Expire stale disposable cache entries.
+- Use an LRU-style strategy or another suitable eviction policy for cached records.
+- Never evict unsynchronized drafts or pending operations.
+- Do not treat eviction as deletion from Supabase.
+- Handle quota-exceeded errors gracefully.
+- Use "navigator.storage.estimate()" when supported to monitor browser storage.
+- Avoid excessive caching that increases browser memory use or slows startup.
+
+Do not request persistent browser storage unless there is a genuine need.
+
+PART 5 — SAFE MIGRATION
+
+12. Migrate existing local data carefully
+
+Before modifying local storage:
+
+1. Inventory existing keys and schemas.
+2. Identify local-only wedding records and pending changes.
+3. Fetch authoritative records from Supabase.
+4. Compare local and server records using stable IDs.
+5. Reconcile locally created records without duplicating server records.
+6. Migrate appropriate caches to IndexedDB.
+7. Verify writes and data integrity.
+8. Remove only redundant legacy cache keys that are proven safe to remove.
+
+Make the migration idempotent and recoverable after a refresh or interrupted operation.
+
+Never clear all localStorage or IndexedDB as a generic cleanup step.
+
+Do not delete user-created weddings, pending uploads, drafts, authentication-provider state, or unsynchronized data.
+
+PART 6 — TESTING
+
+13. Cross-device acceptance test
+
+Run the following scenario using real Supabase queries:
+
+1. Sign in on desktop using a test account.
+2. Create a wedding.
+3. Verify that the wedding and creator relationship are persisted in Supabase.
+4. Sign in on a separate phone/browser session using the same account.
+5. Verify that the wedding appears automatically.
+6. Refresh the phone and verify that it remains available.
+7. Update wedding settings on one device and verify that the other device receives the change through the configured sync mechanism.
+8. Sign in as a different account and verify that private wedding data is not exposed.
+
+Do not count a hardcoded or mocked wedding list as a successful test.
+
+14. Storage acceptance tests
+
+Verify:
+
+- Large wedding objects and media are no longer written into localStorage.
+- Small UI preferences still work.
+- IndexedDB caches load correctly.
+- Cache compression and decompression preserve data exactly where implemented.
+- Legacy records remain recoverable during migration.
+- Repeated migration does not duplicate records.
+- Quota errors are handled.
+- Unsynchronized drafts and pending changes survive cache cleanup.
+- Startup does not load unnecessarily large histories or duplicate datasets.
+
+Run the existing typecheck, production build, and relevant automated tests. Fix regressions caused by these changes.
+
+PART 7 — IMPLEMENTATION RULES FOR THIS TASK
+
+1. Inspect the current source code and Supabase schema before editing.
+2. Identify the actual root cause of the missing weddings.
+3. Reuse the existing Supabase project and tables.
+4. Implement the synchronization fix directly.
+5. Implement safe client-side storage optimization.
+6. Add migrations only where needed.
+7. Verify real queries and the available cross-device workflow.
+8. Report actual changes and test results.
+
+Do not enter a repeated conversation-summary loop. Do not return only a plan. Do not claim success just because the build passes.
+
+If you cannot verify the phone directly, state that limitation and run the closest valid integration test. If a missing credential or external configuration blocks completion, specify the exact blocker.
+
+FINAL REPORT
+
+Provide:
+
+- The actual root cause of missing weddings.
+- The Supabase queries, relationships, and policies changed.
+- How wedding creation and account loading now work across devices.
+- The background synchronization mechanism implemented.
+- The storage categories moved to IndexedDB and the data retained in localStorage.
+- Any compression and cache-eviction strategies implemented.
+- Files and migrations changed.
+- Actual build and test results, including existing failures.
+- What was verified on real devices versus automated tests.
+- Any remaining configuration required.
+
+Success means that a wedding created on desktop is fetched from Supabase on the same account's phone, the correct data loads when signing in or opening the app, local storage is kept small, and existing data and functionality remain intact.

@@ -1,0 +1,149 @@
+The Wedding Circle — Premium Chat UI & Theme Customization Upgrade
+
+Inspect the existing Chat page, message components, chat composer, theme system, and theme customization controls before editing. Upgrade the visual quality to a premium, elegant wedding-chat experience using the attached reference image as inspiration.
+
+Scope: Improve the Chat page's appearance, message presentation, bottom composer, and theme customization UI within the Chat section. Do not redesign unrelated pages or change backend functionality.
+
+1. Make the chat message bar and bubbles more premium
+
+Upgrade the existing message presentation so it feels polished, elegant, and purpose-built for weddings.
+
+- Use refined rounded message bubbles with consistent spacing, balanced proportions, and clean alignment.
+- Create a smooth, naturally curved bubble tail that slopes toward the sender's avatar rather than using a sharp triangular point.
+- Keep avatars the same height as their bubbles or slightly smaller.
+- Use subtle depth, delicate borders, and restrained shadows instead of thick outlines or excessive white containers.
+- Incoming messages should use a soft ivory or cream surface with readable dark text.
+- Verified bride/groom messages should use an elegant golden fill with strong text contrast, including a matching curved tail.
+- Keep the existing peach floral wedding background, but ensure messages remain easy to read against decorative flowers.
+- Make text, voice notes, photos, and videos feel like part of the same visual design system.
+- Keep spacing consistent between messages, avatars, and media.
+- Avoid excessive empty space, bulky cards, oversized controls, or unnecessary borders around individual messages.
+
+Use the attached image as visual inspiration, but implement a more refined, production-ready version rather than copying its exaggerated sizes or every decorative detail.
+
+2. Upgrade the bottom chat composer
+
+Redesign the message composer to feel like a premium floating control, inspired by the attached reference.
+
+- Use a long, pill-shaped composer with a clean ivory surface, subtle border, and restrained shadow.
+- Make the text-entry area spacious and comfortable without making the composer unnecessarily tall.
+- Style the attachment button as a polished circular control on the left.
+- Give the microphone and send controls distinct, consistent circular buttons on the right.
+- Use the existing wedding palette: burgundy or warm brown for primary controls, champagne-gold accents, and ivory surfaces.
+- Ensure the send icon is clear and recognizable.
+- Provide visible focus states, pressed states, and accessible labels.
+- Keep the composer anchored at the bottom of the Chat panel without covering the newest message or the phone's bottom navigation.
+- Handle mobile safe-area insets correctly.
+- On desktop, keep the composer within the Chat panel rather than positioning it across the entire application.
+- Ensure the composer adapts gracefully to different screen widths and does not overflow when the keyboard opens on mobile.
+
+Preserve all existing attachment, photo/video, voice recording, and message-sending functionality.
+
+3. Improve voice-message appearance
+
+Make voice notes visually consistent with the premium chat design.
+
+- Use a refined play/pause control, an elegant waveform, and a clear duration label.
+- Keep the waveform and duration aligned vertically within the bubble.
+- Use restrained gold or burgundy accents, depending on whether the message is incoming or sent by a verified bride/groom.
+- Preserve existing playback, progress, duration, and loading behaviour.
+- Ensure long and short voice notes remain responsive and do not overflow the chat panel.
+
+Do not introduce a new audio system or replace the existing playback implementation.
+
+4. Improve photo and video messages
+
+- Display media cleanly without bulky white containers or unnecessary surrounding boxes.
+- Use subtle rounded corners and a thin, tasteful frame only where it improves the appearance.
+- Keep download controls compact and visually integrated with the media.
+- Place any existing media-description label neatly over the lower portion of the media, using a subtle translucent surface when necessary for readability.
+- Avoid covering important parts of the image or video.
+- Open media in the existing full-screen preview when that functionality is already available.
+- Preserve aspect ratio, playback, downloading, and original media quality.
+- Keep media responsive on mobile and desktop.
+
+5. Enhance the Chat theme customization UI
+
+Improve the existing theme-selection and customization interface inside the Chat experience. This is a key part of the task.
+
+The current themes should feel like complete, professionally designed chat experiences rather than a collection of colour changes.
+
+Theme preview cards
+
+- Redesign theme previews as elegant, compact cards with a miniature chat preview.
+- Show representative incoming and outgoing bubbles, an avatar, a composer sample, and the theme's background.
+- Give each theme a clear name and a consistent visual identity.
+- Highlight the currently selected theme with a refined border or champagne-gold selection indicator.
+- Use subtle hover, press, and selection transitions without distracting animations.
+- Keep the theme picker easy to understand on both mobile and desktop.
+
+Apply themes consistently
+
+When a user selects a theme, apply its visual tokens throughout the Chat interface, including:
+
+- Chat background and floral decorations.
+- Incoming and outgoing message bubbles.
+- Message tails and avatar borders.
+- Voice-message controls and waveforms.
+- Photo/video frames and overlay labels.
+- Composer surface, attachment button, microphone, and send button.
+- Text colours, icons, dividers, and subtle shadows.
+- Selected states, focus states, and other relevant controls.
+
+Do not limit theme application to the background or a few buttons. The whole Chat interface should look cohesive under every supported theme.
+
+Preserve theme identities
+
+- Retain all existing themes and their names.
+- Preserve each theme's intended palette and personality.
+- Ensure light and dark themes remain readable and visually consistent.
+- Do not make every theme look alike.
+- Where a theme has floral decoration, integrate it carefully without reducing text readability.
+- If a theme currently has incomplete styling, finish its coverage by extending the existing theme-token system instead of adding scattered one-off CSS overrides.
+- Ensure switching themes updates the Chat UI consistently without a flash of the previous theme.
+
+6. Refine the overall visual language
+
+Use a premium editorial wedding aesthetic:
+
+- Sophisticated typography and clear visual hierarchy.
+- Burgundy, warm brown, champagne gold, ivory, blush, and soft peach where appropriate to the selected theme.
+- Smooth curves, subtle borders, restrained shadows, and balanced spacing.
+- Delicate animation for transitions, not constant movement.
+- Consistent icon sizing and button proportions.
+- Strong accessibility and text contrast.
+- A polished appearance on both small phones and large desktop displays.
+
+Avoid making the UI overly glossy, childish, crowded, or excessively decorative. The result should feel elegant and premium rather than like a generic messaging app.
+
+7. Preserve behaviour and existing data
+
+This is a visual enhancement, not a functional rewrite.
+
+- Preserve all existing messages, profiles, avatars, photos, videos, voice notes, and chat history.
+- Preserve message alignment and the existing sender/recipient logic.
+- Preserve theme persistence and existing theme-selection behaviour.
+- Do not alter authentication, permissions, wedding membership, host/co-host controls, database configuration, or backend routing.
+- Do not remove features or add duplicate message composers.
+- Do not change the Leaderboard or its animation.
+- Do not reintroduce the Heart, Joy, or Bless reaction buttons beneath messages if they have already been removed.
+- Do not modify unrelated pages or repeat the separate desktop navigation, Live-page scrolling, profile-editor positioning, or Home ceremony-layout fixes.
+
+8. Implementation and verification
+
+Before editing, identify the existing chat components, theme tokens, and shared styles. Reuse the existing architecture and make targeted changes.
+
+After implementation:
+
+1. Test the composer, message sending, attachments, microphone, and voice playback.
+2. Test text, photo, video, and voice-message layouts.
+3. Preview every existing theme and verify that each applies consistently throughout Chat.
+4. Verify readability in both light and dark themes.
+5. Test mobile keyboard behaviour, safe-area spacing, and bottom navigation overlap.
+6. Test the desktop Chat panel for overflow and alignment problems.
+7. Run relevant existing tests and build checks.
+8. Confirm no messages, user data, themes, or unrelated functionality were lost or changed.
+
+Report the files changed, theme coverage completed, tests performed, and any remaining issues. Do not claim successful verification for anything that was not actually tested.
+
+Final objective: Make The Wedding Circle's Chat page feel like a premium wedding communication experience, with elegant message bubbles, a beautifully designed composer, cohesive media presentation, and a genuinely complete theme-customization system.

@@ -1,0 +1,55 @@
+TASK: PERMANENTLY FIX THE LIVE CAMERA PREVIEW ORIENTATION IN THE WEDDING CIRCLE APP.
+
+The bug is still happening. When I hold my Android phone upright in portrait mode, the LIVE CAMERA PREVIEW appears sideways in landscape orientation, even before I capture a photo or start recording a video.
+
+IMPORTANT: The problem is the live preview itself. Do not focus only on captured images, EXIF metadata, or saved videos. Fix the actual camera preview shown on the screen.
+
+STEP 1 — INVESTIGATE BEFORE EDITING
+Inspect the existing camera implementation and trace the complete live-preview pipeline.
+
+Check:
+- Camera initialization and getUserMedia constraints.
+- The actual dimensions and orientation of the camera stream.
+- The HTML video element displaying the stream.
+- The preview container dimensions and aspect ratio.
+- CSS width, height, object-fit, positioning, and transforms.
+- Any JavaScript rotation logic or device-orientation handling.
+- Whether the front and rear cameras behave differently.
+- Whether camera switching reinitializes the preview incorrectly.
+
+Identify the actual root cause before making changes. Do not add another speculative CSS rotation on top of existing code.
+
+STEP 2 — FIX THE LIVE PREVIEW
+- When the phone is held upright, the live preview must appear upright in portrait mode.
+- The subject must not appear rotated sideways.
+- Display the camera feed at the correct aspect ratio without stretching or squashing it.
+- Use an appropriate object-fit strategy so the preview fills its designated area naturally.
+- Preserve the existing camera screen design, capture button, recording controls, and other working functionality.
+- Switching between the front and rear cameras must not introduce a sideways preview.
+- Handle landscape orientation appropriately without breaking portrait mode.
+- Avoid hard-coded 90-degree or 270-degree rotations unless testing proves that a specific camera/browser combination requires them.
+- Do not break photo capture, video recording, or existing camera permissions.
+
+STEP 3 — TEST THE ACTUAL FIX
+Test these cases where the available environment permits:
+1. Rear camera with the phone held upright.
+2. Front camera with the phone held upright.
+3. Switching from the rear camera to the front camera and back.
+4. Rotating the device between portrait and landscape.
+5. Closing and reopening the camera.
+6. Taking a photo and recording a video after confirming that the preview is correct.
+
+If you cannot access a physical Android device, state that limitation clearly. Do not claim that the real-device bug is resolved solely because the code compiles or a desktop preview works.
+
+IMPLEMENTATION RULES
+- Fix the root cause, not just the visible symptom.
+- Inspect and reuse the existing camera component.
+- Make the smallest reliable change.
+- Do not create a second camera implementation.
+- Do not remove existing functionality or redesign unrelated screens.
+- Preserve all existing wedding data, authentication, permissions, and navigation.
+
+FINAL REPORT
+Explain the root cause you identified, the code you changed, the tests you actually performed, and whether the fix was verified on a physical Android device.
+
+Do not report the issue as fixed unless the live camera preview has actually been verified to appear upright.

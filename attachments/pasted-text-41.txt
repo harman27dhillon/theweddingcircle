@@ -1,0 +1,111 @@
+Wedding Circle — Targeted UI Fixes Based on Latest Screenshots
+
+Work on the existing Wedding Circle project in Grok Build. Inspect the current implementation and the screenshots and image assets provided with this request before making changes.
+
+Important: These are targeted fixes to the current UI. Do not redesign the application, change unrelated features, or overwrite working functionality.
+
+1. Fix the floral corner decorations
+
+The four floral images added to the Classic Default theme are not positioned correctly.
+
+- The upper-left and upper-right floral decorations must start at the actual top corners of the page, not underneath the header.
+- Position them so the flowers extend naturally inward from both top corners without covering the couple's names or important controls.
+- The floral artwork should look integrated into the page background, not like separate stickers or rectangular image layers.
+- Remove any unwanted borders, outlines, rectangular edges, halos, or shadows around the transparent floral images.
+- Inspect the source images, transparency, image dimensions, CSS wrappers, clipping, and stacking contexts to identify the actual cause.
+- Preserve the original artwork and transparency. Do not replace the supplied images with newly generated flowers or remove the decorations.
+
+Bottom floral decoration
+
+- Use the supplied wide floral image along the bottom edge of the desktop page.
+- Make the decoration span the full desktop width, with flowers naturally extending inward from both bottom corners.
+- Preserve the original proportions and avoid stretching, obvious edges, and awkward cropping.
+- Keep it behind page content and interactive controls.
+- Make the positioning responsive so it remains attractive on smaller screens.
+
+2. Correct floral layering and content visibility
+
+In the latest desktop screenshot, some text and interface panels appear above the floral decoration in places where the intended layering should keep them behind it.
+
+- Inspect the page's stacking contexts, positioning, "z-index", clipping, and overflow.
+- Correct the layering so floral decorations frame the page without incorrectly covering the header, couple names, buttons, or other essential content.
+- Ensure content scrolls naturally into view instead of appearing through or on top of the wrong decorative layer.
+- Keep decorative images non-interactive so they cannot intercept clicks, taps, or scrolling.
+- Do not hide functional controls or text to solve a layering issue.
+- Avoid arbitrary high "z-index" values and conflicting CSS overrides. Fix the underlying layout and stacking problems.
+
+3. Make the selected cover image the blurred wedding-wide background
+
+The selected cover image, whether the default cover or a theme-specific cover, should also appear as a subtle blurred background throughout that wedding's internal pages.
+
+- Use the actual cover selected for each individual wedding.
+- Display it as a full-page, softly blurred background with an appropriate translucent overlay.
+- Apply it consistently across the wedding home page, ceremonies, chat, live-related pages, album, and other internal wedding sections where appropriate.
+- Preserve readability and the existing layout of cards, text, buttons, and controls.
+- Update the background when the host changes the wedding cover.
+- Keep different weddings' cover images isolated from each other.
+- Respect each theme's existing colors and design.
+- Do not alter chat functionality or its layout. Only apply the shared background layer where appropriate.
+
+4. Remove the visible header line on mobile and desktop
+
+The header currently has a visible horizontal line separating it from the background.
+
+- Remove the visible bottom border, divider, and any shadow responsible for the line.
+- Make the header blend naturally into the page background.
+- Preserve the existing logo, title, navigation, profile controls, and menu.
+- Ensure the floral decorations are layered correctly around the header.
+- Apply the fix to mobile and desktop layouts and avoid breaking other themes.
+
+5. Fix the More-page buttons flickering before opening
+
+Buttons inside the More section sometimes flicker before opening, and some functions feel unresponsive.
+
+- Inspect event handlers, route transitions, component mounting, animation state, overlays, and pointer-event handling.
+- Identify the root cause rather than applying a visual workaround.
+- Ensure buttons respond to the first valid tap or click.
+- Remove unintended repeated animations, duplicate event handlers, and unnecessary state resets or delays.
+- Check whether invisible overlays or decorative layers are intercepting interactions.
+- Preserve every existing More-page feature and permission.
+- Ensure the page can scroll normally and that dialogs and settings remain usable.
+
+6. Add a desktop return-to-landing-page button
+
+In the desktop wedding interface, add a small, discreet exit/return icon between the application icon and the Home navigation button.
+
+- The button should return the user to the main landing page.
+- It must not sign the user out, clear their data, or reset their authentication.
+- Use the existing icon library and navigation mechanism.
+- Add an accessible tooltip or label such as “Back to Landing Page.”
+- Do not duplicate an equivalent control if one already exists.
+- Keep the button visually consistent with the current desktop navigation.
+
+7. Inspect and fix the existing iPhone-like animations
+
+Review the iPhone-like transitions already implemented in the project.
+
+- Determine which transitions are working and which are broken.
+- Inspect existing landing-page entry animations, wedding-page transitions, and relevant modal or navigation animations.
+- Repair broken transitions using the existing animation system wherever possible.
+- Avoid flickering, sudden jumps, repeated animation triggers, excessive delays, and interactions blocked by animations.
+- Keep transitions smooth and restrained, including on lower-powered mobile devices.
+- Ensure animations do not interfere with scrolling, touch input, or button responsiveness.
+- Respect the user's reduced-motion preference.
+
+8. Regression checks
+
+Before completing the work:
+
+1. Test the upper and lower floral decorations on mobile and desktop.
+2. Verify the header has no visible dividing line.
+3. Confirm the selected cover image appears blurred behind the wedding's internal pages.
+4. Check that the floral layers do not block text, controls, or scrolling.
+5. Confirm More-page buttons open on the first tap.
+6. Verify the new desktop return button navigates correctly without signing out.
+7. Check the existing iPhone-like transitions.
+8. Run the available tests, type checks, and production build.
+9. Report the files changed, the root causes fixed, and the tests that actually passed.
+
+Do not claim a feature was tested if it was not.
+
+Final constraint: Keep the changes minimal and isolated. Do not modify unrelated features, database records, authentication, chat behavior, theme functionality, or existing wedding data. Do not simply append more CSS overrides if the problem originates in the component structure or stacking contexts.

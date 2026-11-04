@@ -1,0 +1,231 @@
+TASK: Replace Cloudflare Stream with Cloudflare RealtimeKit — Complete Live Provider Integration
+
+Work directly on the existing Wedding Circle source code. This is an implementation task, not a planning or explanation task.
+
+1. Inspect the existing architecture first
+
+Before changing anything:
+
+- Inspect the entire current livestream provider implementation.
+- Inspect Developer → Infrastructure and its existing provider configuration UI.
+- Inspect backend API routes, services, environment variables, database schema, webhooks, frontend live components and camera handling.
+- Identify every dependency on "cloudflare-stream", including validation, provider selection, health checks, tests and documentation.
+- Inspect existing Cloudflare R2 and Supabase integrations.
+- Check whether a RealtimeKit App ID or related secret already exists under another name. Do not create duplicate secrets or assume their values.
+
+Preserve unrelated working functionality.
+
+2. Replace the live provider configuration
+
+Replace the existing Cloudflare Stream provider configuration with Cloudflare RealtimeKit.
+
+The Infrastructure page must clearly show:
+
+Provider: Cloudflare RealtimeKit
+
+Required configuration:
+
+- "CLOUDFLARE_REALTIME_API_TOKEN"
+- "CLOUDFLARE_REALTIME_APP_ID"
+
+Requirements:
+
+- API token must remain server-side and be masked in the UI.
+- App ID must be configurable and validated.
+- If an existing secret already contains the correct App ID, reuse it where possible.
+- Never expose the API token to the frontend.
+- Do not reuse the Cloudflare Stream API token as a RealtimeKit token.
+- Provide Save, Test Connection and configuration status indicators.
+- Show precise errors when credentials or permissions are incorrect.
+- Test Connection must perform a real, safe RealtimeKit API authentication check, not just check whether fields are populated.
+- Clearly explain that RealtimeKit requires its own API token with appropriate Realtime Admin permissions.
+
+Remove obsolete Stream-specific configuration fields and validation only after confirming no remaining functionality depends on them.
+
+3. Implement actual RealtimeKit integration
+
+Use the official Cloudflare RealtimeKit API and SDK documentation.
+
+Do not invent endpoints, API methods, permission names or SDK methods.
+
+Implement the full backend meeting lifecycle:
+
+1. Create a RealtimeKit meeting for a wedding ceremony.
+2. Add participants through the backend.
+3. Assign the correct preset to each participant.
+4. Generate participant authentication tokens securely.
+5. Return only the participant-specific data required by the frontend.
+6. Validate that each participant belongs to the relevant wedding and has permission to join.
+7. Prevent unauthorized users from joining private wedding broadcasts.
+8. Handle meeting start, participant join/leave and meeting completion.
+9. Clean up meeting state and persist relevant metadata in Supabase.
+
+Use existing wedding IDs and ceremony IDs to associate meetings with the correct wedding.
+
+Meetings must be created automatically when the host starts a ceremony livestream, not manually from the Cloudflare dashboard.
+
+Prevent duplicate meetings when the host double-clicks or reconnects.
+
+4. Configure webinar roles
+
+Use the existing RealtimeKit app presets where possible.
+
+Host: "webinar_presenter"
+
+- Can publish camera and microphone.
+- Can start and stop broadcasting.
+- Can manage the stage.
+- Can control the broadcast according to permitted host capabilities.
+
+Guests: "webinar_viewer"
+
+- Can watch the broadcast.
+- Cannot publish their own camera or microphone.
+- Cannot join the stage unless explicitly permitted by the wedding host.
+- Can send public text comments.
+- Cannot kick or mute other participants.
+- Cannot manage recording or meeting controls.
+
+Verify actual preset settings through the RealtimeKit API or SDK documentation. Do not blindly assume dashboard defaults are correct.
+
+Keep guest camera/microphone disabled by default.
+
+5. Wire the existing Wedding Circle Live interface
+
+Integrate RealtimeKit into the existing Live screen.
+
+Preserve the current Wedding Circle design and navigation.
+
+Requirements:
+
+- Host camera opens in portrait orientation.
+- Host can start and end the live broadcast.
+- Guests can watch the broadcast.
+- Guests can send comments.
+- Comments appear in the existing live comment interface.
+- Host sees participant count.
+- Host can handle connection status and reconnect.
+- Guests see meaningful waiting, ended, unavailable and connection-error states.
+- Prevent multiple camera sessions from opening simultaneously.
+- Support Android Chrome and Samsung Internet.
+- Handle screen rotation and app background/foreground transitions.
+- Preserve existing privacy and wedding membership checks.
+
+Do not redesign unrelated screens.
+
+6. Recording and permanent replay storage
+
+Implement recording through RealtimeKit using its officially supported recording functionality.
+
+Requirements:
+
+- Automatically start recording when the ceremony broadcast begins, if supported by the official meeting API.
+- Do not assume a preset setting enables automatic recording.
+- Detect recording completion through official webhooks or supported APIs.
+- Obtain the completed recording securely.
+- Transfer the recording to the existing private Cloudflare R2 bucket.
+- Store recording metadata in Supabase, including wedding ID, ceremony ID, duration, recording status and R2 object key.
+- Generate short-lived signed playback URLs.
+- Never expose private R2 credentials or permanent public bucket URLs.
+- Handle recording failures and retry uploads safely.
+
+After successful upload, automatically add a replay entry to the relevant wedding chat.
+
+The replay must remain available after the RealtimeKit temporary recording link expires.
+
+7. Chat and comments
+
+Integrate RealtimeKit chat if appropriate for the live session.
+
+However, preserve the existing Wedding Circle chat architecture and Supabase data.
+
+Requirements:
+
+- Live comments must be associated with the correct wedding and ceremony.
+- Prevent duplicate comments.
+- Maintain appropriate access controls.
+- If RealtimeKit chat is used, synchronize required messages into Supabase using supported webhooks or APIs.
+- Do not replace the entire existing wedding chat system.
+
+8. Webhooks and security
+
+Implement secure webhook handling:
+
+- Verify webhook authenticity according to official RealtimeKit documentation.
+- Handle duplicate webhook delivery idempotently.
+- Process participant and meeting lifecycle events.
+- Process recording completion events.
+- Log errors without logging API tokens or participant secrets.
+- Validate all incoming meeting and participant identifiers.
+
+Never trust frontend-supplied wedding IDs or participant roles without backend authorization.
+
+9. Remove obsolete Cloudflare Stream dependencies
+
+After the RealtimeKit implementation works:
+
+- Remove Stream-specific provider selection.
+- Remove obsolete Stream-only configuration UI.
+- Remove unused Stream validation and provider code.
+- Remove unused Stream-only frontend dependencies where safe.
+- Do not delete existing Cloudflare R2 integration.
+- Do not delete existing Cloudflare Stream credentials automatically; they may be retained temporarily for rollback.
+- Do not change Cloudflare R2, Supabase, Firebase authentication or unrelated infrastructure.
+
+The app should use RealtimeKit as its sole live meeting/broadcast provider.
+
+10. Tests and production audit
+
+Write and run tests covering:
+
+- Infrastructure configuration and secret validation.
+- RealtimeKit authentication.
+- Meeting creation.
+- Host and guest participant assignment.
+- Unauthorized participant rejection.
+- Guest camera/microphone restrictions.
+- Host broadcasting.
+- Guest comments.
+- Reconnection and duplicate meeting prevention.
+- Recording lifecycle.
+- Recording transfer to R2.
+- Supabase recording metadata.
+- Replay insertion into wedding chat.
+- Webhook signature validation and duplicate delivery.
+- Android-oriented camera lifecycle behaviour.
+
+Run:
+
+- TypeScript/typecheck.
+- Relevant unit and integration tests.
+- Production build.
+- Existing media, storage and theme regression tests.
+
+Do not claim a feature works merely because the code compiles.
+
+11. Final verification report
+
+At completion, report:
+
+1. Files changed.
+2. Infrastructure fields added or removed.
+3. Backend and frontend integration completed.
+4. Database changes or migrations.
+5. Webhooks implemented.
+6. Recording and R2 replay status.
+7. Tests actually run and their results.
+8. Any remaining manual Cloudflare configuration.
+9. Exact secret names and which values must be supplied.
+10. Anything not implemented, with the precise blocker.
+
+STRICT RULES
+
+- Inspect existing code before modifying it.
+- Implement directly; do not just provide instructions.
+- Do not rewrite unrelated working systems.
+- Do not create fake API responses or mock production functionality.
+- Do not report untested functionality as complete.
+- Do not expose secrets.
+- Use official Cloudflare RealtimeKit documentation.
+- Preserve the current Wedding Circle UI and user experience.
+- Make minimal, production-safe changes and verify them before declaring completion.

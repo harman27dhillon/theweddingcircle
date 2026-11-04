@@ -1,0 +1,143 @@
+The Wedding Circle — Desktop-Only Layout Redesign
+
+Modify the existing The Wedding Circle application to implement a dedicated desktop layout while preserving the current mobile experience and all existing wedding functionality.
+
+1. Strict separation between desktop and mobile
+
+- Apply the new layout only to desktop-sized screens.
+- Keep the existing mobile navigation, page layout, gestures, animations, and component behavior unchanged.
+- Use responsive breakpoints and separate desktop layout rules rather than replacing the shared mobile interface.
+- Ensure switching between desktop and mobile viewport sizes does not reset wedding data, user state, navigation state unnecessarily, or saved preferences.
+- Preserve existing light and dark themes and the premium wedding design.
+
+2. Desktop navigation at the top
+
+On desktop only, move the wedding navigation to a horizontal bar at the top of the wedding workspace.
+
+The navigation must contain these sections in this order:
+
+- Home
+- Chat
+- Live
+- Albums
+- More
+
+Distribute the navigation items evenly across the available width. Use clear labels, suitable icons consistent with the existing design, a visible active state, comfortable spacing, and subtle transitions.
+
+Remove the existing desktop navigation placement that this top navigation replaces. Avoid displaying duplicate navigation bars.
+
+Do not change the mobile navigation position or its appearance.
+
+3. Two-panel desktop layout
+
+Below the desktop navigation, divide the main wedding workspace into two side-by-side panels.
+
+Left panel — Home and Chat
+
+The left panel contains:
+
+- Home: The existing wedding home experience, with its current wedding details, cover content, ceremony information, and associated functionality.
+- Chat: The main shared wedding chat room, accessible to authorized wedding members.
+
+Switching between Home and Chat must display the appropriate content within the left panel without unnecessarily reloading the entire wedding workspace.
+
+Right panel — Live, Albums, and More
+
+The right panel contains:
+
+- Live: Existing live-streaming functionality and related controls.
+- Albums: Existing wedding photo and video album functionality.
+- More: Existing additional wedding features, settings, and available controls.
+
+Switching between Live, Albums, and More must display the selected section within the right panel without unnecessarily reloading the entire wedding workspace.
+
+The two panels must operate independently. Selecting Chat on the left must not force the right panel to switch sections, and selecting Albums or Live on the right must not force the left panel to change sections.
+
+Keep both panels available and visible simultaneously on desktop.
+
+4. Remove the separate private “Chats” navigation entry on desktop
+
+The existing desktop interface shows both “Chat” and “Chats.”
+
+- Keep Chat as the main shared wedding chat room.
+- Remove the separate Chats entry from the desktop navigation and desktop panel layout.
+- Do not delete private messaging code, stored messages, conversations, or associated records.
+- Do not remove any backend functionality or access permissions.
+- Preserve private messaging data and any existing access points outside the removed desktop navigation entry.
+- Do not accidentally route the main Chat tab to the private messaging interface.
+
+Keep the existing mobile private-messaging interface unchanged.
+
+5. Independent desktop Wedding Bar Card aspect ratio
+
+The Developer Center already has an aspect-ratio control for wedding bar cards on the landing page. Extend it so desktop and mobile use independent settings.
+
+Add a clearly labelled Desktop Wedding Bar Card Ratio setting within the existing Developer Center controls.
+
+Requirements:
+
+- Preserve the existing mobile aspect-ratio setting.
+- Add a separate desktop aspect-ratio value and persistence mechanism.
+- Changing the desktop ratio must affect only desktop wedding bar cards.
+- Changing the mobile ratio must affect only mobile wedding bar cards.
+- Ensure the selected ratios apply consistently to the appropriate landing-page cards.
+- Preserve existing card content, cover images, text, interactions, click targets, and wedding data.
+- Provide suitable desktop and mobile defaults based on the existing design.
+- Validate saved ratios to prevent zero dimensions, invalid values, overflow, clipping, or distorted card content.
+- Ensure the card's content adapts correctly to the selected ratio.
+
+Do not reuse one shared setting for both layouts. If the current implementation uses a single setting, introduce backward-compatible separation without losing the existing saved value; preserve the current value as the mobile setting unless code inspection shows a safer migration.
+
+6. Desktop sizing and visual quality
+
+- Make both panels fit the available desktop viewport without unnecessary horizontal scrolling.
+- Allocate space according to the actual content requirements; do not force an arbitrary 50/50 split if it makes chat, live video, or albums unusable.
+- Give each panel its own appropriate scrolling behavior where needed.
+- Avoid nested scrollbars where possible.
+- Prevent panel content from overlapping the top navigation.
+- Ensure chat composers, live-stream controls, album grids, and More options remain accessible.
+- Preserve existing wedding colors, typography, backgrounds, animations, privacy controls, and theme selection.
+- Maintain a polished, premium editorial appearance consistent with The Wedding Circle.
+- Ensure the layout remains usable on smaller desktop and tablet-sized screens. If two panels cannot fit comfortably, introduce a responsive fallback without affecting the mobile-specific interface.
+
+7. Preserve application behavior
+
+This is a targeted layout change, not a functional rebuild.
+
+Before implementation, inspect the existing components, navigation state, responsive breakpoints, landing-page card configuration, and saved settings.
+
+Preserve:
+
+- Authentication and account sessions.
+- Wedding IDs, memberships, and permissions.
+- Host and co-host controls.
+- Wedding themes and backgrounds.
+- Shared chat history and messaging behavior.
+- Live streams and spectator controls.
+- Album uploads and existing media.
+- Invitations, settings, and access codes.
+- Database routing, synchronization, and local pending changes.
+- Existing mobile behavior and animations.
+
+Reuse existing components and state management wherever possible. Avoid duplicate implementations and unrelated redesigns. Do not modify database routing or run migrations unless strictly required for backward-compatible storage of the independent ratio settings.
+
+8. Testing and completion report
+
+Test the actual desktop and mobile layouts.
+
+Verify that:
+
+1. Desktop navigation appears at the top, with no duplicate navigation.
+2. Home and Chat are accessible in the left panel.
+3. Live, Albums, and More are accessible in the right panel.
+4. Changing the selected section on one side does not change the selected section on the other side.
+5. The separate private Chats entry is absent from desktop without deleting private messages or their underlying functionality.
+6. Desktop and mobile wedding bar card ratios save and apply independently.
+7. Existing mobile navigation and page layouts remain unchanged.
+8. Light and dark themes continue to work.
+9. Existing wedding data, access permissions, and core functionality remain intact.
+10. Relevant tests, type checks, and build checks pass.
+
+Report the files changed, the tests performed, any issues discovered, and any remaining work. Do not claim a test passed unless it was actually run.
+
+Final result: Desktop should have a horizontal top navigation, a left panel containing Home and the shared Chat, and a right panel containing Live, Albums, and More. The mobile interface must remain as it is today, and desktop wedding card ratios must be configurable independently from mobile.

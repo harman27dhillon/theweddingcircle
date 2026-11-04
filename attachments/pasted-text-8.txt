@@ -1,0 +1,30 @@
+Audit The Wedding Circle's readiness to switch wedding-data traffic from Neon to Supabase.
+
+Important safeguards:
+
+- Do not switch live traffic yet.
+- Do not delete, reset, or modify existing Neon data.
+- Do not delete wedding records or media.
+- Do not overwrite existing API keys, URLs, secrets, or environment variables.
+- Keep the current Neon connection available for rollback.
+- Do not redesign the UI or make unrelated changes.
+
+Tasks:
+
+1. Inspect the complete source schema and identify every table, view, function, relationship, index, and database operation used by the app—not just the five tables already migrated.
+2. Verify that Supabase has all required schema objects and that row-level security, permissions, and server-side access are configured correctly.
+3. Compare actual records and important field values, not just row counts, for the five migrated tables.
+4. Audit authentication, wedding creation, joining as a guest or family member, memberships, invitations, couple access, chat persistence, and permissions.
+5. Confirm photo/video storage remains on the existing media system and that media URLs and references are unchanged.
+6. Identify any code that still reads or writes wedding data directly through Neon. Determine exactly what must change for Supabase to become the active database.
+7. Verify that failures can be rolled back safely to Neon without losing new writes.
+8. Run safe, read-only checks and non-destructive tests wherever possible. Do not perform a live cutover or destructive migration.
+
+Report:
+
+- PASS, FAIL, or NOT VERIFIED for each area.
+- Missing schema objects or code changes.
+- Any security or data-integrity risks.
+- The exact remaining steps before cutover.
+
+Make only the smallest necessary changes for the audit and safe test setup. Preserve all existing functionality and user data.

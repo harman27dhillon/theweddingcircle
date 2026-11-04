@@ -1,0 +1,51 @@
+The Wedding Circle — Ceremony Cover Images Integration
+
+Integrate the 10 uploaded ceremony cover images into the existing Wedding Circle project.
+
+1. Map the images to ceremonies
+
+Use the uploaded images in the following order, identifying each by its visual content:
+
+1. Haldi — Yellow turmeric, marigolds and traditional haldi arrangements.
+2. Engagement / Roka / Sagai — Prominent engagement ring in a luxurious jewellery arrangement.
+3. Baraat — Decorated wedding horse with traditional Indian wedding procession décor.
+4. Jaggo — Colourful decorated Jaggo pot prominently displayed on the head of a woman or as the main ceremonial element, matching the uploaded image.
+5. Sangeet / Goan Sangeet — Traditional dhol, dholki and musical elements. Use the uploaded image without introducing unnecessary people.
+6. Chooda — Red bridal chooda bangles with gold jewellery and traditional décor.
+7. Walima — Elegant Muslim wedding reception dining arrangement.
+8. Church Ceremony — Christian wedding décor with a cross, candles, flowers and a church setting.
+9. Reception — Luxurious wedding reception tables, floral arrangements and warm lighting.
+10. Pheere / Phere / Saat Phere — Hindu wedding mandap with the sacred havan fire and traditional ritual arrangements.
+
+2. Image implementation requirements
+
+- Use the actual uploaded images as assets. Do not recreate, replace, or regenerate them.
+- Assign each image only to its corresponding ceremony.
+- Preserve the original image aspect ratio and composition.
+- Display the images as cinematic background covers inside the existing ceremony bars/cards.
+- Keep the left side spacious, softly faded and uncluttered so ceremony names, dates and other text remain readable.
+- Keep the important ceremony objects on the right visible and recognizable.
+- Use appropriate "background-size: cover" and background positioning, adjusting per image to avoid cropping important objects.
+- Add a subtle, theme-compatible overlay only if necessary for readability.
+- Ensure the images work on mobile and desktop layouts.
+- Preserve the current premium Wedding Circle aesthetic and all existing functionality.
+
+3. Support user-added ceremonies
+
+Users can create their own ceremony names, so do not limit cover assignment to these 10 predefined categories.
+
+- Automatically use the matching predefined cover when a recognised ceremony name or its common spelling/language variant is selected.
+- For a custom ceremony with no matching predefined cover, use a premium generic wedding-themed fallback background with flowers, warm lighting and a softly faded empty area on the left.
+- If the user can upload a custom cover, let that image override the fallback.
+- Never assign an unrelated ceremony image to a custom ceremony.
+- Keep custom ceremony names and cover selections intact when the app reloads.
+
+4. Important safeguards
+
+- Integrate this into the existing project; do not rebuild the application.
+- Do not change existing themes, wedding backgrounds, page layouts, navigation, databases or unrelated features.
+- Do not change the background-image selection logic for other themes.
+- Store image assets locally within the project where appropriate; avoid external image URLs that may expire.
+- Verify every mapping, text readability, mobile cropping and fallback behaviour before finishing.
+
+First inspect the existing ceremony data model and cover-image implementation. Make the smallest necessary changes and report which files were changed and whether all 10 covers were verified.

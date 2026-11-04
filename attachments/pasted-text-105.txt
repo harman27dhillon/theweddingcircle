@@ -1,0 +1,126 @@
+Task: Connect The Wedding Circle to the Deployed Cloudflare Private Media Gateway
+
+Connect the Grok-hosted Wedding Circle application to our already-deployed Cloudflare Worker.
+
+Worker production URL:
+"https://wedding-circle-media-gateway.labs-circle26.workers.dev"
+
+1. Inspect before changing anything
+
+Inspect the actual application source code and identify:
+
+- Existing Cloudflare R2 upload implementation.
+- Existing private media viewing and signed URL implementation.
+- Current media gateway configuration and API routes.
+- How the application generates and validates media access signatures.
+- Existing server-side environment variables and secrets.
+- Any existing fallback path for private R2 media.
+
+Do not assume the Worker and application already share the same configuration or signing contract.
+
+2. Connect the deployed Worker
+
+Configure the application to use:
+
+"https://wedding-circle-media-gateway.labs-circle26.workers.dev"
+
+Requirements:
+
+- Store the endpoint in the appropriate server-side configuration.
+- Never expose signing secrets or Cloudflare credentials to frontend code.
+- Make the application and Worker use exactly the same signing algorithm, payload format, encoding, timestamp rules and secret.
+- Verify the Worker expects the same request method, URL path, headers and parameters that the application sends.
+- Use the existing MEDIA_GATEWAY_SECRET only if its actual value and signing contract match. Never invent or overwrite secrets.
+- Ensure the production origin is included in ALLOWED_ORIGINS.
+
+3. Preserve private media security
+
+Our R2 bucket is:
+
+"wedding-circle-media"
+
+Existing R2 binding in the Worker:
+
+"MEDIA"
+
+The bucket must remain private.
+
+Do not:
+
+- Enable R2 public access.
+- Make wedding photos or videos publicly accessible.
+- expose signing secrets in browser JavaScript.
+- Add a public R2 custom domain as a workaround.
+- Cache private media in a way that allows one wedding's media to be accessed by another wedding or unauthorised visitor.
+- Change DNS records.
+
+The Worker must reject:
+
+- Anonymous requests.
+- Invalid or expired signatures.
+- Requests for unauthorised objects.
+- Requests from disallowed origins where origin validation applies.
+
+Valid signed requests must return the correct private object.
+
+4. Integrate without breaking existing features
+
+Preserve existing functionality:
+
+- Feed photos and videos.
+- Ceremony photos and videos.
+- Chat media.
+- Profile photos.
+- Wedding cover images.
+- Media downloads.
+- Existing upload flow through signed R2 upload URLs.
+
+Do not change the database schema, R2 object keys, bucket structure, upload optimisation or unrelated application features.
+
+If the gateway is unavailable, preserve the existing secure private-media path as a fallback. Never fall back to public object access.
+
+5. Test the complete integration
+
+Test the actual deployed Worker and application, not just configuration presence.
+
+Verify:
+
+1. Worker endpoint responds.
+2. R2 binding works.
+3. Valid signed request retrieves an existing private image.
+4. Valid signed request retrieves an existing private video, if available.
+5. Anonymous request is rejected.
+6. Invalid signature is rejected.
+7. Expired signature is rejected.
+8. Unauthorised object access is rejected.
+9. Allowed production origin works.
+10. Existing upload and download flows still work.
+11. Existing wedding media remains accessible to authorised users only.
+
+Check HTTP status codes and response content types.
+
+6. Enable only after verification
+
+Do not enable the application's Private Media Gateway activation switch until the actual Worker integration tests pass.
+
+Once all tests pass:
+
+- Save the gateway endpoint configuration.
+- Enable the gateway using the existing activation workflow.
+- Verify the application can load existing wedding media.
+- Confirm that R2 remains private.
+
+If any test fails, leave activation OFF and report the precise failure.
+
+7. Final report
+
+Report clearly:
+
+- Files changed.
+- Environment variables required or reused.
+- Whether the Worker signing contract matches the application.
+- Tests actually executed and their results.
+- Whether the gateway was activated.
+- Any manual Cloudflare action still required.
+
+Important: Do not merely describe the changes or provide instructions. Inspect the real source code, implement the integration, run the tests and report what was genuinely completed. Do not claim success without verification. Keep this task limited to private media gateway integration.

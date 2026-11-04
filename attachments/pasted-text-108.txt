@@ -1,0 +1,96 @@
+Task: Audit and Fix Cloudflare CDN Delivery for The Wedding Circle
+
+The Cloudflare infrastructure is configured, but the app's CDN connection test still reports:
+
+- Cloudflare API token accepted.
+- R2 connection verified.
+- CDN delivery is OFF.
+- Anonymous media request returns HTTP 403.
+- Cache-Control: private, no-store.
+- Edge cache: not reported.
+- Unauthorized media requests are correctly refused.
+- Current cache policy: Authorized edge cache, after the signature check.
+- Media hostname: "media.theweddingcircle.in".
+- CDN base URL: "https://media.theweddingcircle.in".
+- R2 bucket: "wedding-circle-media".
+- Private media gateway Worker: "wedding-circle-media-gateway".
+
+1. Inspect the actual implementation
+
+Inspect the complete source code responsible for:
+
+- Cloudflare CDN configuration and connection testing.
+- Private media gateway integration.
+- Signed media URL generation and verification.
+- Media delivery and response headers.
+- Cache-control policy.
+- Cloudflare cache behavior and cache-status detection.
+- CDN status and infrastructure diagnostics.
+
+Trace the actual request from the app to the Worker and R2. Identify exactly why the CDN test cannot report edge-cache behavior.
+
+Do not assume the issue is Cloudflare dashboard configuration. Determine whether the problem is in application code, Worker behavior, request signing, response headers, cache eligibility, or test methodology.
+
+2. Preserve security and existing infrastructure
+
+Strict requirements:
+
+- Keep the R2 bucket private.
+- Never enable public R2 access or "r2.dev".
+- Never bypass HMAC signature verification.
+- Never cache unauthorized or expired requests.
+- Never expose private media through unsigned URLs.
+- Preserve existing upload, download, membership, and wedding authorization logic.
+- Do not change Supabase, Better Auth, Firebase, or livestream functionality.
+- Do not rotate, replace, or request existing credentials.
+- Do not change DNS records, Cloudflare Access policies, Worker secrets, or bindings.
+- Do not enable CDN delivery automatically.
+
+3. Implement the correct authorized caching behavior
+
+If the current implementation is incorrect, fix it so that:
+
+1. The Worker verifies the signature and authorization before serving an object.
+2. Only successfully authorized media responses are eligible for edge caching.
+3. Unauthorized requests continue returning HTTP 403 with private/no-store behavior.
+4. Missing objects return HTTP 404.
+5. Cache keys cannot allow one wedding's private media to be served to another unauthorized user.
+6. Cache TTL and invalidation behavior are appropriate for private wedding media.
+7. The response exposes reliable cache diagnostics, including Cloudflare cache status where available.
+
+Do not simply add "public" or "s-maxage" headers without verifying the complete security and cache-key design.
+
+4. Fix the CDN connection test
+
+The test must distinguish between:
+
+- Cloudflare API authentication.
+- R2 connectivity.
+- Worker availability.
+- Unauthorized request rejection.
+- Valid signed media delivery.
+- Edge cache MISS.
+- Edge cache HIT.
+
+A 403 from an anonymous request is an expected security result, not proof that CDN delivery is broken.
+
+Use a dedicated, controlled test object or another safe method to test an authorized request twice. Verify whether the second request produces an actual cache HIT. Do not use real private user media as a test object.
+
+If the test cannot verify a cache HIT, report exactly why instead of showing a misleading success or failure.
+
+5. Verification and final report
+
+Run relevant tests, type checks, and production build.
+
+Report:
+
+- Exact root cause.
+- Files changed.
+- What was implemented.
+- Tests passed and failed.
+- Whether an authorized cache MISS and HIT were actually verified.
+- Any remaining Cloudflare dashboard action required.
+
+Important: Do not claim CDN delivery is ready merely because the API token or R2 connection succeeds. Do not enable the CDN switch. Leave CDN status Disabled until I explicitly approve activation.
+
+Make the necessary code changes directly. Do not just provide recommendations or a theoretical explanation. Avoid unrelated refactoring.

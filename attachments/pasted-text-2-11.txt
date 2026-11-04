@@ -1,0 +1,46 @@
+
+/* Photorealistic floral artwork — adapt selectors to the existing app */
+.landing-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+.landing-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    url("/flora/tl.webp"),
+    url("/flora/tr.webp"),
+    url("/flora/bl.webp"),
+    url("/flora/br.webp");
+  background-repeat: no-repeat;
+  background-position:
+    left top,
+    right top,
+    left bottom,
+    right bottom;
+  background-size:
+    clamp(110px, 17vw, 250px) auto,
+    clamp(110px, 17vw, 250px) auto,
+    clamp(110px, 17vw, 250px) auto,
+    clamp(110px, 17vw, 250px) auto;
+}
+
+/* Keep actual content above decorative artwork */
+.landing-stage > * {
+  position: relative;
+}
+
+/* Reduce corner artwork on small screens */
+@media (max-width: 640px) {
+  .landing-stage::before {
+    background-size:
+      100px auto,
+      100px auto,
+      100px auto,
+      100px auto;
+  }
+}

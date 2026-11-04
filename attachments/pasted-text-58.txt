@@ -1,0 +1,169 @@
+The Wedding Circle — Host Permissions Fix, Account Onboarding & Subscription Updates
+
+Implement the following changes directly in my existing The Wedding Circle project. Inspect the current source code and data flow before editing.
+
+Important: These are targeted fixes and product updates. Do not redesign the application, rebuild it from scratch, remove unrelated features, or overwrite existing wedding data.
+
+1. CRITICAL: Fix Wedding Creator Incorrectly Identified as Guest
+
+Current bug
+
+When a user creates a wedding and enters it, the app identifies that same user as a Guest instead of the Host. Host Controls may appear in the More section, but the host settings and features are inaccessible or do not work correctly.
+
+This issue must be fixed at its root.
+
+Investigate and repair the complete identity and authorization flow
+
+Trace the entire process:
+
+1. User signs in or creates an account.
+2. User creates a wedding.
+3. The backend or existing data layer saves the wedding.
+4. The creator is associated with that wedding.
+5. The creator enters the wedding.
+6. The app resolves their membership and role.
+7. Host Controls and individual host actions are authorized.
+
+Identify exactly where the creator's role becomes Guest, is incorrectly inferred, or fails to load.
+
+Required behavior
+
+- The authenticated account that successfully creates a wedding must automatically become its Host.
+- Save the creator's stable account/user ID as the wedding's owner/creator ID.
+- Create or update the corresponding wedding membership record with the Host role.
+- Ensure that the ownership and membership records are consistent.
+- Resolve the current user's role using their authenticated account ID and verified wedding membership, not their displayed name, editable host name, email text alone, or frontend-only state.
+- Do not grant Host permissions merely because someone created a wedding-looking object on the client.
+- Ensure the host identity is restored correctly after refresh, navigation, session restoration and re-entry into the wedding.
+- Ensure the role is correct across Home, Chat, Live, Albums, More and every relevant host-management screen.
+- Fix Host Controls so every feature that the Host is authorized to use actually opens, loads its settings, saves changes and persists those changes.
+- Audit backend APIs, database queries, component conditions and permission checks for conflicting role definitions.
+- Prevent guests from gaining host privileges by changing local state or editing a displayed name.
+- Ensure co-hosts receive only their intended permissions and guests remain restricted.
+- Do not accidentally change existing legitimate hosts into guests.
+
+Existing wedding compatibility
+
+Do not delete or recreate existing weddings to fix this.
+
+For existing weddings, use a safe, documented reconciliation process. If the original creator can be verified from trusted ownership records, restore the correct Host membership. If ownership is ambiguous, flag the record for review rather than granting privileges to an arbitrary user.
+
+Acceptance tests
+
+Test at minimum:
+
+- A newly registered user creates a wedding and immediately appears as Host.
+- The same user can open and use all authorized Host Controls.
+- Changes made in Host Controls persist after refreshing and re-entering the wedding.
+- The creator remains Host after signing out and signing back in.
+- A guest cannot access host-only APIs or settings.
+- Editing a user's display name does not change their role.
+- A co-host cannot use features reserved exclusively for the Host.
+- Existing weddings and their data remain intact.
+
+Do not mark this issue fixed merely by changing the visible role label. Both the displayed role and actual backend authorization must be correct.
+
+2. Simplify Account Creation
+
+Update the account registration flow.
+
+Required changes
+
+- Ask the user to select their country during account creation.
+- Store the selected country in the user's account profile.
+- Preserve any existing country-based currency or locale functionality that depends on this selection.
+- Do not ask for religion during account creation.
+- Do not ask for religious traditions or wedding traditions during account creation.
+- Move or retain religion and traditions questions exclusively in the wedding creation process, where they belong.
+- Do not force users to select a religion or tradition just to register or sign in.
+- Ensure existing accounts continue to work and are not forced through registration again.
+
+Keep the account creation interface clean, simple and consistent with the current design.
+
+3. Remove the Photo Upload Option From Wedding Creation
+
+There is currently an Upload Photo option on one of the wedding creation process pages.
+
+- Locate the exact step and remove that button and its associated upload UI from the wedding creation flow.
+- Remove any now-unused upload handler or validation that exists solely for this button, but only after confirming it has no other uses.
+- Do not remove photo uploads from Albums, profiles, wedding covers or other parts of the app.
+- Do not alter unrelated wedding creation fields or steps.
+- Ensure the page layout remains balanced after removing the button.
+
+4. Update Subscription Plans and Storage Entitlements
+
+Update the plan labels, feature entitlements, subscription configuration and relevant UI consistently.
+
+Free plan
+
+- Cloud storage allowance: 500 MB
+- Replace the currently displayed 2 GB allowance.
+- Ensure the new allowance is reflected wherever free-plan storage is shown.
+- If actual storage enforcement exists, update it to 500 MB as well.
+- Do not delete existing media or forcibly remove data from users who already exceed the new limit.
+- For existing users over the new allowance, allow existing media to remain accessible and prevent additional uploads that exceed the applicable limit, with a clear explanation and upgrade option.
+
+₹499 premium plan
+
+- Price: ₹499, using the existing intended billing period and currency configuration. Do not invent a monthly or annual billing period if one has not been specified in the existing product design.
+- Cloud storage allowance: 10 GB
+- Premium themes: 25 or more themes
+
+Ensure the premium plan actually provides access to the promised themes and storage allowance, not just a marketing label.
+
+Subscription implementation requirements
+
+- Find every place where the current 2 GB free storage allowance, premium storage allowance, price and theme entitlement are defined.
+- Use a centralized plan/entitlement configuration where practical so different pages do not show conflicting values.
+- Update pricing cards, upgrade screens, storage indicators, feature comparisons and relevant developer configuration.
+- Enforce storage quotas in the trusted backend wherever uploads and storage accounting are handled.
+- Use verified subscription or purchase entitlements as the source of truth for premium access.
+- Never unlock premium access based solely on a client-side toggle or an unverified payment response.
+- Preserve existing purchase history and subscriptions.
+- Do not create live Google Play products, charge users, change Play Console settings or activate billing automatically as part of this task.
+- If Google Play Billing is not integrated yet, update the app's plan configuration and UI while clearly documenting what remains necessary for real payments and entitlement verification.
+
+Theme entitlement verification
+
+Audit the actual theme catalogue:
+
+- Count the themes that exist.
+- Confirm which themes are free and which are premium.
+- Make at least 25 themes available to the ₹499 plan only if 25 or more valid themes exist or are properly implemented as part of this task.
+- Do not count incomplete themes, duplicate theme entries or broken theme previews as fully available themes.
+- Do not silently label fewer than 25 working themes as 25+.
+- Keep the existing theme designs and theme-specific behavior intact.
+
+5. Regression Testing
+
+After making these changes:
+
+- Run the existing tests and TypeScript checks, where available.
+- Run the production build.
+- Test account registration with country selection and without religion/tradition questions.
+- Test wedding creation and confirm the creator is recognized as Host.
+- Test every relevant Host Control action and verify persistence.
+- Test Guest and Co-host permission boundaries.
+- Confirm the photo upload button is gone only from the specified wedding creation step.
+- Confirm free-plan storage is 500 MB and the ₹499 plan is configured for 10 GB.
+- Confirm premium theme access and restrictions match the actual entitlement configuration.
+- Check mobile layouts and the relevant navigation flows.
+- Check for regressions in existing weddings, themes, chat, albums and live streaming.
+
+Do not claim that tests passed unless they were actually executed. Do not replace real authentication, database operations or billing with mock behavior to make the tests pass.
+
+6. Final Report
+
+When finished, report:
+
+1. The root cause of the Host/Guest identity bug.
+2. The files and backend/database logic changed to fix it.
+3. Which Host Controls were tested and whether they work.
+4. Confirmation that country remains in registration while religion and traditions are only asked during wedding creation.
+5. The exact wedding creation step from which the Upload Photo option was removed.
+6. The final free and premium storage allowances.
+7. The number of genuinely working themes available under the ₹499 plan.
+8. Test results and production build status.
+9. Any remaining issue requiring manual configuration or external service activation.
+
+Priority: Fix the Host identity and Host Controls problem first. Then implement the registration, photo-upload and subscription changes. Preserve all unrelated working functionality and existing user data.

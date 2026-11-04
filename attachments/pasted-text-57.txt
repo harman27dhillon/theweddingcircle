@@ -1,0 +1,260 @@
+The Wedding Circle — Production Infrastructure Preparation & Developer Control Center
+
+Upgrade my existing The Wedding Circle project by preparing its infrastructure architecture, integration modules, environment configuration, backend interfaces and developer control panels for future production activation.
+
+This is an infrastructure preparation task, not a redesign or a rebuild. Inspect the existing source code, architecture, routes, database connections, authentication, UI and deployment configuration before making changes.
+
+Preserve all existing working functionality, wedding data, themes, navigation, animations, permissions and responsive layouts. Make minimal, organized, backward-compatible changes.
+
+1. Core implementation rules
+
+- Implement real configuration structures, integration interfaces, service adapters, backend routes, validation and status reporting wherever possible.
+- Do not fabricate successful connections, test results, billing transactions, storage usage or livestream status.
+- Do not expose secrets, API keys, service-account credentials, database passwords or private tokens in frontend code.
+- Never replace existing authentication or databases without first inspecting the current implementation.
+- Do not add fake production functionality or mark a service as connected unless it has been genuinely configured and verified.
+- If external credentials or accounts are missing, create a clearly labeled Not configured state and document the exact activation steps.
+- Do not automatically purchase paid plans, create paid resources, publish the app or change production infrastructure.
+- Keep the existing Grok-hosted application working throughout the implementation.
+
+2. Create a Developer Control Center
+
+Add a protected developer-only section to the existing developer area, using the current navigation and design system.
+
+Name it Infrastructure & Integrations.
+
+Include the following sections:
+
+A. Infrastructure dashboard
+
+Show the status of each integration using accurate states:
+
+- Not configured
+- Configuration incomplete
+- Ready for testing
+- Connected and verified
+- Disabled
+- Error
+
+Display the last successful health check, the last error where available, required missing configuration and a concise activation checklist.
+
+Do not expose sensitive values or display fake live health information.
+
+B. Firebase / Google Cloud
+
+Prepare integration modules for:
+
+- Firebase Authentication
+- Email verification
+- Forgot-password and secure password-reset flows
+- User identity and session management
+- Firestore or the existing database for wedding records, memberships, guest lists and permissions
+- Cloud Functions or Cloud Run for appropriate backend operations
+- Server-side authorization and validation
+- Optional push notifications and related Google services
+
+Inspect the current database and authentication implementation first. Preserve existing functionality and make any migration optional, documented and reversible.
+
+Provide a configuration checklist for Firebase project ID, web application configuration, enabled authentication methods, database setup and required backend environment variables.
+
+Firebase web configuration values that are designed to be public may be used client-side, but secrets and privileged credentials must remain server-side. Do not assume that Firebase security rules alone replace server-side authorization.
+
+C. Cloudflare R2 — Media storage
+
+Prepare a media-storage provider interface and server-side adapter for Cloudflare R2 using the S3-compatible API.
+
+Include configuration for:
+
+- R2 account identifier
+- Bucket name
+- Access key ID
+- Secret access key
+- Optional custom media domain
+- Region/endpoint configuration appropriate to R2
+
+All secret credentials must be server-side environment variables.
+
+Prepare secure backend endpoints and service interfaces for:
+
+- Image uploads
+- Video uploads
+- Wedding album media
+- Chat attachments, if supported
+- Profile and cover images
+- Media deletion
+- Object metadata and storage accounting
+- Temporary, signed upload/download access where appropriate
+- File size limits, MIME-type validation, ownership checks and rate limiting
+
+Use private storage by default where appropriate. Enforce wedding membership and media permissions before issuing access links. Never allow users to access another wedding's private files merely by guessing an object key.
+
+Do not migrate or delete existing media. Add a documented migration plan and retain the current media provider until a deliberate cutover.
+
+D. Livestream infrastructure
+
+Prepare a provider-independent livestream module so a real service can be activated later without rewriting the wedding UI.
+
+Support a future integration with Cloudflare Stream or a suitable WebRTC/live-video provider.
+
+Prepare interfaces for:
+
+- Host stream creation
+- Host authorization
+- Stream start and stop
+- Spectator playback
+- Private wedding access
+- Stream status and health
+- Viewer counts when supported by the selected provider
+- Multiple simultaneous livestreams, subject to provider and plan limits
+- Secure stream credentials and playback tokens
+- Reconnection and error handling
+- Optional chat and moderation integration
+
+Keep live-video ingestion and processing separate from R2 object storage. Do not pretend R2 itself provides live-video processing.
+
+Do not generate fake streams or enable public broadcasting before credentials, access policies and provider configuration are verified.
+
+E. Google Play Billing
+
+Prepare the application and backend for Android in-app purchases.
+
+Create a configurable product catalogue structure supporting:
+
+- Premium themes and theme packs
+- Extra wedding media storage
+- Optional premium membership
+- Other approved digital features
+
+Prepare integration interfaces for:
+
+- Product ID mapping
+- Purchase initiation in the Android app
+- Purchase-token verification on the backend
+- Purchase acknowledgement and consumption where applicable
+- Entitlement activation and expiration
+- Subscription status, cancellation and renewal handling where applicable
+- Restore-purchase functionality
+- Duplicate-event and duplicate-purchase protection
+- Refund and revocation handling
+- Test purchase workflows
+
+Use the official supported Google Play Billing integration appropriate to the app's actual Android packaging method.
+
+Inspect whether the Android app is a Trusted Web Activity, another web wrapper or a native application before choosing the implementation. Do not assume a native Android Billing Library can simply be added to a React web frontend.
+
+Keep all privileged purchase verification server-side. Never unlock paid features solely because the frontend reports a successful purchase.
+
+Do not invent product IDs, prices or successful transactions. Provide placeholders and a documented Play Console activation checklist.
+
+F. Backend and deployment configuration
+
+Inspect the existing Express backend, API routes and deployment environment.
+
+Prepare a centralized, validated configuration system for:
+
+- Authentication provider
+- Database provider
+- Media-storage provider
+- Livestream provider
+- Billing provider
+- Public application URL
+- Backend API URL
+- Feature flags
+- Development, test and production environments
+
+Use environment variables and a safe example environment file containing placeholder values only.
+
+Do not overwrite existing production variables. Document each variable, whether it is public or secret, where it belongs and how it is validated.
+
+Add safe startup checks and health endpoints that report configuration status without disclosing credentials, private URLs or internal secrets.
+
+Do not make the application crash merely because an optional provider is not yet configured. Instead, disable the relevant feature gracefully and provide a clear explanation to authorized developers.
+
+3. Developer feature flags and activation controls
+
+Add a protected configuration panel with separate controls for:
+
+- Firebase authentication integration
+- Cloud database integration
+- R2 media storage
+- Livestream provider
+- Google Play Billing
+- Push notifications
+- Media migration
+- Production mode
+
+Each integration should have independent enable/disable and test controls.
+
+Important behavior:
+
+- Enabling a feature flag must not be treated as proof that the service is configured.
+- Require successful configuration validation before allowing activation.
+- Show a confirmation step before switching a provider or enabling a production feature.
+- Never display a Test Connection button as successful without performing an actual safe test.
+- Clearly distinguish simulated development mode from a verified live connection.
+- Do not allow a developer UI toggle to bypass server-side authorization.
+- Log administrative changes without storing secrets or sensitive personal data.
+- Protect all developer routes and APIs using the application's verified developer authorization, not a mutable display name, email text field or client-controlled role.
+
+4. Permissions and security
+
+Use stable account/user IDs and server-verified membership records to determine:
+
+- Wedding creator
+- Host
+- Co-host
+- Guest
+- Circle Developer
+
+Changing a displayed host name must never change ownership or grant permissions.
+
+Ensure that developer-only APIs, configuration changes, purchase entitlements and media access are authorized on the server.
+
+Validate inputs, use secure error handling, prevent secret leakage and avoid logging tokens, passwords or signed URLs.
+
+5. Preserve the existing app
+
+Do not change wedding theme designs, ceremony covers, Home, Chat, Live, Albums, More, landing pages, animations or existing user workflows unless a small change is strictly necessary for the infrastructure integration.
+
+Do not remove existing working features or overwrite real wedding data.
+
+Keep service adapters modular so providers can be changed later without rebuilding unrelated screens.
+
+6. Testing and documentation
+
+Add practical tests for:
+
+- Missing and invalid configuration
+- Authentication and permission checks
+- Unauthorized developer access
+- Media upload authorization
+- File-type and file-size validation
+- Duplicate purchase events
+- Invalid purchase verification
+- Disabled-provider behavior
+- Livestream authorization
+- Environment separation
+
+Create an infrastructure setup document inside the project covering:
+
+1. Current architecture discovered in the source.
+2. Files and modules created or changed.
+3. Required external accounts and credentials.
+4. Exact environment variables and where each must be configured.
+5. Local testing instructions.
+6. Firebase and Google Cloud activation.
+7. Cloudflare R2 activation.
+8. Livestream-provider activation.
+9. Google Play Billing activation.
+10. Security checks and production launch checklist.
+11. Any incomplete work, limitations or steps requiring manual action.
+
+Do not claim that external services are ready for production if they have not been connected and tested.
+
+Final deliverable
+
+Implement the infrastructure preparation directly in the existing project. Do not return only a proposal or pseudocode.
+
+After implementation, provide a concise report listing what was actually implemented, what was tested, what remains unconfigured and the next exact steps needed to activate each service.
+
+Target outcome: The Wedding Circle should have a clean, modular infrastructure foundation and a protected developer control center, with integrations prepared for activation without exposing secrets, disrupting the existing app or creating unnecessary paid resources.

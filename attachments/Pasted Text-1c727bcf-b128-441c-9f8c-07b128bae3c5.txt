@@ -1,0 +1,508 @@
+PROJECT: THE WEDDING CIRCLE
+TASK: FIX EXISTING FEATURES, IMPROVE UI/UX, AND VERIFY FUNCTIONALITY.
+
+You are working on an existing wedding application. Three development batches have already been attempted. Several features exist, but some are broken, incomplete, or visually incorrect.
+
+Your job is to inspect the CURRENT CODEBASE, diagnose the issues, implement the requested corrections, and verify the results.
+
+THIS IS NOT A COMPLETE REWRITE.
+
+Do not rebuild the app from scratch, replace its architecture, or remove working features. Preserve the existing database, authentication, wedding memberships, roles, permissions, storage, messaging, streaming provider, and user preferences.
+
+Do not merely describe the changes. Implement them.
+
+==================================================
+PHASE 1 — INSPECT THE EXISTING PROJECT
+==================================================
+
+Before editing:
+
+1. Inspect the current repository and identify the application framework, routing, components, state management, camera implementation, media pipeline, streaming provider, storage, and backend.
+2. Inspect the current implementation of Home, Feed/Chat, Live, Album, More, Host Control, camera capture, and bottom navigation.
+3. Determine which previously requested features are implemented, partially implemented, or broken.
+4. Identify shared root causes before changing code.
+5. Protect all working functionality and existing user data.
+6. Make targeted changes to existing components wherever possible.
+
+Do not assume that a previous batch was fully implemented simply because it was marked complete.
+
+==================================================
+PHASE 2 — CAMERA INTERFACE AND CAPTURE
+==================================================
+
+A. OPEN CAMERA IN PORTRAIT
+
+The camera interface currently opens in a horizontal or landscape-looking view on a portrait-oriented Android phone.
+
+Fix this so that:
+
+- The camera interface opens upright in portrait orientation on portrait-oriented phones.
+- The preview uses the available portrait screen area.
+- The preview is correctly centered and proportioned.
+- The image is not stretched, unnecessarily rotated, or distorted.
+- Camera controls remain accessible at the bottom.
+- The interface respects system status bars, safe areas, and navigation bars.
+- The implementation works with the actual supported browser, PWA, or Android WebView environment.
+
+Do not assume that rotating the preview with CSS fixes the captured media.
+
+B. FRONT/REAR CAMERA SWITCHING
+
+The camera currently reports that it cannot switch cameras and that the existing camera remains on.
+
+Fix the actual cause.
+
+Requirements:
+
+1. Inspect camera initialization, MediaStream tracks, device selection, and switch-camera handling.
+2. Determine the supported camera APIs in the actual runtime.
+3. Prefer the rear camera initially where supported.
+4. Allow switching between front and rear cameras where supported.
+5. Release or replace existing video tracks safely when necessary.
+6. Update both the local preview and the outgoing broadcast video source when switching during a live stream.
+7. Avoid duplicate camera streams and resource leaks.
+8. Preserve the microphone and active broadcast when appropriate.
+9. If switching fails, retain a usable camera preview whenever possible.
+10. Display a meaningful error rather than pretending the switch succeeded.
+
+C. ONE CIRCULAR CAPTURE BUTTON
+
+Replace the separate Take Photo and Record Video buttons with one prominent circular button centered at the bottom of the camera interface.
+
+Interaction:
+
+- Quick tap: capture a photo.
+- Press and hold: start recording video.
+- Release: stop recording and show the recorded-video preview.
+
+Photo flow:
+- Capture photo.
+- Preview.
+- Retake, cancel, or use photo.
+
+Video flow:
+- Start recording while held.
+- Display a recording indicator and timer.
+- Stop recording on release.
+- Preview the recording.
+- Allow replay, discard, record again, or use the video.
+
+Ensure that a long press cannot accidentally capture a photo and start recording simultaneously.
+
+Handle touch events reliably on Android. Prevent duplicate captures, handle permissions, and release resources after completion or cancellation.
+
+Keep Close and Cancel controls accessible.
+
+D. CORRECT MEDIA ORIENTATION
+
+Photos and videos must retain the correct orientation in the actual saved files.
+
+- Portrait capture should produce correctly oriented portrait media where supported.
+- Inspect camera constraints, canvas processing, recording configuration, and orientation metadata.
+- Do not rely only on rotating the preview.
+- Do not stretch or crop important content unnecessarily.
+- Verify orientation after saving, uploading, downloading, and playing the media.
+- Preserve the existing upload and storage workflow.
+
+==================================================
+PHASE 3 — REDESIGN THE LIVE STREAM VIEWING GRID
+==================================================
+
+THIS IS A CORE PRODUCT REQUIREMENT.
+
+The current Live screen displays a large, nearly full-height inactive video placeholder. Replace that single oversized placeholder layout with a balanced FOUR-TILE GRID.
+
+REQUIRED MOBILE LAYOUT:
+
++----------------+----------------+
+|                |                |
+|    STREAM 1    |    STREAM 2    |
+|                |                |
++----------------+----------------+
+|                |                |
+|    STREAM 3    |    STREAM 4    |
+|                |                |
++----------------+----------------+
+
+All four tiles must have exactly the same dimensions and aspect ratio, with a small, consistent gap between them.
+
+DESIGN REQUIREMENTS:
+
+1. Display a 2-by-2 grid when the Live section opens.
+2. Make all four tiles equal in width and height.
+3. Keep consistent spacing between rows and columns.
+4. Fit the grid comfortably within the usable mobile screen.
+5. Do not use a giant full-screen placeholder for an inactive stream.
+6. Use the existing premium Wedding Circle design: dark video surfaces, tasteful borders, and restrained burgundy, champagne-gold, ivory, and blush accents.
+7. Keep tiles large enough to view portrait-oriented video.
+8. Preserve the Live section heading and existing information controls.
+9. Adapt appropriately to different mobile screen sizes and landscape orientation.
+10. Avoid excessive blank space and unnecessary scrolling.
+
+EMPTY STREAM SLOTS:
+
+Each inactive tile must show a clearly visible plus (+) button in its center.
+
+Tapping the plus button should open the appropriate existing stream-creation or stream-selection flow for an authorized user.
+
+Each tile should represent one stream slot.
+
+ACTIVE STREAM SLOTS:
+
+When a real stream is active, show its actual video in the corresponding tile.
+
+Include appropriate loading, connecting, reconnecting, and ended states.
+
+Allow a viewer to tap an active tile to expand it for easier viewing, then return to the four-tile grid.
+
+MULTIPLE STREAM REQUIREMENTS:
+
+- Support up to four genuinely independent streams if permitted by the existing architecture and provider.
+- Each stream must have its own identifier, broadcaster, status, and lifecycle.
+- Starting one stream must not automatically start the others.
+- Ending one stream must not terminate the others.
+- Never display four copies of one stream to simulate four independent streams.
+- Never display LIVE unless the stream is genuinely active.
+- Enforce existing backend permissions.
+- Handle bandwidth and video-decoding limitations gracefully.
+
+If the existing architecture cannot support four simultaneous independent streams, inspect the limitation and explain what is required. Do not fake support.
+
+==================================================
+PHASE 4 — BROADCASTER LIVE SCREEN
+==================================================
+
+The broadcaster's Live screen currently shows excessive unused dark space above the camera preview.
+
+Correct the layout.
+
+Requirements:
+
+1. Position the camera preview sensibly within the available space.
+2. Remove unnecessary blank space above it.
+3. Preserve the correct video aspect ratio.
+4. Keep the live title, camera controls, microphone controls, End Live button, comment field, and Send button accessible.
+5. Account for Android system bars and safe areas.
+6. Make the comment composer move appropriately when the keyboard opens.
+7. Prevent controls from overlapping the preview or disappearing off-screen.
+8. Preserve the existing design and functionality.
+
+Do not introduce arbitrary fixed heights that only work on one phone.
+
+Keep the broadcaster interface distinct from the viewer's four-tile grid. Do not force the broadcaster's camera controls into the viewer grid.
+
+==================================================
+PHASE 5 — STREAM LIFECYCLE, MINI-PLAYER, AND YOUTUBE LIVE
+==================================================
+
+Preserve and verify the previously implemented streaming features.
+
+A. MINI-PLAYER
+
+When a viewer minimizes a stream, allow them to continue navigating between Home, Chat, Live, Album, and More.
+
+- Keep the mini-player available across navigation.
+- Avoid duplicate connections.
+- Closing viewer playback must not end the broadcaster's stream.
+- Navigating between sections must not unnecessarily destroy active playback.
+
+B. STREAM LIFECYCLE
+
+- Keep stream status synchronized with the actual backend and provider.
+- Handle loading, connecting, reconnecting, active, and ended states.
+- Prevent stale LIVE indicators.
+- Ensure one stream ending does not accidentally stop another.
+- Enforce host/co-host/member permissions through existing authorization rules.
+
+C. YOUTUBE LIVE
+
+Preserve the existing YouTube Live integration.
+
+- Validate YouTube Live URLs.
+- Use the supported official embed/player.
+- Handle private, unavailable, and non-embeddable streams gracefully.
+- Allow supported YouTube streams to appear in the grid alongside other streams.
+- Do not create fake streams when a YouTube video cannot be embedded.
+
+==================================================
+PHASE 6 — CHAT MESSAGE LAYOUT
+==================================================
+
+The current Chat screen has excessive vertical spacing and message bubbles that occupy almost the entire screen width.
+
+Make the conversation more compact and natural.
+
+SENDER NAME:
+
+- Display the sender's name directly above their message bubble.
+- Keep the name outside the bubble.
+- Use consistent spacing between the name and bubble.
+
+MESSAGE BUBBLE:
+
+- Keep message text inside the bubble.
+- Reduce excessive vertical padding and gaps between messages.
+- Make the bubble width respond naturally to the message length.
+- Use a sensible maximum width so long messages wrap cleanly.
+- Preserve appropriate horizontal padding.
+- Do not make every short message occupy the entire screen width.
+- Keep the existing burgundy, navy, gold, ivory, and blush design language.
+- Maintain readable contrast.
+
+CONVERSATION:
+
+- Display messages in the correct chronological order.
+- Keep the newest messages at the bottom if that is the existing intended chat behavior.
+- Preserve timestamps and existing message actions.
+- Keep the conversation scrollable.
+- Preserve message history, pagination, and existing stored messages.
+- Prevent the keyboard from hiding the message composer.
+- Keep the composer accessible above the bottom navigation.
+- Avoid sudden scroll jumps when sending or receiving messages.
+
+The goal is a clean, compact, premium messaging interface where users can see more conversation without excessive scrolling.
+
+==================================================
+PHASE 7 — RENAME FEED TO CHAT
+==================================================
+
+Rename the user-facing Feed section to Chat.
+
+Update:
+
+- Bottom navigation label.
+- Visible section headings.
+- Relevant user-facing labels.
+- Accessibility labels where appropriate.
+
+Preserve the existing route, internal component references, message history, database tables, stored data, permissions, and functionality.
+
+Do not rename database tables or internal identifiers unnecessarily.
+
+Verify that existing wedding messages remain available after the rename.
+
+==================================================
+PHASE 8 — BOTTOM NAVIGATION RESPONSIVENESS
+==================================================
+
+The five bottom navigation buttons sometimes respond slowly after being tapped.
+
+Improve the responsiveness of:
+
+- Home
+- Chat
+- Live
+- Album
+- More
+
+Requirements:
+
+1. Inspect navigation handlers, state updates, animations, and rendering costs.
+2. Remove unnecessary delays and blocking operations.
+3. Avoid expensive work during the initial navigation interaction.
+4. Keep transitions smooth and responsive.
+5. Prevent duplicate navigation from rapid repeated taps.
+6. Preserve section state when appropriate.
+7. Avoid unnecessarily reloading the entire application.
+8. Do not reconnect to an active stream simply because the user changed sections.
+9. Prevent blank screens and flickering.
+10. Preserve the existing navigation order and visual design.
+
+The objective is to make the app feel immediate when users tap a section.
+
+==================================================
+PHASE 9 — RESTORE IPHONE-STYLE TRANSITIONS
+==================================================
+
+The previously requested iPhone-like home/unlock-inspired transition animation is not appearing on:
+
+- Landing page.
+- Home.
+- Chat.
+- Live.
+- Album.
+- More.
+
+Inspect the existing animation implementation and determine why it is missing.
+
+Restore a consistent, polished transition experience across these screens.
+
+Requirements:
+
+1. Preserve the intended iPhone-inspired smooth motion.
+2. Use a consistent animation language across the landing page and main sections.
+3. Use subtle easing and appropriate transition duration.
+4. Avoid excessive zooming, bouncing, or distracting effects.
+5. Do not delay navigation unnecessarily.
+6. Prevent flickering, blank screens, and repeated entrance animations caused by unnecessary component remounts.
+7. Avoid restarting active broadcasts or resetting Chat state during transitions.
+8. Respect reduced-motion preferences.
+9. Ensure animations work in the actual Android browser, PWA, or WebView environment.
+10. Do not assume an animation is working merely because CSS has been added.
+
+The animation must be visibly implemented and functionally tested.
+
+==================================================
+PHASE 10 — MORE SECTION SWIPE NAVIGATION
+==================================================
+
+Horizontal swiping in More does not work across the entire screen, particularly when swiping directly over the options area.
+
+Fix the actual gesture-handling problem.
+
+Requirements:
+
+- Horizontal swipe navigation should work throughout the usable More screen.
+- Swiping over the options area should be recognized where appropriate.
+- Preserve vertical scrolling.
+- Keep buttons, links, and settings interactive.
+- Avoid accidental navigation when the user intends to scroll vertically.
+- Prevent duplicate touch, pointer, and click handlers from triggering multiple transitions.
+- Preserve the existing navigation order.
+
+Do not solve this by disabling pointer events on the options area.
+
+==================================================
+PHASE 11 — HOST CONTROL LIVE-STYLE ANIMATION
+==================================================
+
+Give the existing Host Control button a distinctive, premium live-inspired animation.
+
+Requirements:
+
+- Preserve its position, dimensions, navigation, and authorization.
+- Add a restrained animated border, broadcast indicator, or subtle pulse.
+- Use the Wedding Circle color palette.
+- Avoid distracting flashes and excessive continuous motion.
+- Keep text readable.
+- Respect reduced-motion preferences.
+- Do not imply that a broadcast is active unless it really is.
+
+The result should feel premium and intentional, not gimmicky.
+
+==================================================
+PHASE 12 — PROTECT OTHER EXISTING FEATURES
+==================================================
+
+Preserve and verify the following previously requested functionality.
+
+A. MORE AND HOST CONTROL
+
+- Host Control remains accessible in More.
+- Side Color remains under More > Host Control.
+- Preserve existing color preferences.
+- Edit Ceremonies remains under Host Control.
+- Guests may see directions but cannot edit ceremonies unless authorized.
+
+B. LEAVE WEDDING
+
+- Keep the confirmation dialog centered in the visible viewport.
+- Ensure it is not hidden behind the bottom navigation.
+- Stay must leave the user in the wedding.
+- Exit must perform the intended leave action.
+- Do not accidentally sign the user out or delete membership data.
+
+C. ALBUM
+
+- Fix blank backgrounds and swipe issues.
+- Preserve existing media and navigation.
+- Keep swipe behavior consistent with the other sections.
+
+D. UPLOAD AND CAMERA
+
+- Preserve the existing upload flow.
+- Keep camera access available through the existing plus-button flow where applicable.
+- Do not break media permissions or storage.
+
+E. FEED/CHAT MESSAGING
+
+- Preserve the existing message model and history.
+- Preserve message ordering and pagination.
+- Preserve keyboard behavior and drafts.
+- Preserve message privacy and authorization.
+- Avoid duplicate messages and failed-upload artifacts.
+
+F. VOICE NOTES
+
+Preserve existing voice-note functionality, including recording, playback, upload, cancellation, and resource cleanup.
+
+Do not remove it while modifying Chat.
+
+==================================================
+PHASE 13 — IMPLEMENTATION AND TESTING
+==================================================
+
+Make the changes in a controlled manner.
+
+Do not attempt an uncontrolled rewrite of every component.
+
+Suggested implementation order:
+
+1. Fix camera switching and portrait orientation.
+2. Fix photo/video capture interactions and saved-media orientation.
+3. Implement the four-tile Live grid and empty-slot behavior.
+4. Fix broadcaster layout and streaming lifecycle.
+5. Correct Chat layout and rename Feed to Chat.
+6. Improve bottom navigation and restore section animations.
+7. Fix More swiping and Host Control animation.
+8. Verify the other protected features.
+
+You may adjust this order if inspecting the existing code reveals a safer dependency order.
+
+TESTING:
+
+Run all available relevant checks, including:
+
+- TypeScript or equivalent type checks.
+- Linting.
+- Existing automated tests.
+- Camera and media-flow tests.
+- Navigation tests.
+- Chat rendering and ordering tests.
+- Stream-state and authorization tests.
+- Responsive layout checks.
+
+Where actual device testing is required, clearly say so.
+
+Verify that:
+
+1. The camera opens upright in portrait mode.
+2. Front/rear switching works where supported.
+3. Camera switching updates the outgoing live stream when appropriate.
+4. Photos and videos retain their actual orientation.
+5. The circular button distinguishes taps from long presses.
+6. The Live section opens with four equal stream slots.
+7. Empty slots display plus buttons.
+8. Independent streams can occupy separate slots when supported.
+9. The broadcaster's camera controls remain usable.
+10. The mini-player and YouTube Live integration continue to work.
+11. Chat bubbles are compact and sender names appear above them.
+12. Feed is renamed to Chat without losing existing messages.
+13. All five navigation buttons respond promptly.
+14. The intended transitions visibly work.
+15. More supports horizontal swiping without breaking vertical scrolling.
+16. Host Control retains its permissions and behavior.
+17. No existing data, memberships, authentication, or preferences are lost.
+
+==================================================
+FINAL REPORT
+==================================================
+
+After implementation, provide a concise but precise report containing:
+
+1. Root cause of each issue where identified.
+2. Files and components changed.
+3. Features successfully implemented.
+4. Automated tests executed and their results.
+5. Physical-device tests actually performed.
+6. Items that still require testing on an Android device.
+7. Any architectural limitation affecting four independent streams.
+8. Any unresolved issue.
+
+Do not claim a feature works merely because its interface was created or the project compiled.
+
+Do not fabricate test results.
+
+Do not modify unrelated features.
+
+Begin by inspecting the current project and continue through implementation and verification.

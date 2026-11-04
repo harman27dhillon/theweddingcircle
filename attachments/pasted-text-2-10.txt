@@ -1,0 +1,89 @@
+7. Add Premium Font Customization in Host Control
+
+Create a new Typography & Fonts feature inside the existing Host Control section of Wedding Circle.
+
+A. Provide at least 50 font styles
+
+Include a library of at least 50 distinct, attractive font styles suitable for wedding websites. Use real, loadable fonts rather than simply changing font size, weight, or letter spacing to create fake variations.
+
+Include a balanced selection of:
+
+- Elegant wedding serif fonts.
+- Romantic calligraphy and script fonts.
+- Refined editorial and luxury fonts.
+- Traditional and classic serif fonts.
+- Clean, modern sans-serif fonts.
+- Decorative fonts for names and headings.
+- Readable fonts for ceremony descriptions and details.
+
+Use legally embeddable fonts, preferably from Google Fonts or existing licensed project assets. Load fonts efficiently and avoid downloading all font files unnecessarily on every page load.
+
+B. Allow separate font customization
+
+Provide separate font selectors for these wedding content categories:
+
+1. Couple names — the bride's and groom's names wherever they appear in wedding-specific pages and cards.
+2. Ceremony headings — ceremony names, including the Next Ceremony card.
+3. Ceremony details — dates, times, locations, descriptions, directions labels and other ceremony-related text.
+4. Wedding headings — wedding-specific headings and titles outside Chat.
+5. Wedding body text — general wedding information and descriptive text outside Chat.
+
+Allow the host to preview each font before applying it. Provide a clear font name, sample text and readable preview for each option.
+
+C. Apply fonts consistently across the wedding
+
+When a host selects a font, apply it consistently to the relevant category throughout the entire wedding experience, including:
+
+- Wedding home page and couple-name cards.
+- Ceremony lists, ceremony details and the Next Ceremony card.
+- Wedding-specific pages and details displayed elsewhere in the app.
+- Desktop and mobile layouts.
+
+Do not apply these font settings to the Chat page. Chat is strictly out of scope: do not modify chat typography, message bubbles, composer, buttons, icons, spacing, layout, audio controls or chat behavior.
+
+Do not change the application's global branding or the app icon's typography.
+
+D. Add a premium Host Control interface
+
+Place the feature inside the existing Host Control section, with a clearly labeled entry named Typography & Fonts.
+
+The interface should include:
+
+- A category selector.
+- A searchable library of at least 50 font styles.
+- Font preview samples.
+- An Apply button.
+- A Reset to Default option for each category.
+- A preview of how the selected font looks on the actual wedding content.
+- A clear indication of the currently applied font.
+
+Maintain the existing premium Wedding Circle design language. Make the controls responsive and usable on both mobile and desktop.
+
+E. Permissions and persistence
+
+- Only users with the existing authorized host-level permissions may change wedding fonts.
+- Preserve the existing Host Control access rules.
+- Save font selections against the correct wedding in the existing persistent database or established wedding-settings storage.
+- Do not store these selections only in temporary component state or browser-only storage if the wedding's other settings are stored persistently.
+- Ensure the selected fonts remain applied after refresh, sign-out/sign-in, and opening the same wedding on another device.
+- If the existing app supports co-hosts, follow its established permissions for customization rather than granting new privileges.
+- Do not change wedding records or access codes unnecessarily.
+
+F. Implementation and testing
+
+Inspect the existing theme system, Host Control architecture and wedding settings persistence before implementation. Integrate typography settings with the current theme system without allowing theme changes to overwrite saved font selections.
+
+Use scoped CSS variables or an equivalent maintainable approach. Font choices must not override Chat or the global application interface.
+
+Verify that:
+
+1. At least 50 distinct font options are available and load correctly.
+2. Couple names and ceremony text update immediately after applying a font.
+3. Different categories can use different fonts.
+4. Changes persist after refresh and across devices.
+5. Changing the visual theme preserves the selected fonts.
+6. Resetting one category does not reset the others.
+7. Chat and global application branding remain completely unchanged.
+8. Existing mobile and desktop layouts and Host Control functions continue to work.
+
+Implement the actual feature in the source code. Report the files changed and the checks performed. Do not claim cross-device persistence has been verified unless it has been tested.

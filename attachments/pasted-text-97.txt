@@ -1,0 +1,221 @@
+The Wedding Circle — Firebase Validation Root-Cause Investigation & Permanent Fix
+
+Objective
+
+Firebase integration is still not validating correctly, despite updating the API key and confirming the Firebase project configuration.
+
+Three problems need to be investigated together:
+
+1. Firebase API key validation.
+2. Firebase Project ID mismatch warning.
+3. Email/Password authentication still reported as not enabled or not verified.
+
+I suspect these errors may share an underlying implementation, configuration-loading, or validation problem.
+
+Do not assume the displayed Project ID mismatch is genuine. Verify the actual request and response before accepting that diagnosis.
+
+1. Trace the Complete Firebase Configuration
+
+Inspect the actual current source code and trace every Firebase configuration value from storage to the validation request.
+
+Expected environment variables:
+
+- "FIREBASE_API_KEY"
+- "FIREBASE_AUTH_DOMAIN"
+- "FIREBASE_PROJECT_ID"
+- "FIREBASE_APP_ID"
+- "FIREBASE_MESSAGING_SENDER_ID"
+- "FIREBASE_SERVICE_ACCOUNT_JSON"
+
+Verify:
+
+- Which exact variables are read by the frontend and backend.
+- Whether the backend receives the latest saved values.
+- Whether old configuration values remain cached.
+- Whether multiple Firebase configuration objects exist.
+- Whether a fallback or default configuration overrides the saved configuration.
+- Whether the API key, Project ID, Auth Domain, App ID and service account all belong to the same project.
+- Whether secret saving and retrieval are consistent.
+- Whether blank values accidentally overwrite existing saved credentials.
+
+Do not rename environment variables without checking every existing reference.
+
+2. Investigate API Key Validation
+
+The API key was updated from the older 30 October browser key to the newer 2 November browser key.
+
+The newer key is accepted far enough to reach the next validation stage.
+
+Investigate:
+
+- The exact API endpoint being called.
+- The HTTP status and response body.
+- Whether the request uses the correct API key.
+- Whether the response parser reads the correct project-identifying field.
+- Whether the validation incorrectly treats an unavailable optional field as a mismatch.
+- Whether the Firebase project ID is inferred from an incorrect API response.
+- Whether API restrictions, Identity Toolkit API access or network errors are incorrectly classified.
+- Whether a cached old API key is still being used.
+
+Do not use a weak validation that merely searches for the project ID somewhere in the response.
+
+Do not falsely reject a valid key.
+
+3. Investigate the Project ID Mismatch
+
+The configured Project ID and the project ID inside the downloaded service-account JSON have already been checked manually and match.
+
+The Google Cloud project is:
+
+"the-wedding-circle-b31b6"
+
+Investigate why the application still reports a mismatch.
+
+Trace and compare:
+
+1. Project ID loaded from saved Infrastructure configuration.
+2. Project ID from the service-account JSON.
+3. Project ID associated with the Firebase Web App configuration.
+4. Project ID obtained from the actual validation response.
+5. Project ID used by the Firebase Admin SDK after initialization.
+
+Check for:
+
+- Incorrect field mapping.
+- Incorrect response parsing.
+- Stale server environment variables.
+- Multiple Firebase Admin initializations.
+- Old credentials retained in memory.
+- Incorrect project ID normalization.
+- Validation requests using different configurations.
+
+Do not modify the actual Project ID or create a new Firebase project as a workaround.
+
+4. Fix Email/Password Authentication Validation
+
+Firebase Console already shows Email/Password authentication enabled.
+
+However, Infrastructure still does not correctly confirm this.
+
+Inspect the current implementation of:
+
+"identitytoolkit.googleapis.com/admin/v2/projects/{projectId}/config"
+
+Verify:
+
+- The server uses the correct service-account credentials.
+- The service account has the permissions required to read Firebase Authentication configuration.
+- The OAuth access token is generated for the correct project.
+- The request uses the correct authorization scope.
+- The code reads the actual "signIn.email.enabled" value.
+- Email Link is not confused with Email/Password.
+- "passwordRequired" is interpreted correctly.
+- HTTP 401 and 403 responses are treated as permission/authentication failures, not as disabled providers.
+- A network failure is not reported as Email/Password being disabled.
+
+If the endpoint or permission model is incorrect, fix it using the correct supported Firebase API.
+
+Do not enable or disable providers automatically.
+
+5. Investigate Shared Root Causes
+
+Check whether all three failures originate from one or more of these problems:
+
+- Stale Infrastructure configuration.
+- Incorrect secret retrieval.
+- Wrong Firebase initialization order.
+- Frontend and backend using different configurations.
+- Incorrect service-account initialization.
+- Incorrect Google API endpoint.
+- Incorrect authorization scope or permissions.
+- Cached validation results.
+- Incorrect error classification.
+- Multiple Firebase project configurations being loaded simultaneously.
+
+Trace the full request lifecycle rather than fixing each warning independently.
+
+6. Safe Diagnostic Logging
+
+Add temporary or permanent safe diagnostics that identify:
+
+- Which configuration source was loaded.
+- Whether each required value exists.
+- Project IDs being compared.
+- Which Firebase endpoint was called.
+- HTTP response status.
+- Actual structured error code and message.
+- Which exact validation condition failed.
+
+Never log or expose:
+
+- API key values.
+- Private keys.
+- Service-account JSON.
+- OAuth access tokens.
+- Firebase ID tokens.
+- Secret values.
+
+Do not print full request headers or credential payloads.
+
+7. Preserve Existing Architecture
+
+The Wedding Circle architecture must remain:
+
+- Firebase Authentication: user identity and authentication.
+- Supabase: sole source of truth for weddings, memberships, roles and permissions.
+- Cloudflare R2: private media storage.
+- Cloudflare Stream: livestream provider.
+
+Do not introduce Firebase as a second database or membership system.
+
+Do not change existing user accounts or authentication flows unnecessarily.
+
+8. Testing
+
+Run actual tests for:
+
+- Current API key accepted.
+- Invalid API key rejected.
+- Correct Project ID accepted.
+- Genuine project mismatch detected.
+- Stale configuration detected.
+- Service-account authentication successful.
+- Service-account permission denied.
+- Email/Password enabled.
+- Email/Password disabled.
+- Email Link only.
+- API unavailable.
+- Cached configuration refreshed correctly.
+
+Run typecheck, relevant tests and production build.
+
+If live testing requires credentials that are not available in the workspace, state that clearly.
+
+Strict Restrictions
+
+- Do not regenerate API keys.
+- Do not replace the Firebase project.
+- Do not modify Google Cloud API restrictions without identifying a proven need.
+- Do not modify Firebase Authentication provider settings.
+- Do not delete or overwrite existing secrets.
+- Do not expose credentials in logs or frontend code.
+- Do not migrate Supabase data.
+- Do not change R2 privacy, DNS or Cloudflare Stream.
+- Do not deploy or publish without explicit approval.
+- Do not make unrelated UI or feature changes.
+
+Final Report
+
+Provide:
+
+1. Exact root cause of API key validation.
+2. Exact root cause of the Project ID mismatch warning.
+3. Exact root cause of Email/Password validation.
+4. Whether the three issues shared a common cause.
+5. Files and functions modified.
+6. Tests actually executed and results.
+7. Any manual configuration still required.
+8. What remains unverified.
+9. Explicit deployment status.
+
+Critical requirement: Do not simply change the Infrastructure status labels to green. Fix the actual validation logic and prove that each check reflects the real Firebase project configuration.

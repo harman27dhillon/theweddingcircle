@@ -1,0 +1,85 @@
+Improve Private Media Gateway diagnostics
+
+Inspect the existing Private Media Gateway implementation and improve its diagnostic information so we can identify exactly why a gateway test succeeds or fails.
+
+Currently, the Infrastructure screen shows:
+
+- Gateway: Off
+- Worker origin: "workers.dev" URL
+- Signing secret: Saved on the server
+- Bucket: private
+- Status: disabled
+- Generic messages repeated twice: "The media gateway is off. Photos and videos still use the existing private path. The bucket was not made public."
+
+This is insufficient for troubleshooting.
+
+1. Add a detailed diagnostic panel
+
+Inside the existing Private Media Gateway section, add a compact, readable diagnostic area showing:
+
+- Worker origin: present / missing / invalid format
+- Worker endpoint reachability
+- Worker HTTP response status
+- Worker response content type
+- Signing secret: present / missing (never display its value)
+- R2 binding: verified / unavailable, if the Worker can safely report it
+- Allowed origin: matched / not matched
+- Anonymous access test: passed / failed
+- Invalid signature test: passed / failed
+- Valid signed request test: passed / failed
+- Private object behavior: passed / failed
+- Last successful test timestamp
+- Last failed test timestamp
+- Exact failure stage and useful error message
+
+2. Explain failures precisely
+
+Distinguish between:
+
+- Worker URL unreachable
+- DNS or TLS failure
+- Worker returned 404
+- Worker returned 401 or 403
+- Wrong signing secret
+- Missing R2 binding
+- Incorrect bucket binding
+- Origin not allowed
+- Invalid signature handling
+- Signed URL generation failure
+- Private object unavailable
+- Unexpected redirect or public response
+- Timeout or server exception
+
+Do not report every failure as a generic connection error.
+
+3. Improve test results
+
+When I press Test gateway:
+
+- Run the existing security checks.
+- Show individual results rather than one overall pass/fail.
+- Identify the first failed step and any later checks that could not run.
+- Preserve the actual HTTP status and safe diagnostic details.
+- Do not expose signing secrets, signed tokens, private object keys, or personal information.
+
+4. Fix duplicate messages
+
+The current disabled-state explanation appears twice. Remove the duplicate and show one clear status explanation.
+
+5. Preserve security
+
+- Keep the R2 bucket private.
+- Never enable public R2 access.
+- Never use "r2.dev".
+- Do not change GoDaddy DNS or nameservers.
+- Do not activate the gateway automatically.
+- Keep the gateway OFF until every required security test passes and I explicitly enable it.
+- Do not change Firebase, Cloudflare Stream, or CDN configuration.
+
+6. Verification
+
+Inspect the existing source before editing. Add tests for the diagnostic classifications and failure states. Run relevant tests, TypeScript checks, and production build.
+
+Report the exact root cause if discoverable. If a live test is required, clearly identify what remains unverified.
+
+Do not deploy or change production configuration.

@@ -1,0 +1,318 @@
+TASK: COMPLETE WEDDING-WIDE THEME INTEGRATION — ALL PAGES, SECTIONS, BUTTONS, WINDOWS, AND CHAT UI
+
+The Wedding Circle already has eight selectable wedding themes, and the selected theme is currently visible on the landing-page wedding card. However, the theme is not consistently applied throughout the entire wedding interface.
+
+I want you to inspect the ENTIRE experience inside a specific wedding and make every relevant interface element respond correctly to that wedding's selected theme.
+
+IMPORTANT:
+Do not make another superficial styling change.
+Do not only change page backgrounds or a few main buttons.
+Do not assume you have finished after updating the main screens.
+Inspect the existing implementation, identify every relevant component and section, and systematically integrate the existing theme system throughout the wedding.
+
+Do not create new themes. Use the existing eight presets:
+1. Royal Burgundy
+2. Pastel Blush
+3. Sage Green
+4. Royal Blue
+5. Classic Ivory
+6. Midnight Emerald
+7. Terracotta Sunset
+8. Lavender Dream
+
+==================================================
+PHASE 1 — AUDIT THE ENTIRE WEDDING INTERFACE
+==================================================
+
+Before editing, inspect the application's routing, component hierarchy, theme definitions, wedding context, shared UI components, and existing styling system.
+
+Trace what happens after a user opens a particular wedding.
+
+Create an internal inventory of every screen, subsection, reusable component, popup, dialog, menu, overlay, and interactive state belonging to that wedding.
+
+Inspect all existing sections, including the following wherever they exist in the current app:
+
+A. WEDDING HOME
+- Wedding home page and cover
+- Couple names, dates, and wedding details
+- Chat/Feed and Live shortcut buttons
+- Wedding-specific navigation
+- Header and account menus
+- Any wedding-specific banners, information panels, and cards
+
+B. CHAT / FEED
+- Main chat/feed background
+- Chat message bubbles sent by the current user
+- Chat message bubbles received from other users
+- Sender names, timestamps, separators, and reply indicators
+- Message composer and text input
+- Input borders, placeholder text, and send button
+- Plus/add button and attachment menu
+- Camera and gallery selection controls
+- Image and video previews
+- Voice-note controls, playback buttons, and recording states
+- Reply, reaction, and other existing message actions
+- Context menus, confirmation dialogs, and attachment windows
+- Empty states, loading indicators, and error messages
+
+C. LIVE STREAMING
+- Live screen background
+- Camera preview and broadcaster interface
+- Live-stream player
+- Start/end stream controls
+- Camera switching and other existing controls
+- Floating action buttons
+- Stream-selection and multi-stream layouts
+- Minimized player and expanded player
+- Viewer interface and live indicators
+- Any live settings menus, permission dialogs, or confirmation windows
+
+D. ALBUM AND MEDIA
+- Album page and photo/video grids
+- Album headers and navigation
+- Media viewer and full-screen media windows
+- Upload buttons and upload dialogs
+- Photo/video preview screens
+- Retake, confirm, cancel, and upload buttons
+- Download and sharing controls
+- Progress indicators, empty states, and error dialogs
+
+E. HOST CONTROL AND WEDDING SETTINGS
+- Host Control page and all subsections
+- Settings cards and action buttons
+- Theme selector and theme previews
+- Ceremony and event controls
+- Member and permission-management interfaces
+- Confirmation windows and action menus
+- Existing host/co-host controls
+
+F. OTHER WEDDING-SPECIFIC AREAS
+Inspect every additional route, tab, submenu, modal, bottom sheet, drawer, popup, overlay, form, and nested page that appears after entering the wedding.
+
+The categories above are an inspection checklist, not a reason to invent missing functionality. Update only features and components that actually exist in the project.
+
+==================================================
+PHASE 2 — CREATE A COMPLETE THEME-AWARE DESIGN SYSTEM
+==================================================
+
+Use the existing eight themes as the source of truth.
+
+Inspect the existing theme definitions and determine whether they cover all the design properties required by the interface.
+
+Extend the existing theme tokens where necessary so each theme can consistently define:
+
+- Primary and secondary colors
+- Page and section backgrounds
+- Card and panel backgrounds
+- Primary, secondary, and tertiary button styles
+- Button text and icon colors
+- Hover, pressed, focused, active, disabled, loading, and selected states
+- Text input and chat composer backgrounds
+- Input borders, placeholder colors, and focus states
+- Message bubble colors for sent and received messages
+- Modal, dialog, popup, drawer, and bottom-sheet backgrounds
+- Border colors, dividers, shadows, and outlines
+- Typography and text hierarchy
+- Decorative borders and wedding-themed accents
+- Loading, success, warning, error, and informational states
+- Accessible text contrast
+
+Do not apply one generic color to every component. Each component should use the appropriate colors and styling from the selected theme.
+
+Preserve a consistent design language throughout the wedding. Buttons, windows, text inputs, cards, and chat controls should look like parts of the same selected theme rather than unrelated interfaces.
+
+==================================================
+PHASE 3 — BUTTONS MUST BE THEMED EVERYWHERE
+==================================================
+
+This is a particularly important requirement.
+
+Inspect every button and interactive control inside the wedding. Include primary, secondary, icon-only, floating, compact, and destructive buttons.
+
+The selected wedding theme must consistently control:
+- Button background and border
+- Text and icon colors
+- Shape, corner radius, and visual treatment where appropriate
+- Pressed and active states
+- Disabled and loading states
+- Focus indication and accessibility
+
+Pay special attention to the Chat and Live shortcut buttons on the wedding card.
+
+These buttons must retain the distinctive design from my reference screenshot:
+- Matching rounded-rectangle tiles
+- Identical dimensions and visual weight
+- Prominent centered icons
+- Clearly readable labels
+- Delicate decorative corners and elegant borders
+- Consistent placement inside the card
+
+Their colors and decorative accents must adapt to the chosen theme, while their recognizable layout and functionality remain consistent.
+
+Do not replace them with plain pills or generic application toolbar buttons.
+
+Apply theme-aware styling to the other buttons throughout Chat, Live, Album, Host Control, and their associated dialogs as well.
+
+Do not force every button to have the same shape. Preserve appropriate control types and existing functionality while ensuring they share the selected theme's design language.
+
+==================================================
+PHASE 4 — THEME ALL WINDOWS, POPUPS, AND DIALOGS
+==================================================
+
+Do not overlook interface elements that appear only after a user taps a button.
+
+Inspect every existing:
+- Modal
+- Popup
+- Confirmation dialog
+- Dropdown
+- Context menu
+- Bottom sheet
+- Drawer
+- Attachment window
+- Media preview window
+- Upload dialog
+- Camera review window
+- Settings panel
+- Permission or membership dialog
+- Error and success message
+
+These interfaces must use the active wedding's theme too.
+
+Theme-aware styling must include the window background, headings, body text, input fields, buttons, icons, borders, shadows, separators, and overlay where appropriate.
+
+When a dialog opens inside a wedding using Royal Burgundy, for example, it should not unexpectedly display the application's unrelated default white-and-blue styling.
+
+However, preserve system-critical warnings, destructive-action clarity, contrast, and accessibility. Do not sacrifice readability to achieve a decorative appearance.
+
+Do not just theme the popup trigger button while leaving the popup itself unchanged.
+
+==================================================
+PHASE 5 — THE CHAT BOX MUST RECEIVE A COMPLETE THEME PASS
+==================================================
+
+Inspect the complete chat interface rather than changing only its outer background.
+
+The selected wedding theme must be reflected in:
+- The chat page background
+- Conversation header
+- Sent and received message bubbles
+- Sender names and timestamps
+- Message composer and text field
+- Placeholder text and input borders
+- Send button
+- Attachment/plus button
+- Camera and media attachment menus
+- Voice-note recording and playback controls
+- Message actions and context menus
+- Reply interfaces and other existing chat tools
+- Confirmation dialogs and media previews
+- Loading, empty, and error states
+
+Maintain clear visual distinction between sent and received messages.
+
+Keep messages readable, the composer compact, and essential controls easy to use.
+
+Preserve the current message order, scroll behavior, keyboard behavior, sending logic, attachments, media handling, and existing chat functionality.
+
+Do not change the chat's functionality just to achieve the desired visual appearance.
+
+==================================================
+PHASE 6 — APPLY THE THEME TO THE CORRECT WEDDING
+==================================================
+
+Theme selection must be scoped to the wedding whose theme was selected.
+
+Trace the actual wedding ID and saved theme through the application's existing architecture.
+
+Requirements:
+- Load the correct theme when a specific wedding opens.
+- Make all pages and components belonging to that wedding consume the same selected theme.
+- Persist the theme using the existing storage and data model.
+- Preserve the selected theme after navigation, refresh, sign-in, and reopening the wedding.
+- When switching between different weddings, load each wedding's own theme.
+- Do not accidentally apply one wedding's theme to other weddings.
+- Use the existing default theme when a wedding has no saved theme.
+- Ensure all shared components receive the active wedding's theme rather than silently falling back to hard-coded default styles.
+
+Only users authorized by the existing host/co-host permission system may change the wedding's theme.
+
+Guests and members should see the correct theme without acquiring theme-editing privileges.
+
+Do not create a duplicate theme field, a separate authentication system, or unnecessary parallel styling infrastructure.
+
+==================================================
+PHASE 7 — INSPECT AND FIX OVERRIDES
+==================================================
+
+After applying the theme system, search the relevant components for:
+
+- Hard-coded background and text colors
+- Fixed button colors
+- Default styles overriding theme tokens
+- Inline styles overriding shared components
+- Modals or portals rendered outside the wedding's theme provider
+- Components falling back to the global application theme
+- CSS specificity conflicts
+- Un themed nested components
+- Incorrectly scoped theme variables
+- States that revert to default styling after an interaction
+
+Replace only the conflicting styling where appropriate.
+
+Do not perform an indiscriminate global color replacement. The public discovery Feed, account screens, and other application-wide areas should retain their intended styling unless they genuinely belong to the selected wedding interface.
+
+Fix the underlying theme propagation and rendering problem instead of hiding the symptom with additional CSS overrides.
+
+==================================================
+PHASE 8 — VERIFY THE COMPLETE WEDDING
+==================================================
+
+Do not stop after confirming that the landing card looks correct.
+
+Test all eight themes across the wedding's existing pages, sections, buttons, dialogs, and chat interface.
+
+Use a systematic checklist to verify:
+
+1. Wedding home and shortcut buttons.
+2. Chat/Feed, including messages, composer, and attachment controls.
+3. Live screen, including available controls and overlays.
+4. Album, media viewer, and upload/preview controls.
+5. Host Control and existing settings.
+6. Modals, popups, dropdowns, confirmation windows, and bottom sheets.
+7. Primary, secondary, icon-only, floating, disabled, and active buttons.
+8. Navigation between wedding pages.
+9. Refreshing and reopening the wedding.
+10. Switching between two weddings with different themes.
+11. Theme visibility for guests and regular members.
+12. Theme-editing authorization for hosts/co-hosts.
+13. Mobile layouts, text readability, and accessibility.
+
+Where useful, test interactions by actually opening the relevant windows and exercising their controls; a screenshot of a page alone is not sufficient.
+
+If automated tests already exist, extend them where appropriate. Run the available relevant tests and report their actual results.
+
+If physical-device or live-stream testing is unavailable, state that limitation rather than claiming full verification.
+
+==================================================
+IMPLEMENTATION RULES
+==================================================
+
+- Inspect first; then identify and fix the root cause.
+- Reuse the existing eight themes and styling architecture.
+- Reuse existing components wherever possible.
+- Do not rebuild working pages.
+- Do not replace functional components with static mockups.
+- Do not invent features that do not exist.
+- Do not remove functionality, change permissions, or alter wedding data unnecessarily.
+- Do not change the position or behavior of existing controls unless necessary for theme compatibility.
+- Preserve the established wedding-card layout and decorative Chat/Live shortcut design.
+- Avoid excessive animations, unnecessary dependencies, and performance-heavy effects.
+- Keep the changes focused on implementing the selected theme throughout the wedding experience.
+
+FINAL REPORT:
+Provide a concise audit summary identifying the wedding screens and sections inspected, the components or shared styles changed, any remaining areas that could not be themed, and the tests actually performed.
+
+Most importantly, confirm whether the buttons, popup windows, and Chat interface were individually checked—not merely whether their containing pages received new colors.
+
+Do not claim complete implementation unless the full existing wedding interface has been systematically inspected and verified.

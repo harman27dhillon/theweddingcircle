@@ -1,0 +1,104 @@
+FIX WEDDING DELETION — SYNCHRONIZE NEON/SUPABASE AND LOCAL STORAGE
+
+In The Wedding Circle, when a user deletes a wedding, it sometimes reappears afterward. This suggests the deletion is not being propagated consistently across the backend, local cache, and synchronization logic.
+
+Inspect the existing implementation and fix the actual root cause. Do not merely hide the wedding from the UI.
+
+1. Make deletion authoritative
+
+When an authorized user confirms deletion of a wedding:
+
+1. Identify the wedding using its existing stable, unique ID.
+2. Verify the user's existing permission to delete that wedding.
+3. Delete or mark the wedding as deleted in the authoritative backend database.
+4. Remove the wedding from the local application state and relevant local caches.
+5. Ensure pending synchronization requests cannot recreate the deleted wedding.
+6. Refresh or reconcile the wedding list only after accounting for the deletion state.
+
+First inspect which backend is actually configured. The application may use Neon, Supabase, or both for different purposes. Do not assume both contain wedding records.
+
+2. Delete the correct records from the actual database
+
+Inspect the current schema, repositories, API endpoints, and data flow to identify where wedding records are stored.
+
+- If Neon is authoritative, ensure deletion is committed to Neon.
+- If Supabase is authoritative, ensure deletion is committed to Supabase.
+- If both systems genuinely store wedding records, implement the existing intended synchronization strategy so both converge consistently.
+- Do not invent tables, columns, database URLs, or credentials.
+- Do not delete unrelated user accounts, memberships, or other weddings.
+
+Inspect related records such as ceremony data, wedding settings, media metadata, invitations, and membership associations. Apply the existing retention rules and foreign-key constraints. Delete dependent records only where the existing data model and product behaviour require it.
+
+Do not delete shared media or user records that may belong to other weddings.
+
+3. Synchronize deletion with local storage
+
+Find every place where wedding records or wedding lists are cached, including the actual local-storage keys, IndexedDB stores, query caches, in-memory state, and persisted application stores.
+
+When a wedding is successfully deleted:
+
+- Remove it from the active wedding list immediately or show a clear pending-deletion state.
+- Remove its relevant cached record and list entries.
+- Invalidate or update related queries and persisted state.
+- Ensure navigation, search, pinned weddings, and recent-wedding lists no longer restore it.
+- Prevent stale cache entries or delayed fetch responses from bringing it back.
+
+Do not clear all local storage or remove unrelated user preferences, authentication data, or other weddings.
+
+4. Prevent synchronization from resurrecting deleted weddings
+
+Audit initial loading, periodic refreshes, realtime subscriptions, retries, offline queues, and conflict resolution.
+
+Use a reliable deletion mechanism appropriate to the existing architecture. If a local tombstone or soft-delete marker is needed, persist it until the backend deletion has been confirmed and stale synchronization sources can no longer reintroduce the wedding.
+
+Ensure that:
+
+- A stale local copy cannot overwrite a confirmed deletion.
+- A stale server response cannot restore the wedding in the UI.
+- Queued create/update requests cannot recreate a wedding that has since been deleted.
+- Duplicate deletion requests are handled safely.
+- Failed backend deletion does not falsely report permanent success.
+- If the user is offline, deletion remains visibly pending until it can be synchronized safely, unless the existing architecture supports another reliable mechanism.
+
+Use stable IDs and existing version/timestamp mechanisms where appropriate. Do not rely solely on matching wedding names.
+
+5. Handle failures and user feedback
+
+Do not silently swallow database errors.
+
+If deletion fails on the authoritative backend:
+
+- Explain that the deletion could not yet be confirmed.
+- Preserve or restore the wedding in the UI if necessary.
+- Keep a retryable pending state only if supported safely by the architecture.
+
+If deletion succeeds, ensure subsequent reloads and logins do not bring the wedding back.
+
+6. Preserve data and permissions
+
+- Inspect the current architecture before editing.
+- Do not reset or truncate any database.
+- Do not bulk-delete wedding records.
+- Do not alter unrelated wedding records, user profiles, memberships, or authentication.
+- Preserve existing authorization and ownership checks.
+- Do not bypass server-side permissions to make deletion work.
+- Do not introduce a second source of truth.
+- Make the smallest targeted changes possible.
+
+7. Verify the fix end to end
+
+Test using a dedicated test wedding, not real production weddings:
+
+1. Delete the test wedding and verify the authoritative backend state.
+2. Refresh the page and confirm it remains deleted.
+3. Navigate away and return.
+4. Close and reopen the application.
+5. Test with stale cached data and delayed network responses.
+6. Test a failed deletion request and verify the UI does not falsely report success.
+7. Test repeated deletion requests.
+8. Verify unrelated weddings, memberships, and user data remain intact.
+9. If offline synchronization is supported, verify pending deletion cannot be undone by an older queued update.
+
+Run the relevant tests, type checks, and production build where available.
+
+Report the actual root cause, which backend is authoritative, which local caches were corrected, and the test results. Implement the fix directly rather than merely describing it.

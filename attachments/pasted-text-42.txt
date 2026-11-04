@@ -1,0 +1,52 @@
+Correct the Latest Floral and Header Layout Mistakes
+
+Work on the existing Wedding Circle project. Inspect the latest screenshots and current implementation, then fix only the issues listed below.
+
+1. Remove the bottom floral decoration completely
+
+- Remove the separate bottom floral-border image from both desktop and mobile.
+- Remove only this decorative asset and its associated rendering; do not remove the wedding cover's own flowers or artwork.
+- Remove any empty wrapper, reserved height, or spacing that remains after removing it.
+- Do not replace it with another bottom strip or pseudo-element.
+- Preserve the existing page layout and scrolling.
+
+2. Correct the app icon and name position on desktop
+
+The previous update incorrectly moved the app icon and “The Wedding Circle” name inside the wedding cover card.
+
+- Move them out of the wedding cover and back into the top application header.
+- Within the top header, center the icon-and-name group horizontally according to the center axis of the main wedding cover card—not merely the center of the whole browser viewport.
+- Keep the icon and name together in one compact, aligned group.
+- Do not duplicate the group inside the wedding cover.
+- Preserve the profile button and other existing header controls.
+- Apply this positioning change to desktop only. Do not change the mobile header.
+
+3. Fix the upper-left floral corner's extra spacing
+
+The latest top-left decoration has an unwanted blank gap or inset, making the flowers look as though they start inside a separate rectangle.
+
+- Inspect the actual image dimensions, transparent padding, image wrapper, and CSS positioning.
+- If the asset contains excessive transparent padding, crop the transparent bounds or use an appropriately trimmed copy while preserving the flower artwork.
+- Position the visible flowers naturally at the actual top-left page corner, without an artificial gap or empty block.
+- Do not move the entire page or header to compensate for padding inside the image.
+- Preserve the floral artwork's aspect ratio and natural appearance.
+
+4. Fix the upper-right floral corner
+
+The top-right decoration is still incorrectly positioned.
+
+- Inspect its own asset and positioning independently; do not assume the left and right images have identical transparent bounds.
+- Anchor the visible flowers naturally to the actual top-right page corner.
+- Remove unintended gaps, clipping, duplicate flowers, and rectangular image edges.
+- Keep it balanced with the upper-left decoration without requiring both images to have identical dimensions or offsets.
+- Ensure it does not cover the profile control, Create New Wedding card, or other important content.
+
+5. Preserve responsive behavior and verify
+
+- Keep the existing mobile-specific rule that hides only the two top-corner decorations if that rule is already in place.
+- On desktop, both top-corner decorations should remain visible and correctly aligned.
+- Preserve the cover image, couple names, buttons, theme styling, navigation, and all functional features.
+- Do not introduce new decorative layers or more conflicting CSS overrides.
+- Test desktop and mobile layouts after implementation.
+
+Acceptance criteria: The bottom floral border is completely removed from both devices; the app icon and name are in the desktop header, aligned to the wedding card's center axis; and both upper floral corners sit correctly at the page edges without extra blank space or clipping.

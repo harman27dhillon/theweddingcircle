@@ -1,0 +1,335 @@
+Wedding App Update — Feed Layout Fix + Two Independent Live Streaming Windows
+
+Update the existing wedding app. Inspect the current code before making changes and reuse existing components, backend services, authentication, and design.
+
+Critical requirements:
+
+- Window A = native Wedding App Live.
+- Window B = YouTube Live.
+- Upload and Camera buttons must appear below the Feed text box.
+- Preserve all existing data and functionality.
+- Do not rebuild the app or introduce unrelated changes.
+
+PART 1 — FIX FEED COMPOSER LAYOUT
+
+1. Correct Button Positions
+
+The Upload and Camera buttons were incorrectly moved above the post text box in the previous update. Correct their positions.
+
+The required layout, from top to bottom, is:
+
+1. Post text box with the Post button.
+2. Upload, Camera, and upload-information (i) buttons on the next row.
+3. Function dropdown.
+
+Requirements
+
+- Place Upload and Camera below the post text box, never above it.
+- Keep Upload and Camera on the same horizontal row.
+- Place the upload-information (i) button immediately beside Camera.
+- Preserve the Post button's existing behavior and permissions.
+- Keep the function dropdown below the upload controls.
+- Use compact spacing to save vertical space.
+- Ensure the layout works on small Android screens without overlapping or horizontal scrolling.
+
+2. Upload Button
+
+- Rename the existing Gallery button to Upload, if it has not already been renamed.
+- Tapping Upload must open the device's existing photo/video picker.
+- Preserve existing upload validation and media-storage behavior.
+- Support up to 50 photos and 5 videos per upload.
+- Do not change existing storage providers or upload permissions.
+
+3. Camera Button
+
+- Keep Camera immediately beside Upload on the same row.
+- Tapping Camera must open the existing camera capture interface.
+- Preserve the current capture and attachment functionality.
+- Request camera permission only when required.
+- Do not break the existing post composer.
+
+4. Upload Information Button
+
+- Remove the visible text line stating "Up to 50 photos and 5 videos at once."
+- Show that information only when the user taps the information (i) button beside Camera.
+- Use a compact tooltip, popover, or modal.
+- Keep the information button immediately beside Camera.
+- Do not duplicate the upload-limit text elsewhere in the composer.
+
+5. Side Colors Button
+
+- Keep the existing Side colors button beside the separate circular information (i) button in the upper-right header area.
+- Keep these header controls on the same horizontal line.
+- Do not confuse the header information button with the upload-information button beside Camera.
+- Preserve the Side colors functionality and existing permissions.
+- Avoid overlap with the wedding title and other header controls.
+
+PART 2 — CREATE TWO INDEPENDENT LIVE STREAMING WINDOWS
+
+The Live tab must contain two clearly separated cards:
+
+1. Window A — Wedding App Live
+2. Window B — YouTube Live
+
+These are two different streaming systems. Do not reverse them, combine them, or make either dependent on the other.
+
+PART 3 — WINDOW A: WEDDING APP LIVE
+
+This is the app's own native live-streaming feature. The broadcaster streams directly from their device camera and microphone without requiring a YouTube URL.
+
+1. Start Live and Request Permissions
+
+- Display a prominent Start Live button.
+- Only authorized hosts and co-hosts may start a broadcast, according to existing permissions.
+- Opening the Live tab must not request camera or microphone access.
+- When an authorized broadcaster taps Start Live, request camera and microphone access through the browser's native permission system.
+- Request both permissions and handle each permission result correctly.
+- If permissions are granted, initialize the camera and microphone and show a local preview.
+- Display a Go Live button after the preview is ready.
+- Do not start broadcasting until the broadcaster explicitly taps Go Live.
+
+2. Camera and Microphone Controls
+
+Before going live, provide:
+
+- Camera preview.
+- Microphone status indicator.
+- Camera on/off control.
+- Microphone mute/unmute control.
+- Switch-camera option for front and rear cameras when supported.
+- A Cancel button to exit the preview without broadcasting.
+
+If permission is denied:
+
+- Explain which permission is required.
+- Provide instructions for enabling it in browser or device settings.
+- Offer a retry option.
+- Never falsely show that the stream has started.
+
+If the camera or microphone is unavailable, already in use, or unsupported, show a clear error and allow retrying.
+
+3. Go Live
+
+When the broadcaster taps Go Live:
+
+- Start a real live broadcast with video and audio.
+- Make the stream viewable from other authorized wedding-circle devices.
+- Display a clear LIVE indicator.
+- Show the broadcaster's name and the selected wedding function, when applicable.
+- Display the live video prominently.
+- Show the current viewer count only when it can be measured accurately.
+- Provide an obvious End Live button for the broadcaster.
+- Handle weak networks and temporary disconnections gracefully.
+- Update viewers' screens when the broadcaster disconnects or ends the stream.
+
+Technical requirement: Implement real multi-user streaming, not a local camera preview that only the broadcaster can see.
+
+Reuse existing streaming infrastructure if available. Otherwise, use a suitable WebRTC-based implementation with signaling and a compatible media-relay or streaming service.
+
+If additional backend infrastructure is required, identify the setup required. Do not fake the streaming functionality or silently introduce an expensive paid service.
+
+4. Live Comments
+
+Add a real-time chat section beneath the native live video.
+
+- Viewers can send text comments during the broadcast.
+- Comments should appear promptly on all viewers' devices.
+- Display the sender's name and message.
+- Keep recent comments visible and allow users to scroll through them.
+- Provide a clearly identifiable message input and Send button.
+- Apply existing wedding-circle membership and moderation rules.
+- Allow the host or authorized moderators to remove inappropriate comments.
+- Prevent access to another wedding circle's live chat.
+- Apply sensible message-length limits, validation, and rate limiting.
+- Keep messages associated with the correct wedding and live session.
+- Do not automatically turn live comments into permanent Feed posts.
+
+Live chat should be temporary. Expire its data after the session according to the configured retention policy, without deleting unrelated wedding messages or posts.
+
+5. Wedding-Themed Emoji Reactions
+
+Add a compact reaction bar that works while viewers watch the native live stream.
+
+Include:
+
+- ❤️ Love
+- 🥰 Adorable
+- 💍 Wedding
+- 🥳 Celebration
+- 💃 Dance
+- 🕺 Dance
+- 🎉 Party
+- 🌸 Blessings
+- 🧿 Nazar protection
+- 👏 Applause
+
+Behavior
+
+- Viewers can tap emojis to send reactions.
+- Reactions appear to other viewers in real time.
+- Use tasteful floating or popping animations over the video.
+- Do not obstruct the video, comments, or important controls.
+- Keep animations lightweight for mid-range Android devices.
+- Apply rate limits to prevent reaction spam.
+- Do not play sounds automatically.
+- Do not store reactions as permanent wedding posts.
+
+6. End Live and Release Resources
+
+When the broadcaster taps End Live:
+
+- End the actual broadcast.
+- Stop camera and microphone media tracks immediately.
+- Close the streaming connection and release camera/microphone resources.
+- Update all viewers' screens to show that the stream has ended.
+- Display an offline screen with an option to start another broadcast.
+- Do not automatically record or save the stream.
+- Do not upload the broadcast to the wedding album, Google Photos, Firebase Storage, or other permanent media storage.
+- Clean up temporary streaming resources according to the existing backend architecture.
+
+The native broadcast is a temporary live experience, not a recording feature.
+
+PART 4 — WINDOW B: YOUTUBE LIVE
+
+This window is exclusively for YouTube Live.
+
+1. Attach YouTube Link
+
+- Keep the existing YouTube URL input field.
+- Keep the Attach button.
+- Allow authorized hosts and co-hosts to attach a YouTube Live link.
+- Validate the URL and reject unsupported links with a clear message.
+- Persist the attached link using the existing wedding-event data model where possible.
+- Do not request camera or microphone access to attach or watch YouTube.
+- Do not require a native Wedding App Live session to attach a YouTube link.
+
+2. YouTube Player
+
+After a valid link is attached:
+
+- Display the actual YouTube player inside Window B.
+- Support standard YouTube watch URLs and supported YouTube Live URLs.
+- Convert supported URLs into the appropriate safe embed format.
+- Respect YouTube's playback and embedding restrictions.
+- Display a clear message if the stream is offline, unavailable, private, or cannot be embedded.
+- Allow guests to watch inside the wedding app when YouTube permits playback.
+- Preserve the attached link when users navigate away and return.
+
+Never falsely indicate that a YouTube stream is live when it is unavailable or offline.
+
+3. Keep Both Windows Independent
+
+- Attaching a YouTube link must not start Wedding App Live.
+- Starting Wedding App Live must not require a YouTube link.
+- Ending Wedding App Live must not stop or detach YouTube Live.
+- Changing the YouTube URL must not interrupt the native broadcast.
+- Keep each window's status, controls, and data separate.
+- Do not share the native stream's camera permissions with the YouTube player.
+
+PART 5 — LIVE TAB DESIGN
+
+Display two separate, clearly labelled cards.
+
+Window A — Wedding App Live
+
+Include:
+
+- Start Live button.
+- Camera and microphone permission flow.
+- Camera preview and controls.
+- Go Live button.
+- Live video and broadcaster details.
+- LIVE indicator.
+- Viewer count when available.
+- Wedding-themed emoji reactions.
+- Live comments and message input.
+- End Live button for authorized broadcasters.
+
+Window B — YouTube Live
+
+Include:
+
+- YouTube URL input.
+- Attach button.
+- Embedded YouTube player or an appropriate status message.
+- Existing wedding-function selector, if applicable.
+
+Use the existing wedding colors, typography, rounded cards, and responsive layout. On mobile, stack the two cards vertically. Keep controls compact and easy to tap.
+
+PART 6 — SECURITY AND PERMISSIONS
+
+- Enforce host/co-host permissions on the backend, not just in the UI.
+- Guests may watch, comment, and react according to existing membership rules.
+- Guests must not see or use broadcaster controls.
+- Do not expose secret API keys in frontend code.
+- Protect streaming sessions, signaling, and chat against unauthorized access.
+- Prevent one wedding circle from accessing another circle's streams or comments.
+- Use HTTPS and secure browser media APIs.
+- Request camera and microphone access only when an authorized user initiates broadcasting.
+- Viewers must not be asked for camera or microphone permission merely to watch.
+- Release media resources when broadcasting ends or is cancelled.
+
+PART 7 — PERFORMANCE AND MOBILE COMPATIBILITY
+
+- Optimize for Android browsers and installed web apps.
+- Keep video playback, comments, and reactions responsive.
+- Avoid unnecessary database listeners, network requests, and component re-renders.
+- Handle network interruptions and reconnection gracefully.
+- Avoid duplicate live sessions unless explicitly supported.
+- Use suitable video quality and bitrate for available bandwidth.
+- Do not initialize camera streams in the background before permission is requested.
+- Preserve the existing app's authentication and navigation behavior.
+
+PART 8 — PRESERVE EXISTING DATA AND FEATURES
+
+- Do not rebuild the app from scratch.
+- Do not overwrite existing wedding data, Feed posts, albums, profiles, replies, notifications, or settings.
+- Do not replace the backend, authentication, or storage provider without a clear technical reason.
+- Reuse existing components and services wherever possible.
+- Do not use mock streams, fake viewer counts, fake comments, or sample reactions in production.
+- Do not claim that a feature works if its backend or service configuration is incomplete.
+- Do not change unrelated tabs or features.
+
+PART 9 — FINAL TESTING CHECKLIST
+
+Before declaring the update complete, verify:
+
+Feed
+
+1. Post text box and Post button appear above the upload controls.
+2. Upload and Camera appear below the text box on the same row.
+3. The upload-information button is immediately beside Camera.
+4. Upload opens the existing media picker.
+5. Camera opens the existing camera capture interface.
+6. Upload limits remain 50 photos and 5 videos.
+7. The upload-limit text is hidden until the information button is tapped.
+8. Side colors remains beside the separate header information button.
+9. The Function dropdown remains below the upload controls.
+
+Wedding App Live
+
+10. Start Live requests camera and microphone permissions.
+11. The broadcaster can preview the camera before going live.
+12. Go Live starts a real stream visible on a second device.
+13. Guests can watch, comment, and send emoji reactions.
+14. End Live stops the broadcast and releases camera/microphone resources.
+15. The native stream is not automatically recorded or saved.
+16. Unauthorized users cannot start or end the broadcast.
+
+YouTube Live
+
+17. A supported YouTube link can be attached and played inside Window B.
+18. Unavailable streams display an appropriate status message.
+19. YouTube and native streaming remain independent.
+20. Camera and microphone permissions are not requested just to watch YouTube.
+
+Overall
+
+21. Both windows work on mobile.
+22. Network failures are handled gracefully.
+23. Existing app features and stored data remain intact.
+24. All required backend and external-service configuration is identified honestly.
+
+Implement these changes in the existing code, test both streaming windows independently, and report any remaining backend setup, deployment requirements, or paid-service dependencies.
+
+Final priority: Fix the Feed composer layout exactly as specified, provide two genuinely independent live-streaming windows, and preserve all existing app functionality and data.

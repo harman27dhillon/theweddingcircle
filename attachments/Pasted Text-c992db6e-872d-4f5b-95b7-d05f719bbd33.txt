@@ -1,0 +1,70 @@
+Improve the UI of my existing wedding app's Feed screen. Make it look more premium, clean, modern, and compact on mobile devices.
+
+IMPORTANT: Only modify the Feed screen's visual design and related styling. Do not rebuild the app or change existing functionality.
+
+1. Preserve Custom Backgrounds
+
+- Keep the existing feature that lets users change the feed background.
+- Do not remove, reset, or replace user-selected colors, gradients, or themes.
+- Do not force a white or ivory background.
+- Make all feed components readable against every supported background, including the current pink gradient.
+- Use adaptive text colors, suitable card surfaces, and sufficient contrast without interfering with user-selected themes.
+
+2. Make Feed Cards More Compact
+
+- Reduce excessive padding and vertical gaps inside post cards by approximately 20%.
+- Keep author information, wedding-side labels, post text, reactions, replies, report options, and timestamps clearly organised.
+- Give the actual post content greater visual importance.
+- Avoid unnecessary empty space, especially in short posts.
+- Maintain comfortable spacing for mobile touch interactions.
+
+3. Improve Typography
+
+- Make post content more prominent and readable.
+- Keep author names clear and wedding-side labels secondary.
+- Make timestamps and secondary information smaller and less visually dominant.
+- Standardise font sizes, font weights, and line spacing.
+- Avoid making too many elements bold simultaneously.
+
+4. Refine Buttons
+
+- Reduce the repetitive appearance of outlined pill-shaped buttons.
+- Use filled styling for primary actions and subtle borders or backgrounds for secondary actions.
+- Make button sizes, icon sizes, and spacing consistent.
+- Preserve the existing Love, Joy, Bless, Reply, Share, Gallery, and Camera functionality.
+- Do not reduce touch targets to uncomfortable sizes.
+
+5. Improve the Post Composer
+
+- Make the “What just happened?” input, Share, Gallery, Camera, upload guidance, and Function selector feel like one cohesive section.
+- Reduce unnecessary gaps while preserving clear separation between controls.
+- Keep existing media upload limits, camera access, gallery selection, and Function options unchanged.
+
+6. Compact the Header
+
+- Reduce unnecessary vertical space in the header.
+- Keep the wedding title, notification button, guest/profile control, and developer identity.
+- Make the developer label less prominent than the wedding title.
+- Prevent long titles from overlapping or pushing controls off-screen.
+
+7. Preserve Bottom Navigation
+
+- Keep Home, Feed, Live, Album, and More.
+- Improve icon alignment, label spacing, and selected-state styling.
+- Ensure navigation remains readable against all supported themes.
+- Do not change destinations or navigation behaviour.
+
+8. Strict Rules
+
+- Inspect the existing code before making changes.
+- Reuse existing components and styles wherever possible.
+- Do not change database structures, authentication, roles, permissions, user data, upload logic, reactions, replies, reporting, notifications, or unrelated screens.
+- Do not hardcode a background color that overrides the user's selection.
+- Do not delete existing features or replace working code unnecessarily.
+- Make the smallest practical changes to achieve the requested improvements.
+
+Final Check
+
+Test the updated Feed screen on mobile and desktop. Verify that the pink gradient and other user-selected backgrounds still work, text remains readable, cards are more compact, and every existing control functions as before.
+
+Apply the changes directly to the existing project. Do not merely describe the changes or provide a mockup.

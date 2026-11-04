@@ -1,0 +1,40 @@
+Fix the authenticated startup redirect in The Wedding Circle — minimal change only
+
+There is a startup navigation bug in the existing app.
+
+Current incorrect behaviour:
+
+1. When I open the app, it briefly displays the sample/demo landing page.
+2. After approximately one second, the app detects that the user is already logged in.
+3. It then redirects to the user's actual wedding or wedding-bar landing page.
+
+This causes a visible flicker and makes the app feel slow and unfinished.
+
+Required behaviour:
+
+- On startup, immediately determine the existing authentication/session state before rendering the public sample landing page.
+- If a valid session exists, load the correct authenticated destination directly, including the user's existing wedding or wedding-bar landing page when appropriate.
+- If the session needs to be restored asynchronously, display a neutral branded loading screen until authentication and the initial destination are resolved. Do not display the sample landing page during this process.
+- If the user is genuinely logged out, show the normal public landing page.
+- Preserve the existing wedding selection, wedding access permissions, remembered destination, and login/logout behaviour.
+- Handle expired sessions, failed session restoration, and users who have not created or joined a wedding safely.
+
+Strict scope restrictions:
+
+1. Inspect the existing authentication provider, session restoration, routing, startup initialization, and landing-page rendering logic before editing.
+2. Make the smallest necessary changes to eliminate the incorrect first render and redirect flicker.
+3. Do not rebuild or replace the authentication system.
+4. Do not change the UI design, themes, wedding cards, database, APIs, Google Drive integration, developer controls, or any unrelated feature.
+5. Do not hardcode a wedding ID or assume every authenticated user belongs to the same wedding.
+6. Do not hide the problem using an arbitrary delay or timer.
+
+Verification required:
+
+- Test an already logged-in user refreshing the page.
+- Test closing and reopening the app with a valid saved session.
+- Test a logged-out user.
+- Test a user whose session has expired.
+- Test an authenticated user who has not joined or created a wedding.
+- Test desktop and mobile Chrome specifically.
+
+Deliverable: Make the fix directly in the existing source code. Run the available type checks, tests, and production build. Report the exact files changed and the test results. If another unrelated issue is discovered, report it separately without modifying it.

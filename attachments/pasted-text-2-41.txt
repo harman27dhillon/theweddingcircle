@@ -1,0 +1,90 @@
+Fix the Private Media Gateway configuration fields, saved-state indicators, and signed-probe failure. Inspect the existing implementation and make changes directly.
+
+1. Rename the website field
+
+- Rename the visible label "Signing Secret" to "Media Gateway Secret".
+- Use the exact server-side environment variable name "MEDIA_GATEWAY_SECRET".
+- Keep the label and internal variable name consistent throughout the Developer interface and its configuration handling.
+- Do not create a second secret or use a different environment variable name.
+
+2. Fix Worker Origin saved status
+
+- Load its initial value from actual saved server-side configuration.
+- Show "Saved on server" only when persistence is confirmed.
+- Show "Unsaved changes" when edited but not saved.
+- Never treat a default or hardcoded value as proof of persistence.
+
+3. Fix Media Gateway Secret saved status
+
+- Never return or display the actual secret in the browser.
+- Read only its saved/present status from the server.
+- Show "Saved on server" when the server confirms it exists.
+- Keep the input blank when loading an existing secret.
+- Show "Unsaved changes" when a replacement is entered but not saved.
+- After saving, clear the input and refresh the saved status from the server.
+- Never expose the secret in logs, API responses, diagnostics, or error messages.
+
+4. Configuration status
+
+Show separate, accurate indicators for Worker Origin and Media Gateway Secret:
+
+- "Saved on server"
+- "Unsaved changes"
+- "Missing"
+- "Checking"
+
+Do not show a saved badge based only on frontend state. Refreshing the page must preserve accurate saved-state indicators.
+
+5. Save and verification
+
+- Persist values through the existing server-side configuration mechanism.
+- Do not report success if persistence fails.
+- After saving, verify persistence by reading back non-sensitive status.
+- Do not rotate, regenerate, or overwrite the existing secret unless the user explicitly enters a replacement.
+
+6. Investigate the signed-probe failure
+
+The current live error is:
+
+"Valid signed request. The Worker rejected the signed probe."
+
+Inspect the actual application signing implementation and Cloudflare Worker verification implementation. Compare:
+
+- Canonical signing message
+- HTTP method
+- Object path encoding
+- Timestamp and expiry
+- Token format
+- HMAC-SHA256 algorithm
+- Signature comparison
+- Secret resolution on both sides
+
+Confirm both sides resolve the same "MEDIA_GATEWAY_SECRET" without revealing its value.
+
+Add safe diagnostics identifying the exact mismatch category without logging secrets or signatures.
+
+Do not claim the signing issue is fixed unless real signed GET and HEAD requests succeed against the deployed Worker.
+
+Strict restrictions
+
+- Keep Gateway OFF.
+- Keep the R2 bucket private.
+- Do not change DNS or R2 permissions.
+- Do not change Supabase, Better Auth, Firebase, or membership logic.
+- Do not enable CDN or edge caching.
+- Do not modify unrelated features.
+- Do not deploy automatically.
+
+Required completion report
+
+Report:
+
+1. Exact files changed.
+2. Confirmation that the website label now reads "Media Gateway Secret".
+3. Confirmation that the internal variable is exactly "MEDIA_GATEWAY_SECRET".
+4. How each field's saved status is verified.
+5. Confirmation that the secret is never exposed to frontend code.
+6. Build, typecheck, and test results.
+7. Whether signed GET and HEAD succeeded against the live Worker.
+
+Clearly separate implemented, locally tested, and live-tested results. Do not claim completion of anything that was not actually verified.

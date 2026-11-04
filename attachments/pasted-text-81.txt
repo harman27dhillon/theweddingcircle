@@ -1,0 +1,20 @@
+Cloudflare R2 credentials are now saved successfully in Developer → Infrastructure. However, clicking Test Connection returns:
+
+"Error: fetch failed"
+
+The UI confirms Account ID, bucket, access key and secret are saved on the server.
+
+Investigate the actual backend R2 connection test.
+
+1. Inspect server logs and the R2 test endpoint.
+2. Verify the endpoint URL is constructed correctly:
+   "https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+3. Verify the S3 client uses the correct access key, secret key, account ID, region "auto", and bucket name.
+4. Check whether the backend runtime can make outbound HTTPS requests.
+5. Distinguish DNS, network, timeout, authentication, signature and bucket errors.
+6. Return the actual underlying error message instead of only "fetch failed".
+7. Keep credentials server-side and never expose secrets in browser responses or logs.
+8. Do not enable public bucket access or move any wedding media.
+9. Preserve all existing saved credentials and unrelated infrastructure settings.
+
+Fix the root cause, then run the connection test again. Report the exact cause and verified result. Do not claim success unless the backend actually completes the R2 test.

@@ -1,0 +1,139 @@
+The Wedding Circle — Urgent Regression Fixes After Recent Update
+
+Fix the four issues below in the existing The Wedding Circle project. Use the supplied screenshots as visual references and inspect the actual source code before making changes.
+
+These are targeted bug fixes. Do not redesign unrelated sections, remove working functionality, replace authentication systems, or overwrite existing wedding data.
+
+1. Fix Desktop Profile Button Layering
+
+In the desktop landing-page screenshot, the floral decoration overlaps the profile button or profile area.
+
+Required fix
+
+- Inspect the landing-page background decorations, flower assets, stacking contexts, positioning and z-index rules.
+- Move the decorative flowers into the background layer behind the interactive landing-page content.
+- Ensure the profile button and its complete clickable area remain visible and accessible above the decorative background.
+- Check parent elements for "overflow: hidden", transforms, isolation or stacking contexts that prevent the intended layering.
+- Preserve the current floral design, dimensions, positioning and appearance as much as possible.
+- Do not simply remove the flowers from the landing page.
+- Ensure other interactive buttons and navigation elements are not covered by decorative assets.
+
+Test on desktop at multiple viewport widths.
+
+2. Critical: Fix Mobile Chrome Stuck on Sign-In Check
+
+The mobile screenshot shows a nearly blank page displaying:
+
+“The Wedding Circle — Checking who is signed in on this phone.”
+
+The app does not proceed to the landing page. This started after the recent update and appears to affect mobile Chrome.
+
+Investigate the root cause
+
+Inspect the authentication initialization, Firebase setup, session restoration, loading state, routing guards and asynchronous startup logic.
+
+Check for:
+
+- An authentication listener that never resolves or completes.
+- A loading state that remains true after initialization.
+- A promise that never settles or an exception that is swallowed.
+- Firebase initialization or configuration errors.
+- A route guard waiting indefinitely for a user profile or developer role.
+- A database request blocking initial page rendering.
+- Session restoration differences between desktop and mobile Chrome.
+- A redirect loop or incorrect handling of a signed-out user.
+- Browser storage, cookie or IndexedDB errors.
+- An unavailable backend request that prevents the landing page from rendering.
+
+Required behavior
+
+- Initialize authentication safely and consistently.
+- Show a loading screen only while the necessary initialization is genuinely pending.
+- Handle both authenticated and signed-out users correctly.
+- If no user is signed in, proceed to the intended landing or sign-in screen according to the existing app flow.
+- If the session check fails, show a recoverable error with a retry option rather than leaving the user on an indefinite loading screen.
+- Add appropriate timeouts and cleanup for asynchronous initialization where needed.
+- Ensure errors are logged safely for diagnosis without exposing credentials or tokens.
+- Do not bypass authentication or grant access to protected pages just to remove the loading screen.
+- Do not remove email verification requirements from ordinary users.
+- Preserve the separate developer authentication policy and existing permissions.
+- Ensure authentication initialization does not block public landing-page content unnecessarily.
+
+Mobile compatibility
+
+Test the deployed site in Android Chrome, including a fresh session, an existing session, a signed-out session and a session with unavailable network access.
+
+Check responsive rendering and JavaScript console/network errors where testing tools permit. If an external Firebase or backend configuration is incorrect, identify it precisely instead of hiding the error.
+
+Do not claim the mobile issue is fixed unless the application has actually progressed beyond the loading screen in a suitable test.
+
+3. DESKTOP ONLY -Remove the Bottom Flower Decoration From the Wedding Couple-Name Card
+
+The third screenshot shows an unwanted layer of flowers at the bottom of the couple-name card on Wedding Home.
+
+Required fix
+
+- Locate the exact bottom floral overlay or background decoration on the couple-name card.
+- Remove only that bottom floral layer from the couple-name card.
+- Preserve the main cover image, couple names, date, location, countdown, card dimensions and other approved styling.
+- Do not remove the top or corner floral decorations if they are separate intended elements.
+- Do not remove the flowers from the family-information card, ceremony covers, landing page or other themes.
+- Check all applicable themes so no unwanted bottom flower overlay remains on the couple-name card.
+
+If the bottom flowers are baked into the source image rather than a separate UI layer, do not crop or replace the entire image blindly. Identify the actual source and apply the smallest suitable fix.
+
+4. DESKTOP ONLY- Fix the Leaderboard Double-Crown Rendering Bug
+
+The fourth screenshot shows a crown at the top of the Leaderboard card and a second crown partially cut off below it.
+
+Required fix
+
+- Inspect the Leaderboard card's icon markup, SVGs, pseudo-elements, nested components and responsive styling.
+- Identify why the crown is being rendered twice.
+- Remove the unintended duplicate or clipped crown while preserving the intended premium Leaderboard design.
+- Keep the ranking indicators and crown decorations for the actual top-ranked weddings where applicable.
+- Ensure the card title, description and participant avatars remain correctly aligned.
+- Check for duplicate icons introduced by overlapping parent and child components or CSS pseudo-elements.
+
+Test the Leaderboard at desktop and mobile breakpoints.
+
+5. Fix Automatic Redirect After Successful Wedding Creation
+
+The previous update requested automatic redirection after a wedding becomes live, but the application still does not redirect correctly.
+
+Trace the entire wedding creation flow and fix the actual cause.
+
+Required behavior
+
+- For free weddings, redirect only after the wedding has been saved successfully and its active/live status is confirmed.
+- For paid weddings, wait for genuine payment confirmation through the existing trusted payment flow.
+- For voucher-funded weddings, wait until the wedding and its premium entitlement have been successfully committed.
+- After successful completion, automatically navigate to the existing main application landing-page route.
+- Do not redirect before the database write or payment confirmation completes.
+- Do not require the user to press another button to finish an already successful creation.
+- Prevent duplicate redirects, redirect loops and repeated wedding creation.
+- Preserve the newly created wedding and make it available through the normal landing-page interface.
+- If creation or payment fails, keep the user on a recovery screen with a clear error message.
+
+Use the actual route defined in the existing application. Do not invent a new route or assume the landing page is "/" without inspecting the router.
+
+6. Regression Testing and Reporting
+
+After making the fixes:
+
+1. Run the existing tests, TypeScript checks and production build where available.
+2. Test desktop landing-page layering and profile-button accessibility.
+3. Test mobile Chrome authentication initialization for signed-in and signed-out users.
+4. Test the couple-name card across applicable themes.
+5. Verify that only one intended crown appears in the Leaderboard card.
+6. Test free, paid and voucher-funded wedding creation paths.
+7. Check the browser console, failed network requests and relevant backend logs.
+8. Verify that no existing user accounts, wedding records or permissions were damaged.
+
+Do not suppress errors, introduce mock authentication or claim tests passed when they were not executed.
+
+Final report
+
+List the root cause and repair for each issue, files changed, actual test results, production build status and any remaining external configuration requirements.
+
+Priority order: mobile startup failure first, then wedding-creation redirect, desktop layering, bottom flower removal and Leaderboard crown correction. Preserve all unrelated working features.

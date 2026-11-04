@@ -1,0 +1,49 @@
+Replace the current AI integration used by my AI Code Fixer with the official OpenAI API.
+
+Requirements:
+
+1. Use the official OpenAI API for the AI Code Fixer.
+
+2. Do NOT attempt to connect to a ChatGPT conversation or ChatGPT web session.
+
+3. Use the OpenAI API through a secure server-side/backend integration.
+
+4. Store the OpenAI API key only in a server-side environment variable such as:
+   "OPENAI_API_KEY"
+
+5. Never expose the API key in frontend JavaScript, browser network responses, source code, or client-side environment variables.
+
+6. Make the AI model configurable through a server-side environment variable, for example:
+   "OPENAI_MODEL"
+
+7. Update the AI Code Fixer so that its existing workflow uses OpenAI:
+   
+   User request → OpenAI → analyze code/problem → proposed fix → response
+
+8. Preserve the existing AI Code Fixer UI and functionality.
+
+9. Do not remove the existing Command Center.
+
+10. Handle API errors properly, including authentication, rate limits, insufficient permissions, and unavailable models.
+
+11. Show a useful error message in the Developer Center instead of exposing API credentials or raw secrets.
+
+12. Do not hard-code the API key anywhere.
+
+13. If the current architecture does not have a secure backend endpoint for AI requests, create one using the application's existing backend architecture.
+
+14. Before making changes, inspect the current AI Code Fixer implementation and tell me:
+
+- Which files are involved
+- Which AI provider is currently being used
+- Why it is returning 403
+- What files you will change
+- What environment variables are required
+
+After implementation, test the AI Code Fixer with a simple request such as:
+
+"Inspect the application and identify which files control the Enter Wedding functionality. Do not modify anything."
+
+Do not deploy production changes until the integration works correctly.
+
+Important: use the current official OpenAI API documentation and current supported API interface/model configuration rather than assuming an outdated API format.

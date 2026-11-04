@@ -1,0 +1,42 @@
+Critical: Wedding Home Page Redesign Was Reported Complete, but Nothing Changed
+
+Grok reported that the wedding Home page redesign was completed, but the actual page still looks the same as before.
+
+The page I want redesigned is the Home page INSIDE an already-created wedding, showing:
+
+- The existing floral cover image and couple names.
+- Wedding date and location.
+- Wedding day, Planning and Exit to home buttons.
+- Change background button.
+- Next ceremony card, such as Vidaai.
+- Pre-wedding section.
+- Existing bottom navigation.
+
+I want this page transformed into a premium, religion-aware digital marriage invitation with prominent bride and groom names, the complete ceremony itinerary, dates, timings, venues, dress codes, parents' names and other family members.
+
+First diagnose. Do not make another superficial change.
+
+1. Identify the exact route, page component and render function responsible for the Home page inside an existing wedding.
+2. Trace the actual component displayed when opening a created wedding. Determine whether the previous changes were applied to a different Home page, the main landing page, a sample wedding, or an unused component.
+3. Inspect the actual source files changed during the previous update. Confirm whether the invitation redesign was implemented in the component that the running application actually renders.
+4. Check for duplicate Home page components, conditional rendering, cached bundles, stale previews, route mismatches or a failed build that could explain why the changes are not visible.
+5. Check whether the existing floral hero, Change background button, Next ceremony and Pre-wedding sections are still rendering through the old implementation.
+6. Identify the precise reason the page remains unchanged. Do not assume the changes were applied successfully merely because the previous operation reported completion.
+
+Then implement and verify the actual fix.
+
+Modify the exact component used by the existing wedding Home page. Transform its actual rendered layout into the requested invitation design, using the saved couple names, selected religion/theme and real wedding data.
+
+Do not merely add a new unused component, create a mockup, modify the main login landing page or change unrelated sections.
+
+Preserve existing wedding IDs, saved data, permissions, privacy restrictions, bottom navigation and all other functionality.
+
+After making the changes:
+
+- Verify that the actual wedding Home page renders the new invitation design.
+- Confirm that the couple names and ceremony details come from the correct saved wedding.
+- Report the exact files and components changed.
+- State the actual cause of the previous failure.
+- If you cannot verify the running page, clearly explain what remains unverified.
+
+Do not report success until the actual page has visibly changed.

@@ -1,0 +1,53 @@
+FIX TWO CHAT UI BUGS IN THE EXISTING WEDDING CIRCLE APP
+
+Inspect the current source code and fix these two specific issues directly. Do not redesign the Chat screen, change unrelated features, or merely describe the solution.
+
+BUG 1 — Trophy overlaps the + button
+
+The Who Said It? trophy button must be a separate floating button positioned directly ABOVE the existing + button on the left side of the Chat composer.
+
+Current problem: the trophy occupies the same position as the + button and covers it.
+
+Requirements:
+
+- Restore the original + button exactly as it was, fully visible and independently clickable.
+- Move the trophy into its own separate position immediately above the + button.
+- Ensure there is enough vertical spacing between the two buttons so their touch areas never overlap.
+- Keep both buttons visible and usable on mobile and desktop.
+- Position the trophy relative to the Chat composer/container rather than using arbitrary fixed screen coordinates that break across screen sizes.
+- Preserve the existing trophy artwork, size, styling, and game functionality as much as possible.
+- Check parent containers, positioning, margins, padding, stacking order, and mobile safe-area constraints to identify the actual cause.
+- Do not fix the overlap by hiding, shrinking excessively, or disabling the + button.
+
+Acceptance test: The trophy and + button are visibly separate. Tapping the trophy opens Who Said It?; tapping + opens its original menu. Neither button blocks the other.
+
+BUG 2 — Microphone and speaker icons do not reflect their actual state
+
+The Chat microphone and speaker controls respond to taps and turn on, but their icons do not change to reflect the new state.
+
+Requirements:
+
+- Inspect the existing Chat microphone and speaker controls and their actual audio state logic.
+- Make each icon react immediately and correctly to its own real state.
+- Microphone OFF: show the existing muted/crossed-out microphone icon.
+- Microphone ON: show an unmistakably enabled microphone icon without the mute slash.
+- Speaker OFF: show the existing muted/crossed-out speaker icon.
+- Speaker ON: show an unmistakably enabled speaker icon without the mute slash.
+- Keep microphone and speaker states independent. Turning one on or off must not accidentally change the other.
+- Use the actual application state as the source of truth. Do not merely animate or swap icons optimistically while the underlying audio state remains unchanged.
+- Keep icons synchronized with successful audio-state changes, connection errors, permission failures, and any existing audio provider state.
+- If audio activation fails, the UI must not falsely display an enabled state.
+- Preserve the controls' current positions, dimensions, styling, and click behavior except where needed to fix this bug.
+
+Acceptance test: Tap the microphone OFF → ON → OFF and verify that its icon changes each time. Repeat for the speaker. Verify both combinations—mic ON/speaker OFF and mic OFF/speaker ON—work independently.
+
+Implementation and verification rules
+
+1. Inspect the actual components, state variables, and event handlers before changing code.
+2. Fix the root causes in the existing implementation.
+3. Preserve all other Chat functionality and the current theme.
+4. Run the available build and tests.
+5. Test the actual rendered controls at mobile and desktop sizes, not just the source code.
+6. Report the exact files changed and the tests performed.
+
+Do not repeatedly summarize the task. Do not claim either bug is fixed unless you have verified the corresponding behavior. If any test cannot be performed, state that limitation honestly.

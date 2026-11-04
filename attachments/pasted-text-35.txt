@@ -1,0 +1,120 @@
+Wedding Circle — Desktop Theme Consistency and Navigation Fix
+
+Work directly on the existing Wedding Circle project. Fix the actual implementation, not just the preview or CSS appearance. Focus especially on desktop and laptop layouts while preserving the working mobile experience.
+
+1. Fix theme application across the entire wedding
+
+Currently, changing a wedding theme does not consistently update all components. Some elements retain the original pink, brown, or default colors even when another theme, such as Sage Green, is selected.
+
+Audit the existing theme system and establish one consistent source of truth for the currently selected wedding theme.
+
+The selected theme must correctly style:
+
+- Wedding home page and couple-name card.
+- Next Ceremony card and all ceremony-related cards.
+- Chat navigation tab, chat icon, message composer, send button and other chat controls.
+- Live, Albums and More navigation tabs.
+- Host Control and its buttons, tiles and controls.
+- Page backgrounds, borders, cards, text, icons and interactive states.
+- Desktop-specific components and responsive layouts.
+
+Important: Do not hardcode one theme's colors into shared components. Read colors and design tokens from the selected theme. If Sage Green is active, the entire wedding interface should use a coordinated sage-green palette. Apply the equivalent coordinated palette for every existing theme.
+
+Preserve each theme's identity, including its intended background, text contrast, accent colors, borders and decorative artwork. Do not make all themes look identical.
+
+2. Fix the Chat and Live navigation buttons
+
+In the desktop screenshot, the Chat and Live buttons retain pink/purple backgrounds that do not match the selected theme.
+
+- Remove unintended hardcoded colors and stale default-theme styling.
+- Apply the selected theme's correct colors to the full button, icon, label, hover, focus, active and selected states.
+- Make the buttons visually consistent with Home, Albums and More.
+- Check for conflicting CSS selectors, inline styles, inherited styles and theme variables.
+- Ensure theme changes update these buttons immediately without requiring a page reload.
+
+Do not remove existing navigation behavior or functionality.
+
+3. Expand the Next Ceremony card vertically
+
+In the desktop layout, the Next Ceremony card beside the couple-name card has excessive empty space above and below its content.
+
+- Inspect the actual desktop grid, flex alignment, card height, padding and content layout.
+- Make the ceremony card use its available vertical space more effectively.
+- Vertically distribute its content in a balanced, intentional way.
+- Align its overall height with the couple-name card where appropriate, without stretching individual text elements unnaturally.
+- Use responsive sizing so the layout remains balanced at different laptop and desktop widths.
+- Preserve the ceremony title, date, location, description and Directions action.
+- Apply the active wedding theme to the entire ceremony card, including its background, border, typography, buttons and decorative details.
+
+Avoid arbitrary fixed heights that cause overflow on smaller screens or with longer ceremony names and descriptions.
+
+4. Apply themes to all ceremony sections
+
+Theme styling must apply to every ceremony card, the Next Ceremony preview, ceremony lists and ceremony details on both desktop and mobile.
+
+Audit for components that use default colors instead of the active theme. Replace those defaults with the correct theme tokens while preserving the existing ceremony data and interactions.
+
+When a theme changes, ceremony cards must update immediately and consistently. Do not modify ceremony dates, records or content as part of this visual fix.
+
+5. Move the app icon into the navigation bar
+
+On desktop, the circular app icon currently appears in a separate top-left area, creating unnecessary vertical space above the main navigation.
+
+Change the desktop layout so that:
+
+- The separate top-left app-icon bar is hidden in its normal, closed state.
+- The app icon is positioned neatly beside the Home item in the main navigation bar.
+- The navigation remains aligned and proportionate at desktop and laptop widths.
+- The icon does not overlap Home or cause the navigation items to shift incorrectly.
+- Existing mobile navigation behavior remains intact unless a specific responsive adjustment is needed.
+
+6. Make the app icon an expandable options menu
+
+The app icon currently provides access to options that are hidden inside it. Preserve and improve this behavior.
+
+- When the user clicks or taps the app icon, reveal the existing options menu or app bar.
+- When the menu is open, display the existing options clearly and make them accessible.
+- Allow the user to close the menu by clicking the icon again, selecting an option, or using an appropriate outside-click or Escape-key interaction.
+- Keep the menu accessible by keyboard and provide suitable focus states and ARIA attributes.
+- Prevent the menu from being clipped by navigation containers or appearing behind other interface elements.
+- Preserve all existing options and their actions. Do not delete or replace them with a new, incomplete menu.
+- Ensure the menu works on desktop, mobile and touch devices.
+
+The top bar should remain hidden in its normal state and appear only when the user opens the app-icon menu.
+
+7. Prevent wedding themes from affecting the app icon and global menu
+
+Currently, applying a wedding theme also changes the app icon and its surrounding global interface. This must stop.
+
+Separate the wedding theme scope from the global application UI scope.
+
+- Wedding themes may affect the current wedding's pages, cards, ceremonies, Chat, Live, Albums, More and wedding-specific controls.
+- Wedding themes must not change the app icon's appearance, global app menu, global navigation branding or other application-level elements outside the wedding.
+- Keep the app icon and global menu visually consistent with the application's own design system, regardless of which wedding theme is selected.
+- Scope theme CSS variables and selectors to the wedding content container rather than the entire document or root application.
+- Remove any accidental theme-variable inheritance or broad selectors that cause global elements to change.
+- Do not break the ability to open the app menu or access its options.
+
+8. Technical audit and implementation requirements
+
+Before changing code, inspect the existing theme registry, theme context or state, CSS variables, desktop layout components, navigation components, ceremony cards and app-icon menu.
+
+Identify the exact source of the inconsistencies. Avoid stacking more CSS overrides on top of conflicting rules when the underlying component or theme-token mapping needs correction.
+
+Implement the smallest maintainable set of changes that fixes the shared cause across all themes.
+
+Verify that:
+
+- All existing themes still work.
+- Sage Green and other non-pink themes correctly style Chat, Live and ceremony cards.
+- Changing themes updates all wedding-specific components immediately.
+- The global app icon and menu remain unchanged by wedding theme selection.
+- The desktop navigation has no unnecessary separate icon bar.
+- The app-icon menu opens and closes correctly.
+- The Next Ceremony card uses its available space effectively.
+- Mobile layouts, navigation, ceremony content and interactions remain functional.
+- No unrelated features, data, access controls or wedding records are changed.
+
+Run the available type checks, tests and production build. Fix any regressions introduced by the changes.
+
+At completion, report the files changed, the root causes found, the checks performed and any remaining issues. Do not claim that desktop or mobile behavior was verified unless it was actually tested.

@@ -1,0 +1,491 @@
+PROJECT: THE WEDDING CIRCLE
+UPDATE: SIMPLIFY WEDDING CREATION, IMPROVE PAGE NAVIGATION, UPDATE THE CIRCLE PREVIEW, AND INTRODUCE FREE AND ₹499 PLANS.
+
+IMPORTANT IMPLEMENTATION RULES:
+
+Inspect the existing project and wedding creation flow before modifying anything.
+
+The current wedding creation process has six information pages, followed by a Circle preview and a payment/plan selection page.
+
+Implement the requested changes in the existing application.
+
+Do not rebuild the wedding creation system from scratch.
+
+Preserve existing wedding data models, form validation, uploaded files, authentication, wedding codes, membership, permissions, themes, backend integrations, and payment infrastructure.
+
+Make the smallest safe changes necessary.
+
+Do not remove existing form fields simply because a page is being removed. Relocate any required fields to appropriate remaining pages when necessary.
+
+Do not use mock data or fake successful payments.
+
+==================================================
+PHASE 1 — REDUCE WEDDING CREATION FROM SIX PAGES TO FIVE
+==================================================
+
+Currently, creating a wedding requires users to complete six information pages.
+
+Reduce this to FIVE information pages by removing the existing fourth page from the creation flow.
+
+IMPORTANT:
+First inspect all six pages and determine what information each page collects.
+
+The user specifically wants the CURRENT FOURTH PAGE removed because it is not compulsory for creating a wedding.
+
+Do not guess which page this is. Identify the actual fourth page in the existing implementation.
+
+Remove that page from the wedding creation sequence.
+
+Before removing it:
+- Determine whether any fields on that page are required by the backend.
+- Determine whether any existing creation, preview, payment, or wedding initialization logic depends on its data.
+- Preserve any essential information by relocating the relevant fields to an appropriate remaining page, if necessary.
+- Do not make optional information mandatory.
+- Do not silently discard existing user-entered data when navigating between pages.
+
+The result must be five information pages rather than six.
+
+Update the page numbering, progress indicators, navigation logic, validation, and final submission logic to match the new five-page flow.
+
+There must be no empty page, broken route, or reference to the removed page in the normal creation sequence.
+
+Do not remove unrelated features or data from the wedding system.
+
+==================================================
+PHASE 2 — ADD A NEXT BUTTON TO EVERY INFORMATION PAGE
+==================================================
+
+Every information page in the new five-page flow must have a clearly visible NEXT button at the bottom.
+
+Requirements:
+- Page 1: Next.
+- Page 2: Next.
+- Page 3: Next.
+- Page 4: Next.
+- Page 5: Next, where the existing flow requires the user to advance to the Circle preview.
+
+Place the button near the bottom of each page, following the existing design language.
+
+The button must be easy to tap on a phone screen.
+
+Ensure it does not overlap form fields, the keyboard, or Android navigation areas.
+
+Use consistent styling, spacing, and button dimensions across all five pages.
+
+NAVIGATION BEHAVIOUR:
+
+1. Tapping Next validates the current page.
+2. If required information is missing or invalid, display the appropriate validation message.
+3. If the page is valid, save or preserve the entered information and advance to the next page.
+4. Previously entered information must remain available when the user navigates backward.
+5. Moving between pages must not create duplicate weddings.
+6. Advancing must not trigger payment or finalize the wedding prematurely.
+7. The final information page must advance to the Circle preview, not accidentally skip the preview or payment selection.
+
+Preserve any existing Back button.
+
+If a page has optional fields, the user must be able to proceed without filling them unless existing business rules genuinely require otherwise.
+
+Do not introduce unnecessary validation rules.
+
+==================================================
+PHASE 3 — CHANGE THE BUTTON ON PAGE 2
+==================================================
+
+On the existing second information page, change the button currently labelled "Suggestion" to:
+
+"Next"
+
+Requirements:
+- Preserve the page's existing fields and layout.
+- Do not remove any suggestion functionality that is still needed elsewhere.
+- If the old Suggestion button opens a separate feature, inspect its implementation before changing the button.
+- The button in this location must advance the user to the third information page.
+- It must perform the appropriate validation and preserve entered information.
+
+Do not create a second competing Next button on the same page.
+
+There should be one clear primary navigation action.
+
+==================================================
+PHASE 4 — CHANGE THE BUTTON ON PAGE 3
+==================================================
+
+On the existing third information page, change the button currently labelled "Cover" to:
+
+"Next"
+
+Requirements:
+- Preserve any existing cover-image upload field or cover-related functionality on the page if it is otherwise part of the form.
+- Changing the button label must not delete uploaded images or change existing form fields.
+- The button must advance to the next remaining information page after successful validation.
+- Preserve all previously entered information.
+- Do not make uploading a cover image mandatory unless the existing product rules already require it.
+
+The button's purpose is navigation, not automatically assigning a cover image.
+
+==================================================
+PHASE 5 — REMOVE THE OLD FOURTH INFORMATION PAGE
+==================================================
+
+Remove the current fourth information page from the normal wedding creation sequence.
+
+After the change, the flow must contain exactly five information pages.
+
+Requirements:
+- Update the sequence and page indices.
+- Update progress indicators to show five pages rather than six.
+- Update Next and Back navigation.
+- Update page validation and submission logic.
+- Update any state machine or routing logic that references the old fourth page.
+- Update any tests that assume there are six information pages.
+- Preserve the functionality of the other five information pages.
+
+Do not delete unrelated shared components simply because the fourth page is no longer used in the creation flow.
+
+Do not allow users to reach the removed page through stale navigation state.
+
+If another unrelated feature legitimately uses a component from the removed page, preserve that component.
+
+==================================================
+PHASE 6 — CIRCLE PREVIEW: DO NOT ASSIGN AN AUTOMATIC COVER PHOTO
+==================================================
+
+After the user completes the five information pages, show the existing Circle preview step.
+
+Update the preview so a newly created wedding does not automatically receive an arbitrary or default cover photo merely because the preview is being displayed.
+
+Instead, show the Circle preview animation.
+
+PREVIEW REQUIREMENTS:
+
+- Show the existing Circle preview animation or an appropriate animation already available in the project.
+- Do not automatically generate a cover photo.
+- Do not automatically select an unrelated stock image.
+- Do not assign a random image from the asset library.
+- Do not insert a generic image into the wedding's saved cover-image field.
+- Do not treat the preview animation as a saved cover photo.
+- Do not upload the animation to the wedding's cover-image storage.
+- Do not overwrite an image the user explicitly uploaded or selected.
+
+If the user has not provided a cover image, the preview must show the animation rather than inventing a cover photo.
+
+If the user has explicitly uploaded or selected a cover image during the creation process, preserve that selection in the form data. Do not discard the user's choice.
+
+The distinction is:
+- No user-selected cover image: show the Circle animation in the preview.
+- User-selected cover image: preserve the selection and respect the existing intended display behaviour.
+
+The animation must not permanently replace or populate the wedding's cover-image field.
+
+The preview should use the information already entered by the user, including the wedding name and other available details.
+
+Keep the preview responsive on mobile screens.
+
+Preserve existing animation performance and accessibility.
+
+Do not skip the preview step.
+
+The user must be able to continue from the preview to the plan-selection/payment page using the existing navigation flow.
+
+==================================================
+PHASE 7 — INTRODUCE TWO WEDDING CREATION PLANS
+==================================================
+
+After the Circle preview, display a plan-selection page with TWO clearly differentiated plans.
+
+PLAN A: FREE
+
+Price:
+₹0
+
+Included features:
+
+1. Up to 2 GB of cloud storage for the wedding.
+2. Only ONE live stream can be played at a time.
+3. Only Classic Default, the existing default wedding theme, can be used.
+4. Access to the existing basic wedding functionality that is available on the free plan.
+
+Do not imply that multiple live streams can play simultaneously on the Free plan.
+
+The limitation concerns simultaneous live-stream playback, not necessarily how many live streams can be created or scheduled. Inspect the existing live-stream architecture and implement the restriction accordingly.
+
+Do not disable unrelated free functionality unless it is explicitly restricted by the plan.
+
+PLAN B: PREMIUM
+
+Price:
+₹499
+
+Included features:
+- All supported wedding themes.
+- Multiple live-stream playback, including the existing functionality for opening independent live streams together, where supported by the application.
+- The full set of existing premium wedding features.
+- Premium features already implemented in the project.
+- The existing premium storage and customization capabilities, subject to the product's actual implementation.
+
+IMPORTANT:
+Do not invent features that do not exist.
+
+Inspect the current application to identify the features that are already considered premium.
+
+Preserve those features and make the plan page accurately reflect them.
+
+Do not advertise unlimited storage or any specific storage capacity for the premium plan unless that capacity is already defined by the product.
+
+PRICING PRESENTATION:
+
+Display the two plans clearly, preferably as two distinct cards.
+
+The Free card must show:
+- FREE.
+- ₹0.
+- 2 GB cloud storage.
+- One live stream playable at a time.
+- Classic Default theme only.
+
+The Premium card must show:
+- PREMIUM.
+- ₹499.
+- All supported themes.
+- Multiple simultaneous live-stream playback, where supported.
+- Existing premium functionality.
+
+Make the differences between the two plans easy to understand before the user continues.
+
+Do not hide the Free option or make users purchase Premium to create a basic wedding.
+
+Do not add misleading countdowns, fake discounts, or fabricated popularity indicators.
+
+BILLING CLARIFICATION:
+
+Inspect the existing payment integration to determine whether ₹499 represents a one-time payment, a recurring subscription, or another existing billing model.
+
+Preserve the established payment model unless the current implementation explicitly requires a change.
+
+Label the price accurately so users understand what they will pay.
+
+Do not invent a recurring billing period or claim that the plan is lifetime access without confirmation from the existing product requirements.
+
+Do not process any payment merely because the user reaches the plan-selection page.
+
+==================================================
+PHASE 8 — FREE AND PREMIUM ENTITLEMENTS
+==================================================
+
+The plan-selection page must connect to the application's actual entitlement system.
+
+Do not implement restrictions solely by hiding buttons in the frontend.
+
+FREE PLAN:
+
+A user who selects Free must receive:
+- The existing default Classic Default theme.
+- A maximum of 2 GB of cloud storage for the wedding.
+- At most one live stream playing at a time.
+
+Enforce the 2 GB storage limit through the appropriate trusted backend or storage-validation mechanism where supported.
+
+Enforce the one-live-stream playback limit through the existing live-stream playback architecture.
+
+Do not accidentally prevent a user from creating or joining a wedding simply because the plan is Free.
+
+If a user reaches the storage limit:
+- Prevent additional uploads that would exceed the limit.
+- Preserve existing files.
+- Display a clear explanation.
+- Offer the existing Premium upgrade path if appropriate.
+
+Do not delete existing files automatically.
+
+If a Free user attempts to play another live stream while one is already playing:
+- Follow the existing live-stream interface patterns.
+- Explain that only one live stream can be played at a time on Free.
+- Offer the appropriate Premium upgrade option.
+- Avoid silently interrupting playback or losing the current stream.
+
+THEME RESTRICTION:
+
+Free weddings must use Classic Default as their available theme.
+
+Do not delete or overwrite existing theme data.
+
+Do not silently reset a paid wedding's theme when a user navigates between weddings.
+
+Premium weddings should be able to use the supported themes according to the existing authorization and theme-persistence system.
+
+Apply plan restrictions at the correct wedding/account level based on the existing product architecture.
+
+Do not assume that a user's personal Premium status automatically changes every wedding they can access unless that is how the existing product is designed.
+
+==================================================
+PHASE 9 — PAYMENT AND PLAN SELECTION FLOW
+==================================================
+
+Implement the following sequence:
+
+1. User completes information page 1.
+2. User taps Next.
+3. User completes information page 2.
+4. User taps Next.
+5. User completes information page 3.
+6. User taps Next.
+7. User completes information page 4.
+8. User taps Next.
+9. User completes information page 5.
+10. User taps Next.
+11. Circle preview appears with the required animation and no automatically assigned cover photo.
+12. User continues to the plan-selection page.
+13. User chooses Free or Premium.
+14. If Free is selected, use the existing free-plan activation flow.
+15. If Premium is selected, proceed through the existing legitimate payment process.
+16. Activate Premium only after payment has been verified successfully.
+
+The Free option must not open a paid checkout unless the existing business rules explicitly require one.
+
+The Premium option must not grant paid entitlements before successful payment verification.
+
+If payment fails or is cancelled:
+- Do not mark the wedding as Premium.
+- Preserve the entered wedding information.
+- Allow the user to retry or return to plan selection.
+- Avoid creating duplicate weddings on retry.
+- Display accurate status messages.
+
+Do not fake payment success.
+
+Do not replace the existing payment provider or backend billing architecture unnecessarily.
+
+==================================================
+PHASE 10 — PRESERVE WEDDING DATA AND DRAFT STATE
+==================================================
+
+Wedding creation must remain reliable throughout the five information pages, preview, and plan selection.
+
+Requirements:
+- Preserve information when moving between pages.
+- Preserve selected wedding details and any user-uploaded files.
+- Preserve the selected theme where appropriate.
+- Do not create duplicate wedding records while navigating.
+- Do not permanently finalize the wedding before the appropriate step in the existing creation architecture.
+- Recover gracefully if the user refreshes or temporarily loses connectivity, where supported.
+- Ensure the preview uses the current draft rather than stale data.
+- Ensure the final wedding record reflects the user's actual selections.
+- Preserve existing wedding codes, membership, access control, and backend relationships.
+
+If the current application creates a draft record early in the flow, preserve that architecture rather than introducing a second draft system.
+
+If the user cancels creation, follow the existing draft-cleanup policy.
+
+Do not delete unrelated drafts or existing weddings.
+
+==================================================
+PHASE 11 — USER INTERFACE AND MOBILE BEHAVIOUR
+==================================================
+
+The updated creation flow must work on phone-sized screens.
+
+Requirements:
+- All five information pages fit the existing responsive layout.
+- The Next button remains accessible at the bottom.
+- The Android keyboard must not cover the active input or navigation button.
+- Long forms must scroll correctly.
+- Back and Next navigation must work consistently.
+- Progress indicators must show the correct position out of five.
+- The Circle preview animation must not cause layout shifts.
+- The plan-selection cards must remain readable on narrow screens.
+- Prices and restrictions must be clearly legible.
+- The page must not overflow horizontally.
+- Preserve existing design language and animations wherever possible.
+
+Do not introduce a completely new visual design unless required to make the new flow consistent with the current app.
+
+==================================================
+PHASE 12 — TESTING
+==================================================
+
+Test the actual implementation.
+
+WEDDING CREATION:
+1. The creation flow contains exactly five information pages.
+2. The former fourth page no longer appears in the sequence.
+3. Every remaining page has a working Next button.
+4. Page 2's Suggestion button has been changed to Next.
+5. Page 3's Cover button has been changed to Next.
+6. Page 1 validation works.
+7. Page 2 validation works.
+8. Page 3 validation works.
+9. Page 4 validation works.
+10. Page 5 validation works.
+11. Back navigation preserves entered information.
+12. No duplicate wedding is created when moving between pages.
+13. Page numbering and progress indicators show five pages.
+
+CIRCLE PREVIEW:
+14. The preview appears after the fifth information page.
+15. The preview shows the Circle animation when no cover image was selected.
+16. No random or default cover photo is automatically assigned.
+17. The animation does not overwrite the cover-image field.
+18. A user-selected cover image is preserved.
+19. The preview uses the latest entered wedding details.
+20. The user can proceed from preview to plan selection.
+
+PLAN SELECTION:
+21. Both Free and Premium plans are displayed.
+22. Free shows ₹0 and 2 GB storage.
+23. Free shows the one-live-stream-at-a-time restriction.
+24. Free shows Classic Default as its available theme.
+25. Premium shows ₹499 with accurately described existing premium features.
+26. The billing model is labelled accurately.
+27. Selecting Free activates the correct free entitlements.
+28. Selecting Premium uses the existing payment flow.
+29. Failed or cancelled payments do not activate Premium.
+30. Successful payment verification activates Premium.
+31. Storage restrictions are enforced by the actual storage architecture.
+32. Live-stream playback restrictions are enforced correctly.
+33. Theme restrictions do not accidentally overwrite unrelated weddings' saved themes.
+
+REGRESSION:
+34. Existing authentication continues working.
+35. Wedding codes and invitations continue working.
+36. Wedding membership and permissions remain intact.
+37. Existing themes and theme persistence remain intact.
+38. Pinned wedding functionality remains intact.
+39. Chat, Live, Feed, and Album remain functional.
+40. Existing developer and host controls remain accessible to the correct roles.
+
+Do not claim a scenario passed unless it was actually exercised.
+
+Clearly distinguish:
+- Code inspection.
+- Automated tests.
+- Rendered UI/browser tests.
+- Backend/payment integration tests.
+- Physical-device tests.
+
+If payment-provider credentials or test environments are unavailable, state that payment processing could not be fully verified.
+
+==================================================
+PHASE 13 — FINAL REPORT
+==================================================
+
+After implementation, provide a concise report containing:
+
+1. The original six-page flow and the resulting five-page flow.
+2. Which page was removed.
+3. The navigation changes made to the remaining pages.
+4. The Circle preview changes.
+5. Confirmation that no automatic cover photo is assigned when the user has not selected one.
+6. The Free plan's exact restrictions.
+7. The Premium plan's included existing features.
+8. How the storage and live-stream restrictions are enforced.
+9. How the payment flow was integrated.
+10. Files and components changed.
+11. Tests actually completed.
+12. Remaining limitations or unverified areas.
+
+IMPLEMENT THE CHANGES DIRECTLY IN THE EXISTING PROJECT.
+
+Do not merely provide a plan or pseudocode.
+
+Inspect first, make targeted changes, preserve existing functionality, and report honestly what was implemented and tested.

@@ -1,0 +1,443 @@
+Upgrade The Wedding Circle from the current landing-page/demo into a complete functional wedding platform.
+
+Keep the existing branding, name, overall visual identity, and ₹499 pricing concept, but build the following features into the app.
+
+1. CREATE WEDDING CIRCLE
+
+Add a prominent “Create Wedding Circle” button.
+
+The creation flow should collect:
+
+- Bride name
+- Groom name
+- Wedding date
+- Wedding city/venue
+- Wedding type
+- Religion
+- Region/state
+- Culture/community
+- Wedding description
+- Wedding photo/cover
+- Contact details
+
+Allow users to choose:
+
+Religion
+
+- Sikh
+- Hindu
+- Muslim
+- Christian
+- Jain
+- Buddhist
+- Other
+
+Region/Culture
+
+Include Indian regional/cultural options such as:
+
+- Punjabi
+- North Indian
+- South Indian
+- Gujarati
+- Rajasthani
+- Bengali
+- Marathi
+- Kashmiri
+- Tamil
+- Telugu
+- Malayalam
+- Kannada
+- Assamese
+- Other
+
+Allow combinations such as Sikh + Punjabi or Hindu + Punjabi.
+
+2. WEDDING FUNCTIONS
+
+During creation, let the couple select existing functions or create custom ones.
+
+Examples:
+
+- Engagement
+- Roka
+- Mehndi
+- Haldi
+- Sangeet
+- Jaggo
+- Wedding / Anand Karaj
+- Baraat
+- Reception
+- Vidaai
+- Custom Function
+
+Each function should have:
+
+- Date
+- Time
+- Venue
+- Description
+- Photos
+- Guest access
+- Function-specific feed
+
+The available functions should adapt to the selected religion/region/culture.
+
+3. ₹499 PAYMENT
+
+Creating a Wedding Circle costs ₹499.
+
+Flow:
+
+Create Wedding → Enter Details → Preview → Pay ₹499 → Wedding Circle Created
+
+Guests should join for free.
+
+Do not charge guests.
+
+For now, create the payment UI and architecture so a real payment provider can be connected later. Clearly show payment status and successful/failed payment states.
+
+4. WEDDING DASHBOARD
+
+After creation, create a beautiful private dashboard containing:
+
+- Couple profile
+- Wedding countdown
+- Wedding date
+- Venue
+- Upcoming functions
+- Guest count
+- RSVP status
+- Wedding feed
+- Family threads
+- Photos/videos
+- Live ceremony
+- Vendors
+- Wedding planner/contact section
+
+Make the dashboard feel like the central digital home of the entire wedding.
+
+5. INVITATION SYSTEM
+
+Give every Wedding Circle a unique private invitation link.
+
+Example:
+
+"theweddingcircle.com/w/harman-simran"
+
+Also generate a QR code for the invitation.
+
+Guests should be able to:
+
+- Open invitation
+- Enter their name
+- RSVP
+- Select relationship/family
+- Join the Wedding Circle
+
+The couple/admin should be able to see:
+
+- Invited
+- Accepted
+- Maybe
+- Declined
+- Not responded
+
+6. FAMILY THREADS
+
+Create private family/community groups.
+
+Examples:
+
+- Bride's Family
+- Groom's Family
+- Friends
+- College Friends
+- Cousins
+- Wedding Planning
+- Custom Group
+
+Admins can create, rename and delete groups.
+
+Groups should support:
+
+- Text posts
+- Photos
+- Videos
+- Replies
+- Reactions
+
+7. WEDDING FEED
+
+Create a private wedding social feed.
+
+Members can post:
+
+- Text
+- Photos
+- Videos
+
+Add:
+
+- Likes/reactions
+- Comments
+- Replies
+- Delete own post
+- Admin moderation
+
+Only members of that Wedding Circle can see its content.
+
+8. LIVE CEREMONY
+
+Create a dedicated Live Ceremony section.
+
+It should support a future live-stream/video integration.
+
+For now include:
+
+- Live status
+- Scheduled start time
+- Countdown
+- “Watch Live” area
+- Live chat
+- Viewer count
+
+If no stream is active, show the next scheduled ceremony.
+
+9. WEDDING PLANNERS & VENDORS
+
+Add a Wedding Services section.
+
+Categories:
+
+- Wedding planners
+- Venues
+- Photographers
+- Videographers
+- Caterers
+- Decorators
+- Makeup artists
+- Mehndi artists
+- DJs/music
+- Invitation designers
+- Bridal/groom clothing
+- Jewellery
+- Transportation
+
+Add a dedicated “Contact Wedding Planner” option.
+
+Allow vendors/planners to eventually have profiles with:
+
+- Name
+- Location
+- Services
+- Photos
+- Description
+- Contact
+- Pricing/range
+- Reviews
+
+10. CULTURE-SPECIFIC WEDDING EXPERIENCE
+
+Based on religion + region + culture, automatically suggest relevant:
+
+- Functions
+- Traditions
+- Ceremony names
+- Typical wedding sequence
+- Useful planning checklist
+
+Do not force these suggestions; users should be able to add/remove/customize everything.
+
+11. WEDDING CHECKLIST
+
+Add a planning checklist.
+
+Categories:
+
+- Venue
+- Invitations
+- Catering
+- Clothing
+- Jewellery
+- Photography
+- Decoration
+- Music
+- Transportation
+- Accommodation
+- Ceremony arrangements
+
+Allow users to:
+
+- Add tasks
+- Mark complete
+- Set deadlines
+- Assign tasks
+- Add custom tasks
+
+12. PHOTO & VIDEO ALBUM
+
+Create a private wedding album.
+
+Automatically organize media by:
+
+- Function
+- Date
+- Family/group
+
+Example:
+
+Mehndi → Photos
+
+Haldi → Photos
+
+Wedding → Photos
+
+Reception → Photos
+
+Members can upload media according to their permissions.
+
+13. AFTER-WEDDING MODE
+
+After the wedding date passes, automatically transition the Circle into After-Wedding Mode.
+
+Show:
+
+- Complete wedding album
+- Photos by function
+- Videos
+- Wedding memories
+- Guest contributions
+- Final wedding timeline
+
+Keep the Wedding Circle accessible to members.
+
+14. PRIVACY & ADMIN CONTROLS
+
+The Wedding Circle must be private by default.
+
+Add:
+
+- Admin role
+- Remove guest
+- Block user
+- Delete post
+- Delete media
+- Approve/restrict members
+- Control who can post
+- Control who can upload
+- Control who can access specific family groups
+
+Never make private wedding content publicly searchable.
+
+15. NOTIFICATIONS
+
+Add notification architecture for:
+
+- New invitation
+- RSVP
+- New family message
+- New comment
+- New reaction
+- New wedding announcement
+- Upcoming function
+- Live ceremony starting
+- New photo/video
+
+16. USER ACCOUNT
+
+Add:
+
+- Sign up
+- Login
+- Profile
+- My Weddings
+- Joined Weddings
+- Notifications
+- Settings
+- Logout
+
+A user can eventually manage multiple Wedding Circles.
+
+17. ADMIN PANEL
+
+Create an admin area for the platform owner.
+
+Include:
+
+- Total weddings
+- Active weddings
+- Completed weddings
+- Revenue
+- Users
+- Payments
+- Reported content
+- Vendor accounts
+- Wedding Circle management
+
+Include basic search/filtering.
+
+18. MOBILE-FIRST DESIGN
+
+The entire application must be optimized for mobile because most users will access it through phones.
+
+Use:
+
+- Bottom navigation
+- Large touch targets
+- Fast loading
+- Clean cards
+- Modern typography
+- Elegant wedding aesthetic
+
+Keep the interface modern rather than overly traditional.
+
+19. IMPORTANT PRODUCT STRUCTURE
+
+The main user journey should become:
+
+Landing Page
+↓
+Create Wedding Circle
+↓
+Wedding Details
+↓
+Religion / Region / Culture
+↓
+Select Functions
+↓
+Preview Wedding
+↓
+Pay ₹499
+↓
+Wedding Circle Created
+↓
+Wedding Dashboard
+↓
+Invite Guests
+↓
+Plan Wedding
+↓
+Share Updates
+↓
+Live Ceremony
+↓
+Wedding Album
+↓
+After-Wedding Memories
+
+20. IMPORTANT
+
+Do not remove the existing landing page or existing features.
+
+Build these features into the existing project and maintain the current branding.
+
+Where a backend/payment/live-stream service is not yet connected, create the complete frontend flow and clean integration points so those services can be connected later.
+
+Use realistic demo data where necessary so every screen can be previewed.
+
+Make the application feel like a real product, not a collection of static demo pages.
+
+The core idea should remain:
+
+“One private circle for the entire wedding.”

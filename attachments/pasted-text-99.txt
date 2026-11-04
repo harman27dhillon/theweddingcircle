@@ -1,0 +1,48 @@
+We have inspected parts of the current source code and identified several potential problems. I want you to investigate all of them against the actual implementation before making changes.
+
+1. Firebase project mismatch diagnostic — confirmed false positive
+Firebase Console shows the same project number, "637941576967", as the API key. The saved project ID is "the-wedding-circle-b31b6". These identifiers represent the same project.
+
+- Find the code responsible for reporting the project mismatch.
+- Check whether it incorrectly compares the API key's project number against the Firebase project ID.
+- Correct the verification to compare compatible identifiers.
+- Do not change any Firebase credentials.
+
+2. Environment-locked configuration fields
+The Infrastructure form disables fields when values exist in server environment variables but not in the encrypted vault.
+
+- Inspect "src/lib/infra/config.ts" and the Infrastructure form component.
+- The backend merge logic appears to support replacing environment-only values, but the disabled UI may prevent users from entering replacements.
+- Fix this safely without exposing secrets or weakening security.
+
+3. Firebase vault versus process.env inconsistency
+Our inspection suggests "resolvedEnv()" merges encrypted vault values with server environment values, but "firebase-identity.server.ts" and "firebase-storage.server.ts" may read directly from "process.env".
+
+- Verify this.
+- Ensure Firebase server-side operations use the correct resolved configuration.
+- Preserve server-only handling of service-account credentials.
+
+4. Firebase test diagnostics
+The current test reports that Email/Password has not been read yet because the initial API-key/project check fails.
+
+- Confirm the exact test sequence.
+- Improve error reporting so genuine Google API failures are distinguishable from internal validation errors.
+- Do not claim Email/Password is disabled unless it has actually been checked.
+
+5. Cloudflare Stream
+Inspect the Stream configuration and test implementation.
+
+- Verify the provider selection, account ID, token permissions, and API request.
+- Confirm whether the Stream test is actually reaching Cloudflare.
+- Distinguish account-ID mismatch, insufficient token permissions, and invalid credentials.
+- Do not create a Live Input or change credentials.
+
+Important restrictions:
+
+- Do not regenerate, overwrite, or delete credentials.
+- Do not change Supabase wedding membership or existing authentication behavior.
+- Do not modify Cloudflare R2 storage or the media gateway.
+- Do not deploy anything.
+- Do not report an issue as fixed without implementing and testing it.
+
+First provide a precise audit identifying which of these issues are confirmed, which are false positives, and which require live credential testing. Include exact file names and relevant code locations. Then propose the smallest safe fixes. Wait for approval before implementing.

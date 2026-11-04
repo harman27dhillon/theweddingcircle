@@ -1,0 +1,242 @@
+Wedding Circle — Fix Mobile White Screen + Landing Background Controls + Classic Theme Maker
+
+Modify my existing Wedding Circle project directly. Do not rebuild the app from scratch. Inspect the current code and identify the actual causes before changing anything.
+
+Priority order:
+
+1. Fix the mobile white screen immediately.
+2. Move and repurpose the Background feature for the mobile landing page only.
+3. Build a complete Classic Theme Maker inside Developer options.
+
+Preserve existing wedding data, authentication, permissions, themes, wedding-bar customization, desktop layout, and working features.
+
+1. CRITICAL: Fix the Mobile White Screen
+
+After the latest update, the website opens on mobile but displays a completely blank white screen.
+
+Before implementing new features, investigate and fix this issue.
+
+Inspect:
+
+- JavaScript runtime exceptions and React rendering errors.
+- Recent changes to mobile-specific components, CSS, and responsive breakpoints.
+- Invalid imports, missing exports, dependency errors, and build failures.
+- Components that render differently on mobile.
+- Theme initialization and background-image loading.
+- Authentication, API requests, and database initialization that might block the first render.
+- CSS rules that accidentally hide the main application or place a white overlay over it.
+- Browser console errors, failed network requests, and mobile viewport-specific layout problems.
+
+Requirements:
+
+- Find the actual root cause; do not simply hide the error or add a forced reload.
+- Ensure the landing page renders even if an optional image, theme asset, or noncritical API request fails.
+- Add an appropriate error boundary and a useful recovery screen if the app encounters an unexpected rendering error.
+- Keep loading states temporary and ensure loading failures cannot leave the user on a permanently blank screen.
+- Test the app at mobile viewport widths, including a narrow phone, and at desktop widths.
+- Run the production build and relevant tests.
+- Confirm that the landing page, wedding cards, navigation, authentication, and existing wedding features still work.
+
+Do not proceed on the assumption that the issue is fixed just because the project compiles. Verify the actual rendered page.
+
+2. Repurpose Background in Developer Options
+
+The existing Background button was moved from More into Developer options. Now change its purpose.
+
+This Background setting must control the mobile landing page background only. It must no longer be linked to individual weddings.
+
+Requirements:
+
+- Remove its connection to individual wedding IDs, wedding themes, wedding-card settings, and wedding-specific background records.
+- Do not change the background of an individual wedding when this setting is updated.
+- Keep the existing Developer section and its authorization protections.
+- Make the setting available for configuring the mobile version of the landing page.
+- Clearly label it Mobile Landing Page Background so its purpose is unmistakable.
+
+A. Choose a background from the phone gallery
+
+Inside this setting, provide a button such as Choose Photo from Gallery.
+
+When used on a phone:
+
+- Open the device's normal image picker using an appropriate browser-supported file input or the project's existing image-picker functionality.
+- Allow the user to select a photo from their gallery.
+- Display a preview before saving.
+- Provide Save, Cancel, and Reset to Default controls.
+- Apply the selected image to the mobile landing page background.
+- Preserve the existing landing-page content, navigation, buttons, wedding cards, and readability.
+- Support appropriate image sizing and positioning for different phone screens.
+- Prevent the image from stretching or distorting.
+- Provide a graceful fallback if the image fails to load.
+
+The image picker must work on mobile browsers. Do not assume that a desktop-only file path or native mobile API exists in the browser.
+
+B. Background behavior and persistence
+
+- Save the selected background persistently using the existing project architecture.
+- Make the background remain after refreshes and new sessions.
+- Use the existing storage system where possible.
+- If images are stored remotely, follow the project's current upload, security, and size-limit practices.
+- Do not store large image files as base64 strings in the database.
+- Do not introduce an unnecessary new paid storage service.
+- Provide appropriate image validation, upload progress, and error messages if uploading is required.
+
+C. Strict scope separation
+
+The Background setting must affect only the mobile landing page.
+
+- Do not modify individual wedding cover photos.
+- Do not modify the wedding-bar aspect ratio.
+- Do not modify the selected theme of any wedding.
+- Do not change the desktop landing-page background through this mobile-only setting.
+- Do not accidentally overwrite the background selected by the Classic Theme Maker described below.
+
+Keep the implementation separate from wedding-specific settings.
+
+3. Create a Classic Theme Maker Inside Developer Options
+
+Add a new Developer option named exactly Classic Theme Maker.
+
+This is a developer-only tool for creating and managing custom Classic themes for the existing Wedding Circle application.
+
+It must be a real, functional theme editor, not a mockup.
+
+A. Theme management
+
+Provide:
+
+- Create New Classic Theme.
+- Edit an existing custom Classic theme.
+- Preview changes before saving.
+- Save Theme.
+- Cancel Changes.
+- Duplicate Theme.
+- Reset to Default.
+- Delete custom themes with a confirmation step.
+
+Do not allow custom themes to overwrite built-in themes accidentally.
+
+Keep existing built-in themes, including Classic Default and Classic Ivory, intact. Do not automatically convert all existing themes into custom themes.
+
+Give each custom theme a name and a persistent unique identifier. Ensure the theme registry and existing theme-selection interface can recognize custom Classic themes.
+
+B. Color customization
+
+Allow the developer to configure colors using visual color pickers and, where useful, editable HEX values.
+
+Include separate controls for:
+
+- Main page background.
+- Secondary page or panel background.
+- Primary text.
+- Secondary text.
+- Primary buttons.
+- Secondary buttons.
+- Button text.
+- Borders and decorative accents.
+- Cards and tiles.
+- Chat bubbles and chat text.
+- Navigation bar.
+- Headings and labels.
+- Wedding-bar text and decorative elements.
+- Live and album interface accents.
+
+Use sensible defaults and maintain sufficient text contrast for readability.
+
+C. Background image customization
+
+Allow the developer to select and configure background images separately for:
+
+1. Desktop landing page
+2. Mobile landing page
+3. Desktop wedding card/bar
+4. Mobile wedding card/bar
+
+For each image slot, provide:
+
+- Choose image.
+- Preview image.
+- Replace image.
+- Remove image.
+- Reset to default.
+- Image positioning controls, such as center, top, bottom, left, and right.
+- Suitable fit options, such as cover and contain, where appropriate.
+
+Use the project's existing file upload and storage mechanisms. Validate image types and sizes, handle failed uploads, and show meaningful errors.
+
+Desktop and mobile artwork must be independently configurable. Changing the desktop image must not unintentionally replace the mobile image, or vice versa.
+
+D. Wedding card/bar image
+
+Allow the developer to configure the actual wedding card/bar artwork for both desktop and mobile.
+
+Requirements:
+
+- Use separate desktop and mobile image settings.
+- Preserve the existing card/bar layout, dimensions, aspect-ratio settings, couple names, date, location, buttons, and interactive elements.
+- Do not flatten the entire wedding card into one static image.
+- The selected artwork must function as the card's background while the existing text and controls remain independently rendered and interactive.
+- Respect the existing developer-controlled regular and pinned wedding-bar aspect ratios.
+- Do not override the host's separately selected wedding cover photo or the host/co-host's saved text positions unless explicitly requested.
+
+E. Live preview
+
+Build a live preview that updates as the developer changes colors and images.
+
+Include:
+
+- Desktop preview.
+- Mobile preview.
+- Landing-page preview.
+- Wedding-card/bar preview.
+
+Allow the developer to switch between these preview modes without losing unsaved changes.
+
+The preview must reflect the actual appearance of the application as closely as possible. It must not display controls that cannot be saved.
+
+F. Theme saving and application
+
+- Save custom Classic themes persistently using the existing backend and database architecture.
+- Ensure themes remain available after refreshes, new sessions, and deployments.
+- Add custom themes to the appropriate Classic Themes section.
+- Keep Preset Themes and Classic Themes separate.
+- Apply a selected custom theme consistently across supported application screens.
+- Ensure desktop and mobile theme assets are applied to the correct viewport.
+- Preserve existing theme effects, music mappings, and unrelated settings.
+- Do not make the mobile landing-page background editor a replacement for the Classic Theme Maker's theme-specific backgrounds.
+- Do not expose developer-only theme creation controls to ordinary users.
+
+If database schema changes are needed, implement them using the project's existing migration and validation practices. Do not rely solely on local component state for saved themes.
+
+4. Security and Reliability
+
+- Keep Developer access restricted to authorized developer accounts.
+- Enforce developer authorization on the server, not just by hiding the UI.
+- Validate all submitted colors, theme properties, image types, and image sizes.
+- Prevent invalid theme records from breaking the application.
+- Use safe defaults when a custom theme is missing, incomplete, or fails to load.
+- Do not remove existing authentication checks or loosen permissions.
+- Do not delete existing wedding records or user-uploaded images.
+- Avoid creating duplicate database tables, duplicate theme registries, or competing background systems.
+
+5. Required Testing Before Completion
+
+Verify each of the following:
+
+1. The mobile landing page no longer shows a blank white screen.
+2. The app renders correctly on mobile and desktop.
+3. The mobile landing-page background can be selected from the phone gallery.
+4. The background remains after refreshing the page.
+5. Changing the mobile landing-page background does not change any individual wedding.
+6. The desktop landing-page background remains unaffected by the mobile-only Background setting.
+7. The Classic Theme Maker can create, edit, preview, save, duplicate, and delete custom themes.
+8. Desktop and mobile colors and images can be configured independently.
+9. Custom Classic themes appear in the correct theme section and remain available after refresh.
+10. Existing themes and wedding-bar customization still work.
+11. Developer-only operations are rejected for unauthorized users at the API level.
+12. Missing images or malformed custom themes do not produce a blank screen.
+13. Type checks, relevant tests, and the production build pass.
+
+Finally, summarize the root cause of the mobile white screen, the files changed, the database changes made, and the tests actually performed. Clearly distinguish verified results from anything that remains untested.
+
+Important: Fix the white screen first and verify the application renders before implementing the two new features. Do not sacrifice the working desktop version to fix mobile.

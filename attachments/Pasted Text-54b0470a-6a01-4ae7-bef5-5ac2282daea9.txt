@@ -1,0 +1,164 @@
+Add a Developer Media Library / Cover Photo Management system to the wedding app.
+
+Goal
+
+The app currently contains preloaded wedding images that users can select as:
+
+- Wedding Circle cover photo
+- Wedding background
+- Invitation/background images
+- Other predefined visual assets
+
+I need the developer/admin to have full control over these built-in images.
+
+Developer/Admin controls
+
+Create a secure Developer Media Library accessible only to the authorized developer/admin account.
+
+The developer must be able to:
+
+1. View all existing built-in images
+   
+   - Show thumbnails.
+   - Show image name/ID.
+   - Show where the image is currently used.
+   - Clearly distinguish built-in/default images from user-uploaded images.
+
+2. Upload new images
+   
+   - Provide an "Upload Image" button.
+   - Allow selecting images directly from the device/gallery.
+   - Support JPG, JPEG, PNG and WebP.
+   - Show upload progress.
+   - Validate file type and reasonable file size.
+   - Automatically generate an optimized version suitable for the app.
+
+3. Replace an existing built-in image
+   
+   - Developer selects an existing image.
+   - Clicks "Replace".
+   - Selects a new image from the gallery/device.
+   - The new image becomes the replacement for that existing asset.
+   - Keep the same asset ID/reference where possible so existing wedding circles that use that asset do not break.
+
+4. Delete built-in images
+   
+   - Developer can permanently delete an existing built-in image.
+   - Require a confirmation before deletion.
+   - Before deleting, show how many places/wedding circles currently reference that image.
+   - If an image is currently being used, do NOT silently break existing wedding circles.
+   - Either:
+     - prevent deletion until references are handled, OR
+     - replace the deleted asset with a safe default image.
+
+5. Add new default images
+   
+   - Developer can upload completely new images.
+   - Give the image a name/category.
+   - It should then automatically appear in the appropriate image-selection library for users.
+
+6. Enable/disable images
+   
+   - Add an Active/Inactive switch.
+   - Inactive images should no longer appear as options for new users.
+   - Existing wedding circles using an inactive image should continue working.
+
+Important separation
+
+DO NOT give normal users developer permissions.
+
+Users may only:
+
+- Browse available default images.
+- Select an available image for their wedding circle.
+- Upload their own permitted wedding photos according to the existing app rules.
+
+Only the authenticated developer/admin can:
+
+- Upload default assets.
+- Replace default assets.
+- Delete default assets.
+- Disable/enable default assets.
+- Rename/categorize default assets.
+
+Backend requirements
+
+Do not store this management system only in frontend code.
+
+Create a proper persistent media/asset structure in the existing backend/storage system.
+
+Each default asset should have fields similar to:
+
+- assetId
+- name
+- category
+- storageUrl
+- thumbnailUrl
+- active
+- createdAt
+- updatedAt
+- createdBy
+- usage/reference information
+
+Make sure deleting or replacing an image does not accidentally delete user-uploaded wedding photos.
+
+Security
+
+Implement proper authentication and authorization.
+
+The developer/admin controls must not be accessible simply by:
+
+- changing a URL,
+- changing frontend JavaScript,
+- modifying local storage,
+- changing a browser request,
+- or manually calling a client-side function.
+
+All upload/delete/replace operations must be authorized by the backend/security rules.
+
+UI
+
+Create a simple Developer Media Library page:
+
+Developer Media Library
+
+[ Upload New Image ]
+
+Then show cards:
+
+[IMAGE]
+Name: Floral Gold
+Category: Wedding Covers
+Status: Active
+Used by: 12 circles
+
+[ Replace ] [ Disable ] [ Delete ]
+
+Also provide:
+
+- Search
+- Category filter
+- Active/Inactive filter
+- Preview
+- Upload new asset
+
+Existing images
+
+IMPORTANT: First detect and identify where the currently hard-coded/preloaded wedding images are stored in the existing app.
+
+Do not simply add another separate image system while leaving the current images disconnected.
+
+Migrate/connect the existing images to this media library so the developer can manage the images that are already appearing in the app.
+
+Do not remove any existing images during implementation.
+
+After implementation, verify that:
+
+1. Existing wedding circles still display their current images.
+2. Users can still select default images.
+3. Developer can upload a new image.
+4. Developer can replace an existing image.
+5. Developer can disable an image.
+6. Developer can delete an unused image.
+7. Unauthorized users cannot access developer controls.
+8. Existing user-uploaded photos are completely protected from developer default-asset deletion operations.

@@ -1,0 +1,35 @@
+Continue The Wedding Circle's Neon-to-Supabase migration work using the audit results. This is a preparation and remediation phase only. Do not perform a live cutover.
+
+STRICT SAFEGUARDS:
+
+- Keep Neon as the active production database.
+- Do not delete, reset, overwrite, or truncate existing data.
+- Do not change, remove, regenerate, or rename existing API keys, URLs, secrets, or environment variables.
+- Preserve all wedding records, memberships, access codes, invitations, couple access, chat messages, account sessions, permissions, and media references.
+- Keep photos and videos on the existing media storage system.
+- Do not redesign the UI or make unrelated changes.
+- Inspect existing code and schema before editing; make small, targeted changes.
+
+TASK 1 — FULL SCHEMA INVENTORY
+Inspect the complete codebase and identify every table, view, database function, relationship, and read/write path. Classify each by its current database and intended database. Include live-room state, live signaling, wedding data, chat, authentication, account sessions, and media metadata. Do not assume the five previously migrated tables are the entire schema.
+
+TASK 2 — COMPLETE THE MIGRATION PLAN
+For each table intended for Supabase, determine the required schema, constraints, indexes, foreign keys, and access policies. Generate additive, versioned SQL migrations for missing objects. Do not apply destructive migrations. Keep Neon as the source of truth until verification is complete.
+
+TASK 3 — DATA INTEGRITY
+Create a safe verification procedure that compares source and destination records for the five migrated tables. Compare primary keys and all relevant field values, including nulls and relationships—not just row counts. Use read-only queries where possible. If either database cannot be queried, clearly report NOT VERIFIED rather than claiming success.
+
+TASK 4 — SECURITY
+Review Supabase row-level security and policies for every table intended to be accessed by the app. Ensure public access is not granted accidentally. Verify that privileged database credentials remain server-side and are never exposed to browser code. Do not change existing secrets.
+
+TASK 5 — ROLLBACK DESIGN
+Design and implement, if safely possible, a migration state machine that prevents cutover until required checks pass. Address writes made after cutover: rollback must not silently lose or hide new wedding data. Propose a concrete strategy such as controlled write forwarding, a verified reverse-sync mechanism, or a maintenance/read-only window during rollback. Do not claim rollback is safe until the chosen strategy is implemented and tested.
+
+TASK 6 — FEATURE TESTS
+Prepare tests for sign-in, wedding creation, joining as guest or family, memberships, access codes, invitations, couple permissions, chat persistence, and media references. Keep account sign-in on Neon unless a separately reviewed migration plan explicitly changes it. Keep media bytes and existing media URLs on their current storage system.
+
+TASK 7 — SAFE EXECUTION
+Run only non-destructive inspections and tests in this phase. Do not copy more rows, alter production schema, enable Supabase routing, or switch live traffic without explicit approval.
+
+DELIVERABLE
+Report the exact files changed, missing schema objects, verified versus unverified data checks, test results, remaining blockers, and the precise safe next action. If any requirement cannot be completed without live database access or an external action, explain that limitation instead of simulating success.

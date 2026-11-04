@@ -1,0 +1,143 @@
+Update The Wedding Circle's existing theme system by adding FOUR new, complete classic themes based on the four newly uploaded images.
+
+This is a direct implementation task inside the existing Grok Build project. Inspect the current theme architecture and integrate the themes properly. Do not modify unrelated features.
+
+1. Classic Crimson Sunset
+
+Image: The first uploaded image featuring a dramatic crimson-red sunset, mountains, a glowing lake, and romantic heart-shaped floral islands.
+
+Color palette
+
+- Primary: Crimson rose "#B83E52"
+- Secondary: Sunset coral "#E66B70"
+- Accent: Warm gold "#E8BD78"
+- Background: Blush ivory "#FFF5F2"
+- Cards: Soft rose "#F9E5E5"
+- Primary text: Deep burgundy "#48242D"
+- Secondary text: Muted rose "#89636B"
+- Borders: Champagne rose "#DDB6A9"
+
+Use elegant crimson buttons, warm gold accents, and subtle rose-colored highlights. Keep the overall design romantic and refined, not excessively red.
+
+2. Classic Marigold Palace
+
+Image: The second uploaded image featuring a lakeside palace courtyard, a large tree, hanging marigold garlands, brass lanterns, and colorful embroidered cushions.
+
+Color palette
+
+- Primary: Marigold amber "#C77B20"
+- Secondary: Leaf green "#66784B"
+- Accent: Antique gold "#D8B36A"
+- Background: Warm ivory "#FFF8E9"
+- Cards: Sand cream "#F5E8D1"
+- Primary text: Deep olive-brown "#44392A"
+- Secondary text: Muted olive "#82765D"
+- Borders: Soft antique gold "#D7C092"
+
+Use amber buttons, restrained green accents, and traditional Indian palace-inspired detailing.
+
+3. Classic Rose Bridal
+
+Image: The third uploaded image featuring a bride in a richly embroidered red bridal lehenga, walking toward an ornate white palace mandap framed by flowers and rose petals.
+
+Color palette
+
+- Primary: Bridal rose "#B94D61"
+- Secondary: Dusty pink "#D8A0A5"
+- Accent: Champagne gold "#D8B77D"
+- Background: Pearl ivory "#FFF8F4"
+- Cards: Blush cream "#F8E8E3"
+- Primary text: Deep wine "#482A32"
+- Secondary text: Muted mauve "#8B7078"
+- Borders: Rose champagne "#DFC0B4"
+
+Use refined rose buttons, champagne borders, and elegant bridal styling. Keep the interface light, premium, and readable.
+
+4. Classic Royal Lakeside
+
+Image: The fourth uploaded image featuring a luxurious white marble wedding pavilion beside a peaceful lake, with floral arches, lanterns, candles, and a golden sunset.
+
+Color palette
+
+- Primary: Antique rose gold "#B98268"
+- Secondary: Lake blue-grey "#8FA5AD"
+- Accent: Champagne gold "#DCC18B"
+- Background: Pearl ivory "#FFFAF4"
+- Cards: Warm marble cream "#F5EDE3"
+- Primary text: Warm charcoal "#453C38"
+- Secondary text: Muted stone "#857A73"
+- Borders: Pale gold "#D9C5A4"
+
+Use rose-gold buttons, soft lake-inspired accents, and understated luxury.
+
+5. Use each image throughout its corresponding theme
+
+Associate each uploaded image exclusively with its matching theme.
+
+For each theme, use its image in both locations:
+
+Wedding bar / cover
+
+- Use the matching image as the wedding bar's cover background.
+- Preserve the wide composition and use responsive "background-size: cover" behavior.
+- Position the important subject correctly and avoid cutting off the bride, mandap, palace, or other focal details.
+- Keep existing wedding names and information readable using a theme-matched gradient.
+
+Shared page background
+
+Use the same image as the background throughout:
+
+- Home
+- Chat
+- Live
+- Album
+- More
+- Host Control and other relevant in-wedding screens
+
+Implementation:
+
+- Use a shared background component or the existing global wedding layout.
+- Apply a subtle blur or softened treatment so the image adds atmosphere without competing with content.
+- Add a translucent overlay matching the active theme's palette.
+- Keep the image's natural colors recognizable; avoid heavy color filters.
+- Keep text, controls, chat bubbles, buttons, and navigation sharp and readable.
+- Preserve scrolling, touch gestures, live-stream functionality, camera access, and album interactions.
+- Prevent flickering when navigating between pages.
+- Update the background immediately when the user switches themes.
+- Fall back to the existing theme background if an image cannot load.
+
+6. Theme selector and persistence
+
+1. Add four distinct theme options:
+   - Classic Crimson Sunset
+   - Classic Marigold Palace
+   - Classic Rose Bridal
+   - Classic Royal Lakeside
+2. Use each corresponding uploaded image as its theme thumbnail.
+3. Apply each theme's color palette throughout the entire wedding, not just the landing page.
+4. Persist theme selection when navigating between pages and reopening a wedding.
+5. Ensure each wedding uses the correct image for its selected theme.
+6. Keep Classic Default, Classic Sunset Romance, Classic Celestial Ivory, and every existing theme unchanged.
+7. Do not mix up the four uploaded images.
+
+7. Implementation safeguards
+
+- Inspect the existing project before editing.
+- Reuse the existing theme configuration, design tokens, and background architecture.
+- Do not create a separate or competing theme system.
+- Do not rewrite existing pages or remove features.
+- Preserve current layouts, navigation, ceremony cards, host/co-host permissions, chat, live streaming, and album gestures.
+- Optimize image loading and caching for mobile performance.
+- Maintain sufficient contrast and accessibility in every theme.
+
+8. Validation
+
+Test all four themes on mobile and desktop. Verify that:
+
+- Each theme uses the correct cover image.
+- The same image appears as the shared background on all specified pages.
+- Colors, buttons, borders, and text update consistently.
+- Theme selection persists after navigation and reopening.
+- Existing themes and functionality remain unchanged.
+
+Implement the changes directly in the existing project. Report the files changed, tests performed, and any remaining limitations.

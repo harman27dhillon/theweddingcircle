@@ -1,0 +1,190 @@
+Sure — here’s the full consolidated prompt you can paste directly into your coding/AI builder:
+Wedding Circle — Living Page Background Feature
+Add a new Living Page Background customization feature to the existing Wedding Circle.
+1. VERY IMPORTANT: What is being customized
+This feature is specifically for the Wedding Circle Page Background / App Background.
+The Page Background is the underlying visual area behind the Wedding Circle's content, including:
+Feed posts
+Text/content bars
+Chat and reply sections
+Content cards
+Input areas
+Other elements displayed on the main Wedding Circle page
+Use the attached screenshot as the visual reference for what I mean by Page Background: the light-colored area surrounding/behind the white content cards.
+DO NOT confuse this with:
+❌ Cover photo
+❌ Profile photo
+❌ Wedding header/banner
+❌ Couple photo
+❌ Invitation cover
+❌ Album cover
+❌ User profile theme
+❌ Post backgrounds
+Only the underlying Page Background should change.
+The existing cards, posts, navigation, header, cover images, profile images, buttons, and other UI components must remain structurally unchanged and sit on top of the selected Page Background.
+2. Where this feature exists
+The Page Background customization should exist only inside an already-created Wedding Circle.
+It should NOT be a general app-wide theme setting.
+For example:
+Wedding Circle → Customize Circle → Page Background
+If no Wedding Circle has been created, this feature should not appear.
+3. Permissions
+Only these roles can change the Page Background:
+Host
+Co-host
+Regular members and guests:
+Can see the selected background.
+Cannot change it.
+Should not see the editing controls.
+If a Co-host loses their Co-host role, they immediately lose permission to modify the background.
+The selected background is a Circle-level setting, not a personal/user-level setting.
+Therefore, when the Host or Co-host changes it, everyone inside that Wedding Circle sees the same background.
+4. Background Style Collection
+Create a visual background picker with 20+ styles.
+Organize the styles into categories.
+Elegant
+Ivory
+Champagne
+Pearl
+Soft Silk
+Subtle Marble
+Warm Cream
+Romantic
+Blush Gradient
+Floating Rose Petals
+Soft Bokeh
+Floating Hearts
+Rose-Gold Particles
+Romantic Pink Gradient
+Indian Wedding
+Subtle Mehndi Pattern
+Gold Mandala
+Phulkari-inspired Pattern
+Marigold Petals
+Indian Textile Pattern
+Subtle Paisley
+Nature
+Floating Leaves
+Falling Flower Petals
+Gentle Clouds
+Soft Rain
+Fireflies
+Spring Garden
+Modern
+Aurora Gradient
+Animated Mesh Gradient
+Floating Glass Circles
+Geometric Motion
+Soft Particle Field
+Dark Starry Background
+5. Animated Backgrounds
+Some backgrounds should have subtle animations.
+Examples:
+Rose petals slowly floating downward
+Small particles gently moving
+Soft bokeh slowly drifting
+Fireflies fading in and out
+Leaves slowly moving
+Clouds slowly moving
+Aurora gradient slowly shifting
+Mesh gradient gently changing
+Tiny stars subtly twinkling
+Gold particles slowly floating
+Animations should feel premium and wedding-appropriate.
+Do NOT make them fast, flashy, distracting, or childish.
+The Wedding Circle's actual content must remain the visual priority.
+6. Animation Intensity
+Allow the user to select:
+Static
+No animation.
+Subtle Motion
+Very slow and minimal animation.
+This should be the default for animated backgrounds.
+Motion
+Slightly more visible animation while remaining elegant.
+Also provide:
+Reduce Motion
+If enabled, animated backgrounds should automatically use their static version or extremely minimal motion.
+Respect the device's prefers-reduced-motion accessibility setting as well.
+7. Live Preview
+The background selection screen should show a realistic preview of the Wedding Circle rather than just small color squares.
+The preview should contain example:
+Post card
+Text content
+Chat/reply area
+Input field
+Navigation elements
+The selected background should appear behind these elements so the user can understand exactly what it will look like.
+Allow the user to:
+Preview → Select → Apply
+Do not immediately change the Circle before confirmation.
+8. Design of the Background Picker
+Make it feel like choosing a wedding invitation aesthetic, not a basic color picker.
+Use visual thumbnails/previews for each background.
+Each option should have:
+Background preview
+Name
+Category
+Small indication if it is animated
+For example:
+🌸 Rose Petals
+Romantic · Animated
+✨ Champagne
+Elegant · Static
+🌿 Sage Garden
+Nature · Animated
+The interface should feel premium, modern, and visually attractive.
+9. Performance
+Animated backgrounds must be lightweight.
+Do not use resource-heavy animations that could:
+Drain battery
+Cause scrolling lag
+Increase memory usage significantly
+Make older Android phones struggle
+Prefer efficient CSS animations, gradients, lightweight particles, or similarly efficient techniques.
+The background must never interfere with scrolling or interaction.
+10. Readability
+The Page Background must remain behind the existing UI.
+Content cards should remain visually distinguishable from the background.
+Automatically ensure sufficient contrast for:
+Text
+Icons
+Buttons
+Input fields
+Cards
+Do not allow a decorative background to make wedding content difficult to read.
+The background should complement the existing UI rather than redesigning it.
+11. Circle-wide synchronization
+Store the selected Page Background as a Wedding Circle property.
+Example concept:
+weddingCircle.pageBackground
+When the Host or Co-host changes it:
+Host/Co-host changes background → save Circle setting → all Circle members see the new background
+It should not depend on each user's personal settings.
+If a member opens the Wedding Circle on another phone/device, they should still see the same selected background.
+12. Default background
+Keep the existing current Page Background as the default option.
+Do not automatically change existing Wedding Circles when this feature is introduced.
+Existing Circles should continue looking exactly as they currently do until the Host or Co-host chooses a new background.
+13. Important UI separation
+Maintain this hierarchy:
+Wedding Circle
+→ Header / Cover
+→ Navigation
+→ PAGE BACKGROUND ← THIS IS WHAT WE ARE CHANGING
+→ Posts / Cards / Chat / Content
+→ Other existing UI
+The Page Background is the visual canvas behind the content, not the content itself.
+Do not modify the existing cover photo, header, profile imagery, or individual post backgrounds when changing this setting.
+14. Final requirement
+Build this feature so that the Wedding Circle itself can have its own visual personality.
+A Host should be able to make their wedding circle feel:
+Elegant
+Romantic
+Traditional Indian
+Natural
+Modern
+Festive
+while keeping the actual Wedding Circle UI and content structure unchanged.
+The core requirement is:
+Customize the Page Background behind the Wedding Circle's content — not the cover photo, header, profile, or individual posts. Only Host and Co-host can change it, and the selected background is shared by everyone in that Wedding Circle.

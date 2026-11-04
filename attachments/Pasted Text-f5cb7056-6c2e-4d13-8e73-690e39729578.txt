@@ -1,0 +1,507 @@
+PROJECT: THE WEDDING CIRCLE
+FEATURE: BRIDE & GROOM ACCESS MANAGEMENT, ORGANIZED HOST CONTROL, DROPDOWN SETTINGS, AND TWO-STEP WEDDING DELETION CONFIRMATION
+
+OBJECTIVE
+
+Implement Bride & Groom Access management in the existing Wedding Circle application while improving the organization of Host Control.
+
+The host must be able to:
+1. Assign a bride and groom to a wedding.
+2. Generate unique access codes for the bride and groom.
+3. Allow them to claim their respective roles through the existing Enter as Family flow.
+4. Designate themselves as the bride or groom.
+5. Manage all wedding-related controls through an organized Host Control interface with expandable dropdown sections.
+6. Delete a wedding only after completing a clear two-step confirmation process.
+
+IMPORTANT:
+Inspect the existing project before making changes.
+
+Implement these features directly in the existing application.
+
+Do not rebuild the application or unnecessarily replace existing components.
+
+Preserve all existing wedding functionality, authentication, membership, permissions, themes, Chat layout, pinned wedding feature, developer settings, live streaming, album, feed, and navigation.
+
+==================================================
+PHASE 1 — ORGANIZE THE ENTIRE HOST CONTROL INTERFACE
+==================================================
+
+Reorganize Host Control into a clean, structured interface.
+
+The objective is to place all existing wedding-management settings and the new Bride & Groom Access controls inside Host Control, instead of scattering related controls across unrelated screens.
+
+Use expandable dropdown sections, also known as accordions, to organize the settings.
+
+Suggested structure:
+
+HOST CONTROL
+
+1. Wedding Settings
+   - Wedding details.
+   - Existing wedding configuration.
+   - Existing settings that control the wedding's general presentation.
+
+2. Bride & Groom Access
+   - Bride assignment.
+   - Groom assignment.
+   - Bride access-code management.
+   - Groom access-code management.
+   - Host self-assignment.
+
+3. Theme & Appearance
+   - Existing theme selection.
+   - Existing theme preview.
+   - Existing Apply Theme and Cancel functionality.
+   - Other existing wedding appearance settings.
+
+4. Guest & Family Management
+   - Existing guest or family management controls.
+   - Existing invitation or membership-related controls, where applicable.
+
+5. Live & Media Controls
+   - Existing live-stream settings.
+   - Existing media controls and permissions, where applicable.
+
+6. Privacy & Permissions
+   - Existing privacy settings.
+   - Existing host and co-host permissions.
+   - Other existing access-control settings.
+
+7. Wedding Management
+   - Existing wedding-management actions.
+   - Delete Wedding action, with the two-step confirmation described below.
+
+IMPORTANT:
+This is an organizational proposal, not permission to remove existing settings.
+
+First inspect all existing Host Control features and determine their actual purposes. Place every existing wedding-management setting into the most appropriate section.
+
+If a feature does not fit these categories, create another clearly named dropdown section rather than deleting it or hiding it permanently.
+
+Do not invent settings that the project does not support.
+
+DROPDOWN BEHAVIOUR:
+
+- Each section must have a clear title and expand/collapse indicator.
+- Tapping a section expands its contents.
+- Tapping it again collapses it.
+- Use smooth, lightweight animations consistent with the existing interface.
+- Keep the layout usable on phone-sized screens.
+- Prevent nested controls from overflowing the screen.
+- Ensure dropdown headers and controls remain accessible.
+- Do not make every section permanently expanded.
+- Use sensible default expansion states so the page is not overwhelming.
+- Preserve existing control labels and functionality unless a label genuinely needs clarification.
+- Keep destructive actions visually separate from ordinary settings.
+
+The interface must remain clean, professional, and consistent with The Wedding Circle's existing design.
+
+Do not modify the Developer Control panel or move developer-only settings into Host Control.
+
+Do not grant hosts access to developer-only capabilities.
+
+==================================================
+PHASE 2 — BRIDE & GROOM ACCESS SECTION
+==================================================
+
+Add a dedicated expandable section inside Host Control named:
+
+"BRIDE & GROOM ACCESS"
+
+Within it, provide two separate cards:
+
+A. BRIDE ACCESS
+B. GROOM ACCESS
+
+Each card should display:
+- Current assignment status.
+- Assigned person's identity, when available.
+- Current role status.
+- Access-code status.
+- Controls to assign, change, or remove the assignment.
+- Controls to generate, regenerate, or revoke an access code.
+
+Use the existing Host Control design language.
+
+Do not expose secret access codes to ordinary guests.
+
+Only users authorized to manage the wedding may access these controls.
+
+==================================================
+PHASE 3 — THREE WAYS TO ASSIGN THE BRIDE AND GROOM
+==================================================
+
+Support three assignment methods for each role.
+
+METHOD A: ASSIGN AN EXISTING WEDDING MEMBER
+
+Allow the host to select an existing authenticated wedding member and designate that person as the bride or groom.
+
+Requirements:
+- Use the member's stable account ID.
+- Do not rely only on display names.
+- Show enough identifying information for the host to select the correct person.
+- Require confirmation before replacing an existing assignment.
+- Preserve existing membership and permissions.
+
+METHOD B: GENERATE A SPECIAL ACCESS CODE
+
+Allow the host to generate a unique Bride Access Code or Groom Access Code.
+
+The intended person can enter the code through the existing Enter as Family flow.
+
+The system validates the code and associates the authenticated user with the appropriate role for that wedding.
+
+METHOD C: THE HOST IS THE BRIDE OR GROOM
+
+Provide these options:
+- I am the Bride.
+- I am the Groom.
+- I am neither.
+
+When the authenticated host selects a role, associate the host's account ID with that role for the current wedding.
+
+Do not require the host to enter a special access code for themselves if their authenticated identity and permissions have already been verified.
+
+Prevent the same account from accidentally occupying both roles unless the product explicitly supports that situation.
+
+Allow the host to change or remove their assignment through an appropriate confirmation flow.
+
+A host who is also the bride or groom must retain their existing host permissions independently of their bride/groom identity.
+
+==================================================
+PHASE 4 — GENERATE AND MANAGE SPECIAL ACCESS CODES
+==================================================
+
+Provide separate controls for generating the bride's and groom's codes.
+
+Each code must be associated with:
+- The specific wedding.
+- The intended role.
+- The assignment or invitation.
+- Its validity status.
+- Whether it has already been claimed, where applicable.
+
+CODE MANAGEMENT:
+
+The host must be able to:
+- Generate a code.
+- View or copy the code when authorized.
+- Share it privately with the intended person.
+- Regenerate it.
+- Revoke it.
+- See whether the code is active, claimed, expired, or revoked, as supported by the implementation.
+
+Regenerating a code must invalidate the previous code according to the intended code lifecycle.
+
+Revoked codes must no longer work.
+
+CODE SECURITY:
+
+- Generate codes using a secure random method supported by the project.
+- Use a reasonable code length and character set.
+- Validate codes through a trusted backend or server-side function where available.
+- Apply rate limiting or equivalent protection against guessing where supported.
+- Associate every code with the correct wedding and role.
+- Never allow a code from Wedding A to assign a role in Wedding B.
+- Do not expose private codes in publicly readable database records.
+- Avoid logging complete secret codes.
+- Do not use a display name as proof of identity.
+- Do not grant Host, Co-host, Developer, or Administrator privileges merely because a role code was entered.
+
+If secure backend validation is not supported by the existing architecture, explain the limitation and implement the strongest solution available without falsely claiming server-side security.
+
+==================================================
+PHASE 5 — INTEGRATE WITH ENTER AS FAMILY
+==================================================
+
+Extend the existing Enter as Family flow.
+
+Do not create a disconnected entry system.
+
+Add an appropriately labelled option or input for a Bride/Groom Access Code.
+
+EXPECTED FLOW:
+
+1. The user opens the existing wedding-entry interface.
+2. The user selects Enter as Family.
+3. The user enters the special code.
+4. The system validates the code.
+5. The system confirms that the code belongs to the wedding being entered.
+6. The system associates the authenticated user's stable account ID with the appropriate bride/groom role.
+7. The user enters the wedding with the correct role.
+8. The role persists for future visits using the same authenticated account.
+
+ERROR HANDLING:
+
+Show appropriate messages for:
+- Invalid code.
+- Revoked code.
+- Expired code, if expiry is supported.
+- Code belonging to another wedding.
+- Code already claimed by another person.
+- Network or backend validation failure.
+
+Do not reveal sensitive account information in error messages.
+
+Do not grant unrestricted access to a private wedding merely because a code was entered.
+
+If the existing Enter as Family flow supports people without accounts, inspect that implementation and integrate securely. Do not invent fake authenticated identities or attach roles to shared anonymous accounts.
+
+==================================================
+PHASE 6 — WEDDING-SPECIFIC ROLES AND PERMISSIONS
+==================================================
+
+Bride and Groom must be wedding-specific roles.
+
+The same person may be the groom in one wedding and an ordinary guest in another, if authorized.
+
+The role system must support:
+- Host who is the bride.
+- Host who is the groom.
+- Host who is neither.
+- Bride and groom who are existing wedding members.
+- Bride and groom who claim their roles using special access codes.
+
+Do not automatically grant Bride or Groom:
+- Host privileges.
+- Co-host privileges.
+- Developer privileges.
+- Administrator privileges.
+
+A host who is also the bride or groom retains their host permissions because of their existing host role, not because of the bride/groom assignment.
+
+Preserve all existing authentication, membership, privacy, and authorization rules.
+
+==================================================
+PHASE 7 — INTEGRATE VERIFIED IDENTITIES WITH CHAT
+==================================================
+
+Expose the verified bride/groom role information to the existing Chat implementation so that the previously requested special golden sparkle and message-highlight treatment can identify the correct people.
+
+Requirements:
+- The bride's messages receive the intended special treatment.
+- The groom's messages receive the intended special treatment.
+- Other participants' messages remain normal.
+- Role identification uses verified wedding-specific role data.
+- Do not identify people through hard-coded names or display-name text.
+- Preserve the existing current-user-right and other-user-left message alignment.
+- The same message must be recognized as belonging to the bride or groom on every participant's screen.
+- Do not change the Chat layout, message timestamps, message history, or composer as part of this task.
+- Do not rewrite the existing sparkle animation if it already works; connect it to the verified role information instead.
+
+If the sparkle feature is implemented separately, expose the verified role data without duplicating or breaking the existing implementation.
+
+==================================================
+PHASE 8 — TWO-STEP WEDDING DELETION CONFIRMATION
+==================================================
+
+Improve the existing Delete Wedding flow.
+
+Deleting a wedding is a destructive action. Require TWO distinct confirmation steps before deletion can proceed.
+
+This requirement applies wherever an authorized user can delete a wedding, including any existing Delete Wedding action inside Host Control.
+
+STEP 1 — INITIAL CONFIRMATION
+
+When an authorized host selects Delete Wedding:
+
+- Open a clear confirmation dialog.
+- Display the wedding's actual name.
+- Explain that deleting the wedding is destructive.
+- Clearly state that the action may permanently remove the wedding and its associated data according to the existing deletion policy.
+- Provide two actions:
+  - Cancel.
+  - Continue to Final Confirmation.
+
+Do not delete anything during this step.
+
+The Cancel action must close the dialog without modifying the wedding or its data.
+
+STEP 2 — FINAL CONFIRMATION
+
+Only after the user selects Continue to Final Confirmation should a second confirmation dialog appear.
+
+The second dialog must:
+- Clearly identify the wedding being deleted.
+- Repeat the destructive-action warning.
+- Make the final nature of the action clear.
+- Provide a clearly distinguished final Delete Wedding button.
+- Provide a Cancel action.
+
+Require an explicit tap on the final Delete Wedding button before starting the deletion operation.
+
+Do not treat opening the dialog, pressing Enter, navigating away, or selecting the first confirmation as authorization to delete.
+
+OPTIONAL ADDITIONAL SAFEGUARD:
+
+If the existing project can safely support it, require the user to type the wedding's name into the second confirmation dialog.
+
+Only enable the final deletion action when the entered name matches the actual wedding name.
+
+Do not add this typing requirement if it conflicts with existing accessibility or application constraints; the two distinct confirmation dialogs remain mandatory.
+
+DELETION SECURITY AND CORRECTNESS:
+
+- Enforce deletion permissions through the existing trusted authorization mechanism.
+- Do not rely exclusively on hiding the Delete button.
+- Only an appropriately authorized user may delete the wedding.
+- Prevent double submission while a deletion is in progress.
+- Show a loading state during deletion.
+- Do not report success until the backend confirms the operation succeeded.
+- If deletion fails, preserve the wedding and show an accurate error.
+- Do not partially clear the UI and falsely imply that deletion succeeded.
+- Prevent accidental deletion caused by stale state or repeated taps.
+- Preserve the existing data-deletion policy and backend relationships.
+- Do not silently delete unrelated weddings or users' accounts.
+- If the deletion policy removes associated data, follow the existing policy and clearly explain it to the user.
+
+After successful deletion:
+- Return the authorized user to the appropriate existing landing page.
+- Clear stale navigation state referring to the deleted wedding.
+- Ensure the deleted wedding is no longer presented as accessible.
+- If the deleted wedding was the user's pinned wedding, clear that pinned preference safely and return to the normal landing page.
+- Do not remove unrelated wedding memberships or pinned preferences.
+
+Do not add additional deletion routes that bypass the two-step confirmation process.
+
+==================================================
+PHASE 9 — PERSISTENCE AND MULTI-WEDDING SUPPORT
+==================================================
+
+Persist role assignments against the correct wedding and authenticated user.
+
+Requirements:
+- Assignments survive app restarts and sign-ins.
+- Roles remain isolated between weddings.
+- Changing a display name does not break an assignment.
+- A user switching accounts must not inherit another user's role.
+- Leaving a wedding must not preserve unauthorized access.
+- Removing an assignment must update the role status correctly.
+- Regenerating a code invalidates the previous code as intended.
+- Host Control reflects the actual saved state after reopening the wedding.
+- Failed operations must not display false success messages.
+
+Use the existing backend and database architecture.
+
+Avoid duplicating membership records or creating conflicting role systems.
+
+==================================================
+PHASE 10 — PRESERVE ALL EXISTING FEATURES
+==================================================
+
+Do not break or unnecessarily modify:
+- Wedding creation.
+- Wedding cards.
+- Wedding codes and invitations.
+- Wedding membership.
+- Host and co-host permissions.
+- Developer controls.
+- Theme selection and Apply Theme.
+- All nine existing themes.
+- Pinned wedding opening behavior.
+- Normal landing-page card ratios.
+- Pinned card aspect ratio and full-screen settings.
+- Chat alignment and layout.
+- Chat timestamp visibility.
+- Golden bride/groom sparkle animations.
+- Feed.
+- Live streams and camera controls.
+- Album.
+- More.
+- Premium subscriptions and payment logic.
+- Authentication.
+- Existing privacy controls.
+- Existing Android navigation.
+
+Keep all developer-only settings inside their existing authorized developer interface.
+
+Keep wedding-management settings inside Host Control.
+
+Do not replace real backend data with mock data.
+
+==================================================
+PHASE 11 — TESTING
+==================================================
+
+Test the following scenarios.
+
+HOST CONTROL ORGANIZATION:
+1. All existing wedding-management settings are accessible inside the appropriate Host Control dropdowns.
+2. Dropdowns expand and collapse correctly.
+3. The interface remains usable on phone-sized screens.
+4. No existing setting or control has been accidentally removed.
+5. Developer-only settings remain restricted to authorized developers.
+
+BRIDE/GROOM ASSIGNMENT:
+6. Host assigns an existing member as bride.
+7. Host assigns an existing member as groom.
+8. Host generates a Bride Access Code.
+9. Host generates a Groom Access Code.
+10. The intended users claim their respective roles through Enter as Family.
+11. Invalid codes are rejected.
+12. Revoked codes cannot be reused.
+13. A code from one wedding cannot assign a role in another wedding.
+14. An ordinary guest cannot assign bride/groom roles.
+15. A host can designate themselves as bride.
+16. A host can designate themselves as groom.
+17. A host who is neither can leave both roles assigned to other people.
+18. Bride/groom roles do not automatically grant Host, Co-host, or Developer privileges.
+19. Assignments persist across app restarts and sign-ins.
+20. Different users see consistent role assignments for the same wedding.
+21. Switching accounts does not leak role information.
+22. The Chat interface recognizes verified bride/groom roles correctly.
+
+WEDDING DELETION:
+23. Selecting Delete Wedding opens the first confirmation.
+24. Cancelling the first confirmation leaves the wedding unchanged.
+25. Continuing opens a separate final confirmation.
+26. Cancelling the final confirmation leaves the wedding unchanged.
+27. Deletion occurs only after the explicit final confirmation.
+28. Unauthorized users cannot delete a wedding.
+29. Repeated taps cannot trigger duplicate deletion operations.
+30. A failed deletion preserves the wedding and displays an error.
+31. A successful deletion returns the user to the appropriate landing page.
+32. Deleting the pinned wedding clears the stale pin safely.
+33. No unrelated wedding is deleted.
+
+REGRESSION:
+34. Existing theme behavior remains intact.
+35. Pinned wedding startup behavior remains intact.
+36. Chat alignment and controls remain intact.
+37. Live, Feed, and Album continue working.
+38. Authentication and membership remain intact.
+
+Do not claim a scenario passed unless it was actually exercised.
+
+Clearly distinguish:
+- Code inspection.
+- Automated tests.
+- Browser or rendered-UI tests.
+- Multi-account tests.
+- Physical-device tests.
+
+==================================================
+FINAL REPORT
+==================================================
+
+After implementation, report:
+
+1. Which Host Control sections were organized.
+2. Which dropdowns were added.
+3. Which Bride/Groom assignment methods are available.
+4. How access codes are generated and validated.
+5. How Enter as Family was integrated.
+6. How host self-assignment works.
+7. How role permissions remain separate.
+8. How verified identities connect to Chat.
+9. How the two-step deletion confirmation works.
+10. Which files and components were changed.
+11. Which tests actually passed.
+12. Any remaining limitations or unverified areas.
+
+IMPLEMENT DIRECTLY IN THE EXISTING PROJECT.
+
+Do not merely provide instructions or pseudocode.
+
+Make the smallest safe changes necessary, preserve existing functionality, and do not claim completion for features that were not actually implemented or tested.

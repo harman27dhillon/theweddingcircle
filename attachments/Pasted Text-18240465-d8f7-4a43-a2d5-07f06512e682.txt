@@ -1,0 +1,82 @@
+The Wedding Circle — Restore Proper Desktop Layout
+
+Fix the responsive layout of the existing The Wedding Circle web application so that when opened on a desktop or laptop browser, it displays a proper desktop version rather than stretching or reusing the mobile layout.
+
+Critical requirements
+
+This is a layout-only task. Do not change anything else.
+
+Before editing, inspect the existing application, responsive breakpoints, CSS, page layouts, navigation components, and desktop-specific styles if present.
+
+1. Desktop layout
+
+For desktop and laptop screens, arrange the existing interface using a natural desktop layout:
+
+- Use the available screen width appropriately, with balanced margins and spacing.
+- Use desktop-appropriate content widths and alignment.
+- Arrange existing panels, cards, sections, and controls to make good use of horizontal space.
+- Prevent mobile-sized content from appearing unnecessarily narrow, stretched, or awkwardly positioned.
+- Keep text readable and prevent horizontal overflow.
+- Ensure modals, dropdowns, menus, forms, media previews, and other existing components fit within the desktop viewport.
+- Make the existing top navigation and other navigation elements work naturally on desktop.
+- Keep chat messages, the message composer, the bottom navigation or desktop navigation, and other page controls correctly positioned for desktop use.
+
+2. Preserve the existing design
+
+- Keep the existing colours, typography, wedding themes, backgrounds, borders, animations, icons, images, and component styling.
+- Reuse existing desktop styles and components if they already exist.
+- If desktop styles are missing or broken, add only the minimum responsive CSS and layout rules needed.
+- Do not introduce a new visual design system or redesign the application.
+- Do not change the content, labels, wording, or order of existing features unless a layout adjustment is strictly necessary.
+
+3. Keep mobile unchanged
+
+The existing mobile version must continue to work and look as it does now.
+
+- Preserve the current mobile layout, touch controls, bottom navigation, swipe gestures, and mobile menu behavior.
+- Use appropriate responsive breakpoints so desktop-specific layout rules apply only to desktop and laptop viewports.
+- Do not globally change component dimensions or styles in ways that break mobile.
+- Verify tablet behavior separately and preserve the existing responsive experience where possible.
+
+4. Apply the fix across the entire application
+
+Check all existing sections, not just the landing page:
+
+- Landing page and wedding discovery.
+- Wedding home.
+- Chat and message composer.
+- Live streaming and video playback.
+- Album and media viewers.
+- More and Host Control.
+- Developer section and its tools.
+- Discover and product details.
+- Existing dialogs, dropdowns, settings, and forms.
+
+Apply a consistent desktop layout wherever appropriate, using the existing component structure and responsive design conventions.
+
+5. Technical safeguards
+
+- Inspect the current code before editing.
+- Identify the actual cause of the mobile-style layout appearing on desktop.
+- Check viewport detection, breakpoints, fixed widths, maximum widths, flexbox/grid constraints, and mobile-only CSS being applied globally.
+- Prefer targeted desktop media queries and reusable layout rules over duplicating entire pages.
+- Avoid user-agent detection when responsive viewport breakpoints can solve the issue.
+- Do not change routes, backend APIs, database schemas, authentication, permissions, data, business logic, or integrations.
+- Do not reset or replace existing files or persistent data.
+- Do not remove or disable existing functionality.
+
+6. Test and report
+
+Test representative pages at desktop widths such as 1280px and 1440px, along with a typical mobile viewport.
+
+Confirm that:
+
+- Desktop uses available screen space appropriately.
+- No page is stuck in a narrow mobile-sized layout.
+- Navigation and existing controls remain functional.
+- There is no unintended horizontal scrolling, clipping, or overlap.
+- Mobile appearance and interactions remain intact.
+
+Report the root cause, the files changed, and the tests actually performed.
+
+Final instruction: Make the existing application responsive to desktop screens. Preserve everything else exactly as much as possible. Do not perform unrelated fixes, feature additions, content changes, or redesigns.

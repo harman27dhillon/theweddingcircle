@@ -1,0 +1,47 @@
+Bug Fix — Restrict Ceremony Cover Photos to Classic Themes Only
+
+Fix the existing ceremony cover image behavior in The Wedding Circle.
+
+The issue
+
+The previous update that added or modified ceremony cover photos was intended strictly for the Classic themes only. It was not intended to affect preset themes.
+
+Currently, ceremony cover photos are also appearing inside weddings using preset themes. This is incorrect.
+
+Required fix
+
+1. Inspect the existing theme configuration, ceremony rendering components, background-image assignments and theme-selection logic.
+2. Restrict the ceremony cover photos introduced by the previous update exclusively to the applicable Classic themes.
+3. Preset-themed weddings must not display these Classic-theme ceremony cover photos.
+4. Ensure the distinction is based on the actual selected theme type or explicit theme configuration, not on theme names, colors, or unreliable string matching.
+5. Keep the existing ceremony cover images and their mappings intact for Classic themes.
+6. For preset themes, restore their original ceremony appearance and background behavior exactly as intended before the Classic-theme cover-image update.
+7. Ensure the fix applies consistently across all relevant ceremony cards and wedding pages, including after changing themes, refreshing the app, reopening a wedding, and switching between weddings.
+8. If users switch from a Classic theme to a preset theme, remove the Classic-specific cover images immediately. Switching back to a Classic theme should restore the appropriate covers.
+9. Check for shared CSS classes, global background styles, fallback images, cached theme state or shared components that could cause the covers to leak into preset themes.
+
+Strict preservation rules
+
+- Do not redesign any theme.
+- Do not change the existing Classic ceremony cover images or their image-to-ceremony mappings.
+- Do not replace preset-theme artwork or backgrounds with new images.
+- Do not modify unrelated wedding features, ceremony text, layout, animations or colors.
+- Do not remove ceremony cover functionality from Classic themes.
+- Do not change the behavior of other theme-specific backgrounds.
+
+Verification
+
+Test every applicable Classic theme and every preset theme.
+
+Confirm that:
+
+- Classic themes display the intended ceremony covers.
+- Preset themes never display those Classic-specific covers.
+- Switching themes updates the images correctly without requiring a full app restart.
+- The correct appearance persists after refreshing and reopening a wedding.
+- Two different weddings can use different theme types without sharing the wrong background images.
+- No unrelated theme behavior has regressed.
+
+Fix the underlying theme-selection and rendering logic rather than hiding the images with a superficial CSS workaround.
+
+After implementation, report the root cause, the files changed and the test results. Do not claim success unless the behavior has actually been verified.

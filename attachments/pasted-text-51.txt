@@ -1,0 +1,106 @@
+Upgrade the existing theme system in The Wedding Circle by adding TWO new, complete classic wedding themes based on the two uploaded cover images.
+
+This is a theme-building task inside the existing application. Inspect the current theme architecture and integrate both themes properly. Do not modify unrelated features.
+
+Theme 1 — Classic Sunset Romance
+
+Image: First uploaded image showing a bride and groom overlooking a lake and mountains at sunset beneath a floral canopy.
+
+Color palette
+
+- Primary: Warm sunset rose "#C98279"
+- Secondary: Dusty mauve "#B99AAE"
+- Accent: Champagne gold "#D6B77A"
+- Background: Soft sunset ivory "#FFF7F1"
+- Surface/cards: Warm blush cream "#F8EAE5"
+- Primary text: Deep plum-brown "#49353D"
+- Secondary text: Muted mauve "#806A75"
+- Borders: Soft champagne "#D8C19A"
+- Primary buttons: Sunset rose with ivory text
+- Secondary buttons: Ivory with rose borders
+
+Theme 2 — Classic Celestial Ivory
+
+Image: Second uploaded image showing a luxurious floral wedding mandap above the clouds at sunset, with glowing chandeliers, steps, candles, and a pink-gold sky.
+
+Color palette
+
+- Primary: Soft rose gold "#C99483"
+- Secondary: Cloud lavender "#C7B8D8"
+- Accent: Luminous champagne "#E4C88F"
+- Background: Cloud ivory "#FFFAF5"
+- Surface/cards: Pearl cream "#FFF3EB"
+- Primary text: Warm charcoal "#493F43"
+- Secondary text: Muted lavender-grey "#827887"
+- Borders: Pale rose gold "#DFC5B8"
+- Primary buttons: Rose gold with ivory text
+- Secondary buttons: Pearl cream with champagne borders
+
+Critical requirement — use the images throughout the wedding
+
+Each uploaded image must be associated exclusively with its corresponding theme.
+
+For Classic Sunset Romance, use the first image. For Classic Celestial Ivory, use the second image.
+
+Apply the respective image in BOTH places:
+
+A. Wedding bar / wedding cover
+
+- Use the image as the cover/background image for the wedding bar.
+- Preserve the original wide aspect ratio and use an appropriate "cover" crop.
+- Position the main subject prominently without cutting off the couple or mandap.
+- Keep wedding names and existing information readable.
+- Blend the left text area naturally into the theme's colors using a soft gradient.
+
+B. Background throughout all wedding pages
+
+Use the same theme-specific image as a shared, elegant background throughout:
+
+- Home
+- Chat
+- Live
+- Album
+- More
+
+Also apply it consistently to Host Control and other existing in-wedding screens where appropriate.
+
+Implementation requirements:
+
+- Use a shared background component or the existing global wedding layout instead of duplicating background code.
+- Keep the image softly blurred or softened enough to prevent it competing with text and controls.
+- Add a theme-aware translucent overlay so the image harmonizes with the active theme's colors.
+- Keep text, icons, chat messages, buttons, forms, and navigation crisp and readable above the background.
+- Preserve the image's natural colors; do not apply a heavy color filter.
+- Use responsive positioning and cropping for mobile and desktop.
+- Prevent background flickering during page transitions.
+- Ensure the background does not interfere with scrolling, touch gestures, camera access, live streaming, or album interactions.
+- If the theme changes, update both the wedding bar image and page backgrounds immediately.
+- If no image is available, fall back gracefully to the existing theme background.
+
+Theme selector and persistence
+
+1. Add two distinct options named Classic Sunset Romance and Classic Celestial Ivory to the existing theme selector.
+2. Use the matching uploaded image as each theme's thumbnail.
+3. Apply all theme colors and image backgrounds consistently across the entire wedding.
+4. Persist the selected theme when navigating between pages and reopening the wedding.
+5. Ensure each wedding uses the image associated with its selected theme.
+6. Keep the existing Classic Default theme and every other existing theme unchanged.
+
+Preserve existing functionality
+
+Do not redesign or remove existing features. Preserve the current page layouts, navigation, typography, ceremony cards, chat behavior, live-stream functionality, album gestures, host/co-host permissions, and wedding-specific settings.
+
+Inspect the current implementation before editing. Reuse the existing theme configuration and design tokens rather than creating a parallel theme system. Do not introduce unnecessary dependencies or duplicate state.
+
+Validation
+
+Test both themes and Classic Default on mobile and desktop. Confirm that:
+
+- The correct image appears in the wedding bar and on Home, Chat, Live, Album, and More.
+- The image and color palette always match the selected theme.
+- Host Control and other relevant screens remain visually consistent.
+- Text is readable across bright skies, clouds, flowers, and other detailed areas.
+- Switching themes updates the entire wedding without stale images or flickering.
+- All existing interactions and features continue to work.
+
+Implement the changes directly in the existing project. Report the files changed, the behavior verified, and any remaining limitations.

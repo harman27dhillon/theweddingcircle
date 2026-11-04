@@ -1,0 +1,47 @@
+WEDDING CIRCLE — RESTORE AND APPLY IPHONE-STYLE ENTRANCE ANIMATION TO BOTH PAGES
+
+The iPhone-like entrance animation that previously existed in my app is no longer visible. Investigate why it disappeared, restore it if possible, and apply a consistent, premium iPhone-style entrance animation to BOTH:
+1. The official main Landing page, where users choose or enter a wedding.
+2. The Home page inside an individual Wedding Circle.
+
+IMPORTANT: Modify the actual components and routes used by the running application. Do not create unused animation components, duplicate pages, or redesign either page. Preserve all current layouts, wedding data, themes, glass panels, cover selections, and navigation.
+
+ANIMATION DESIGN:
+- Use a refined iPhone-like entrance: content begins slightly scaled down (approximately 96–98%), with subtle opacity and position transitions into its final layout.
+- Use smooth, natural spring-like easing, similar to a polished iOS interface. Avoid exaggerated bouncing, spinning, zooming, or flashy effects.
+- Use a short duration of approximately 400–700 ms for the main entrance.
+- Stagger the appearance of major content groups slightly: page header, primary content/cards, and secondary sections. Keep the stagger subtle so the page feels unified rather than slow.
+- On the official Landing page, animate the heading, wedding cards, and relevant controls without delaying access to them.
+- On the individual wedding Home page, animate the invitation cover and couple details first, followed by the ceremony and family information panels.
+- Keep the existing page backgrounds and glass-like panels visually stable. Do not animate the background image itself or cause it to flash, reload, shift, or disappear.
+- Use transform and opacity where possible to maintain performance. Avoid layout thrashing and expensive blur animations.
+
+RESTORE THE ORIGINAL BEHAVIOR:
+Inspect the previous animation implementation, component styles, route transitions, animation libraries, and recent changes that may have removed or overridden it. If the original implementation is still available, restore and reuse it where appropriate rather than creating an unrelated replacement.
+
+WHEN TO PLAY:
+- Play when the user first opens the official Landing page.
+- Play when the user enters a wedding and its Home page is opened.
+- Play again when the user exits a wedding and later re-enters it, where appropriate.
+- Do not replay the entire entrance animation on every small state update, cover change, data refresh, or component re-render.
+- Do not replay unnecessarily when switching between Feed, Live, Album, and More within the same active app session.
+- Avoid duplicate animation triggers during route changes or component remounts.
+
+PERFORMANCE AND ACCESSIBILITY:
+- The animation must never block taps, scrolling, swipes, login, wedding selection, or bottom navigation.
+- The page must remain usable immediately while content finishes animating.
+- Respect the device's reduced-motion accessibility setting by using a minimal or disabled animation when requested.
+- Ensure smooth behavior on Android and iPhone, including mobile WebViews.
+- Avoid flicker, white flashes, delayed content loading, scroll-position resets, and background jumps.
+- Do not delay data fetching or wait for images to finish downloading before displaying the page. Use graceful image loading and animate available content safely.
+
+IMPLEMENTATION AND VERIFICATION:
+1. Identify the actual Landing page and wedding Home page components.
+2. Investigate why the previous iPhone-style animation disappeared.
+3. Restore or implement the animation in the actual rendered components.
+4. Verify the entrance animation on both pages in the running application.
+5. Test navigating into and out of a wedding, refreshing, switching sections, scrolling, and selecting a cover.
+6. Confirm the animation does not replay on every render and does not interfere with swipe gestures or page interaction.
+7. Report the actual files changed, the reason the previous animation disappeared if identifiable, and which behaviors were tested.
+
+Do not merely add CSS and claim success. Verify that the animation is visibly working on BOTH pages in the actual app. Preserve all existing features and fix any regressions introduced by the change.

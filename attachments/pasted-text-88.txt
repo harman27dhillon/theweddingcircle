@@ -1,0 +1,195 @@
+The Wedding Circle — Complete Media Experience UI/UX Overhaul
+
+Redesign and improve the complete photo and video experience, covering every stage from selecting media to uploading, viewing, downloading and saving it to the device.
+
+Design direction: Premium, smooth, modern and intuitive, inspired by WhatsApp's simplicity, but consistent with The Wedding Circle's existing visual identity.
+
+Do not redesign the entire application. Focus specifically on media interactions across Chat, Feed, Albums and other existing media sections.
+
+1. Media selection experience
+
+When a user selects one or multiple photos/videos:
+
+- Show an immediate preview.
+- Display selected media in a clean thumbnail strip.
+- Allow users to remove individual selections.
+- Allow users to add more media before sending.
+- Show filenames, file sizes and media types where useful.
+- Provide a clear Send button.
+- Prevent accidental duplicate selection.
+- Maintain the existing privacy and wedding permissions.
+
+The interface should feel responsive immediately after selection.
+
+2. Image and video processing experience
+
+After selection:
+
+- Show a subtle Processing indicator.
+- Display the actual compression progress where measurable.
+- Distinguish image processing from uploading.
+- Avoid freezing the interface.
+- Keep previews visible during processing.
+- Show a meaningful error if processing fails.
+- Allow the user to retry without selecting everything again.
+
+Do not display fake progress percentages.
+
+3. Upload experience
+
+Create a polished upload interface.
+
+Each selected media item should have its own status:
+
+- Preparing
+- Uploading
+- Processing
+- Uploaded
+- Failed
+
+Requirements:
+
+- Show real upload progress.
+- Use a smooth progress animation.
+- Show individual and overall progress for multiple uploads.
+- Allow users to continue navigating the application.
+- Keep upload tasks running appropriately in the background.
+- Prevent duplicate sends.
+- Provide retry and cancel actions where safe.
+
+When an upload succeeds, transition naturally into the completed state.
+
+4. Uploaded media experience
+
+Once uploaded:
+
+- Display the media thumbnail immediately.
+- Avoid showing broken-image placeholders unnecessarily.
+- Load low-resolution previews first.
+- Load the full-resolution version when opened.
+- Show a subtle loading indicator while full media loads.
+- Provide a clean full-screen image viewer.
+- Support video playback with familiar playback controls.
+- Keep chat bubbles and feed layouts consistent with existing designs.
+
+If media cannot load, show a proper retry option instead of a broken image.
+
+5. Download experience
+
+When the user taps the download icon:
+
+- Show Downloading status.
+- Display real download progress.
+- Prevent repeated download requests.
+- Keep the user on the current page.
+- Do not navigate to an R2 URL.
+- Do not expose Cloudflare storage URLs.
+- Download using a secure authorized backend flow.
+- Preserve the correct original file format and filename.
+
+After completion:
+
+- Show a clear Downloaded confirmation.
+- Provide an option to open the downloaded file.
+- Where supported, allow saving to the device gallery.
+- Handle permission denial gracefully.
+- Never report success before the device download has actually completed.
+
+6. Media status design
+
+Create consistent visual states throughout the application.
+
+Use understated icons and animations rather than large distracting messages.
+
+State| UI behaviour
+Selected| Preview visible
+Processing| Subtle processing indicator
+Uploading| Progress indicator
+Uploaded| Completed state
+Loading| Thumbnail or skeleton
+Downloading| Download progress
+Downloaded| Success confirmation
+Failed| Clear error and retry
+Cancelled| Cancelled status
+
+7. Multiple media handling
+
+For multiple photos/videos:
+
+- Display a compact upload queue.
+- Show progress for every item.
+- Allow individual retries.
+- Show overall completion.
+- Do not block successful uploads because another item failed.
+- Avoid layout jumping while items change status.
+
+8. Visual design
+
+Maintain The Wedding Circle's existing theme system.
+
+- Respect Pastel Blush, Royal Burgundy, Classic Default and all other existing themes.
+- Support light and dark modes.
+- Use existing typography, spacing and component styles.
+- Use smooth transitions and subtle animations.
+- Avoid excessive popups and notifications.
+- Keep the interface clean and mobile-first.
+
+Do not introduce a completely different design language.
+
+9. Error handling
+
+Provide understandable errors for:
+
+- Network interruption.
+- Server unavailable.
+- Storage upload failure.
+- Unsupported media format.
+- File too large.
+- Insufficient storage.
+- Download failure.
+- Permission denied.
+
+Provide retry actions wherever recovery is possible.
+
+Do not expose technical storage URLs or internal server details to ordinary users.
+
+10. Performance and implementation
+
+- Reuse the existing upload and download services.
+- Integrate with Cloudflare R2 and the existing Premium entitlement system.
+- Preserve private wedding access.
+- Avoid unnecessary rerenders.
+- Avoid loading full-resolution media unnecessarily.
+- Keep animations lightweight on Android devices.
+- Ensure compatibility with Chrome and Samsung Internet.
+
+11. Testing
+
+Test the complete journey on real Android devices:
+
+1. Select one photo.
+2. Select multiple photos.
+3. Select a video.
+4. Process and upload media.
+5. Navigate away during upload.
+6. Return and verify completion.
+7. Open uploaded media.
+8. Download a photo.
+9. Download a video.
+10. Verify files appear in device Downloads.
+11. Test retry after network interruption.
+12. Test both Chrome and Samsung Internet.
+
+Final requirements
+
+Inspect the existing UI and source code before implementation.
+
+Implement the complete experience directly in the existing application.
+
+Do not modify unrelated features, wedding layouts, navigation or existing theme designs.
+
+Do not use fake progress indicators or claim a download is complete before it actually finishes.
+
+Report the files changed, real-device tests performed and any remaining limitations.
+
+The final result should feel effortless: select → preview → upload → view → download → saved.

@@ -1,0 +1,52 @@
+Fix Theme Apply Bug — Selected Theme Reverts to Previous Theme
+
+Investigate and fix the actual code in The Wedding Circle. Sometimes when I select a new theme and press Apply, the app unexpectedly applies or returns to the previous theme instead of the theme I selected.
+
+1. Find the real root cause
+
+Inspect the existing theme selector, Apply button handler, theme state management, theme provider/context, persistence logic, and any backend or local-storage synchronization.
+
+Check specifically for:
+
+- The Apply handler reading a stale state value instead of the currently selected theme.
+- A race condition between selecting a theme, pressing Apply, and saving the change.
+- React state updates that have not completed before the Apply handler runs.
+- An effect, component remount, cached value, or backend response overwriting the newly selected theme.
+- Multiple theme states or duplicate theme registries that disagree about the active theme.
+- Async save requests completing out of order, allowing an older theme selection to overwrite the newer one.
+- Incorrect theme IDs, object references, or mismatched theme names.
+- A delayed load or subscription restoring the previous theme after Apply succeeds.
+
+2. Implement a reliable fix
+
+- Keep the currently selected theme separate from the currently applied theme.
+- When the user presses Apply, capture the exact theme ID currently selected in the selector and apply that ID—not an older state value.
+- Update the visible theme immediately and consistently across the wedding.
+- Persist the same theme ID using the app's existing authoritative storage system.
+- Prevent older asynchronous requests or stale cached data from overwriting a newer theme selection.
+- Ensure effects, rerenders, page navigation, and component remounts cannot silently revert the applied theme.
+- If saving fails, show a clear error and handle rollback deliberately; never silently switch to the previous theme.
+- Disable duplicate Apply submissions while a save is in progress if needed, without making the interface feel slow.
+- Keep the theme selector's selected preview, active-theme indicator, and actual wedding appearance synchronized.
+
+3. Preserve the existing app
+
+- Do not redesign the theme selector or change the theme artwork.
+- Do not rename, remove, duplicate, or recreate themes.
+- Do not change Classic Default or other theme designs.
+- Do not reset the database, clear user data, or modify unrelated wedding settings.
+- Use the existing theme architecture and identify the actual source of truth before changing persistence.
+
+4. Test the fix
+
+Test these scenarios using the real implementation:
+
+1. Select Theme A and press Apply; confirm Theme A is applied.
+2. Select Theme B and immediately press Apply; confirm Theme B is applied, not Theme A.
+3. Switch rapidly between several themes and apply the final selection; confirm only the intended theme remains active.
+4. Open the selector again; confirm its active indicator matches the applied theme.
+5. Navigate between Home, Chat, Live, Album, and More; confirm the theme remains consistent.
+6. Refresh or reopen the wedding; confirm the latest successfully applied theme persists.
+7. Test slow network responses and failed saves to ensure an older request cannot overwrite a newer choice.
+
+Deliverable: Make the code changes directly, run the available build/type checks and relevant tests, fix any regressions caused by the change, and report the root cause and files modified. Do not merely explain the likely cause or provide a proposed plan—implement and verify the fix.

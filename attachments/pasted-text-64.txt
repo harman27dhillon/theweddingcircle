@@ -1,0 +1,191 @@
+URGENT IMPLEMENTATION — FIX CHAT VOICE CONTROLS AND IMPLEMENT WHO SAID IT?
+
+Project: The Wedding Circle
+
+Critical clarification: Which Mic and Speaker buttons?
+
+Throughout this task, the terms Mic button and Speaker button refer exclusively to the two floating audio controls in the existing wedding Chat screen, in the upper-right area of the Chat conversation.
+
+In my supplied screenshot, these are the floating controls beside the existing Music Track selector, above the message composer and separate from the bottom navigation.
+
+- Mic button: The new floating microphone button that replaces the existing Music Track selector.
+- Speaker button: The existing floating Speaker button that must remain in its original position immediately to the right of the new Mic button.
+- Participant arrow: A small arrow immediately to the left of the Mic button, used to expand or collapse participant profile pictures.
+- Who Said It? button: A separate floating trophy button on the left side of the Chat screen, directly above the existing plus button.
+
+Do not confuse these with any microphone, speaker, or audio controls on the Live page, the device itself, or any other screen. Do not modify unrelated audio controls.
+
+1. Previous implementation failed
+
+The previous Who Said It? implementation request did not produce a visible trophy button in Chat, and no meaningful implementation response was provided.
+
+The two floating Chat voice controls are also unresponsive: pressing the new Chat Mic button or the existing Chat Speaker button leaves them muted, with no apparent response.
+
+These are unresolved bugs. Do not assume the features work because an earlier prompt was processed or a completion report claimed success.
+
+Inspect the current source code, diagnose the actual failures, implement the missing functionality directly, and verify the result.
+
+Do not spend this task summarizing the conversation or returning another implementation plan.
+
+2. Fix the exact Chat Mic and Speaker buttons
+
+Locate the actual floating Mic and Speaker components rendered on the wedding Chat screen.
+
+Their required order, from left to right, is:
+
+"[Participant profiles, when expanded] [Arrow] [CHAT MIC] [CHAT SPEAKER]"
+
+- Keep Chat Speaker in the same upper-right floating position it occupies now.
+- Keep Chat Mic immediately to its left, replacing the former Music Track selector.
+- Keep the arrow immediately to the left of Chat Mic.
+- Keep the controls floating over the existing Chat background.
+- Do not move them into the message composer or bottom navigation.
+- Do not change the audio controls on the Live page or any other screen.
+
+Chat Mic behavior
+
+When the user presses the floating Chat Mic button:
+
+1. Respond visibly to the tap.
+2. Request browser microphone permission if necessary.
+3. Acquire a real microphone audio track after permission is granted.
+4. Connect and publish audio through the configured group voice infrastructure.
+5. Display the ON state only when the microphone is actually enabled and publishing successfully.
+6. Update the participant's authoritative microphone status so their profile picture can appear in the Chat participant strip.
+7. When pressed again, stop outgoing audio, release the microphone track when appropriate, and remove the participant from the active microphone list.
+
+If permission is denied or audio publishing fails, show a useful error and remain safely muted.
+
+Chat Speaker behavior
+
+When the user presses the existing floating Chat Speaker button:
+
+1. Respond visibly to the tap.
+2. Toggle local remote-audio playback independently of Chat Mic.
+3. When ON, allow incoming audio from subscribed participants to play.
+4. When OFF, mute all remote audio locally without disabling the microphone.
+5. Handle browser autoplay restrictions and show a recovery action if needed.
+6. Display the actual playback preference and connection status accurately.
+
+Do not change the speaker's state merely because the microphone was toggled, and do not disconnect the participant just because Speaker is OFF.
+
+Both Chat Mic and Chat Speaker must start OFF for every new voice session.
+
+Diagnose why the controls currently do nothing
+
+Inspect their actual event handlers, React state, CSS hit-testing, overlays, disabled conditions, audio hooks, permission handling, backend routes, authentication, provider configuration, and runtime errors.
+
+Check for missing "onClick" handlers, buttons submitting forms, intercepted pointer events, state immediately resetting, failed API requests, missing credentials, and audio tracks that never publish.
+
+Fix the actual cause instead of adding cosmetic icon animations.
+
+3. Real group voice infrastructure
+
+Implement functional two-way group audio for authenticated members of the same wedding Chat.
+
+Reuse the existing authentication, database, and real-time infrastructure where suitable. If a proper audio transport is missing, implement a production-capable WebRTC/SFU integration such as LiveKit or an equivalent service.
+
+Include:
+
+- Secure server-side room authorization and short-lived room credentials.
+- Wedding-membership validation.
+- Real microphone publishing and remote audio playback.
+- Real-time microphone presence.
+- Wedding-room isolation.
+- Error handling and reconnection.
+- Cleanup when users leave Chat, change weddings, or log out.
+- No automatic microphone activation after refresh or reconnect.
+- No exposed provider secrets in frontend code.
+
+If external credentials or deployment are required, implement the code that can be completed safely and identify the exact remaining setup. Do not claim real audio works without verification.
+
+4. Participant profile controls
+
+The profile strip is associated exclusively with the floating Chat Mic and Chat Speaker controls.
+
+- Collapsed by default.
+- Expand or collapse using the arrow immediately to the left of Chat Mic.
+- Show round profile pictures for participants whose microphones are actually enabled.
+- Match the exact rendered diameter of Chat Mic and Chat Speaker.
+- Extend the profile row toward the left while the two audio controls remain fixed.
+- Support horizontal swiping when more profiles exist than fit on screen.
+- Remove profiles when their microphone is disabled or their voice session ends.
+- Never display participants from another wedding.
+- Expanding or collapsing the strip must not change microphone or speaker state.
+
+5. Implement the missing Who Said It? trophy button
+
+Inspect why the previous request did not create a visible button.
+
+Add a functional, text-free floating trophy button to the actual wedding Chat screen, on the left side directly above the existing plus button.
+
+Use the approved trophy artwork if it exists in the project; otherwise use a suitable existing trophy icon.
+
+The button must:
+
+- Be visible above decorative backgrounds.
+- Have a working click handler.
+- Have the accessible label and tooltip "Who Said It?".
+- Open the real game interface.
+- Leave the plus button and all other Chat controls intact.
+
+Implement the full game:
+
+- Any authorized wedding participant can start a round.
+- One anonymous, one-line statement per participant.
+- Exactly 60 seconds for submissions, enforced by the server.
+- Statements are shuffled and revealed together in a Chat card.
+- Only the starter can guess statement authors.
+- Exactly 120 seconds for guessing, enforced by the server.
+- A Lock It button appears when all guesses are complete; pressing it ends the round immediately.
+- Correct guesses are green, incorrect guesses red, and unanswered statements neutral.
+- One point per correct guess for the starter.
+- One active round per wedding at a time, with independent rounds in different weddings.
+- Secure author anonymity until reveal.
+- Persistent state across refreshes and reconnects.
+- Concurrency-safe submissions, reveal, and scoring.
+
+Do not implement only the trophy icon or a mock game screen.
+
+6. Work directly in the existing project
+
+Inspect the current source and working tree before editing. Identify the actual Chat screen, both floating audio controls, existing voice code, game code, authentication, database, and real-time infrastructure.
+
+Make targeted changes. Do not rebuild the entire app or overwrite existing wedding data.
+
+Do not create a duplicate voice system if a suitable implementation already exists. Repair or complete the existing implementation.
+
+7. Verify before claiming success
+
+Run the relevant typecheck, production build, and automated tests.
+
+Verify that:
+
+- The floating Chat Mic and Chat Speaker buttons respond to taps and change state correctly.
+- Mic permission is requested only when the user enables Chat Mic.
+- Microphone publishing succeeds with real provider configuration.
+- Speaker toggles remote audio playback independently.
+- Two authenticated participants can communicate in both directions.
+- Mic and Speaker start OFF after refresh.
+- Participant profiles accurately reflect microphone-enabled status.
+- The Who Said It? trophy appears in the actual Chat screen and opens the game.
+- The game works with real server-enforced deadlines and scoring.
+- Existing Chat messages, plus button, composer, themes, and navigation remain functional.
+
+If full audio testing requires external credentials or multiple accounts, report exactly what could and could not be tested.
+
+Do not use a successful build as proof that real audio or the game works.
+
+8. Final report
+
+Report:
+
+1. Why the floating Chat Mic and Chat Speaker were unresponsive.
+2. What code fixed those specific buttons.
+3. Why the trophy button was missing and how it was corrected.
+4. Actual files changed.
+5. Features verified in the running application.
+6. Build and test results, including existing failures.
+7. Any remaining external voice-service setup.
+
+Do not return another summary of the requested features. Implement the changes directly in the current project and report only what the code and tests establish.

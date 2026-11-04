@@ -1,0 +1,160 @@
+Task: Fix Cloudflare Worker Edge Caching for Actual Wedding Photos
+
+We have completed the Cloudflare infrastructure setup and deployed the Worker with the following Production environment variable:
+
+"MEDIA_EDGE_CACHE=authorized"
+
+Active Worker deployment: "58bd492d"
+
+Cloudflare configuration:
+
+- Worker: "wedding-circle-media-gateway"
+- Custom domain: "media.theweddingcircle.in"
+- R2 bucket: "wedding-circle-media"
+- R2 binding: "MEDIA"
+- App cache policy: "Authorized edge cache, after the signature check"
+- App CDN delivery status: Disabled.
+
+1. Actual problem observed
+
+We tested a real, successfully uploaded wedding photo through Firefox Developer Tools → Network → Images.
+
+The request reached "media.theweddingcircle.in" and returned the image successfully.
+
+Observed response headers:
+
+- "content-type: image/jpeg"
+- "cache-control: private, no-store"
+- "cdn-cache-control: no-store"
+- Cloudflare response header "cf-ray" present.
+- No visible "x-wc-cache" header.
+- No visible "cf-cache-status" header.
+
+The image is being served, but edge caching is not demonstrated.
+
+The Worker variable "MEDIA_EDGE_CACHE=authorized" has already been added to Production and deployed. Do not ask me to add it again.
+
+2. Investigate the actual request path
+
+Inspect the complete source implementation for:
+
+- Signed media URL generation.
+- HMAC signature verification.
+- Object-path and wedding authorization.
+- Worker request routing.
+- "MEDIA_EDGE_CACHE" environment-variable reading.
+- Cache lookup and cache storage.
+- R2 object retrieval.
+- Response-header construction.
+- CDN policy configuration.
+- "x-wc-cache" diagnostic header generation.
+
+Trace the exact request flow for a real existing wedding photo.
+
+Determine why a successful authorized image response still returns "private, no-store" and does not expose "x-wc-cache".
+
+Do not assume the environment variable is being read correctly merely because Cloudflare displays it.
+
+3. Check the cache implementation carefully
+
+Investigate whether:
+
+- The Worker actually reaches the cache lookup after successful HMAC verification.
+- "MEDIA_EDGE_CACHE=authorized" activates the correct code path.
+- Cache lookup and storage are both implemented.
+- The image response headers prevent the Worker Cache API from storing the response.
+- A "no-store" response is incorrectly being reused for the internal cache write.
+- The application cache policy is correctly communicated to the Worker.
+- The cache key uniquely identifies the correct R2 object and cannot cause cross-wedding data exposure.
+- The cache is populated only after retrieving a valid existing object.
+- Cache TTL is appropriate and does not outlive the authorization rules.
+- Cache behavior works for both GET and HEAD requests where supported.
+
+Pay particular attention to the distinction between:
+
+1. The headers sent to the browser.
+2. The response stored internally in Cloudflare's Worker Cache API.
+
+The browser must continue receiving private/no-store headers. However, determine whether the Worker needs a separate, safely constructed cacheable response for its internal cache storage after authorization succeeds.
+
+Do not simply remove "private, no-store" from the browser response.
+
+4. Security requirements
+
+These are mandatory:
+
+- Verify HMAC signature before every cache lookup.
+- Reject expired signatures before accessing cached objects.
+- Reject modified object paths.
+- Never serve cached media to unauthorized users.
+- Preserve wedding-level media isolation.
+- Never make the R2 bucket public.
+- Never enable "r2.dev".
+- Never bypass existing authorization or membership checks.
+- Never expose signed URLs, HMAC secrets, or tokens in logs.
+- Never enable CDN delivery automatically.
+- Do not change DNS, Cloudflare Access, R2 bindings, or existing secrets.
+
+5. Implement and improve diagnostics
+
+For authorized requests, expose an accurate "x-wc-cache" response header indicating:
+
+- "MISS" when the authorized object is not cached and is fetched from R2.
+- "HIT" when the authorized object is served from the Worker cache.
+- "BYPASS" when the cache is intentionally not used.
+
+Unauthorized requests should remain rejected and must never access cached objects.
+
+Do not fabricate cache-status results.
+
+6. Test with a real existing photo
+
+Use a controlled existing test photo from our wedding media storage, or create a dedicated test object if necessary.
+
+Do not use the intentionally missing "gateway-probe" object for cache verification.
+
+Perform the following tests:
+
+1. Valid signed request for an existing photo: expect HTTP 200 and "x-wc-cache: MISS" on the first uncached request.
+2. Repeat the same authorized request: expect HTTP 200 and "x-wc-cache: HIT".
+3. Invalid signature: expect HTTP 403.
+4. Expired signature: expect HTTP 403.
+5. Modified object path: expect HTTP 403.
+6. Unauthorized wedding access: must be refused.
+7. Missing object: expect HTTP 404 and must not produce a false HIT.
+
+Make sure the test accounts for the actual behavior of Cloudflare's Worker Cache API and does not mistake browser caching for edge caching.
+
+7. Implementation and verification
+
+Fix confirmed defects directly in the source code.
+
+Run:
+
+- Relevant unit tests.
+- Worker cache tests.
+- HMAC and authorization regression tests.
+- Cache isolation tests.
+- TypeScript checks.
+- Production build.
+
+Report exact files changed and test results.
+
+Clearly distinguish:
+
+- Implemented.
+- Unit-tested.
+- Verified against a real existing media object.
+- Not yet verified against the live Worker.
+
+8. Deployment restrictions
+
+Do not deploy the Worker automatically.
+
+Do not enable CDN delivery in The Wedding Circle.
+
+Do not change the existing Cloudflare environment variable or rotate secrets.
+
+First implement the correction and report the findings. If a Worker deployment is required for live verification, tell me exactly what will be deployed and wait for my approval.
+
+Final objective: Deliver privately authorized wedding photos through Cloudflare edge caching, with a demonstrable MISS followed by HIT, while keeping browser responses private and preserving all existing media security.

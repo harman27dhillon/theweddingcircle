@@ -1,0 +1,56 @@
+Fix Chat Message Bar, Plus Menu, and Bottom Navigation Flickering
+
+Make these targeted fixes in the existing The Wedding Circle app. Use the supplied screenshots as visual references.
+
+Important: Inspect the existing chat layout, composer, bottom navigation, scrolling logic, and plus-menu components first. Make the smallest necessary changes. Preserve all existing chat data, message functionality, permissions, themes, and other features. Do not redesign the interface or create duplicate components.
+
+1. Fix the Chat Message Bar
+
+- Keep the message composer fully visible and correctly positioned immediately above the bottom navigation bar.
+- Fix any clipping, overlap, jumping, or disappearing of the composer when scrolling, swiping, opening the keyboard, or opening the plus menu.
+- Ensure the message field, plus button, microphone button, and Post button remain fully visible and accessible.
+- Handle Android system navigation insets, safe areas, keyboard resizing, and viewport height correctly.
+- When the keyboard opens and closes, maintain the correct composer position without sudden jumps or blank gaps.
+- Preserve the existing rounded composer design, spacing, colors, and button actions.
+
+2. Remove Two Options from the Plus Menu
+
+Completely remove these two controls from the menu opened by the plus (+) button:
+
+- Function — including its ceremony/function selector and associated dropdown.
+- Who can see this — including its visibility/privacy selector and associated dropdown.
+
+Remove these controls from the plus-menu UI and its rendered menu content, not merely by making them invisible.
+
+Keep the remaining menu options, including Upload from device and Camera, fully functional. Do not delete unrelated backend data, ceremony configuration, or privacy settings used elsewhere in the app. Do not remove privacy functionality from other existing screens.
+
+Adjust the menu height and spacing naturally after removing the two sections. Prevent empty gaps, overlapping content, or unnecessary scrolling.
+
+3. Stop Bottom Navigation Flickering During Swipes
+
+The bottom navigation bar currently flickers during swipes. Fix the underlying layout or rendering problem so it remains stable, as it did previously.
+
+- Keep the Home, Chat, Live, Album, and More navigation bar fixed to the bottom of the app viewport.
+- Ensure it does not flicker, flash, disappear, resize, jump, or repeatedly rerender when the user scrolls the chat, swipes between sections, opens the keyboard, or opens/closes the plus menu.
+- Inspect and fix the actual cause, such as unstable positioning, nested scrolling, viewport resizing, unnecessary component remounts, conflicting touch handlers, or scroll-linked animation.
+- Keep the navigation bar outside the chat message-list scrolling container.
+- Preserve existing tab-switching behavior, icons, labels, theme styling, and navigation actions.
+- Avoid continuously toggling CSS classes or rebuilding the navigation component during scroll events.
+- Do not break the existing swipe gestures between app sections.
+
+4. Test Before Finishing
+
+Test on a mobile-sized viewport, especially Android:
+
+1. Scroll and swipe through the Chat message history repeatedly.
+2. Confirm the bottom navigation stays stable without flickering.
+3. Open the plus menu and verify Function and Who can see this are completely absent.
+4. Confirm Camera and Upload from device still work.
+5. Type a message with the keyboard open, send it, and verify the composer remains correctly positioned.
+6. Open and close the plus menu while scrolling.
+7. Switch between Home, Chat, Live, Album, and More and confirm navigation still works.
+8. Check light and dark modes and the existing wedding themes.
+
+Safety requirements: Inspect existing code before editing. Preserve current backend state and user data. Do not reset storage, replace unrelated components, remove permissions, or claim tests passed unless they were actually run.
+
+Finish by reporting the root cause of the flickering, the files changed, and the tests actually completed.

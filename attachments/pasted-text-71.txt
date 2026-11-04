@@ -1,0 +1,26 @@
+READ-ONLY VERSION AUDIT — DO NOT MODIFY OR DEPLOY ANYTHING.
+
+The live website (theweddingcircle.in) is currently showing a design approximately one week older than the latest version we had before the recent restoration attempt.
+
+I need you to identify:
+
+1. The exact source version currently loaded in Grok Build.
+2. The exact version currently deployed to the live website.
+3. The most recent source version from before the restoration attempt.
+4. Whether that latest version still exists in project history, checkpoints, snapshots or another recoverable source.
+5. The date and identifier of each relevant version.
+6. Which version contains the latest Home, Chat, Live, Albums and More layouts.
+7. Which version contains the latest features and backend integrations, including Supabase and LiveKit.
+
+IMPORTANT:
+
+- Do not modify source files.
+- Do not restore a checkpoint.
+- Do not deploy.
+- Do not delete or overwrite any version.
+- Do not roll back the database.
+- Preserve all current data and features.
+
+Return a chronological comparison of the available versions and identify the most recent complete version before the restoration attempt.
+
+Wait for my approval before taking any action.

@@ -1,0 +1,23 @@
+Directional Prompt — Realistic Wedding Florals
+
+You are updating my existing Wedding Circle application. Before changing code, inspect the current source files and identify exactly how the landing-page floral decorations, wedding cover image, and theme backgrounds are rendered.
+
+Visual direction
+
+Use the supplied realistic wedding-cover image as the visual reference: natural blush-pink and ivory roses, small white flowers, detailed green foliage, soft natural shadows, warm champagne lighting, and realistic depth.
+
+The existing corner flowers look like stickers because they use simplified vector SVG artwork. Replace the illustrated appearance with detailed, photorealistic floral assets that blend naturally into the page.
+
+Implementation requirements
+
+1. Inspect "public/flora/tl.svg", "tr.svg", "bl.svg", and "br.svg", plus the floral positioning rules in "src/styles.css".
+2. Create or use four separate, high-quality floral assets with transparent backgrounds. Prefer realistic transparent PNG or WebP artwork rather than trying to imitate photographic flowers with simple SVG shapes.
+3. Keep the flowers near the page edges and corners. Let branches extend naturally inward, with varied sizes and asymmetrical arrangements. Avoid four identical-looking corner stickers.
+4. Make the floral placement responsive on desktop, tablet, and mobile. Prevent flowers from covering names, buttons, navigation, ceremony details, or other interactive elements.
+5. Use the existing wedding-cover image as the actual cover artwork when selected. Do not replace it with a screenshot of the application.
+6. Preserve the existing Classic Default theme and all other themes. Do not force every theme to use the same floral colors. Ensure the artwork complements each theme and does not cause unwanted color changes to the app icon or navigation.
+7. Optimize image size and rendering performance. Use "object-fit" and background positioning appropriately; avoid excessive blur, heavy filters, and unnecessary animation.
+8. Do not change chat, database logic, authentication, navigation behavior, wedding records, or unrelated features.
+9. Test the landing page at desktop and mobile widths, including scrolling, theme switching, and interaction with the existing buttons.
+
+First inspect the current implementation. Then make the actual source-code changes and provide a list of every changed file, the assets created, and the build/test results. Do not merely describe the changes or provide another prompt.

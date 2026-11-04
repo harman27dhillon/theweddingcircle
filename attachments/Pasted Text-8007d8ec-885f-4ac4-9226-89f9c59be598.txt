@@ -1,0 +1,35 @@
+WEDDING CIRCLE — MASTER UPDATE
+
+Implement all five changes directly in my existing application. Inspect the actual components, routes, styling, and gesture handlers before editing. Do not create mockups or duplicate pages, reset data, or remove working features.
+
+1. WEDDING BACKGROUND: Fix the existing BackgroundsN system so the selected wedding-wide theme remains visible across the entire Home page and stays stationary while information scrolls. Keep the theme persistent and separate from the invitation cover. Use separate background and content layers; verify on mobile rather than relying only on background-attachment: fixed.
+
+2. GLASS HOME SECTIONS: Put the invitation, couple details, date, venue, upcoming ceremony, functions, family information, and other Home page content into individual translucent frosted-glass panels. Use controlled blur, subtle borders, soft shadows, elegant rounded corners, consistent spacing, and readable text. Let the selected background show through and between panels. Avoid one opaque page container, excessive blur, nested scrolling conflicts, and performance regressions. Keep the background stationary and content scrollable.
+
+CHANGE COVER: Inspect the actual project assets and include all existing developer-added cover pictures in the current Change cover gallery. Retain existing choices, preview, selection, upload, and persistence features. Associate each cover with the correct wedding ID. Never assign a single image automatically to all weddings. Keep invitation cover selection independent of the wedding-wide BackgroundsN theme.
+
+3. ALBUM SWIPE BUG: Diagnose and repair the actual reason horizontal swipes fail inside Album. Inspect touch/pointer handlers, event propagation, touch-action, overflow, nested scrolling, image viewers, overlays, and gesture conflicts. A deliberate horizontal swipe left must navigate to the next section; right must navigate to the previous section. Preserve vertical gallery scrolling, image zoom, carousels, video playback, and media controls. Ignore gestures originating on interactive controls. Ensure section changes begin rendering promptly without unnecessary timers or blocking work. Test both directions inside Album itself.
+
+4. OFFICIAL LANDING PAGE: Make each wedding card's image area exactly 1:1 using responsive sizing and intelligent cropping without distorting photographs. Preserve readable couple names and dates. Apply a subtle, colorful, slightly blurred/glossy background to the official landing page while keeping cards prominent and text readable. Do not apply this square-card requirement to ceremony cards inside individual weddings. Preserve login, wedding selection, routing, and loading performance.
+
+5. EXIT GESTURE: On the Home page inside an individual wedding, add a deliberate horizontal swipe starting near the left screen edge and moving right to return to the existing official landing page. Preserve the session, wedding membership, permissions, and all data. Do not sign the user out or leave/delete the wedding. Avoid triggering on vertical scrolling, buttons, inputs, dialogs, image viewers, or other interactive controls. Respect operating-system back gestures and prevent conflicts with existing section swipes. If the platform reserves the gesture for system navigation, use the safest compatible alternative.
+
+IMPLEMENTATION REQUIREMENTS:
+A. Inspect the real BackgroundsN implementation, Home component, scrolling structure, Change cover gallery, developer-added assets, Album gesture logic, landing-page cards, and navigation routes.
+B. Diagnose each issue before editing; update the actual rendered components, not unused code.
+C. Reuse existing storage, routes, and state models. Avoid duplicate listeners, redundant state, unnecessary dependencies, and destructive database changes.
+D. Test on mobile viewport sizes and verify real interactions, not just successful compilation.
+E. Regression-test saved themes, cover isolation, scrolling, Album media controls, bottom navigation, login, permissions, and all five requested changes.
+
+ACCEPTANCE CHECKLIST:
+- Selected wedding background visible across Home and stationary while content scrolls.
+- Individual Home sections display readable frosted-glass panels.
+- Developer-added images appear in Change cover.
+- Covers and wedding-wide backgrounds remain independent.
+- Album left/right swipes work without breaking vertical scrolling or media controls.
+- Official landing-page wedding cards are square.
+- Landing-page background has a restrained colorful/glossy finish.
+- Left-edge-to-right gesture returns to the official landing page safely.
+- Existing data and functionality remain intact.
+
+Do not merely explain what should be done or claim completion. Implement changes in the actual project, test the rendered app, fix regressions, and report the actual files changed, tests passed or failed, and anything that could not be verified. Never claim a test passed unless it was actually performed.

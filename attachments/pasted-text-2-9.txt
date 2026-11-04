@@ -1,0 +1,119 @@
+Fix Wedding Circle: Cross-Device Theme Persistence and Synchronization
+
+Work directly on my existing The Wedding Circle project. Diagnose and permanently fix the bug where changing a wedding theme on one device does not appear on another device, even after refreshing the second device.
+
+Current bug
+
+- I change a wedding's theme on my phone.
+- The desktop continues showing the old theme, even after a page refresh.
+- The app may show a successful save even though the updated theme is not reaching the shared wedding record.
+- The app has local state/local storage, server-side persistence, and Supabase PostgreSQL database routing. These must be investigated together.
+
+1. Trace the complete theme data flow first
+
+Inspect the existing code before making changes, particularly:
+
+- "src/lib/wedding/store.ts"
+- "pushCircle()"
+- "startCircleSync()"
+- "pullCircle()" and any equivalent remote-loading functions
+- The wedding/circle API endpoints and server-side persistence layer
+- Supabase database adapter, schema, and migration logic
+- Theme selection controls, host/co-host permissions, revision/version logic, and local-storage cache
+- Any real-time subscriptions or polling already implemented
+
+Trace the complete path:
+
+Theme selection → client state → save request → server → Supabase PostgreSQL → second device fetch/subscription → rendered theme.
+
+Identify the actual root cause. Do not assume that adding a refresh, a timer, or a real-time subscription alone will fix the underlying persistence problem.
+
+2. Make Supabase the shared source of truth
+
+The active wedding's selected theme must be stored in its shared server-side wedding/circle record, using the existing schema and appropriate fields wherever possible.
+
+Requirements:
+
+- Persist the selected theme ID and any associated theme configuration required to reproduce the same appearance.
+- Ensure the save request actually reaches the backend and writes to the active Supabase PostgreSQL database.
+- Ensure the server returns a clear success or failure response.
+- Do not show “saved” until the server confirms the write.
+- If saving fails, preserve the user's selection locally as a pending change and show a clear retry state.
+- Ensure desktop and mobile load the same persisted theme from the same wedding record.
+- Do not rely on each device's independent "localStorage" value as the authoritative theme.
+- Keep local caching for fast rendering if needed, but reconcile it with the server's confirmed version.
+
+3. Implement reliable cross-device updates
+
+Use the project's existing synchronization architecture where possible.
+
+- When the host or an authorized co-host changes the theme, save it to the server and notify other connected devices.
+- Prefer Supabase Realtime if the existing Supabase project, table configuration, and permissions support it safely.
+- Otherwise, implement an appropriate authenticated server-side polling or revalidation fallback.
+- When a device reconnects, opens the wedding, returns to the foreground, or refreshes, fetch and reconcile the latest persisted theme.
+- Update the theme immediately on connected devices without requiring manual refresh.
+- Subscribe only to the relevant wedding/circle, and clean up subscriptions when the user leaves it.
+- Avoid duplicate subscriptions, repeated fetch loops, unnecessary database traffic, and memory leaks.
+
+4. Fix conflict resolution and revision handling
+
+Inspect the current revision, timestamp, version, and synchronization logic.
+
+- A stale local revision must not overwrite a newer server-confirmed theme.
+- A successful newer server update must not be discarded because the device has an older cached revision.
+- Handle simultaneous changes deterministically, using server-confirmed versions or a reliable revision strategy.
+- Ensure unrelated wedding updates do not accidentally overwrite the selected theme with an old value.
+- Preserve all other wedding fields when saving a theme change.
+- Prevent infinite save/pull loops and duplicate writes caused by synchronization events.
+
+5. Preserve existing behavior and permissions
+
+- Only the existing authorized host/co-host roles may change the shared wedding theme, according to the current permission model.
+- Guests must receive the selected theme without gaining permission to modify it.
+- Preserve all 23 existing themes, their colors, typography, decorative effects, and animations.
+- Do not redesign the UI or change the theme-selection experience unless a minimal status indicator is required.
+- Preserve the existing Supabase database configuration, migration/cutover state, developer access, authentication, chat, invitations, albums, live streaming, and wedding memberships.
+- Do not disconnect Neon, reset databases, drop tables, delete records, or perform a destructive migration.
+- Do not create a second independent theme store or a parallel synchronization system if the existing architecture can be repaired.
+
+6. Test the actual failure scenario
+
+Add or update automated tests for:
+
+1. A host changes the theme on mobile; the server persists the new theme.
+2. A separately initialized desktop client loads the new theme after refreshing.
+3. Two connected clients receive the updated theme without manual refresh.
+4. A stale cached theme cannot overwrite a newer server-confirmed theme.
+5. A failed network request does not falsely report a successful save.
+6. Reconnecting after being offline retrieves the latest theme.
+7. Unauthorized guests cannot change the shared theme.
+8. Updating the theme preserves unrelated wedding data.
+9. Existing themes continue rendering correctly.
+10. Repeated updates do not cause loops, duplicate subscriptions, or excessive writes.
+
+Use the project's existing test framework. Run the available typecheck, tests, and production build. Fix any regressions introduced by your changes.
+
+7. Verify the deployed behavior
+
+If the available environment supports it, test using two separate browser sessions or devices connected to the same wedding:
+
+- Change the theme in session A.
+- Verify the shared database record is updated.
+- Verify session B changes to the same theme without manual refresh.
+- Refresh session B and confirm the theme remains correct.
+- Repeat with a different theme and verify that stale cached data does not revert it.
+
+Do not claim that live cross-device synchronization is verified unless it has actually been tested.
+
+8. Final report
+
+After implementing the fix, report:
+
+- The exact root cause found.
+- The files changed and why.
+- How theme persistence and cross-device synchronization now work.
+- Which automated tests, typechecks, and builds passed.
+- Whether live two-device testing was completed or remains outstanding.
+- Any Supabase configuration, table permissions, or deployment steps still required.
+
+Important: Implement the actual code changes in the existing project. Do not return only a plan, a proposed patch, or instructions for me to implement manually. Preserve existing data and features, and do not make unrelated changes.

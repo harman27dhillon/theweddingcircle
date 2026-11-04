@@ -1,0 +1,58 @@
+Wedding Circle — Fix Feed Layout, Swipe Navigation and App Latency
+
+Inspect the existing Wedding Circle app and fix the actual underlying problems. Do not rebuild the app or introduce unrelated changes.
+
+1. Fix the hidden Feed text bar and bottom controls
+
+- Keep the Feed text/post input bar fully visible at the bottom of the Feed, directly above the bottom navigation.
+- Prevent the text bar, Upload, Camera, Function, Audience and Information controls from being clipped or covered by the bottom navigation or Android system bars.
+- When the keyboard opens, move the composer above it and keep the input and posting controls usable. Restore the correct layout when the keyboard closes.
+- Make Feed posts scroll naturally in the available space above the composer.
+- Remove excessive blank space and ensure the last post remains accessible.
+- Inspect viewport-height calculations, safe-area insets, fixed positioning, overflow and nested scrolling. Fix the root cause rather than adding arbitrary margins.
+
+2. Make swipe navigation reliable and smooth
+
+The app has five main sections: Home, Feed, Live, Album and More.
+
+- Implement reliable horizontal swipe navigation across the full non-interactive screen area, not just a small portion of the page.
+- Swiping left moves to the next section. Swiping right moves to the previous section.
+- Do not loop from More back to Home or from Home back to More.
+- Update the active bottom-navigation indicator immediately and keep it synchronized with the displayed section.
+- Use a clear horizontal swipe threshold and directional detection. Ignore small movements and accidental diagonal gestures.
+- Do not trigger section changes when the user is vertically scrolling, typing, selecting text, dragging a gallery, interacting with a dropdown, using camera controls, or manipulating other interactive elements.
+- Prevent gesture handlers from conflicting with one another or being registered multiple times.
+- Make transitions feel smooth and responsive without unnecessary animation delays.
+- Preserve each section's scroll position, Feed draft text, selected options and other relevant state when switching sections.
+- Ensure swipe navigation does not interrupt an active livestream or camera session.
+
+3. Reduce latency throughout the entire app
+
+First identify the actual causes of sluggishness, then fix them.
+
+- Investigate slow initial loading, delayed section transitions, Feed loading, database requests, repeated API calls, unnecessary component re-renders and large media files.
+- Avoid fetching the same data repeatedly when it can be safely reused.
+- Load only the data needed for the current screen and fetch additional Feed posts or album media when needed.
+- Optimize image and video thumbnails, lazy loading and media rendering.
+- Reduce expensive rendering and calculations during swipes and scrolling.
+- Clean up obsolete event listeners, subscriptions, timers and requests where appropriate.
+- Add sensible loading states, request cancellation and controlled retries where needed.
+- Cache appropriate data without displaying stale private information or bypassing access permissions.
+- Keep backend data, authentication, guest permissions, family privacy restrictions and live-stream functionality intact.
+- Do not introduce aggressive polling or background requests that make performance worse.
+
+4. Test the actual fixes
+
+Test on mobile-sized screens and verify:
+
+1. The Feed text bar and all its controls remain visible.
+2. The keyboard does not cover the composer.
+3. Horizontal swipes consistently navigate between all five sections.
+4. Vertical scrolling and interactive controls continue to work normally.
+5. Switching sections feels responsive and does not cause unnecessary reloads.
+6. Feed posts, albums and media load efficiently.
+7. Active livestreams continue uninterrupted during navigation.
+
+Measure performance before and after wherever possible. Report the actual causes found, the fixes implemented and any remaining limitations. Do not claim improvements that have not been verified.
+
+Strict preservation rule: Keep the existing design, especially the Home page, unchanged except for the specific fixes requested. Do not remove features, reset existing data, replace the app architecture unnecessarily or break any working functionality. Make targeted changes to the existing project.

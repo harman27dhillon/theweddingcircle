@@ -1,0 +1,60 @@
+Critical Bug: Developer Settings → Infrastructure Forms Not Responding
+
+The Infrastructure section is currently malfunctioning. When I enter configuration values into the Firebase, Cloudflare R2 and other infrastructure fields, the application does not properly detect, process or save the entered values.
+
+Investigate the complete frontend-to-backend configuration workflow.
+
+1. Input handling
+
+- Verify every input is editable and correctly controlled by React state.
+- Check onChange handlers, state updates, component re-rendering and form event handling.
+- Ensure typed values are actually captured.
+
+2. Save functionality
+
+- Verify Save buttons trigger the correct handlers.
+- Ensure the frontend sends the entered values to the correct backend API.
+- Fix request validation, API routes and database persistence.
+- Display meaningful errors instead of silently failing.
+
+3. Configuration retrieval
+
+- Load the latest saved configuration when opening Infrastructure.
+- Ensure saved values replace old values.
+- Eliminate stale state, cached values and duplicate configuration records.
+
+4. Connection testing
+
+- Test using the latest submitted credentials.
+- Do not run tests using old credentials or hardcoded environment variables.
+- Display the actual connection result.
+
+5. Apply across all infrastructure cards
+
+- Firebase
+- Cloudflare R2
+- Livestream provider
+- Google Play Billing
+- Push Notifications
+
+6. Security
+
+- Keep secrets server-side.
+- Never expose secret values in frontend responses or browser logs.
+- Preserve existing authorization and validation.
+
+7. Testing requirements
+Test the actual workflow:
+
+1. Enter a new value.
+2. Confirm the input captures it.
+3. Save it.
+4. Reload the page.
+5. Confirm the saved configuration is retrieved.
+6. Change the value and save again.
+7. Confirm the old value is replaced.
+8. Run the connection test.
+
+Do not redesign the interface, remove existing configurations, reset the database or modify unrelated application features.
+
+First identify the root cause, fix it, and report which files, API routes and database operations were changed.

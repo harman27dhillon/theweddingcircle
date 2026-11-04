@@ -1,0 +1,57 @@
+Wedding Circle — Restore Previous Leaderboard Button Design
+
+The Leaderboard button was recently changed and its previous approved design needs to be restored.
+
+Inspect the current source code and Git history to identify the previous implementation. Restore that design rather than inventing a new one.
+
+Exact design to restore
+
+1. Keep the existing white pill-shaped button.
+2. Keep the word "Leaderboard" clearly visible.
+3. Use a small, elegant champagne-gold crown icon immediately before the text.
+4. Add a subtle animated ranking motif: numbers 1, 2 and 3 should emerge directly behind the "Leaderboard" text as a delicate champagne-gold ranking trail.
+5. The numbers should gently shimmer and fade away.
+6. Add a soft, warm golden glow to the button.
+7. On tapping, provide a subtle lift and shadow effect.
+
+Animation behaviour
+
+- The champagne-gold shimmer should occur slowly every 4–6 seconds.
+- Keep the animation elegant and understated.
+- The ranking numbers must appear behind the text, not as separate badges or circles.
+- Do not add separate gold, silver or bronze ranking circles.
+- Avoid excessive movement, flashing or distracting effects.
+- Respect the device's reduced-motion accessibility setting.
+
+Important visual restrictions
+
+- Preserve the existing white pill shape and proportions.
+- Do not enlarge the crown.
+- Do not replace the button with a new layout.
+- Do not change the surrounding header, app title, menu or landing-page layout.
+- Maintain good readability on mobile and desktop.
+
+Implementation instructions
+
+- First inspect whether the previous animation and styling still exist in the code.
+- Check Git history for the last approved version.
+- Reuse and restore existing code wherever possible.
+- If the previous code was overwritten, recreate only the approved design described above.
+- Do not introduce duplicate animation components or unnecessary dependencies.
+
+Verification
+
+Check the actual rendered button on mobile and desktop.
+
+Confirm:
+
+- White pill appearance is preserved.
+- Small gold crown is correctly positioned.
+- Ranking numbers appear subtly behind the text.
+- Shimmer and fade animation works every 4–6 seconds.
+- Tap interaction works.
+- Reduced-motion preference is respected.
+
+Do not modify unrelated components. Do not deploy or publish without my approval.
+
+Report whether the previous implementation was recovered or recreated, and distinguish tested changes from deployed changes.

@@ -1,0 +1,82 @@
+Implement the following four desktop UI fixes in The Wedding Circle. Inspect the actual source code and existing component structure first, then make the changes directly.
+
+Use the attached screenshots as visual references. Preserve the existing mobile layout and functionality.
+
+1. Expand the wedding navigation bar on desktop
+
+Inside an individual wedding, the top navigation currently appears compressed and occupies only part of the header width.
+
+Required:
+
+- Expand the navigation so it spans the full available header bar width on desktop.
+- Keep the existing app icon on the far left.
+- Preserve the existing back-arrow button and its functionality.
+- Distribute the navigation items evenly across the remaining available width.
+- Maintain the current visual styling, active-tab indicator, typography, and spacing.
+- Ensure Home, Chat, Live, Albums, and More remain properly aligned.
+- Do not stretch, distort, hide, or remove the app icon or back button.
+- Avoid horizontal overflow.
+- Keep mobile navigation behavior unchanged.
+
+2. Remove excess white space in the ceremony card
+
+The upcoming ceremony card beside the couple's name on the wedding home screen has unnecessary empty white space at its top and bottom.
+
+Required:
+
+- Inspect the card's actual content container, image dimensions, padding, margins, and height constraints.
+- Remove unnecessary vertical whitespace.
+- Make the card content fit its intended visual area naturally.
+- Vertically balance the ceremony title, date, location, and other details.
+- Preserve the existing image, typography, and card styling.
+- Ensure the card aligns cleanly with the couple's wedding invitation card.
+- Do not solve this by simply shrinking all text or cropping important content.
+
+3. Fix scrolling inside More sections
+
+When opening sections from More, the content does not scroll properly. The previously opened top settings section remains frozen or appears over other opened sections.
+
+Required:
+
+- Inspect More navigation, section mounting/unmounting, scroll containers, and CSS overflow/height rules.
+- Ensure each More section opens its own correct content.
+- Ensure the previous section does not remain frozen, overlap, or block the newly opened section.
+- Make the active section's content vertically scrollable when it exceeds the available screen height.
+- Keep the top navigation/header stable if that is the existing intended behavior.
+- Ensure scrolling works with both a mouse wheel and touch input.
+- Check all More buttons, not just one section.
+- Preserve all existing section functionality and permissions.
+
+4. Completely remove the bottom floral corner decorations
+
+The third screenshot shows floral decorations rendering at the bottom corners of the interface.
+
+Required:
+
+- Completely remove these bottom-corner floral decorations from the application.
+- Find and remove their actual source components, background images, CSS pseudo-elements, and global decoration references where applicable.
+- Do not merely hide them on the current screen.
+- Remove the unwanted decoration from every page and responsive layout where it is used.
+- Preserve other intentional wedding imagery, ceremony cover images, and card artwork.
+- Do not replace the flowers with another decoration.
+
+Strict implementation rules
+
+- Make only these four requested changes.
+- Do not redesign the application or change its color themes.
+- Do not modify backend, database, authentication, media storage, gateway, or CDN.
+- Preserve all existing wedding data and user interactions.
+- Avoid introducing desktop fixes that break mobile layouts.
+
+Audit and verification
+
+After implementation:
+
+1. Inspect each modified component and its responsive behavior.
+2. Test desktop navigation width and confirm the app icon and back button remain visible.
+3. Check ceremony card spacing and alignment.
+4. Open multiple More sections and test independent scrolling.
+5. Search the source for remaining bottom-corner floral decoration references.
+6. Run typecheck, relevant tests, and production build.
+
+Report exact files changed, what was fixed, and actual test results. Distinguish implemented changes from anything not verified. Do not claim success based only on visual assumptions.

@@ -1,0 +1,121 @@
+Update Wedding Circle — Classic Default Theme Only
+
+Implement a premium visual upgrade to the existing Classic Default theme using the four uploaded image assets. Treat the uploaded images as production assets, not as references to recreate.
+
+1. Asset integration
+
+Use the four uploaded images as follows:
+
+- Image 1 — Main cover: Use the sunset wedding mandap image as the main wedding cover background.
+- Image 2 — Top-left floral corner: Use as an independent decorative overlay.
+- Image 3 — Top-right floral corner: Use as an independent decorative overlay.
+- Image 4 — Bottom floral border: Use as an independent decorative overlay along the bottom edge.
+
+First inspect the uploaded assets and assign each image to the correct role. If the images have different filenames, identify them by their visual content. Store them in the project's existing public asset structure using clear filenames, such as:
+
+- "classic-default-cover"
+- "classic-default-floral-top-left"
+- "classic-default-floral-top-right"
+- "classic-default-floral-bottom"
+
+Use the correct file extensions and update all asset paths accordingly.
+
+2. Main cover design
+
+Transform the Classic Default wedding cover into an elegant, immersive wedding scene.
+
+- Display the sunset mandap image as the actual cover background, using "background-size: cover" or an equivalent responsive image implementation.
+- Choose a sensible "background-position" that preserves the floral mandap, sunset and ceremony area on both desktop and mobile.
+- Keep couple names, wedding date, location, countdown, and existing actions readable.
+- Add a subtle warm ivory gradient or translucent cream overlay behind text only where needed for readability.
+- Do not flatten the cover image into a screenshot or place it inside another decorative picture frame.
+
+3. Make floral decorations look natural
+
+The flowers must blend into the page instead of looking like stickers.
+
+- Position the top-left and top-right overlays independently at the relevant cover corners.
+- Position the bottom garland along the lower edge, adapting its size and placement to the cover's aspect ratio.
+- Preserve transparent pixels and use the original image transparency wherever available.
+- If an uploaded asset does not actually contain transparency, do not pretend it does. Use careful masking or another appropriate compositing technique only if it can be done without visibly damaging the flowers.
+- Avoid white rectangular backgrounds, hard image edges, obvious cutout borders, repeated flower patterns, excessive shadows, and oversized decorations.
+- Use "object-fit: contain" for transparent overlays, not "cover".
+- Use "pointer-events: none" and suitable stacking order so decorations never block buttons, text selection, links, scrolling, or navigation.
+- Keep decorations within the cover or intended page boundaries. Do not allow them to overlap important content or produce horizontal overflow.
+- On small screens, reduce the overlays proportionally and hide or reposition parts that interfere with content.
+
+4. Apply a coordinated colour palette
+
+Derive the Classic Default theme's accent colours from the sunset image.
+
+Use a sophisticated palette inspired by:
+
+- Warm ivory and champagne
+- Soft blush and dusty rose
+- Muted botanical green
+- Deep burgundy for important actions
+- Restrained antique-gold accents
+
+Apply the coordinated palette consistently to the Classic Default theme's own cover, ceremony cards, ceremony details, next-ceremony card, and related wedding-home decorative surfaces. Preserve good contrast and readability.
+
+Do not force every element to use the same colour. Use a restrained hierarchy: light surfaces, subtle botanical details, and a small number of strong accents.
+
+5. Desktop and mobile
+
+Make the design responsive across desktop, tablet, and mobile.
+
+Desktop:
+
+- Let the cover feel spacious and cinematic.
+- Keep the couple's names and wedding information clearly arranged.
+- Position floral corners and bottom garland so they complement the cover without crowding the content.
+- Ensure the ceremony and next-ceremony cards have balanced spacing and coordinated colours.
+
+Mobile:
+
+- Reposition and scale the same assets rather than simply cropping the desktop layout.
+- Keep couple names, dates, locations, buttons and ceremony information readable.
+- Prevent flowers from covering interactive controls.
+- Prevent fixed-height layouts from cutting off content or preventing normal scrolling.
+
+6. Strict theme isolation
+
+This is a Classic Default-only change.
+
+- Do not change Royal Burgundy, Pastel Blush, Sage Green, Royal Blue, Classic Ivory, Midnight Emerald, Terracotta Sunset, Lavender Dream, or any other theme.
+- Do not change the global app icon, navigation icon, logo, profile icon, or application header decorations.
+- Do not make the cover image or floral overlays automatically apply to every theme.
+- Switching away from Classic Default must restore the selected theme's existing appearance.
+- If users already have their own Classic Default cover customization, preserve it and provide a safe fallback to the new cover only when appropriate.
+
+7. Preserve existing functionality
+
+Do not redesign or remove existing features. Preserve:
+
+- Wedding creation, editing, deletion and joining
+- Theme selection and persistence
+- Couple names, dates, locations and countdown
+- Ceremony cards and ceremony navigation
+- Host controls and permissions
+- Chat, live streaming, albums, invitations and privacy settings
+- Existing mobile and desktop navigation
+
+Do not modify chat functionality, database schemas, authentication, or unrelated application logic for this visual task.
+
+8. Implementation and verification
+
+Inspect the existing components and theme architecture before editing. Reuse the current Classic Default theme mechanism rather than creating a duplicate theme.
+
+After implementation:
+
+1. Verify the four image paths resolve correctly.
+2. Check that all four assets are used in the intended positions.
+3. Check Classic Default on desktop and mobile.
+4. Switch through other themes and verify they remain unchanged.
+5. Verify scrolling, buttons, ceremony cards and navigation still work.
+6. Run the project's existing type checks, tests and production build.
+7. Fix any errors introduced by this change.
+
+Do not claim a test passed unless it was actually run.
+
+Deliverable: Implement the actual code changes in the existing project. At the end, report which files were changed, where the four assets were stored, what was verified, and any remaining issues. Do not merely provide another plan or code snippet.

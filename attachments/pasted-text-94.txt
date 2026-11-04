@@ -1,0 +1,145 @@
+# Recover the Original Chat Group Voice Controls — NO VIDEO
+
+## Objective
+
+The original **Chat Group Voice** feature in The Wedding Circle has disappeared after the recent website crash and code changes. Recover the exact feature described below.
+
+**This is NOT a video call, NOT a Live Stream, and NOT the separate group video-call idea. There must be no video or camera UI in this feature.**
+
+Do not guess what the feature is from generic voice-call patterns. Use this specification as the source of truth.
+
+## 1. Find the original implementation first
+
+Before editing anything, inspect the current project and search for:
+
+- Group voice, group audio, chat voice, voice room, microphone, speaker, audio participants, and related component names.
+- The two floating Mic and Speaker controls.
+- Participant profile/avatar rows or stacks associated with those controls.
+- Chat layout, message composer, chat header, and responsive positioning.
+- Audio transport, room/session logic, real-time events, hooks, services, and permissions.
+- Git history, earlier commits, branches, and previous versions from before the recent crash and code changes.
+
+Determine whether the feature was:
+- deleted,
+- hidden by a conditional,
+- disconnected from event handlers,
+- broken by a component/layout change,
+- or left in the code but disconnected from its audio service.
+
+Recover the original code from history wherever possible. Repair existing code before rebuilding. Do not create duplicate implementations.
+
+## 2. Exact feature appearance and placement
+
+Restore the feature inside **Wedding Circle Chat**.
+
+- Show two separate, compact, round floating controls in the upper-right area of Chat.
+- One control is the microphone toggle.
+- The other control is the speaker toggle.
+- Both controls must be independently operable.
+- Participant profile pictures appear immediately to the LEFT of these two controls, extending horizontally left as participants join the group voice.
+- Profiles are circular and use the participants' actual Wedding Circle profile pictures/avatars.
+- When there are more participants than fit, allow horizontal swiping/scrolling through the profile row.
+- Keep the controls and profiles clear of the message composer, message list interactions, and bottom navigation.
+- Preserve the existing Wedding Circle visual style and responsive layout. Do not redesign the Chat screen.
+
+## 3. Exact behaviour
+
+### Microphone toggle
+- Default state: OFF.
+- When the user turns it ON, they join/participate in the group audio session and transmit their microphone audio, subject to permission.
+- When OFF, their microphone must not transmit audio.
+- Their participant profile appears in the group profile row when their microphone is ON.
+- Their profile disappears from that row when their microphone is OFF or they leave the group audio session.
+- Show a clear visual distinction between ON and OFF.
+- Handle microphone permission denial with a clear explanation and leave the control in the correct OFF state.
+
+### Speaker toggle
+- Default state: OFF.
+- When ON, the user can hear incoming group audio.
+- When OFF, incoming group audio is muted locally for that user.
+- Turning the speaker OFF must NOT turn off the microphone.
+- Turning the speaker OFF must NOT remove the user's profile from the participant row if their microphone remains ON.
+- Turning the speaker ON/OFF must not disconnect the user from the group audio session.
+- Show a clear visual distinction between ON and OFF.
+
+### Participant profiles
+- Show profiles for participants whose microphones are ON and who are participating in the group audio session.
+- Do not show profiles merely because someone is online or viewing Chat.
+- Do not show profiles for participants whose microphones are OFF.
+- Profiles must update in real time for every member of that wedding's Chat.
+- Show a subtle speaking indicator or ring only if reliable active-speaker detection already exists or can be implemented safely. Do not confuse this with the microphone ON state.
+- Profile row must support multiple participants and horizontal scrolling without covering Chat content.
+
+## 4. Audio and real-time architecture
+
+Inspect the existing project before choosing or changing audio technology.
+
+- Reuse any existing working audio transport/provider and room implementation.
+- Do not add video tracks, camera permissions, video tiles, or video-call screens.
+- Do not use the existing broadcast Live Stream as a substitute for two-way group audio.
+- Do not create a separate video-call feature.
+- If no usable group-audio implementation exists, report the missing infrastructure and propose the smallest compatible audio-only implementation before adding a new paid service or credentials.
+- Use the existing authentication and wedding-membership checks. Only authorized members of the same wedding may join that wedding's group audio.
+- Keep participant state scoped to the correct wedding and audio session.
+- Handle join, leave, mute, disconnect, reconnect, and stale participant state.
+- Stop microphone tracks and release media resources when the user leaves or the session ends.
+- Avoid duplicate audio streams, feedback, and accidental self-audio.
+- Ensure speaker mute is local playback mute, not a global mute affecting other participants.
+- Do not expose private audio sessions to users outside the wedding.
+
+## 5. Important distinctions — do not get these wrong
+
+- This is audio-only group talk inside Chat.
+- There are exactly two independent controls: Mic and Speaker.
+- Both start OFF.
+- Profiles extend LEFT of the controls.
+- Profiles represent users with microphones ON in the group audio session.
+- Speaker OFF only mutes what the current user hears; it does not affect their microphone or profile.
+- No camera, no video, no video thumbnails, no enlarged video, no video-call UI.
+- Do not confuse this with the broadcast Live Stream feature.
+- Do not confuse this with the separate proposed 4–5-person group video-call concept.
+
+## 6. Protect the rest of the app
+
+- Do not change unrelated Chat functionality, message rendering, composer, navigation, themes, wedding home screen, Live Stream, album, or other features.
+- Do not remove other working audio functionality.
+- Do not change authentication, privacy policies, or database schema unless genuinely necessary.
+- Reuse the current backend and real-time architecture wherever possible.
+- Do not add new paid services, subscriptions, or credentials without explaining the need and waiting for approval.
+- Do not deploy or publish without explicit approval.
+
+## 7. Verification required
+
+Do not claim completion just because the buttons are visible.
+
+Test and verify:
+
+1. Both controls are visible in the correct Chat location.
+2. Both controls start OFF.
+3. Mic ON requests permission and actually transmits audio.
+4. Mic OFF stops transmission.
+5. Speaker ON plays incoming group audio.
+6. Speaker OFF mutes incoming audio locally without disconnecting or muting the user's microphone.
+7. A user's profile appears when their mic is ON and disappears when OFF or when they leave.
+8. Other members see profile changes in real time.
+9. Multiple participant profiles fit and can be horizontally scrolled.
+10. Two or more real participants can communicate in the same wedding's Chat.
+11. Disconnect/reconnect and permission-denied states behave correctly.
+12. No camera permission, video track, video thumbnail, or video-call UI is introduced.
+13. Existing Chat and Live Stream still work.
+14. Relevant tests and the production build pass.
+
+If real multi-device audio testing is unavailable, state that clearly. Do not pretend it was tested.
+
+## 8. Final report
+
+Report:
+- Where the original controls and audio code were found.
+- Whether the feature was deleted, hidden, or disconnected.
+- Whether you recovered the original implementation or rebuilt missing parts.
+- Exact files changed.
+- Whether real multi-user audio was tested, and how.
+- Build/test results.
+- Any missing provider configuration or blockers.
+
+**Work in this order: inspect → recover → repair → verify. Do not start by inventing a new design. Do not make unrelated changes. Do not deploy.**

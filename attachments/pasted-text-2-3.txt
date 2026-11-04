@@ -1,0 +1,168 @@
+The Wedding Circle — Chat Profile, Floating Media & Message Composer Redesign
+
+Implement the following targeted UI and interaction changes to the existing Wedding Circle chat on both mobile and desktop. Inspect the current chat components and state management first. Preserve all existing messages, media, user data, permissions, and backend functionality.
+
+1. Remove the profile-edit popup triggered by swiping
+
+Currently, swiping in the chat opens a popup window for profile editing.
+
+- Remove this swipe-triggered profile-editing behavior on mobile and desktop.
+- Ensure ordinary scrolling, horizontal gestures, and navigation do not accidentally open profile editing.
+- Keep profile editing available through the new profile-picture control described below.
+- Do not remove the underlying profile-editing functionality or any saved profile information.
+
+2. Give guests temporary animated cartoon profile pictures
+
+When a guest enters a wedding chat without an assigned profile picture, automatically provide a temporary animated cartoon avatar.
+
+Requirements:
+
+- Use an attractive, friendly cartoon-style avatar suitable for a premium wedding application.
+- Give the avatar subtle animation, such as gentle floating, blinking, or a small idle movement.
+- Keep animations lightweight and smooth on mobile and desktop.
+- Assign a stable temporary avatar to each guest for the duration of their participation in that wedding, rather than randomly changing it on every render.
+- Allow guests to change their avatar or upload their own profile picture through the profile editor.
+- If a guest uploads a picture, display that picture instead of the default cartoon avatar.
+- Preserve the guest's chosen picture and profile details according to the existing account/session and wedding-membership model.
+- Keep temporary guest profiles separate between weddings where appropriate.
+- Respect existing image validation, file-size limits, privacy settings, and upload rules.
+
+Do not require every guest to create a permanent account just to have a temporary wedding profile.
+
+3. Replace the couple-name area with a circular profile-picture control
+
+In the chat's top bar, the area on the left currently displaying the bride and groom's names must be redesigned.
+
+- Remove the bride-and-groom-name display from that specific top-bar position.
+- Replace it with a clearly visible circular profile-picture section.
+- Display the currently active guest's chosen profile picture, or their default animated cartoon avatar if they have not selected a picture.
+- Keep the circle neatly sized and aligned with the existing top bar.
+- Add a subtle premium border that matches the active wedding theme.
+- Make the circular profile picture clickable or tappable.
+- Clicking or tapping it must open the existing profile-editing details window.
+- The editing window should allow the guest to update their display name, profile picture/avatar, and other currently supported profile details.
+- Provide a clear close action and preserve unsaved-change handling.
+
+Use the correct current guest's profile, not a shared bride/groom image or another participant's profile.
+
+Do not delete wedding names or couple information from the database or other screens. Only replace their display in this particular top-bar position.
+
+4. Remove the excessive white space around chat photos and videos
+
+Currently, photos and videos in chat have too much white space or a large white container surrounding them.
+
+Remove that unnecessary surrounding space completely.
+
+New media presentation:
+
+- Display photos and videos directly against the chat background, without a large white card, white panel, or padded container.
+- Keep only a very thin, elegant frame around the media itself.
+- Make the media feel like it is floating naturally within the chat timeline.
+- Remove unnecessary inner padding, outer margins, card backgrounds, and container borders responsible for the excessive white space.
+- Preserve suitable spacing between separate messages so the chat remains readable.
+- Keep the original media aspect ratio wherever possible.
+- Prevent images and videos from stretching, becoming distorted, or overflowing the available chat width.
+- Maintain appropriate corner rounding and subtle shadows only where they improve the existing premium design.
+- Ensure the design works in both light and dark wedding themes without introducing unwanted white blocks.
+
+Apply the same visual treatment to media messages across mobile and desktop.
+
+5. Make media actions float over the media
+
+Keep the existing download functionality, but turn the download icon into a floating action button.
+
+- Position the download icon over or immediately on the media's edge, according to the available space.
+- Use a small, clear icon button with a subtle background that keeps it visible against both light and dark photos.
+- Do not allocate a separate large white action bar for it.
+- Preserve the existing download behavior, permissions, and media source.
+- Ensure the button remains easy to tap on mobile and easy to click on desktop.
+
+The download control must remain functional, not merely decorative.
+
+6. Make the “shared a photo/video/file” label float
+
+The existing text indicating that someone shared a photo, video, or other media must also become a floating label.
+
+Examples:
+
+- “Shared a photo”
+- “Shared a video”
+- The existing appropriate label for another supported media type.
+
+Requirements:
+
+- Position the label as a compact overlay on or immediately beside the relevant media.
+- Avoid placing it inside a large white message container.
+- Use a subtle translucent or theme-compatible background when needed for legibility.
+- Keep the text readable and ensure it does not obscure important parts of the media.
+- Preserve the sender identity and any existing attribution or privacy behavior.
+- Adapt placement to different media aspect ratios and screen widths.
+
+The download button and shared-media label should feel like part of the media presentation, not separate bulky interface elements.
+
+7. Replace the “Post” button with a Send Message icon button
+
+In the chat composer, replace the existing button labelled Post with a compact send-message icon button.
+
+Requirements:
+
+- Use a recognizable send icon, such as a paper-plane or send-message symbol.
+- Remove the visible “Post” label from the button.
+- Keep the composer slim, clean, and premium.
+- Match the icon button to the active wedding theme, including the existing burgundy, champagne-gold, or other configured theme colors.
+- Include a clear hover state on desktop and pressed/focus states on mobile and desktop.
+- Provide an accessible label such as “Send message” for screen readers.
+- Keep the button disabled when the message is empty or cannot be sent, if that matches the existing validation rules.
+- Support keyboard submission where appropriate, including Enter to send and Shift+Enter for a newline if the existing composer supports multiline messages.
+- Preserve current message validation, sending behavior, optimistic updates, retry behavior, and backend integration.
+
+Do not replace the actual message-submission logic with a new disconnected implementation.
+
+8. Responsive behavior and visual consistency
+
+Apply all these changes to mobile and desktop while respecting their different layouts.
+
+- Do not undo the desktop-specific two-panel layout or top navigation.
+- Do not change the existing mobile navigation.
+- Preserve the current shared chat room and its membership/access rules.
+- Preserve existing private messaging data and functionality outside the specific navigation changes already requested.
+- Keep chat messages, sender alignment, replies, privacy controls, media uploads, downloads, and existing long-press interactions working.
+- Do not bring back the swipe-triggered profile popup.
+- Ensure the new circular profile control does not overlap other top-bar controls.
+- Ensure floating media labels and buttons do not cover important content or conflict with existing long-press menus.
+- Support keyboard navigation, visible focus indicators, sufficient contrast, and accessible button labels.
+- Maintain smooth scrolling and avoid adding unnecessary animation or layout work that could slow down the chat.
+- Preserve the premium wedding aesthetic and all existing theme configurations.
+
+9. Implementation and testing safeguards
+
+Before modifying the application:
+
+1. Inspect the existing chat UI, media rendering components, profile model, guest identity handling, composer, and responsive styles.
+2. Identify the exact swipe gesture that currently opens the profile editor and remove only that behavior.
+3. Reuse the existing profile-editing modal/window and existing message submission and download handlers.
+4. Make the smallest targeted changes needed.
+5. Preserve existing data, wedding IDs, membership permissions, messages, media references, and backend state.
+6. Do not reset databases, clear local storage, overwrite profiles, or remove existing chat records.
+7. Avoid duplicate components or unrelated redesigns.
+
+After implementation, test:
+
+- Mobile and desktop profile editing through the circular avatar.
+- No profile popup opening from chat swipes.
+- Default animated avatars and user-uploaded pictures.
+- Guest identity and profile persistence across chat refreshes.
+- Photo and video messages without the excessive white container.
+- Floating download controls and shared-media labels.
+- The send icon actually submitting messages.
+- Light and dark themes.
+- Existing message history, media loading, scrolling, and permissions.
+- Desktop two-panel layout and mobile layout remaining intact.
+
+Run relevant tests, type checks, and build checks where available.
+
+Final expected result
+
+The Wedding Circle chat should feel lighter and more polished: a circular profile picture in the top-left area opens profile editing, guests receive attractive temporary animated cartoon avatars, media floats naturally without excessive white space, download and shared-media labels float over the media, and the Post button becomes a clean send-message icon.
+
+All changes must work on mobile and desktop without breaking existing functionality or deleting data.

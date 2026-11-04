@@ -1,0 +1,170 @@
+The Wedding Circle — Complete Production-Readiness Audit and Upgrade
+
+Act as a senior Android, React, backend, database, security, and production deployment engineer. Your task is to audit and upgrade my existing The Wedding Circle project to make it reliable, secure, performant, and ready for eventual Google Play Store production release.
+
+1. Critical rules — protect the existing project
+
+- Work on the existing project. Do not rebuild it from scratch.
+- Preserve all working features, UI designs, animations, wedding themes, navigation, layouts, and user workflows.
+- Do not remove features, simplify the design, replace working implementations with mockups, or introduce unnecessary dependencies.
+- Do not overwrite or delete existing user data, wedding records, database tables, storage files, environment variables, or configuration.
+- Preserve all nine existing wedding themes and ensure theme settings apply consistently throughout the wedding experience.
+- Keep the existing Grok Build workflow functional so I can continue updating and testing the app there.
+- Do not migrate databases, change hosting providers, rotate credentials, or make destructive infrastructure changes without explaining the reason and obtaining my approval.
+- Never expose secrets, private keys, access tokens, service-role keys, or database credentials in frontend code, logs, or generated reports.
+- Do not claim a test passed unless you actually ran it and verified its result.
+
+2. Begin with a complete audit
+
+Before making changes, inspect the actual project structure, dependencies, build configuration, Android wrapper, backend, database integration, authentication, storage, API endpoints, and deployment settings.
+
+The project has used React, TypeScript, Vite, Tailwind CSS, Motion, Lucide React, an Express backend, and an Android wrapper. Verify the current implementation instead of assuming every technology or configuration remains unchanged.
+
+Produce an audit covering:
+
+- Critical errors and crash risks.
+- Missing or incorrect production configuration.
+- Security vulnerabilities and exposed credentials.
+- Database persistence and synchronization risks.
+- Broken or incomplete features.
+- Performance and memory issues.
+- Android build, signing, and compatibility issues.
+- Missing privacy, permission, and error-handling safeguards.
+
+Classify findings as Critical, High, Medium, or Low. Distinguish confirmed defects from items that require external credentials, device testing, or deployment access.
+
+After the audit, fix verified problems incrementally, starting with Critical and High severity issues. Preserve a clear record of changes.
+
+3. Production-grade Android build
+
+Verify the Android project's actual build system and release configuration.
+
+- Ensure a reproducible release build can be generated.
+- Configure the correct application ID, version name, version code, minimum SDK, target SDK, and supported device configurations.
+- Verify that the release AAB is generated through the proper Android Gradle signing workflow.
+- Configure secure release signing using an upload keystore. Never commit the keystore, passwords, or private signing material to source control.
+- Keep debug signing separate from release signing.
+- Verify the resulting AAB's signature and build integrity using appropriate Android tooling.
+- Check Android permissions and remove unnecessary permissions only when confirmed safe.
+- Check app launch, splash screen, status bar, keyboard behavior, navigation, orientation, camera access, media access, and back-button behavior.
+- Confirm that the app does not depend on a development server or development-only configuration.
+- Confirm that production API URLs, HTTPS, and environment variables are correctly configured.
+- Check compatibility with current Google Play requirements, including applicable target API requirements, using authoritative documentation where available.
+
+Do not manually sign an AAB using an improvised procedure or claim that a bundle is production-ready merely because a signing command reports success.
+
+4. Backend and database reliability
+
+Inspect the actual backend and database used by the existing app.
+
+- Verify that wedding information, user accounts, chat history, posts, albums, invitations, and other supported data persist correctly.
+- Identify any data that is stored only in memory or localStorage and could disappear after a restart, reinstall, deployment, or device change.
+- Do not silently replace existing persistence with a new database or storage service.
+- Verify authentication, authorization, access policies, data validation, error handling, and safe synchronization.
+- Ensure that hosts, co-hosts, family members, and ordinary guests can perform only their permitted actions.
+- Prevent unauthorized reading or modification of another wedding's private information.
+- Verify that production builds use the intended backend rather than development endpoints.
+- Protect against duplicate submissions, failed requests, race conditions, and inconsistent updates.
+- Check database migrations and backups where the existing provider supports them.
+- Never log passwords, tokens, private messages, or sensitive personal information.
+
+Do not claim database security or backup readiness without verifying the actual configuration and available permissions.
+
+5. Security and privacy
+
+Conduct a practical security review of both frontend and backend.
+
+- Check for exposed API keys, secrets, database credentials, insecure endpoints, unsafe file uploads, and missing authorization checks.
+- Verify that private wedding spaces and media cannot be accessed merely by guessing an identifier or URL.
+- Verify upload type and size validation, rate limiting where appropriate, and protections against common web vulnerabilities.
+- Validate inputs on the server, not just in the frontend.
+- Use HTTPS for production communications.
+- Avoid collecting unnecessary personal information.
+- Verify privacy controls for posts, albums, wedding invitations, live sessions, and family access.
+- Ensure host and co-host privileges cannot be acquired by manipulating client-side state.
+- Review account deletion, data deletion, privacy disclosures, and applicable Google Play requirements.
+
+Do not expose private data while testing or weaken security rules to make features appear functional.
+
+6. Verify every major Wedding Circle feature
+
+Inspect and test existing implementations without redesigning them unnecessarily.
+
+- Wedding creation and wedding invitations.
+- Bride and groom selection and wedding joining flows.
+- Host and co-host controls.
+- Wedding feed/chat, message alignment, posting, and history.
+- Photos, videos, albums, upload progress, and media permissions.
+- Camera photo capture and video recording.
+- Live streaming, spectator playback, comments, and supported simultaneous streams.
+- Wedding themes, backgrounds, cover images, and persistent preferences.
+- Family access codes and invitation permissions.
+- Leaderboard, wedding discovery, search, and other implemented features.
+- Offline mode, saved drafts, pending messages, and safe reconnection synchronization, if implemented.
+
+For each feature, verify loading, success, failure, permission-denied, empty, and network-disconnected states where applicable. Do not report unimplemented functionality as working.
+
+Preserve the existing premium wedding design and all working animations.
+
+7. Performance and scalability
+
+- Identify slow rendering, unnecessary network requests, repeated database queries, memory leaks, oversized assets, and avoidable re-renders.
+- Optimize images, videos, loading states, pagination, and media handling without visibly degrading quality.
+- Avoid loading an entire wedding's media history when only a small portion is needed.
+- Handle slow networks, interrupted uploads, reconnects, and server errors gracefully.
+- Review API and database usage for avoidable costs.
+- Do not promise support for a specific number of simultaneous users or live streams without load testing and infrastructure evidence.
+
+8. Website and Android app consistency
+
+The existing website must remain functional while the Android version is improved.
+
+- Preserve the public website URL and existing deployment workflow.
+- Verify that the website and Android app connect to the intended production backend.
+- Ensure the app works correctly on supported Android screen sizes.
+- Verify mobile layouts, touch targets, keyboard interactions, and scrolling.
+- Do not introduce changes that break the Grok Build preview or existing deployment.
+- Clearly identify any differences between website functionality and native Android functionality.
+
+9. Testing and verification
+
+Run all relevant checks available in the current environment, including:
+
+- Dependency and build checks.
+- TypeScript checks and linting where configured.
+- Existing automated tests.
+- Production frontend build.
+- Backend tests and API checks where available.
+- Android release build and AAB signing verification.
+- Security checks supported by the environment.
+
+Test critical user journeys and report exactly which tests passed, failed, were skipped, or require a physical device, external service, or credentials.
+
+Do not fabricate test results, Play Console validation, load-test results, or security certifications.
+
+10. Final deliverables
+
+When the work is complete, provide:
+
+1. A concise summary of verified problems discovered.
+2. A list of changes made, including the affected files.
+3. Tests executed and their actual results.
+4. Any unresolved critical or high-severity issues.
+5. Any steps I must complete manually, such as supplying credentials, configuring production services, testing on my phone, or generating the final signed AAB.
+6. The exact procedure to produce and locate the release AAB.
+7. A final readiness assessment with separate statuses for:
+   - Website readiness.
+   - Backend and database readiness.
+   - Android build and signing readiness.
+   - Real-device testing.
+   - Google Play submission readiness.
+
+Use these statuses: Verified, Needs testing, Blocked, or Not implemented.
+
+Final instruction
+
+Start by auditing the existing project and explaining the most important findings. Then fix confirmed issues in small, safe, verifiable steps.
+
+Do not make destructive changes or perform an unrequested deployment or publication. Do not declare The Wedding Circle production-ready until all required checks have evidence supporting that conclusion.
+
+My objective is to make the existing app dependable and ready for a future release while keeping the current website accessible and preserving my ability to continue developing it in Grok Build.

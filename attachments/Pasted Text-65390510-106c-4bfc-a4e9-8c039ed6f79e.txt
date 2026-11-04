@@ -1,0 +1,781 @@
+PROJECT: THE WEDDING CIRCLE
+
+TASK: COMPLETE THE THEME SYSTEM BY ADDING INDIVIDUAL CHAT DESIGN CONFIGURATIONS TO ALL 13 THEMES, REDESIGN CHAT TO MATCH EACH THEME, ADD FOUR NEW LIGHT THEMES, REMOVE INDIVIDUAL MESSAGE INFORMATION ICONS, AND REMOVE THE SIDE-COLOUR SELECTOR FROM HOST CONTROL.
+
+============================================================
+IMPORTANT IMPLEMENTATION RULES
+============================================================
+
+Inspect the existing project before making changes.
+
+Implement these changes directly in the existing application. Do not merely provide a plan, explanation, or mockup.
+
+The Wedding Circle already has an existing theme system, wedding-specific theme persistence, a theme selector, and an Apply Theme workflow.
+
+The objective is to EXPAND AND IMPROVE THAT EXISTING SYSTEM, not replace it with a separate system.
+
+Every theme must contain its own complete visual configuration for Chat, in addition to its existing configuration for the rest of the wedding.
+
+The Chat styling must be part of the actual theme definition.
+
+There must be:
+- No separate Chat theme selector.
+- No independent Chat theme preference.
+- No separate Chat Apply button.
+- No duplicate theme-persistence mechanism.
+- No competing theme provider.
+
+When the host applies a wedding theme, the entire wedding, including Chat, must use that theme's complete visual design.
+
+Preserve all working features and data.
+
+Make the smallest safe changes necessary. Inspect the actual implementation, identify relevant dependencies, and fix the underlying architecture rather than applying superficial CSS patches.
+
+============================================================
+PHASE 1 — AUDIT THE EXISTING THEME ARCHITECTURE
+============================================================
+
+Inspect the current implementation of:
+
+1. Existing theme definitions.
+2. Theme identifiers and palettes.
+3. Theme selector and preview components.
+4. Apply Theme and Cancel behaviour.
+5. Wedding-specific theme persistence.
+6. Theme provider, context, CSS variables, and design tokens.
+7. Chat components and their styles.
+8. Home, Live, Album, More, and Host Control styling.
+9. Background images, floral assets, decorative borders, gradients, and animations.
+10. Bride/groom identity and message-highlight styling.
+11. The side-colour selector currently displayed in Host Control.
+12. Existing message information icons.
+
+Identify which Chat components currently ignore the applied theme, which colours are hard-coded, and which styles override theme definitions.
+
+Do not assume that adding more CSS variables alone will fix the problem.
+
+Determine how the current theme reaches the actual rendered components, then extend that architecture consistently.
+
+Do not change the theme system unnecessarily if it already provides a suitable foundation.
+
+============================================================
+PHASE 2 — PRESERVE AND EXPAND ALL EXISTING THEMES
+============================================================
+
+The application already contains nine themes:
+
+1. Royal Burgundy
+2. Pastel Blush
+3. Sage Green
+4. Royal Blue
+5. Classic Ivory
+6. Midnight Emerald
+7. Terracotta Sunset
+8. Lavender Dream
+9. Classic Default
+
+Preserve all nine existing themes and their identities.
+
+Royal Burgundy, Royal Blue, and Midnight Emerald already have established dark styling. Do not redesign their palettes or damage their existing appearance.
+
+Pastel Blush, Sage Green, Classic Ivory, Terracotta Sunset, and Lavender Dream must retain their established light-theme identities.
+
+Classic Default must retain the original cream-and-brown interface and must remain distinct from Classic Ivory.
+
+Add four new light themes:
+
+10. Blossom Pink
+11. Sky Blue
+12. Rose Romance
+13. Peach Garden
+
+The final theme selector must contain 13 distinct themes.
+
+Do not delete, rename, merge, or replace existing themes.
+
+Do not silently reset previously saved wedding themes.
+
+============================================================
+PHASE 3 — ADD COMPLETE CHAT CONFIGURATION TO EVERY THEME
+============================================================
+
+Expand the actual existing theme definitions so each theme contains its own complete Chat visual configuration.
+
+Use the existing architecture and extend its theme schema appropriately.
+
+For example, a theme may contain a dedicated Chat configuration object, but adapt this to the actual project rather than introducing an unnecessary new architecture.
+
+Every theme's Chat configuration must include all relevant properties needed by the existing Chat components.
+
+A. CHAT BACKGROUND
+
+Define:
+- Background colour or gradient.
+- Background artwork or decorative assets.
+- Appropriate floral, botanical, or other theme-specific details.
+- Decoration opacity.
+- Decoration positioning.
+- Background layering.
+- Any theme-appropriate glassmorphism.
+- Background treatment for responsive screens.
+
+B. MESSAGE BUBBLES
+
+Define:
+- Sent-message background.
+- Received-message background.
+- Sent-message text colour.
+- Received-message text colour.
+- Border colour and width.
+- Appropriate corner radius.
+- Shadow and highlight treatment.
+- Sender-name styling.
+- Timestamp styling if timestamps are displayed by the existing Chat design.
+- Readable contrast for long messages.
+
+C. BRIDE AND GROOM MESSAGE EFFECTS
+
+Define the visual accents needed for the existing special bride/groom message treatment.
+
+Where appropriate, include:
+- Champagne-gold or complementary sparkles.
+- Border highlights.
+- Subtle glow.
+- Theme-compatible accent colours.
+
+Preserve the existing verified bride/groom identification mechanism.
+
+Do not identify the bride or groom using hard-coded names or display-name text.
+
+D. CHAT HEADER
+
+Define:
+- Header background.
+- Heading colour and typography.
+- Decorative separators.
+- Border treatment.
+- Appropriate theme accents.
+
+E. MESSAGE COMPOSER
+
+Define:
+- Composer background.
+- Input background.
+- Input text and placeholder colours.
+- Border and focus treatment.
+- Plus button styling.
+- Attachment menu styling.
+- Camera/photo controls.
+- Microphone and voice-note controls.
+- Post/send button background, text, and borders.
+
+F. CHAT NAVIGATION
+
+Define:
+- Bottom navigation background.
+- Icon colours.
+- Label colours.
+- Selected-tab styling.
+- Appropriate borders and highlights.
+- Theme-specific decorative accents where appropriate.
+
+G. DECORATIVE EFFECTS
+
+Where suitable, define:
+- Floral and botanical assets.
+- Decorative corner treatments.
+- Gradient and glassmorphism effects.
+- Subtle floating petals or sparkles.
+- Animation settings.
+- Reduced-motion alternatives.
+
+Not every theme needs identical decorations. Each theme must have its own coordinated visual identity.
+
+Do not make every theme use the same floral overlay.
+
+============================================================
+PHASE 4 — VISUAL DESIGN FOR THE 13 THEMES
+============================================================
+
+Each theme must define a complete Chat design, not just a background colour.
+
+THEME 1: ROYAL BURGUNDY
+
+Preserve the established deep burgundy and champagne-gold identity.
+
+Chat should feature:
+- Rich burgundy or complementary dark surfaces.
+- Refined champagne-gold borders.
+- Elegant wedding-inspired decorations.
+- Appropriate message-bubble contrast.
+- Coordinated composer and navigation styling.
+
+Do not replace the established palette.
+
+THEME 2: PASTEL BLUSH
+
+Use the established blush-pink, warm-cream, and rose-gold identity.
+
+Chat should feature:
+- A soft romantic background.
+- Delicate floral details where appropriate.
+- Warm cream or blush message surfaces.
+- Deep rose or plum text for readability.
+- Subtle rose-gold highlights.
+
+THEME 3: SAGE GREEN
+
+Use sage, ivory, and botanical accents.
+
+Chat should feature:
+- A calm, elegant background.
+- Subtle botanical styling.
+- Sage and ivory message surfaces.
+- Dark, readable text.
+- Restrained natural highlights.
+
+THEME 4: ROYAL BLUE
+
+Preserve the established royal-blue or navy identity.
+
+Chat should feature:
+- Refined blue surfaces.
+- Complementary gold or existing established accents.
+- Elegant borders and consistent text contrast.
+- Coordinated composer and navigation.
+
+THEME 5: CLASSIC IVORY
+
+Use ivory, cream, soft brown or charcoal, and restrained gold.
+
+Chat should feature:
+- A clean, refined background.
+- Minimal decorative details.
+- Ivory and cream message surfaces.
+- Elegant, understated borders.
+- Clear, readable typography.
+
+THEME 6: MIDNIGHT EMERALD
+
+Preserve the established dark emerald and antique-gold identity.
+
+Chat should feature:
+- Deep emerald surfaces.
+- Antique-gold accents.
+- Refined borders and highlights.
+- Coordinated message bubbles and controls.
+
+THEME 7: TERRACOTTA SUNSET
+
+Use terracotta, peach, sand, and bronze.
+
+Chat should feature:
+- Warm gradients.
+- Peach or cream message surfaces where appropriate.
+- Deep terracotta text.
+- Bronze or champagne accents.
+- Subtle sunset-inspired or botanical decorations.
+
+THEME 8: LAVENDER DREAM
+
+Use lavender, lilac, pearl, and silver.
+
+Chat should feature:
+- Soft lavender or pearl surfaces.
+- Elegant lilac gradients.
+- Readable dark text.
+- Delicate borders and subtle highlights.
+
+THEME 9: CLASSIC DEFAULT
+
+Preserve the original pre-theme cream-and-brown appearance.
+
+Chat should retain:
+- Cream background.
+- Original-style solid brown sent-message bubbles.
+- Appropriate original-style received-message styling.
+- Brown text and restrained borders.
+- The existing basic interface without unnecessary floral decorations or excessive glow.
+
+Classic Default must not become another decorative theme.
+
+THEME 10: BLOSSOM PINK
+
+Create a new light theme using:
+- Soft blossom pink.
+- Blush.
+- Warm ivory.
+- Champagne gold.
+
+Chat should feature:
+- Romantic floral details.
+- Soft pink and blush surfaces.
+- Deep rose or plum text where appropriate.
+- Delicate borders and restrained highlights.
+
+THEME 11: SKY BLUE
+
+Create a new light theme using:
+- Powder blue.
+- Pale sky blue.
+- Ivory.
+- Soft silver.
+- Restrained complementary accents.
+
+Chat should feature:
+- An airy, calm background.
+- Pale blue or ivory surfaces.
+- Dark blue-gray text.
+- Soft silver-blue borders.
+- Elegant, delicate styling.
+
+THEME 12: ROSE ROMANCE
+
+Create a new light theme using:
+- Dusty rose.
+- Rose pink.
+- Warm cream.
+- Rose gold.
+
+Chat should feature:
+- Sophisticated floral styling.
+- Rose-tinted surfaces.
+- Deep rose text.
+- Refined rose-gold borders.
+- A romantic but restrained appearance.
+
+THEME 13: PEACH GARDEN
+
+Create a new light theme using:
+- Peach.
+- Soft coral.
+- Cream.
+- Sand.
+- Bronze.
+
+Chat should feature:
+- Warm botanical styling.
+- Soft peach gradients.
+- Deep terracotta text.
+- Bronze or champagne accents.
+- Subtle decorative textures.
+
+These palettes are design directions, not permission to replace the existing established palettes of the first nine themes.
+
+The four new themes must be genuinely distinct from one another and from the existing themes.
+
+============================================================
+PHASE 5 — USE THE UPLOADED CHAT SCREENSHOT AS A DESIGN REFERENCE
+============================================================
+
+Use the user's uploaded Chat screenshot as a reference for the desired quality and overall visual treatment.
+
+The reference includes:
+- A beautiful wedding-themed background.
+- Soft gradients.
+- Floral decorations and subtle floating petals.
+- Rounded message bubbles.
+- Elegant borders and restrained glow.
+- A coordinated message composer.
+- A premium wedding atmosphere.
+
+Reproduce the level of visual polish while preserving the existing application structure.
+
+Do not copy the screenshot's peach palette into all themes.
+
+Instead, apply the design language to each theme using its own complete Chat configuration.
+
+Background artwork must remain behind the content.
+
+Do not let decorations:
+- Obstruct message text.
+- Cover the composer.
+- Intercept taps.
+- Interfere with scrolling.
+- Reduce text contrast.
+- Cause layout shifts.
+
+Reuse suitable existing assets where possible.
+
+Do not introduce unnecessary duplicate assets or a disconnected image system.
+
+============================================================
+PHASE 6 — REMOVE INDIVIDUAL MESSAGE INFORMATION ICONS
+============================================================
+
+Remove the individual information icon currently displayed beside each message sender's name.
+
+Requirements:
+- Remove the icon from every individual message.
+- Remove unnecessary spacing reserved for the icon.
+- Preserve sender names.
+- Preserve message alignment.
+- Preserve message bubbles.
+- Preserve existing message interactions.
+- Preserve timestamp behaviour as currently intended.
+- Preserve message history and permissions.
+- Do not remove the main Chat information button.
+- Do not remove unrelated information controls elsewhere in the application.
+- Do not remove moderation, privacy, or reporting functionality that exists through other controls.
+
+Remove the actual message-level icon and its associated layout space.
+
+Do not merely hide the icon while leaving an empty gap.
+
+Do not remove the underlying message identity or permissions logic.
+
+============================================================
+PHASE 7 — REMOVE THE SIDE-COLOUR SELECTOR FROM HOST CONTROL
+============================================================
+
+Remove the existing side-colour selector from Host Control.
+
+Requirements:
+- Remove the visible side-colour selector.
+- Remove associated event handlers or obsolete state only after checking their dependencies.
+- Preserve the main wedding theme selector.
+- Preserve all theme definitions.
+- Preserve theme previews.
+- Preserve Apply Theme and Cancel.
+- Preserve theme persistence and authorization.
+- Preserve unrelated Host Control features.
+
+Do not confuse the side-colour selector with the main wedding theme selector.
+
+Do not delete shared theme tokens or definitions merely because the side-colour selector is removed.
+
+Verify that existing saved themes continue to work.
+
+============================================================
+PHASE 8 — UPDATE THE EXISTING THEME SELECTOR AND PREVIEWS
+============================================================
+
+Update the existing theme selector to include all 13 themes.
+
+Each theme must have:
+- Its existing name, where applicable.
+- Its correct visual identity.
+- A representative colour preview.
+- A useful preview of its complete design.
+- An indication of whether it is currently applied or only selected.
+
+Where practical, improve the theme preview so it communicates how the theme affects both the main wedding interface and Chat.
+
+The preview may include a representative Chat header, message bubbles, and composer styling.
+
+Use the actual theme configuration to render the preview. Do not hard-code separate preview designs that differ from the real theme.
+
+Do not create a separate Chat theme selector.
+
+Preserve the existing Apply Theme workflow:
+
+1. Selecting a preview marks it as selected.
+2. The currently applied theme remains unchanged until Apply Theme is pressed.
+3. Apply Theme saves and applies the selected theme.
+4. Chat updates as part of the same theme application.
+5. Cancel discards an unsaved selection.
+6. A failed save preserves the previously applied theme.
+
+Do not apply an unsaved theme merely because its preview was selected.
+
+============================================================
+PHASE 9 — APPLY THE COMPLETE THEME TO THE ENTIRE WEDDING
+============================================================
+
+Each theme must continue to control the existing wedding interface, including:
+- Home.
+- Chat.
+- Live.
+- Album.
+- More.
+- Host Control.
+- Relevant nested pages.
+- Buttons.
+- Inputs.
+- Menus.
+- Dialogs.
+- Popups.
+- Navigation.
+- Wedding cards and shortcut tiles.
+
+This task must not regress existing theme support on any screen.
+
+Chat must be upgraded as part of each theme definition, but the remaining wedding screens must retain their established styling.
+
+Use one applied theme identifier as the source of truth for the entire wedding.
+
+Do not introduce independent Chat theme persistence.
+
+When the applied theme changes, the entire wedding—including Chat—must update consistently.
+
+============================================================
+PHASE 10 — PRESERVE THE EXISTING CHAT LAYOUT
+============================================================
+
+The Chat layout has previously become disarranged during styling changes. Avoid repeating that problem.
+
+Preserve the existing, repaired message layout.
+
+A. MESSAGE ALIGNMENT
+
+Messages sent by the current authenticated user appear on the RIGHT.
+
+Messages sent by other participants appear on the LEFT.
+
+Use stable authenticated user IDs and message sender IDs.
+
+Do not determine alignment using:
+- Display names.
+- Host labels.
+- Developer labels.
+- Bride/groom display text.
+- Hard-coded names.
+
+The same message must appear on the correct side for each participant viewing the conversation.
+
+B. MESSAGE BUBBLES
+
+Preserve:
+- Rounded bubble geometry.
+- Natural content-based width.
+- Appropriate maximum width.
+- Internal padding.
+- Consistent spacing.
+- Long-message wrapping.
+- Readable text.
+- Chronological ordering.
+- Smooth scrolling.
+
+Do not stretch every message across the screen.
+
+Do not change bubble dimensions simply to accommodate decorations.
+
+C. MESSAGE COMPOSER
+
+Preserve:
+- Plus button.
+- Message input.
+- Attachment menu.
+- Camera/photo attachments.
+- Microphone and voice notes.
+- Post/send button.
+- Existing message submission logic.
+- Keyboard handling.
+- Composer placement.
+
+D. OTHER FUNCTIONALITY
+
+Preserve:
+- Message history.
+- Real-time messaging.
+- Sender names.
+- Existing timestamp visibility behaviour.
+- Permissions.
+- Wedding membership.
+- Message privacy.
+- Existing animations and interactions.
+
+Do not replace functional components with decorative mockups.
+
+============================================================
+PHASE 11 — PRESERVE BRIDE AND GROOM MESSAGE EFFECTS
+============================================================
+
+Preserve the existing verified bride/groom identity mechanism and special message treatment.
+
+If the golden sparkle animation and enhanced highlights already exist:
+- Keep them working.
+- Adapt their colours to each theme's Chat configuration.
+- Preserve their animation behaviour.
+- Do not rewrite them unnecessarily.
+
+Only verified bride/groom messages should receive the special treatment.
+
+Do not identify the bride or groom through hard-coded names or display-name text.
+
+The same message must receive the correct effect whether it appears on the left or right for the current viewer.
+
+Ordinary guests' messages must retain normal styling.
+
+Do not let the effect alter bubble dimensions, alignment, or padding.
+
+Respect reduced-motion accessibility preferences.
+
+============================================================
+PHASE 12 — UPDATE THE THEME ARCHITECTURE WITHOUT DUPLICATION
+============================================================
+
+Use the existing theme architecture.
+
+Extend its schema or configuration with the Chat-specific properties required by the existing components.
+
+Requirements:
+- All 13 themes must have complete Chat configurations.
+- Components must consume the correct configuration.
+- Avoid duplicate theme providers.
+- Avoid independent Chat theme persistence.
+- Avoid hard-coded Chat palettes overriding the applied theme.
+- Provide sensible fallbacks for missing optional decorative assets.
+- Do not silently fall back to unrelated default colours when a theme property is available.
+- Preserve all existing theme identifiers and saved wedding preferences.
+- Keep Classic Default distinct from Classic Ivory.
+- Preserve wedding-specific theme persistence.
+
+If a theme-schema change is necessary, update all relevant theme definitions and consumers consistently.
+
+Do not create a second styling architecture that competes with the existing system.
+
+============================================================
+PHASE 13 — PERFORMANCE, RESPONSIVENESS, AND ACCESSIBILITY
+============================================================
+
+Ensure the complete Chat design works on phone-sized screens.
+
+Verify:
+- No horizontal overflow.
+- No clipped text.
+- No overlapping controls.
+- No composer hidden behind the Android keyboard.
+- Correct message alignment.
+- Appropriate text contrast.
+- Decorative backgrounds remain behind content.
+- Smooth scrolling.
+- No layout shifts caused by animations.
+- Reasonable image and animation performance.
+- Reduced-motion support.
+- Accessible labels for controls.
+
+Use lightweight CSS effects where appropriate instead of unnecessary JavaScript animation loops.
+
+Decorative elements must not block tapping, text selection, or scrolling.
+
+============================================================
+PHASE 14 — PRESERVE EXISTING FUNCTIONALITY
+============================================================
+
+Do not break or unnecessarily modify:
+- Authentication.
+- Wedding membership.
+- Wedding codes and invitations.
+- Host and co-host permissions.
+- Developer permissions.
+- Existing wedding data.
+- Message history.
+- Real-time Chat.
+- Message sending and receiving.
+- Message alignment.
+- Camera/photo attachments.
+- Voice notes.
+- Live streams.
+- Feed.
+- Album.
+- Pinned wedding functionality.
+- Wedding creation.
+- Free and Premium plan selection.
+- Payment processing.
+- Theme persistence.
+- Existing animations and navigation.
+
+Do not replace real backend integrations with mock implementations.
+
+Do not reset existing saved wedding themes.
+
+Do not delete or modify user data unnecessarily.
+
+Do not change unrelated settings or screens merely to implement Chat styling.
+
+============================================================
+PHASE 15 — TESTING
+============================================================
+
+Test the actual implementation.
+
+A. THEME CONFIGURATION
+
+1. All 13 themes exist.
+2. Every theme has a complete Chat configuration.
+3. The four new themes have distinct visual identities.
+4. Existing theme identifiers remain intact.
+5. Classic Default remains distinct from Classic Ivory.
+6. Missing optional decorative assets do not break rendering.
+
+B. CHAT VISUALS
+
+7. Chat has a complete background matching the applied theme.
+8. Message bubbles use the theme's own styling.
+9. Sent messages appear on the right.
+10. Received messages appear on the left.
+11. Long messages wrap correctly.
+12. The composer and bottom navigation remain correctly positioned.
+13. Camera, photo, microphone, voice-note, and Post controls work.
+14. Individual message information icons are removed.
+15. No empty spacing remains where those icons appeared.
+16. The main Chat information control remains available.
+17. Bride/groom sparkle effects remain functional.
+
+C. THEME SELECTOR
+
+18. All 13 themes appear in the existing selector.
+19. Previews accurately reflect the actual theme configuration.
+20. Selecting a preview does not change the applied theme.
+21. Apply Theme updates the entire wedding, including Chat.
+22. Cancel does not apply an unsaved theme.
+23. Failed saving preserves the previous theme.
+24. The side-colour selector is removed from Host Control.
+25. The main theme selector continues working.
+
+D. WEDDING ISOLATION
+
+26. Different weddings can retain different themes.
+27. Switching weddings updates Chat to the correct applied theme.
+28. Theme settings do not leak between weddings.
+29. A wedding without a saved theme uses Classic Default.
+30. No separate Chat theme setting is required.
+
+E. REGRESSION
+
+31. The three established dark themes remain intact.
+32. Existing light themes retain their established identities.
+33. Chat data and functionality remain intact.
+34. Authentication and permissions remain intact.
+35. Live, Feed, and Album remain functional.
+36. Pinned wedding functionality remains intact.
+37. Wedding creation and payment functionality remain intact.
+38. No unrelated features are removed.
+
+Do not claim a test passed unless it was actually performed.
+
+Clearly distinguish:
+- Code inspection.
+- Automated tests.
+- Rendered UI/browser tests.
+- Backend tests.
+- Multi-account tests.
+- Physical-device tests.
+
+Do not claim every theme was visually tested if only its configuration was inspected.
+
+============================================================
+PHASE 16 — FINAL REPORT
+============================================================
+
+After implementation, report:
+
+1. How the existing theme definitions were expanded.
+2. Which Chat properties were added to each theme.
+3. How the four new light themes were implemented.
+4. How the theme previews represent the complete design.
+5. How Apply Theme updates Chat and the rest of the wedding.
+6. How duplicate or independent Chat theme settings were avoided.
+7. How individual message information icons were removed.
+8. How the side-colour selector was removed.
+9. Which files and components were changed.
+10. Which themes and screens were actually tested.
+11. Which regression tests passed.
+12. Any remaining limitations or unverified areas.
+
+IMPLEMENT THE CHANGES DIRECTLY IN THE EXISTING PROJECT.
+
+Inspect first, make targeted changes, preserve existing functionality, and report honestly what was implemented and tested.
+
+Do not claim completion for features that were not actually implemented or tested.

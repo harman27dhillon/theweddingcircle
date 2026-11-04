@@ -1,0 +1,326 @@
+Update the EXISTING The Wedding Circle application.
+
+This is BATCH 1 of a staged update. Implement only the interface,
+navigation, Feed styling, and chat-layout changes specified below.
+
+IMPORTANT:
+- Inspect the existing code before making changes.
+- Modify the existing implementation rather than rebuilding it.
+- Preserve all existing user data, wedding memberships, authentication,
+  permissions, themes, and working features.
+- Do not reset or replace existing user preferences.
+- Do not introduce mock functionality or placeholder buttons.
+- Keep the app fast, responsive, and reliable on mobile devices.
+- Avoid unrelated redesigns and unnecessary dependencies.
+- Test actual interactions, not just the visual appearance.
+- Do not begin Batch 2 or Batch 3 in this task.
+
+==================================================
+1. HOST CONTROL BUTTON IN MORE
+==================================================
+
+Move Host Control to the very top of the More section.
+
+Design:
+- Full-width horizontal button.
+- Approximately 3:1 width-to-height ratio.
+- Premium wedding styling consistent with the existing design.
+- Clear Host Control label and appropriate icon.
+- Responsive on narrow mobile screens.
+
+Place every existing host-management feature inside Host Control
+where appropriate.
+
+Preserve existing authorization checks. Guests must not gain access
+to host-only features through direct navigation or UI manipulation.
+
+Do not duplicate existing host controls.
+
+==================================================
+2. FIX THE LEAVE-WEDDING DIALOG
+==================================================
+
+The "Leave this wedding?" confirmation dialog on Wedding Home is
+partly hidden behind the bottom navigation bar.
+
+Fix the actual layout problem.
+
+Requirements:
+- Position the dialog within the visible viewport, centered vertically
+  where practical.
+- Account for the mobile viewport, status bar, safe areas, and bottom
+  navigation.
+- Ensure the complete message and both Stay and Exit buttons are visible.
+- On short screens, allow the dialog content to scroll internally.
+- Prevent background scrolling while the dialog is open.
+- Keep both buttons fully tappable.
+
+Stay:
+Close the dialog without leaving the wedding.
+
+Exit:
+Return to the official Wedding Circle landing page without signing
+the user out or deleting their wedding membership.
+
+Do not merely increase z-index. Fix the positioning and viewport issue.
+
+==================================================
+3. MOVE SIDE COLOR INTO HOST CONTROL
+==================================================
+
+Remove the standalone Side Color button from the top of Feed.
+
+Move the existing setting to:
+
+More > Host Control > Side Color
+
+CRITICAL:
+- Preserve the currently selected color.
+- Preserve all existing color choices.
+- Preserve the setting across navigation, refreshes, and redeployment.
+- Ensure the selected color continues affecting the same Feed elements.
+- Changes made by the authorized host should take effect immediately.
+- Do not introduce a second independent color setting.
+- Do not reset the existing setting to a default value.
+
+Inspect the existing storage and state-management implementation before
+moving the control.
+
+The relocation must not change the underlying preference or its behavior.
+
+==================================================
+4. MOVE EDIT CEREMONIES INTO HOST CONTROL
+==================================================
+
+Remove the separate host-only Edit Ceremonies button from Wedding Home.
+
+Move the existing editing functionality to:
+
+More > Host Control > Ceremonies
+
+Requirements:
+- Reuse the existing ceremony editor.
+- Preserve all saved ceremony information, including names, dates,
+  times, descriptions, locations, and Google Maps links.
+- Hosts can continue adding and editing ceremonies.
+- Guests can still see ceremony information.
+- Guests should see the existing Directions button wherever a valid
+  location is available.
+- Guests must not see host-only editing controls.
+- Do not delete or duplicate ceremony records.
+
+Do not change the appearance or behavior of the official landing page.
+
+==================================================
+5. FIX ALBUM BACKGROUND AND SWIPE NAVIGATION
+==================================================
+
+The Album section has empty areas where the page background is visible.
+Horizontal swiping does not work when the gesture begins over those areas.
+
+Investigate and fix the actual gesture handling.
+
+Requirements:
+- Preserve the existing wedding background and theme.
+- Keep the Album section sized correctly for the available viewport.
+- Show an appropriate empty state when there are no media items.
+- Allow horizontal swipe navigation when the gesture starts over
+  empty background areas as well as visible album content.
+
+Use the existing section order:
+Home > Feed > Live > Album > More
+
+Preserve the app's current navigation conventions. Do not introduce
+circular navigation if it is not already supported.
+
+Ensure:
+- Vertical scrolling remains natural.
+- Buttons and media controls remain tappable.
+- Child components do not accidentally block parent navigation.
+- Horizontal carousels retain their intended behavior.
+- A simple tap does not trigger a swipe.
+
+==================================================
+6. ADD SUBTLE FEED ENTRANCE ANIMATIONS
+==================================================
+
+Give Feed the same restrained, polished entrance and transition
+effects used elsewhere in the app.
+
+Requirements:
+- Smooth, subtle transitions, approximately 250–450 ms.
+- Animate when intentionally entering Feed.
+- Do not replay entrance animations after every state update or new post.
+- Do not delay scrolling, typing, posting, or media interactions.
+- Respect reduced-motion accessibility settings.
+- Avoid heavy animations, unnecessary particles, and expensive effects.
+
+Prioritize responsiveness over decoration.
+
+==================================================
+7. APPLY GLASS EFFECT TO FEED CHAT BOXES
+==================================================
+
+Give existing and newly created chat/message boxes inside Feed a
+subtle frosted-glass appearance.
+
+Use:
+- Translucent surfaces.
+- Restrained background blur where supported.
+- Subtle borders.
+- Readable text and timestamps.
+- Clear separation between messages and surrounding content.
+
+Support existing light mode, dark mode, and wedding themes.
+
+CRITICAL SIDE COLOR REQUIREMENT:
+The glass effect must preserve the currently selected Side Color.
+Do not overwrite it with a fixed white, gray, or default background.
+
+Integrate the glass effect with the existing selected color.
+
+If blur causes performance problems on lower-end devices, provide a
+lighter fallback with a similar appearance.
+
+Do not apply this change globally to unrelated pages.
+
+==================================================
+8. FIX CHAT ORDER AND KEYBOARD LAYOUT
+==================================================
+
+Currently, newer messages appear at the top and older messages move down.
+
+Change the conversation layout to the familiar chronological behavior
+used by WhatsApp and Instagram:
+
+- Older messages appear higher.
+- Newer messages appear lower.
+- The latest message appears at the bottom.
+- Opening a conversation positions the viewport at the newest message.
+- Incoming messages appear in chronological order.
+- Older messages can still be loaded by scrolling upward.
+
+Do not reverse stored messages, timestamps, or backend data incorrectly.
+
+When the mobile keyboard opens:
+- Move the conversation viewport upward appropriately.
+- Keep the latest message visible.
+- Keep the composer above the keyboard.
+- Prevent the composer, keyboard, and bottom navigation from overlapping.
+- Preserve the draft while the user types.
+- Restore the layout correctly when the keyboard closes.
+- Avoid sudden or repeated page jumps.
+
+Support Android Chrome and the installed web-app/PWA environment.
+
+Test sending and receiving messages, scrolling older messages, opening
+the keyboard, typing, and closing the keyboard.
+
+==================================================
+9. COMBINE UPLOAD AND CAMERA UNDER A PLUS BUTTON
+==================================================
+
+Replace the separate always-visible Upload and Camera buttons in the
+Feed composer with one compact plus (+) button.
+
+When tapped, it should open an accessible action menu containing:
+
+1. Upload from device
+2. Camera
+
+Requirements:
+- Reuse the existing upload and camera handlers.
+- Preserve the existing upload functionality.
+- Close the menu after selecting an action.
+- Allow dismissal by tapping outside the menu.
+- Position the menu so it is not clipped by the screen edge or keyboard.
+- Ensure it works on mobile touchscreens.
+
+Do not implement the camera itself as part of this batch unless a small
+change is necessary to connect the existing camera action.
+
+The actual camera repair belongs to Batch 2.
+
+==================================================
+10. FIX SWIPING THROUGHOUT MORE
+==================================================
+
+Horizontal swipe navigation must work when a gesture starts anywhere
+on the usable More section, including empty background areas.
+
+Test gestures starting over:
+- The Host Control button's surrounding area.
+- Empty background.
+- Spaces between square tiles.
+- The lower part of More.
+- Areas without visible components.
+
+Requirements:
+- Use the same swipe thresholds and navigation logic as other sections.
+- Do not trigger navigation on ordinary taps.
+- Do not intercept vertical scrolling.
+- Do not interfere with buttons or interactive elements.
+- Avoid duplicate gestures and double navigation.
+- Preserve the existing section order.
+- Respect reduced-motion preferences.
+
+Fix the underlying event-handling issue rather than adding a
+separate, conflicting swipe implementation.
+
+==================================================
+11. REGRESSION TESTING
+==================================================
+
+After implementation:
+
+A. Verify Host Control is the first, full-width 3:1 button in More.
+
+B. Verify the Leave Wedding dialog is fully visible and both actions
+   behave correctly.
+
+C. Verify Side Color remains unchanged after moving the setting and
+   survives refresh.
+
+D. Verify ceremony editing works inside Host Control and guests retain
+   read-only access to ceremony information.
+
+E. Verify Album and More swipes work over empty background areas.
+
+F. Verify Feed transitions are smooth without delaying interaction.
+
+G. Verify the glass message styling respects the saved Side Color.
+
+H. Verify messages appear chronologically, with the newest at the
+   bottom, and the composer remains visible above the keyboard.
+
+I. Verify the plus menu opens and both existing Upload and Camera
+   actions are connected correctly.
+
+J. Verify existing wedding data, authentication, permissions,
+   membership, and navigation remain intact.
+
+Run the relevant type checks, lint checks, and tests available in the
+project.
+
+Do not mark a requirement as verified merely because the code compiles.
+
+If a test requires a real mobile device or multiple authenticated
+users, state that explicitly.
+
+==================================================
+FINAL REPORT
+==================================================
+
+When finished, report:
+
+1. Files changed.
+2. Changes implemented.
+3. Tests actually executed and their results.
+4. Any remaining failures or unverified behaviors.
+5. Any regressions discovered and fixed.
+
+Do not begin camera implementation, voice-note implementation, or
+the four-stream/YouTube live-streaming work in this batch.
+
+Start by inspecting the existing implementation, then make the
+smallest reliable set of changes needed.

@@ -1,0 +1,167 @@
+The Wedding Circle — Complete Firebase & Cloudflare Stream Repair
+
+I want you to fix all six identified Infrastructure issues in the current source code. Do not merely explain them or provide recommendations. Inspect the actual implementation, make the necessary changes, and verify them.
+
+Do not skip any issue.
+
+1. Firebase project-number mismatch
+
+Confirmed diagnostic bug.
+
+Firebase API-key verification returns the numeric Google Cloud project number ("637941576967"), while our saved Firebase project ID is "the-wedding-circle-b31b6".
+
+Both belong to the same project.
+
+- Inspect "src/lib/developer/cloud.ts".
+- Fix "firebaseProjectId" and "interpretFirebaseProject".
+- Compare numeric project numbers against the Firebase Web App ID's project-number segment or messaging sender ID.
+- Validate the project slug separately using appropriate project information.
+- Never compare a numeric project number directly with a project ID.
+- Do not change valid Firebase credentials.
+
+2. Environment-locked credential fields
+
+Confirmed frontend bug.
+
+- Inspect "src/lib/infra/config.ts".
+- Inspect "src/components/wedding/developer-infrastructure.tsx".
+- Remove the restriction that disables fields merely because a value exists in server environment variables but not in the encrypted vault.
+- Allow authorized users to enter replacement values.
+- Preserve existing secret masking.
+- Keep environment values active when the vault field is left blank.
+- Ensure typed vault values correctly override environment values.
+- Never expose existing secret values to the browser.
+
+3. Firebase vault versus process.env inconsistency
+
+Confirmed configuration inconsistency.
+
+Inspect:
+
+- "src/lib/wedding/firebase-identity.server.ts"
+- "src/lib/developer/firebase-storage.server.ts"
+- Infrastructure credential-resolution helpers.
+
+Currently, Infrastructure tests use "resolvedEnv()", but Firebase Identity and Storage reportedly read directly from "process.env".
+
+Fix this so Firebase server-side operations use the same resolved configuration, including encrypted vault overrides.
+
+Requirements:
+
+- Keep service-account JSON strictly server-side.
+- Correctly resolve project ID and storage bucket.
+- Handle cached Firebase Admin initialization safely when configuration changes.
+- Do not change Better Auth sign-in behavior, Supabase membership, or existing user records.
+
+4. Firebase Email/Password verification
+
+Confirmed test-sequence problem.
+
+The Firebase test performs project/API-key verification before checking Email/Password authentication. An incorrect project-number comparison prevents the later test from running.
+
+- Correct the verification sequence and diagnostics.
+- Run the Email/Password probe only when prerequisites are satisfied.
+- Distinguish internal validation errors from actual Google API errors.
+- Report whether Email/Password was actually checked.
+- Never report that authentication is disabled without an actual response proving it.
+- Preserve existing authentication behavior.
+
+5. Cloudflare Stream connection test
+
+Inspect the complete Stream configuration and test implementation.
+
+Relevant fields:
+
+- "LIVESTREAM_PROVIDER"
+- "CLOUDFLARE_ACCOUNT_ID"
+- "CLOUDFLARE_STREAM_API_TOKEN"
+
+Verify:
+
+- Provider selection.
+- Account ID resolution.
+- Encrypted token storage and retrieval.
+- Required Cloudflare Stream Read permission.
+- Authorization header formatting.
+- Stream API endpoint and response parsing.
+
+The Stream test should distinguish:
+
+- Missing configuration.
+- Incorrect account ID.
+- Invalid token.
+- Insufficient permissions.
+- Successful Stream API access.
+
+The "/user/tokens/verify" endpoint must not override a successful Stream API read if its failure is unrelated to the Stream permission being tested.
+
+Do not create a Live Input or change Cloudflare resources.
+
+6. Cloudflare Stream token field rejection
+
+Potential frontend and save-flow bugs identified.
+
+Inspect token validation, input locking, provider selection, sanitization, and save logic.
+
+- Check for incorrect token length or character restrictions.
+- Check whether environment-only token fields are disabled.
+- Ensure normal Cloudflare Stream tokens are accepted.
+- Preserve encrypted storage and never expose or log token contents.
+- Do not confuse Stream tokens with R2 credentials.
+- If a token or account ID is entered while another provider is selected, display a clear validation error.
+- Never silently discard typed credentials or delete previously saved Stream configuration because of provider selection.
+- Require explicit provider selection before saving Stream credentials.
+- Preserve existing credentials when no replacement is supplied.
+
+Do not weaken genuine security checks to make validation pass.
+
+---
+
+Regression testing requirements
+
+Add or update tests for all six issues.
+
+At minimum verify:
+
+1. Firebase numeric project number correctly matches the saved project.
+2. A genuine project mismatch is still detected.
+3. Environment-only fields can be replaced through the vault.
+4. Blank secret fields preserve existing values.
+5. Vault credentials override environment credentials consistently.
+6. Firebase Identity and Storage use the resolved credentials.
+7. Email/Password verification runs after successful prerequisites.
+8. Cloudflare Stream tokens are saved and retrieved correctly.
+9. Provider selection cannot silently delete saved Stream credentials.
+10. Cloudflare API errors are reported accurately.
+
+Run:
+
+- Relevant unit and integration tests.
+- TypeScript checks.
+- Production build.
+- Final source diff review.
+
+Strict project protection
+
+- Do not regenerate or replace credentials.
+- Do not delete database records.
+- Do not change Supabase authentication or wedding membership.
+- Do not modify R2 storage or the media gateway.
+- Do not remove either existing Firebase implementation.
+- Do not perform unrelated refactoring.
+- Do not deploy or change production settings.
+
+Final report
+
+For each of the six issues, report:
+
+- Root cause.
+- Exact files changed.
+- What was implemented.
+- Tests performed and actual results.
+- What still requires live Firebase or Cloudflare credentials.
+- Any remaining blockers.
+
+Clearly distinguish implemented, tested, untested, and blocked.
+
+Start implementing all six issues in this task. Do not stop after producing another audit. If a change requires my decision or access to production credentials, leave that part untouched and explain exactly what is needed.

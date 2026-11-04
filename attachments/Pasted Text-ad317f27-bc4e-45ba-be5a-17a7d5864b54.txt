@@ -1,0 +1,222 @@
+FEATURE: PREMIUM PINNED WEDDING AS THE APP'S LANDING PAGE
+
+Implement the previously planned Pinned Wedding Landing Page feature in the existing Wedding Circle project.
+
+IMPORTANT:
+Inspect the current application architecture before making changes. Implement this feature directly in the existing project.
+
+Do not redesign the application or replace existing components unnecessarily.
+Preserve all existing wedding cards, theme functionality, navigation, authentication, membership, wedding data, and permissions.
+
+OBJECTIVE
+
+Allow a premium user to pin one wedding as their personal landing page.
+
+When that user opens The Wedding Circle, the pinned wedding should appear immediately as a full-screen opening experience instead of the normal landing page.
+
+The user should not have to visit the normal landing page and click the wedding card before entering.
+
+This is an in-app opening screen, NOT an Android lock-screen overlay, system notification, or device wallpaper.
+
+1. PREMIUM-ONLY PINNING
+
+Add a "Pin as Landing Page" option to the appropriate existing wedding-card menu or controls.
+
+Requirements:
+- Only eligible premium users can pin a wedding.
+- Free users must not be able to activate the feature.
+- If a free user tries to access it, display the existing appropriate premium upgrade experience.
+- Enforce the premium eligibility check in the appropriate backend or trusted authorization layer if the project supports it. Do not rely exclusively on hiding a button in the UI.
+- Allow only ONE pinned wedding per user.
+- Pinning a different wedding replaces the previously pinned wedding.
+- Do not change the user's wedding membership or permissions.
+- Do not automatically grant access to weddings the user is not authorized to enter.
+
+Reuse existing subscription and entitlement logic. Do not invent a separate payment system.
+
+2. FULL-SCREEN PINNED WEDDING OPENING SCREEN
+
+When the app starts:
+- Check whether the current user has a pinned wedding.
+- If one exists and the user is authorized to access it, open that wedding's full-screen landing experience directly.
+- Skip the normal landing page for this opening flow.
+- If no wedding is pinned, show the normal landing page.
+- If the user has signed out, preserve the existing authentication flow.
+- If the pinned wedding is no longer accessible or no longer exists, safely fall back to the normal landing page and provide an appropriate explanation if necessary.
+- Do not get stuck in a redirect loop.
+- Handle loading and network errors gracefully.
+
+The pinned screen must feel like opening a premium digital wedding invitation.
+
+Use the EXISTING wedding card and theme system rather than creating a disconnected design.
+
+Preserve:
+- Couple's names.
+- Wedding date and location, when available.
+- Existing cover image or wedding artwork.
+- Current applied wedding theme.
+- Existing decorative borders and visual styling.
+- Existing wedding-card proportions and design language where appropriate.
+
+The card should occupy the available app screen and become the main visual focus.
+
+This is a full-screen in-app opening experience. It must not display a browser address bar or launch an external browser unnecessarily.
+
+3. TOP-LEFT PIN CONTROL
+
+Add a small, elegant pin control in the top-left corner of the pinned wedding screen.
+
+Tapping it should reveal an "Unpin Wedding" action.
+
+On confirmation:
+- Remove the pinned-wedding preference.
+- Return the user to the normal landing page.
+- Preserve the wedding itself, all its data, membership, invitations, and access permissions.
+- Do not delete or archive the wedding.
+- Do not remove the user from the wedding.
+
+The control should be easy to discover without obstructing the couple's names or important invitation details.
+
+Use a clear accessible label such as "Unpin wedding".
+
+4. EXISTING WEDDING SHORTCUTS
+
+Preserve the existing shortcut buttons on wedding cards.
+
+Where appropriate, the pinned opening screen should provide direct access to:
+- Chat.
+- Feed.
+- Live.
+- Album.
+- Enter Wedding.
+
+Reuse existing navigation actions and route handlers.
+
+Each shortcut must open the correct section of the pinned wedding, not another wedding or the main landing page.
+
+Do not invent new routes if equivalent routes already exist.
+
+Keep existing shortcut tile dimensions, proportions, positions, and animations. Allow their colors and decorations to follow the wedding's applied theme.
+
+5. PIN STATE AND PERSISTENCE
+
+Persist the pinned wedding preference per user.
+
+Requirements:
+- The pinned wedding survives app restarts, refreshes, and ordinary navigation.
+- It remains associated with the correct authenticated user.
+- Different users can pin different weddings.
+- Pinning a wedding replaces the user's previous pin.
+- Unpinning removes only the preference, not the wedding.
+- Sign-out and sign-in must never leak one user's pinned wedding into another user's session.
+- Avoid stale cached pin information after pinning or unpinning.
+- Use the project's existing backend and persistence architecture wherever possible.
+- Do not store sensitive authentication information in insecure local storage.
+- If offline startup is supported, handle cached pinned-wedding information safely and revalidate authorization when connectivity returns.
+
+6. THEME INTEGRATION
+
+The pinned opening screen must use the wedding's CURRENTLY APPLIED theme.
+
+Do not apply a pending theme selection that has not been saved.
+
+Support all nine existing themes:
+- Royal Burgundy.
+- Pastel Blush.
+- Sage Green.
+- Royal Blue.
+- Classic Ivory.
+- Midnight Emerald.
+- Terracotta Sunset.
+- Lavender Dream.
+- Classic Default.
+
+Do not rewrite the theme system to implement pinning.
+
+Do not change theme palettes, theme selection behavior, or the existing Apply Theme workflow.
+
+Classic Default must retain its original cream-and-brown visual style.
+
+7. NAVIGATION AND BACK BUTTON
+
+- Provide a clear way to enter the complete wedding.
+- Preserve existing navigation between Home, Chat, Live, Album, and More.
+- Handle Android Back navigation correctly.
+- Do not trap the user in the pinned opening screen.
+- Unpinning must restore the normal landing page.
+- Ordinary navigation must not accidentally remove the pinned preference.
+- Returning to the app after it has been backgrounded must not cause an infinite navigation loop.
+
+Follow the existing app's navigation conventions.
+
+8. PROTECT EXISTING FUNCTIONALITY
+
+Do not break:
+- Wedding creation.
+- Wedding cards.
+- Wedding membership and invitation codes.
+- Host and co-host permissions.
+- Theme selection and persistence.
+- Chat and messages.
+- Live streams and camera controls.
+- Feed and album.
+- Existing premium subscriptions and payment logic.
+- Existing authentication and account switching.
+
+Do not use sample wedding data in place of real data.
+
+Do not make a wedding publicly accessible simply because it is pinned.
+
+9. TESTING
+
+Verify these scenarios:
+
+A. Premium user pins Wedding A.
+Expected: Wedding A opens directly when the app starts.
+
+B. Premium user pins Wedding B while Wedding A is pinned.
+Expected: Wedding B replaces Wedding A as the pinned landing page.
+
+C. User unpins the wedding.
+Expected: The normal landing page appears, and the wedding remains intact.
+
+D. Free user tries to pin a wedding.
+Expected: Pinning is blocked and the existing upgrade experience is offered.
+
+E. Two users have different pinned weddings.
+Expected: Each user sees their own pinned wedding.
+
+F. The user has no pinned wedding.
+Expected: The normal landing page appears.
+
+G. The pinned wedding is no longer accessible.
+Expected: The app safely returns to the normal landing page without granting unauthorized access.
+
+H. The user restarts the app.
+Expected: The saved pinned wedding opens directly again.
+
+I. The user uses a shortcut.
+Expected: The correct section of the pinned wedding opens.
+
+J. The wedding uses a different theme.
+Expected: The pinned screen follows that wedding's applied theme.
+
+K. The user signs out and another user signs in.
+Expected: The second user's pin is used; the first user's preference does not leak into the second user's session.
+
+Test on a phone-sized viewport and check Android Back navigation.
+
+Do not claim a scenario was tested unless it was actually exercised. Clearly distinguish code inspection, automated testing, browser testing, and physical-device testing.
+
+FINAL REPORT
+
+Explain:
+- Which files and components were changed.
+- How pinning is persisted.
+- How premium eligibility is enforced.
+- How app startup selects the pinned wedding.
+- How unpinning restores the normal landing page.
+- Which scenarios were actually tested.
+- Any remaining limitations.
+
+Implement the feature in the existing project without replacing unrelated parts of the application.

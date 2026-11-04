@@ -1,0 +1,97 @@
+TASK: UPDATE THE WEDDING CIRCLE HEADER AND ACCOUNT MENU.
+
+In the current mobile landing-page screenshot, the header still displays “Circle developer.” I want that visible label replaced with a three-dot menu in the top-right corner.
+
+The three-dot menu must handle account information, sign-in/sign-up, and sign-out. This must use the application's existing authentication and wedding-role systems.
+
+STEP 1 — INSPECT THE CURRENT IMPLEMENTATION
+Before editing, inspect:
+- The landing-page header and its responsive layout.
+- The source of the “Circle developer” label.
+- The existing sign-in and sign-up screens.
+- The authenticated user's profile and display name.
+- The existing sign-out function.
+- Wedding membership, host-role permissions, and the current wedding context.
+
+Reuse existing functionality instead of building a duplicate authentication system.
+
+STEP 2 — UPDATE THE HEADER
+- Remove “Circle developer” from the visible header.
+- Add a clean, touch-friendly vertical three-dot icon (⋮) in the top-right area.
+- Preserve the existing Wedding Circle logo, app title, and Feed button.
+- Align the header elements neatly on small mobile screens.
+- Avoid unnecessary title truncation and prevent overlapping controls.
+- Do not leave an empty space where the old developer label appeared.
+- Keep the existing wedding-card artwork and layout unchanged.
+
+STEP 3 — BUILD THE THREE-DOT MENU
+
+When the user taps the three-dot icon, open a compact dropdown or popover anchored to the top-right corner.
+
+FOR SIGNED-OUT USERS:
+Display:
+- Sign in / Sign up
+
+Selecting this option must open the existing authentication screen.
+
+FOR SIGNED-IN USERS:
+Display:
+- The user's actual account display name.
+- A “Host” label only when the existing wedding-role data confirms that the user is the host of the relevant wedding.
+- A Sign out action.
+
+Organize the menu clearly: account name and verified role near the top, followed by the appropriate action.
+
+Do not hard-code “Circle developer,” invent a display name, or assume every signed-in user is a host.
+
+STEP 4 — CONNECT THE ACTIONS
+SIGN IN / SIGN UP:
+- Open the existing authentication flow.
+- Preserve the intended wedding ID and context during authentication.
+- After authentication, return the user to the appropriate existing wedding flow.
+- Preserve the current join-wedding and membership logic.
+
+SIGN OUT:
+- Call the existing authentication sign-out function.
+- Correctly update the application’s authentication state and header.
+- Show the signed-out version of the menu afterward.
+- Handle any required redirect using the app's existing navigation rules.
+
+REMOVE THE OLD SIGN-IN PLACEMENT:
+- Remove the previous standalone sign-in/sign-up entry from its current location if it is now redundant.
+- Do not leave duplicate sign-in options scattered across the landing page.
+- Preserve any necessary join-wedding behavior and make sure users can still access the appropriate wedding after signing in.
+- Do not replace existing authentication or authorization checks with visual-only UI changes.
+
+STEP 5 — MENU BEHAVIOUR
+- Close the menu when the user taps outside it.
+- Close it after an action is selected.
+- Support the Android Back button and Escape where appropriate.
+- Ensure the menu is not clipped off-screen.
+- Use accessible labels and comfortable touch targets.
+- Prevent unauthorized users from receiving host-only permissions merely because a Host label is displayed.
+
+STEP 6 — VERIFY THE IMPLEMENTATION
+Check:
+1. Header appearance on a narrow mobile screen.
+2. Menu contents when signed out.
+3. Menu contents when signed in as a regular member.
+4. Menu contents when signed in as the verified host.
+5. Sign-in/sign-up navigation.
+6. Sign-out and the resulting signed-out state.
+7. Preservation of the selected wedding context.
+8. Correct menu dismissal and positioning.
+
+If any test cannot be performed, disclose it.
+
+IMPLEMENTATION RULES
+- Make a targeted change to the existing code.
+- Preserve working functionality, existing wedding data, roles, permissions, and navigation.
+- Do not apply the planned selectable wedding themes.
+- Do not redesign the wedding cards or modify the camera implementation as part of this task.
+- Fix underlying state or routing problems rather than concealing them with CSS.
+
+FINAL REPORT
+Summarize the files changed, the behavior implemented, the tests actually performed, and any remaining limitations.
+
+Do not claim that authentication works unless the corresponding behavior has been verified.

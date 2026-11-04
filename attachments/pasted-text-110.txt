@@ -1,0 +1,53 @@
+Task: Fix Firebase Email Verification Flow in The Wedding Circle
+Inspect the actual authentication code and implement a reliable fix. Do not just explain the issue or provide recommendations.
+1. Fix verification links incorrectly showing as expired or already used
+Current problem:
+• A user creates an account.
+• The app sends a Firebase verification email.
+• The user opens the link shortly afterward.
+• Firebase displays: “Your request to verify your email has expired or the link has already been used.”
+• This happened even when the user opened the link quickly.
+Investigate the complete flow, including:
+• Firebase sendEmailVerification() implementation.
+• Action-code generation and verification handling.
+• ActionCodeSettings, redirect URLs, and authorized domains.
+• Whether repeated resend requests invalidate earlier links.
+• Whether the app processes the verification code more than once.
+• Whether email security scanners or link previews are consuming verification links.
+• Whether the verification page incorrectly reports an expired link.
+• Whether account creation, resend, and verification state are properly synchronized.
+Implement the correct fix. Ensure that:
+• A newly sent verification link works when opened once.
+• Resending verification does not create unnecessary duplicate requests.
+• The user receives clear feedback when a link is expired or already used.
+• After successful verification, the app correctly recognizes the verified account.
+• The user can return to the app and continue without creating another account.
+• Verification does not accidentally bypass email verification.
+2. Update the verification screen wording
+Remove all user-facing wording that mentions Firebase.
+Replace:
+• “The link is from Firebase.”
+• Any other Firebase-specific technical references.
+Use simple wording such as:
+“A verification link has been sent to your email. Open the link to verify your email address before continuing.”
+The screen should display:
+• Verification email sent.
+• Resend verification email.
+• I've verified.
+• Use a different email.
+Keep the existing Wedding Circle design and styling.
+3. Restrictions
+• Do not replace Firebase authentication.
+• Do not modify Better Auth, Supabase membership, wedding ownership, or existing account permissions.
+• Do not weaken email verification security.
+• Do not expose Firebase credentials or API keys.
+• Do not make unrelated changes.
+4. Verification and reporting
+After implementation:
+• Run relevant authentication tests.
+• Run TypeScript checks and production build.
+• Add tests for successful verification, expired links, already-used links, and resend behavior.
+• Report exactly which files were changed.
+• Distinguish implemented fixes from scenarios actually tested.
+• Do not claim a real Firebase email verification succeeded unless it was tested against the live Firebase project.
+Implement the fix directly and report any remaining blocker precisely.

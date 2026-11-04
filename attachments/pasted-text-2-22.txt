@@ -1,0 +1,85 @@
+The Wedding Circle — Safely Remove Obsolete Vercel Code and Dependencies
+
+Audit the entire existing The Wedding Circle codebase and remove dead, unused or obsolete Vercel-specific code left over from previous deployment experiments.
+
+The app is currently hosted through its existing working setup. Do not migrate, redeploy or change the hosting provider as part of this task.
+
+1. Identify Vercel-Specific Artifacts
+
+Search the complete repository for:
+
+- Vercel-specific imports, SDKs and packages that are no longer used.
+- Vercel serverless functions and obsolete API handlers.
+- Vercel-specific configuration files and deployment settings.
+- Unused Vercel environment-variable references.
+- Vercel deployment scripts, build commands and package scripts.
+- Vercel analytics or speed-insights integrations that are no longer required.
+- Vercel-specific middleware, rewrites, redirects and routing configuration.
+- Obsolete Vercel deployment documentation and unused helper files.
+- Dead code, components and dependencies used exclusively by removed Vercel integrations.
+
+Search nested directories, configuration files, source code, build scripts and documentation rather than checking only the project root.
+
+2. Verify Before Removing Anything
+
+For every suspected artifact:
+
+- Confirm whether it is genuinely Vercel-specific.
+- Search for imports, references, dynamic loading and runtime usage.
+- Check whether any shared functionality depends on it.
+- Distinguish obsolete deployment code from application code that is still needed.
+- Remove only confirmed-unused Vercel-specific artifacts.
+
+Do not delete a file merely because its name contains "vercel". If it contains functionality used by the application, preserve the necessary functionality and remove only the obsolete deployment-specific portion.
+
+3. Preserve the Existing Application Infrastructure
+
+Do not remove or damage:
+
+- The existing React, Vite, TypeScript, Tailwind CSS or Motion setup.
+- The Express backend and its working API routes.
+- Firebase Authentication or database integration.
+- Cloudflare R2 media-storage configuration and integration.
+- Existing environment-variable handling.
+- Current hosting and deployment configuration.
+- Google Play Billing preparation.
+- Wedding creation, login, permissions, themes, chat, albums or livestream functionality.
+
+Do not replace Vercel-specific code with mock implementations. If a currently working backend route depends on Vercel's runtime, migrate that functionality to the existing supported runtime before removing the dependency, and only if the migration is necessary and safe.
+
+4. Clean Dependencies and Configuration
+
+- Remove unused Vercel packages from the dependency manifest and lockfile only after verifying they are unnecessary.
+- Remove obsolete Vercel configuration files only when the current hosting setup no longer requires them.
+- Update scripts and documentation to match the actual current build and deployment workflow.
+- Keep required environment variables intact.
+- Never print or expose secrets during the audit.
+- Do not remove general-purpose dependencies just because they were previously installed during Vercel experiments.
+
+5. Verification
+
+After cleanup:
+
+1. Run the existing tests.
+2. Run TypeScript checks and linting where available.
+3. Run the production build.
+4. Verify the Express server and API routes still work.
+5. Check Firebase initialization and authentication configuration.
+6. Check Cloudflare R2 integration and media-related routes.
+7. Verify the application starts using its existing supported hosting setup.
+8. Search the repository again for remaining Vercel references and classify any that must remain.
+
+Do not deploy automatically or change production configuration. Do not claim that the live site was tested unless it was actually tested.
+
+6. Final Report
+
+Provide:
+
+- A list of Vercel-specific files and code removed.
+- Dependencies removed and why.
+- Vercel references intentionally retained and why.
+- Files modified.
+- Test and production-build results.
+- Any remaining deployment-specific configuration requiring manual review.
+
+Strict rule: Remove obsolete Vercel code only. Preserve all working application functionality, existing user data, authentication, Firebase, Cloudflare R2 and the current deployment setup.

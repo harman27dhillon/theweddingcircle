@@ -1,0 +1,160 @@
+WEDDING CIRCLE — HOME PAGE VISUAL POLISH & COVER CUSTOMIZATION UPDATE
+
+Update the existing Home page inside an individual Wedding Circle. Use the two supplied screenshots as the reference for the current layout.
+
+Important: Make these changes in the actual rendered page and existing code. Do not create a separate mockup, unused component, or replacement page. Preserve all existing wedding data, navigation, permissions, and working functionality.
+
+1. Transform the entire invitation cover into a soft, colorful, premium design
+
+The large top invitation card currently contains the flower image, Sikh label, bride and groom names, ampersand, date, and location.
+
+Redesign this entire card as a cohesive, elegant invitation cover with a soft blur, colorful atmospheric effect, and premium glass-like appearance.
+
+Requirements:
+
+- Keep the existing cover photograph as the source image, but use a carefully controlled blur and color treatment to create a soft, dreamy background.
+- Use a layered design: blurred image background, subtle warm cream/champagne overlay, delicate rose and gold color accents, and a clean foreground for readable text.
+- Keep the actual bride and groom names sharp, prominent, and beautifully typeset in the foreground. Never blur the names or important details.
+- Keep the religion/tradition label, wedding date, and location readable and correctly positioned.
+- Add a subtle glass-like border or elegant frame, gentle shadows, and tasteful depth. Avoid excessive glow, neon colors, or a cheap-looking glass effect.
+- Use a responsive blur treatment that performs smoothly on Android and iPhone. If backdrop filters are expensive, use a pre-blurred background layer or another performant CSS solution.
+- Make the cover look like a premium digital Indian wedding invitation, not an ordinary website card.
+- Preserve the current cover image and all existing wedding details unless the host changes them.
+
+Visual direction: soft floral colors, warm ivory, champagne gold, muted rose, elegant typography, a subtle dreamy blur, and a refined invitation-card finish.
+
+2. Organize the scattered action buttons into a compact framed panel
+
+In the second screenshot, these existing controls are visually scattered across the page:
+
+- Change background
+- Switch to planning
+- Pre-wedding
+- Family threads
+- Checklist
+- Vendors
+- Exit to home
+
+Reorganize the applicable controls into a neat, compact “Wedding tools” panel.
+
+Requirements:
+
+- Give the panel a subtle light frame or thin champagne-colored border.
+- Use a pale cream or translucent warm background with a small radius and consistent internal padding.
+- Arrange controls in a clean, responsive grid or neatly aligned rows. Use consistent spacing, alignment, icon sizes, and typography.
+- Use compact button styles with subtle borders or light backgrounds. Keep them visually distinct from plain text links.
+- On mobile, avoid awkward wrapping, clipped labels, overlapping controls, or buttons touching the screen edges.
+- Use small, consistent icons where appropriate.
+- Keep all existing actions functional and connected to their current destinations.
+- Maintain a clear hierarchy: primary actions should be easy to spot, while secondary actions remain compact.
+- Do not place the panel over the ceremony itinerary or obstruct the bottom navigation.
+
+3. Replace “Change background” with “Change cover”
+
+The current Change background control should become Change cover because it will now control the invitation’s cover photograph.
+
+When the host taps it, open a polished mobile-friendly cover selection interface.
+
+Provide 8–10 built-in cover designs
+
+Create 10 distinct, attractive cover options that users can preview before selecting one. Use actual visual designs or bundled/generated image assets, not just ten differently colored buttons.
+
+Include a tasteful selection such as:
+
+1. Pastel floral garden
+2. Ivory and champagne gold
+3. Dusty rose flowers
+4. Elegant maroon and gold
+5. Sage green botanical
+6. Royal Indian wedding motifs
+7. Minimal cream and gold
+8. Romantic sunset florals
+9. Soft peach and blush flowers
+10. Deep emerald with refined gold details
+
+Requirements:
+
+- Make each option visually distinct and suitable for a wedding invitation.
+- Display them as a responsive thumbnail grid with clear labels.
+- Tapping a thumbnail should show a larger preview of the invitation cover using that design.
+- Include Apply cover and Cancel actions.
+- Clearly mark the currently selected cover.
+- The selected design must update the real invitation cover immediately after the host applies it.
+- Save the selected cover against the correct wedding so it persists after refreshing, logging out, or reopening the app.
+- Allow the host to change it again at any time.
+- Reuse existing wedding settings and database/storage architecture where possible. Do not create duplicate settings or hardcode the selection only in local component state.
+
+Let hosts upload their own cover photograph
+
+Include an Upload your own photo option in the same interface.
+
+- Allow the host to select an image from their phone gallery or supported file picker.
+- Request only the permissions actually needed by the platform.
+- Show a preview and crop/position adjustment before applying the photo.
+- Use a sensible aspect ratio appropriate for the invitation cover.
+- Handle large files safely with appropriate resizing/compression where supported.
+- Save the selection persistently using the app’s existing storage architecture.
+- Show a useful error if upload or saving fails; never pretend it succeeded.
+- If co-hosts are already authorized to manage the invitation design, respect the existing permission rules. Do not grant cover-editing rights to ordinary guests.
+- Never overwrite or delete a previously selected cover just because the user opens the picker or cancels.
+
+The selected image or design must drive the blurred/colorful cover treatment from section 1. Switching covers must not change the couple names, wedding details, ceremonies, or privacy settings.
+
+4. Remove the visible “Exit to home” button and add a deliberate swipe-down exit gesture
+
+The current Exit to home button looks out of place among the wedding tools. Remove it from the visible Home page controls and replace it with a deliberate gesture.
+
+Gesture behavior
+
+When the user is on the Home page inside an individual Wedding Circle:
+
+- A deliberate hard downward swipe from near the top of the screen should return the user to the app’s main landing page, where they can select or enter another wedding.
+- Make the gesture responsive and intentional, with a clear threshold and sufficient downward movement.
+- Do not trigger it from a tiny accidental movement.
+- Provide subtle visual feedback while the gesture is being recognized, such as a small downward indicator or a gentle transition.
+- Navigate only after the gesture passes the threshold.
+- Use a smooth, quick transition without a long animation or blank screen.
+- Do not navigate away if the user starts the gesture inside a text input, button, modal, image viewer, gallery, or other interactive control.
+- Do not interfere with ordinary vertical scrolling through the ceremony itinerary or family section.
+- Preserve browser/mobile safe areas and the existing bottom navigation.
+
+Navigation safety
+
+- This gesture should exit the current wedding view, not delete, close, leave, or modify the wedding.
+- Do not sign the user out.
+- Preserve the existing wedding membership and host/co-host permissions.
+- If the app already has an established navigation route for returning to the landing page, use it instead of creating a duplicate route.
+- If the gesture conflicts with browser or operating-system navigation, implement the safest supported alternative and explain the limitation rather than breaking normal navigation.
+
+5. Preserve existing functionality and wedding-specific data
+
+Do not alter:
+
+- Bride and groom names or their order
+- Wedding date, location, and religion/tradition settings
+- Ceremony itinerary, dates, times, directions, and notes
+- Family information and family privacy
+- Feed, Live, Album, More, and bottom navigation
+- Existing swipe navigation between app sections
+- Wedding creation, login, membership, or host/co-host permissions
+- Existing animations and cover-editing data outside the intended changes
+
+All cover choices must be associated with the correct wedding. Two different weddings must be able to use different cover designs independently.
+
+6. Implementation and verification — mandatory
+
+Do not just describe the changes or claim they are finished.
+
+1. Inspect the actual Home page component and route shown in the supplied screenshots.
+2. Identify the existing cover, action controls, storage model, and navigation route.
+3. Implement the changes in the real application files.
+4. Verify the page renders with the new blurred/colorful invitation cover and organized Wedding tools panel.
+5. Test all 10 cover previews, custom image selection, Apply, Cancel, and persistence.
+6. Test the downward exit gesture and confirm it does not interfere with scrolling, image selection, or buttons.
+7. Check the result on a narrow mobile viewport and ensure the bottom navigation remains visible and usable.
+8. Confirm the Feed, Live, Album, More, and ceremony itinerary still work.
+9. Fix any errors introduced by the changes.
+
+Final acceptance criteria: The invitation cover looks noticeably more premium; the scattered controls are organized in a framed panel; Change cover opens a working gallery with 10 choices and custom photo upload; Exit to home is no longer a visible button; and a deliberate downward swipe returns to the main landing page without resetting or leaving the wedding.
+
+At the end, report which actual files were changed and which of these behaviors were tested successfully. Clearly identify anything that could not be tested. Do not claim successful testing without verifying it.

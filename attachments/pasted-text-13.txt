@@ -1,0 +1,190 @@
+The Wedding Circle — Complete Supabase Migration Repair and Verified Cutover
+
+Take ownership of finishing the existing Neon-to-Supabase wedding-data migration. Do not stop at investigation, another audit report, or a list of recommendations. Inspect the existing implementation, identify the root causes, implement the necessary repairs, and carry the migration through to a genuinely verified production cutover when all safety conditions pass.
+
+The goal is a working, reliable migration, not merely green test results or a changed status label.
+
+1. Inspect the actual implementation first
+
+Inspect the existing code, database schemas, migration desk, runtime configuration, migration history, and routing logic before modifying anything.
+
+Pay particular attention to these files and their dependencies:
+
+- "src/lib/developer/core-route.server.ts"
+- "core-migration.ts"
+- "core-migration.server.ts"
+- "core-reconcile.ts"
+- "migrations/supabase/0017_wedding_core_additive.sql"
+
+Find every read, insert, update, delete, reconciliation, health-check, validation, and cutover code path for the wedding-core tables. Trace the real published-server execution path rather than assuming the preview, tests, and production server share the same configuration.
+
+Preserve the existing architecture wherever possible. Make focused, compatible changes instead of rewriting the migration system unnecessarily.
+
+2. Fix the connection and health-check failure
+
+The migration desk reports:
+
+- The server database URL and service-role key are configured.
+- The password is present but must remain hidden.
+- The configured session pooler is "aws-0-ap-northeast-1.pooler.supabase.com:5432", database "postgres".
+- The expected pooler username format is "postgres.<project-ref>".
+- A prior read-only connection succeeded, but the current connection diagnostics say no connection has been attempted.
+- The Supabase health check failed.
+- Supabase reads only "SUPABASE_DB_URL", exactly as stored. "DATABASE_URL" remains the Neon connection.
+
+Trace why these statements are inconsistent. Determine which connection each diagnostic actually tests and which connection the published server uses for health checks, reconciliation, and live wedding requests.
+
+Verify the configured connection on the actual runtime path, with appropriate TLS and connection handling. Check the host, database name, username format, URI encoding, permissions, connection pool behavior, and table-access requirements without exposing credentials.
+
+Do not ask me to re-enter the database secrets. Do not print secrets, passwords, connection strings, or service-role keys in logs, screenshots, reports, or browser-visible code. Reuse the existing server-side secrets. If an indispensable credential is genuinely unavailable to the execution environment, report exactly which operation is blocked rather than pretending it succeeded.
+
+Correct the actual cause of the health-check failure. Do not make the health check return success without verifying a real database operation.
+
+3. Resolve the 11 field differences and extra destination rows
+
+The current migration desk reports:
+
+Table| Neon/current source| Supabase destination
+"circles"| 3| 4
+"circle_members"| 6| 9
+"circle_auth"| 3| 4
+"ceremony_invites"| 1| 1
+"couple_access"| 1| 1
+
+An earlier operation reported that 14 source rows were upserted into Supabase. Validation subsequently reported 11 field differences and Access: closed.
+
+Do not assume matching counts mean matching data. Do not assume the additional five rows are disposable duplicates.
+
+Implement a real, key-based reconciliation and comparison process that:
+
+- Compares records using their actual stable primary keys or documented natural keys.
+- Identifies missing records, unexpected destination-only records, duplicate logical records, and every field-level difference.
+- Compares all relevant fields, including nested JSON payloads, wedding settings, chat messages, posts, notes, membership relationships, access codes, invitation relationships, permissions, timestamps, and null values.
+- Uses a documented, deterministic comparison rule for JSON, dates, and values that can legitimately have different representations.
+- Produces a server-side diagnostic identifying the table, record key, differing field, and conflict category without disclosing access codes or sensitive user information.
+- Detects conflicting changes instead of silently overwriting newer or unrelated records.
+- Handles retries and repeated reconciliation safely without producing duplicate records.
+
+Until the cutover, Neon is the source of truth for the wedding-core data it currently serves. However, preserve all existing Supabase-only data until its origin and ownership have been established.
+
+Determine why the additional destination rows exist. If any are legitimate records, preserve and reconcile them through an explicit conflict-resolution process. If any are demonstrably stale or accidental migration artifacts, preserve an auditable recovery copy before removing them, and verify all affected relationships first. Never delete rows merely to make table counts match.
+
+Make the reconciliation idempotent so running it again does not compound the differences.
+
+4. Repair the access validation securely
+
+Investigate what "Access: closed" actually represents in the existing validator. Determine whether it means public access is correctly restricted, the privileged server cannot access a required table, RLS blocks an operation, or another authorization check failed.
+
+Do not blindly open access, disable RLS, grant unrestricted permissions, or expose the Supabase service-role key to the client.
+
+Verify that:
+
+- Anonymous and unauthorized users cannot read or modify private wedding data through public interfaces.
+- Authenticated application requests resolve to the correct stable account identity and membership.
+- The trusted server can perform the intended operations through its properly authorized server-side connection.
+- RLS policies, SQL grants, foreign keys, and server-side authorization agree with the application’s access model.
+- Invitation access, wedding membership, couple access, and access-code checks continue to enforce their intended permissions.
+- All relevant foreign keys and constraints exist on the Supabase destination and do not create orphaned records or prevent legitimate deletion workflows.
+
+If a schema change is required, use an additive, repeatable migration and verify its result. Apply it to the intended database only. Do not accidentally modify Neon’s schema when the change belongs on Supabase.
+
+Do not report an access check as passed merely because public access is blocked; verify both the expected public restrictions and the required privileged server operations.
+
+5. Complete the migration across the application’s real data paths
+
+The intended Supabase wedding-core tables are:
+
+- "circles": wedding settings, chat, posts, and notes held in the existing payload.
+- "circle_members"
+- "circle_auth"
+- "ceremony_invites"
+- "couple_access"
+
+Route every intended read, insert, update, and delete through the same authoritative wedding connection. Eliminate split-brain behavior where a read uses Supabase but a write or secondary query silently continues using Neon.
+
+Preserve these boundaries:
+
+- Account sign-in, Better Auth users, password hashes, sessions, and account records remain on their existing system.
+- Media bytes, photo and video storage, existing media URLs, Google Photos files, live rooms, and live signaling remain on their existing systems.
+- Do not migrate unrelated tables or rebuild authentication as part of this repair.
+
+Audit less obvious paths too, including wedding creation, joining, invitations, access codes, couple seats, membership removal, wedding deletion, album titles, library usage, and chat stored within the wedding payload.
+
+For every operation, confirm that it uses the correct database, stable account identity, and authorization rules.
+
+6. Make the login experience server-first and cross-device reliable
+
+Our user-facing objective is that someone who signs in to the same account on another phone or computer immediately sees their existing weddings and has access to the correct content.
+
+After authentication, the app must fetch the user’s weddings and memberships from the authoritative server database using the authenticated account identity. Do not rely on local storage, seeded demo data, stale cached membership lists, or browser-specific state as the source of truth.
+
+Ensure that:
+
+- Wedding saves are persisted successfully before they are treated as durable.
+- Login refresh retrieves existing server data promptly.
+- Membership and permission checks use current server data.
+- Cached content can render quickly but is reconciled against fresh server data.
+- Old asynchronous responses cannot overwrite data for a newly signed-in account.
+- Create, join, invite, chat, update, and delete operations refresh the relevant application state.
+- A failed request produces a clear, recoverable error instead of silently displaying incorrect data.
+
+Do not introduce an unrelated redesign or alter the existing wedding interface unnecessarily.
+
+7. Implement a genuine, safe production cutover
+
+The migration desk currently has conflicting messages: it says the wedding connection or routing is Supabase, yet it also says the health check failed, validation did not pass, and wedding traffic stays on the current database.
+
+Trace the actual production routing decision to its authoritative runtime state. Fix the discrepancy so the migration desk truthfully reports:
+
+- Which database currently serves live wedding requests.
+- Which database accepts wedding writes.
+- Whether reconciliation is running or complete.
+- Whether field, relationship, permission, and health checks passed.
+- Whether cutover is eligible or blocked, with the exact reason.
+
+A displayed label or migration flag alone is not proof of cutover.
+
+Before switching:
+
+1. Verify the source and destination schemas and required connection paths.
+2. Establish a consistent migration boundary so writes cannot be lost during reconciliation.
+3. Reconcile source data with the destination using the rules above.
+4. Validate every required record and relationship.
+5. Verify privileged access and public restrictions.
+6. Exercise the real application create, read, update, delete, join, invitation, membership, and chat paths.
+7. Confirm the production server’s effective routing and database configuration.
+8. Switch the authoritative routing decision only after every mandatory check passes.
+
+If the checks pass, complete the cutover rather than stopping at a dry run or an audit report. Then verify real requests against Supabase and confirm that changes persist across different devices.
+
+If a genuinely external blocker remains, isolate it precisely and complete all independent repairs. Never label the migration complete if a mandatory check is still failing.
+
+8. Prove that rollback works
+
+Keep Neon intact as the recovery source during cutover.
+
+Implement and verify the safest available rollback process: stop or coordinate wedding writes, reconcile the latest authoritative Supabase changes back to Neon, compare every relevant core field and relationship, and restore routing only after consistency is established.
+
+Do not implement rollback as a flag flip that could hide newer Supabase writes. Do not claim rollback is verified unless its critical steps have actually been exercised safely. If production cannot be tested without risking user data, state that limitation and provide evidence from an appropriately isolated test.
+
+9. Finish the work, not just the investigation
+
+Make the necessary code and schema changes. Run relevant existing tests, add regression tests for each identified failure, run type checking, and build the published application. Test real server code paths against the available databases, not mocks alone.
+
+Use isolated test records or a disposable environment for destructive-operation testing. Do not create unwanted production weddings or send real invitations or notifications just for testing.
+
+Preserve existing production data and user access. Do not wipe or reset stores, truncate tables, replace production data with fixtures, delete source records, disable tests, or introduce duplicate migration implementations.
+
+When finished, report:
+
+1. The actual root cause of the health-check failure.
+2. The precise cause of all 11 field differences and the five additional destination rows.
+3. The meaning and repair of "Access: closed".
+4. The files and destination schema changes modified.
+5. Whether record-level reconciliation and relationship validation passed.
+6. Whether the production routing genuinely switched to Supabase.
+7. Whether cross-device login and the key wedding workflows were verified.
+8. Whether rollback was tested, and any remaining limitation.
+9. Any outstanding blocker, with the exact evidence for it.
+
+Success means the existing wedding data is safely reconciled, the required server operations and authorization checks work, production reads and writes actually use Supabase, and the same account sees the correct weddings across devices. Do not report success based on row counts, configuration presence, a successful build, or a status label alone.

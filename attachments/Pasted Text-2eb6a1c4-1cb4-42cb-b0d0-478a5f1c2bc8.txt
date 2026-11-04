@@ -1,0 +1,64 @@
+Fix the wedding role-permission system. Do not change anything else.
+
+Critical problem
+
+Right now, after entering a wedding as Guest, the user can freely switch their role to Family Member, Co-Host, or Host, and vice versa.
+
+This must NOT be possible.
+
+Required behavior
+
+1. Role is locked after entering
+
+- When a person enters a wedding as Guest, their role becomes Guest and is locked.
+- They must NOT be able to switch themselves to Family Member, Co-Host, or Host.
+- Likewise, a Family Member, Co-Host, or Host cannot simply switch themselves to another privileged role.
+
+2. Authorization code required
+
+- Changing from Guest → Family Member / Co-Host / Host requires the appropriate authorization code.
+- The code must actually be validated before the role changes.
+- Never trust a role value supplied by the client/browser.
+
+3. Prevent bypasses
+The role lock must survive:
+
+- Page refresh
+- Closing/reopening the app
+- Leaving and re-entering the wedding
+- Opening the wedding in another browser/device
+- Manipulating URL parameters
+- Editing localStorage/sessionStorage
+- Changing frontend state through browser developer tools
+
+The app must verify the user's actual authorized role whenever the wedding is loaded.
+
+4. Store the authorized role persistently
+Use the wedding's persistent data/backend as the source of truth for the user's role, rather than only React/frontend state or localStorage.
+
+The frontend should display whatever role the backend says the user is authorized for.
+
+5. Never expose privileged role selection to unauthorized guests
+A Guest should not see an unrestricted role selector containing Host, Co-Host, or Family Member.
+
+If there is an option such as Request/Enter Code to Change Role, that is fine, but the role must change only after successful verification.
+
+6. Host/Co-Host protection
+A Guest must never be able to promote themselves to Host or Co-Host simply by selecting that option.
+
+Test this before finishing
+
+Test at minimum:
+
+- Guest → Host ❌ without code
+- Guest → Co-Host ❌ without code
+- Guest → Family ❌ without code
+- Family → Host ❌ without authorization
+- Guest → Host ✅ only with valid authorization code
+- Refresh after becoming Guest → still Guest
+- Leave/re-enter → still Guest
+- Reopen app → still Guest
+
+Important: This is an authorization/security fix, not just a UI fix. Do not merely hide the buttons. Enforce the role restriction at the data/backend level wherever the app stores and validates wedding membership.
+
+Do not modify any unrelated wedding-app functionality.

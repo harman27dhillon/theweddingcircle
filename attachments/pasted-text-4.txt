@@ -1,0 +1,40 @@
+Fix the "SELF_SIGNED_CERT_IN_CHAIN" TLS certificate verification error in The Wedding Circle while preserving all existing configuration and data.
+
+1. Preserve existing secrets
+
+- Inspect the existing configuration before making changes.
+- Preserve all currently saved secrets and their values, including "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_DB_URL", and any other configured variables.
+- Do not delete, reset, rename, overwrite, or replace existing secrets with placeholders.
+- Do not print secret values or ask me to re-enter them unless a specific change is proven necessary.
+
+2. Diagnose and fix TLS securely
+
+- Trace the actual deployed backend connection to Supabase.
+- Investigate why the Session Pooler connection returns "SELF_SIGNED_CERT_IN_CHAIN".
+- Inspect the PostgreSQL driver, runtime CA certificates, TLS configuration, and any proxy or certificate interception.
+- Fix the underlying cause using a trusted certificate chain.
+- Never disable TLS certificate verification, use "rejectUnauthorized: false", or trust arbitrary certificates.
+- Do not reset the database password or rewrite the username unless independent evidence proves either is incorrect.
+
+3. Verify the actual connection
+
+- Confirm the backend reads the existing "SUPABASE_DB_URL" secret.
+- Preserve the generated Supabase Session Pooler hostname, correct username, port 5432, and database name.
+- Perform one secure, read-only "SELECT 1" connection test.
+- Report the actual result and precise error category if unsuccessful.
+- Do not claim success unless the connection test passes.
+
+4. Protect existing data and functionality
+
+- Keep "DATABASE_URL" pointing to Neon and leave Neon as the active database.
+- Do not create migration tables, copy wedding rows, change database routing, or move photos/videos as part of this fix.
+- Preserve all existing accounts, wedding records, memberships, permissions, media references, app features, and settings.
+- Make only the smallest necessary code/configuration changes.
+
+5. Publish and report
+
+- Determine whether the fix requires publishing or redeploying for the existing secrets to reach the runtime.
+- Confirm that all existing secret names remain intact without revealing their values.
+- Report the root cause, changed files, connection-test result, whether publishing is required, and whether I need to update any specific secret.
+
+Do not begin data migration or database cutover. Fix and verify the secure connection first.

@@ -1,0 +1,71 @@
+Wedding Circle — Fix Cloudflare Stream Authorization Failure
+
+The Cloudflare Stream connection is still failing with:
+
+"Authorization Failure: The authentication credentials are not authorized to perform the request. (10002)"
+
+Confirmed facts
+
+- Cloudflare Account ID is saved in Developer → Infrastructure.
+- A new Cloudflare API token named "weddingcircle-stream" was created.
+- The token has Account → Stream → Edit and Account → Stream → Read permissions.
+- The token is active.
+- The previous token has already been deleted from Cloudflare.
+- The new token was entered and saved in Wedding Circle.
+- The connection test still fails.
+- No Live Input has been created.
+
+Your task: inspect and fix the actual cause
+
+1. Audit the existing implementation first
+
+- Trace the complete Cloudflare Stream connection-test flow from the Infrastructure UI to the backend request.
+- Identify exactly which server-side secret is read and where it is stored.
+- Verify that the newly saved token is actually being used.
+- Check whether an old token is cached, retained in memory, or loaded from an outdated configuration.
+- Verify the saved Account ID is used in the Stream API request.
+
+2. Verify Cloudflare API authentication
+
+- Confirm the request uses the correct Cloudflare Stream API endpoint.
+- Confirm the authorization header is formatted correctly as "Authorization: Bearer <token>".
+- Check for accidental double "Bearer" prefixes, whitespace, truncation, encoding problems, or incorrect secret mapping.
+- Verify the endpoint uses the correct Cloudflare Account ID.
+- Check that the token has the necessary permissions and account scope.
+- Do not assume the token is invalid just because the request failed.
+
+3. Fix the root cause
+
+- Correct the actual faulty code or configuration.
+- Ensure saving a new token replaces the old server-side value.
+- Ensure the connection test uses the latest saved credentials.
+- Do not expose the token, private credentials, or authorization headers in logs or error messages.
+
+4. Test safely
+
+- Test authentication and Stream read access without creating a Live Input.
+- If authentication succeeds, verify that the account's Stream resources can be read.
+- Do not create, modify, or delete any live inputs during testing.
+- Return the actual Cloudflare response and identify which stage fails.
+
+5. Preserve existing functionality
+
+- Do not modify the existing in-app camera.
+- Do not change Cloudflare R2 or its private bucket.
+- Do not change DNS, Workers, CDN configuration, or media storage.
+- Do not replace Cloudflare Stream with another provider.
+- Do not request another API token unless the code audit proves it is necessary.
+
+Final report required
+
+Tell me:
+
+1. The exact root cause.
+2. Which files and functions you inspected.
+3. What you changed.
+4. Whether the new token was actually being used.
+5. Whether Stream authentication and read access now pass.
+6. Whether any Live Input was created (the answer must be NO).
+7. Which tests passed and failed.
+
+Do not claim the issue is fixed unless the actual backend connection test succeeds. Do not deploy or publish anything.

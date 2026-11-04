@@ -1,0 +1,30 @@
+Fix the Cloudflare R2 credential editing bug in The Wedding Circle Developer → Infrastructure section.
+
+Current bug:
+All R2 credential fields behave as read-only. Tapping any field does nothing and the keyboard never opens. Users can only copy the existing values. There is no working way to replace incorrect credentials.
+
+Required implementation:
+
+1. Inspect the actual source code for the Cloudflare R2 Developer settings form and identify why the fields are not editable.
+2. Make these fields properly editable:
+   - "R2_ACCOUNT_ID"
+   - "R2_BUCKET"
+   - "R2_ACCESS_KEY_ID"
+   - "R2_SECRET_ACCESS_KEY"
+3. Add a functional Edit/Update mode if the current design uses read-only saved credentials.
+4. For existing secrets, do not reveal or prefill the saved secret. Show a clear "Saved — enter a new value to replace" placeholder.
+5. Allow users to enter replacement credentials, save them securely through the existing server-side configuration API, and receive clear success or error feedback.
+6. Ensure inputs work on Android mobile browsers and desktop browsers. Check focus, keyboard opening, controlled input state, and disabled/read-only attributes.
+7. Never expose secret values in frontend code, browser responses, logs, or error messages.
+8. Preserve existing saved credentials if the user cancels or leaves the edit form without saving.
+9. Do not change bucket permissions, enable public access, move wedding media, or modify unrelated Firebase, authentication, storage, or UI features.
+
+Verification required:
+
+- Open the R2 settings on mobile and desktop.
+- Confirm every field accepts input.
+- Save a replacement credential and reload the page to verify persistence.
+- Run the R2 connection test.
+- Confirm the secret remains masked and is never exposed to the browser.
+
+Inspect, implement, and test the actual source code. Do not merely describe the fix or claim completion without verification. Report any remaining blocker precisely.

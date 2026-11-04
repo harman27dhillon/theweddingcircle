@@ -1,0 +1,131 @@
+Redesign ONLY the main/landing page of The Wedding Circle.
+
+Do NOT change the app's underlying functionality, routing, database, authentication, wedding-circle logic, or other pages.
+
+The goal is to make the landing page feel like a premium modern Indian wedding product, not a developer prototype.
+
+1. Hero section
+
+Make the first screen visually strong and immediately explain the product.
+
+Headline:
+Your Wedding. Everyone Together.
+
+Subheadline:
+One private space for your family, friends and wedding moments — before, during and after the big day.
+
+Primary CTA:
+Create Wedding Circle — ₹499
+
+Secondary CTA:
+Explore as Guest
+
+Add a beautiful, subtle Indian wedding visual/background treatment. Keep it elegant and modern — not overly flashy, not stereotypical Bollywood.
+
+2. Show the product visually
+
+Instead of explaining everything with large blocks of text, show 3 attractive visual cards:
+
+LIVE
+Share wedding moments and updates in real time.
+
+FAMILY
+Keep both families connected in one private space.
+
+MEMORIES
+Photos, videos and moments stay together after the wedding.
+
+These should look like actual product features, not generic marketing cards.
+
+3. Explain the concept simply
+
+Add a short section:
+
+One wedding. One private circle.
+
+Explain in 2–3 short sentences that the couple/families create a private wedding space where invited people can follow updates, participate, share memories and stay connected even if they cannot physically attend.
+
+Do NOT use long paragraphs.
+
+4. Pricing
+
+Keep ₹499 visible, but don't make pricing the first thing users see.
+
+Use a clean card:
+
+Create your Wedding Circle
+₹499
+One wedding space for the entire celebration.
+
+Button:
+Create Wedding Circle
+
+If the existing product already supports bride-side/groom-side collaboration, mention that clearly but briefly.
+
+5. Visual design
+
+Use:
+
+- premium ivory/cream base
+- subtle wedding-inspired accent colors
+- elegant typography
+- generous spacing
+- rounded cards
+- subtle shadows
+- tasteful animations
+- polished mobile-first layout
+
+Avoid:
+
+- excessive gradients
+- excessive text
+- huge empty areas
+- generic SaaS/dashboard appearance
+- too many buttons
+- excessive animations
+- cheap-looking wedding clipart
+
+6. Navigation
+
+Keep navigation extremely simple.
+
+Logo:
+The Wedding Circle
+
+Navigation:
+How It Works
+Explore as Guest
+Create Wedding
+
+On mobile, use a clean compact menu.
+
+7. Social proof / emotional section
+
+Add a small section near the bottom:
+
+Because not everyone can be there.
+
+Explain that The Wedding Circle lets people who cannot attend physically still feel part of the wedding through live updates, photos, videos and family moments.
+
+This is one of the strongest emotional reasons to use the product, so make it visually meaningful.
+
+8. Final CTA
+
+End with:
+
+Make everyone part of your wedding.
+
+Button:
+Create Your Wedding Circle
+
+Important
+
+Do not rewrite the entire application.
+
+Modify ONLY the landing/main page.
+
+Preserve all existing functionality and links.
+
+Make the result feel like a real consumer product that could be launched publicly, with the visual quality of a modern premium wedding/lifestyle app.
+
+Before finishing, check the page carefully on both desktop and mobile widths and fix spacing, overflow, button sizing and typography issues.

@@ -1,0 +1,70 @@
+The Wedding Circle — WhatsApp-Style Media Download Experience
+
+Fix the existing media download functionality.
+
+Currently, when a user taps the download icon on an uploaded photo, the application opens a direct Cloudflare R2 storage URL in the browser.
+
+This is not the desired user experience.
+
+Required behaviour
+
+Make photo and video downloads work naturally like WhatsApp.
+
+1. When a user taps the download icon, download the media directly to their device.
+2. Do not navigate the user to an R2 URL or expose storage URLs in the browser address bar.
+3. Do not open a separate browser page just to display the original image.
+4. Use a secure backend-authorized download flow.
+5. Return the media as a download response with the correct filename, MIME type and Content-Disposition attachment header.
+6. Keep R2 credentials and storage implementation completely hidden from the client.
+
+Android behaviour
+
+- Support Android Chrome and Samsung Internet.
+- Trigger the native browser download mechanism.
+- Use a meaningful filename, such as "WeddingCircle_Photo_001.jpg".
+- Ensure downloaded photos can be found in the device's Downloads folder.
+- Where supported, provide an option to save media to the device gallery.
+- Show download progress and completion feedback.
+
+Video downloads
+
+Apply the same behaviour to videos.
+
+Preserve the original video file and format when downloading.
+
+Security
+
+- Verify wedding membership and media access permissions server-side.
+- Verify that the requested media belongs to the correct wedding.
+- Use short-lived authorization.
+- Never make the R2 bucket public.
+- Never expose permanent R2 object URLs.
+- Prevent unauthorized cross-wedding downloads.
+
+Performance
+
+- Stream files from R2 through an efficient authorized download mechanism.
+- Avoid loading entire large files into server memory.
+- Support large video downloads.
+- Handle interrupted downloads and errors gracefully.
+
+Preserve existing functionality
+
+Do not change the existing upload pipeline, compression system, R2 credentials, Premium entitlement system or unrelated UI.
+
+Inspect the existing download implementation first and modify only what is necessary.
+
+Testing
+
+Test on real Android devices:
+
+- Download a photo.
+- Download a video.
+- Verify the file appears in Downloads.
+- Verify the correct filename and file format.
+- Verify the photo opens correctly after download.
+- Verify unauthorized users cannot download another wedding's media.
+
+Do not claim completion based only on a successful build. Verify actual downloads on Android.
+
+The final experience should feel like downloading media from WhatsApp, with no visible Cloudflare or R2 URLs.

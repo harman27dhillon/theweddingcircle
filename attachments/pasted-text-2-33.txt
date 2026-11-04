@@ -1,0 +1,140 @@
+Wedding Circle — Chat Send Button, Media Viewer Navigation and Album Thumbnail Recovery
+I need you to investigate and fix three specific issues in the existing Wedding Circle application.
+CRITICAL: Inspect the current source code and Git history before implementing fixes.
+These features have existed or were fixed previously. Some code may still be present but disconnected, overwritten, incorrectly integrated or broken by later changes.
+Do not immediately rebuild anything. Recover and repair existing implementations wherever possible.
+1. Chat send button does not work while keyboard is open
+Current problem
+When a user types a message in the Chat text composer and the mobile keyboard is open, tapping the Send button does nothing.
+If the keyboard is closed first, the same Send button works normally.
+This is a mobile chat interaction bug.
+Investigation
+• Inspect the existing chat composer and send-button implementation.
+• Check previous fixes in Git history, if available.
+• Inspect keyboard visibility handling, focus and blur events.
+• Inspect mobile viewport resizing and visual viewport handling.
+• Check whether the keyboard intercepts taps or causes the send button to move outside its actual clickable area.
+• Check z-index, pointer events, touch handling and event propagation.
+• Check whether a blur event or keyboard dismissal happens before the send action executes.
+• Check whether the message submission callback is incorrectly dependent on keyboard state.
+Required behaviour
+• The Send button must work while the keyboard is OPEN.
+• Tapping Send must immediately submit the message.
+• The keyboard may remain open after sending, allowing the user to type another message.
+• Message text must not disappear before successful submission.
+• Prevent duplicate message sending.
+• Preserve existing sending indicators, error handling and retry behaviour.
+• Maintain correct composer positioning when the keyboard opens and closes.
+Do not require users to close the keyboard before sending messages.
+2. Replace Previous/Next text buttons in the media viewer
+Current problem
+When opening a photo or video from Chat or any Album, the viewer displays two text buttons labelled "Previous" and "Next".
+I want these replaced with simple arrow controls.
+Required design
+• Remove the visible Previous and Next text buttons.
+• Add a left arrow control at the left edge of the screen.
+• Add a right arrow control at the right edge of the screen.
+• Use simple, elegant arrow icons.
+• Keep both controls vertically centred.
+• Make the controls easy to tap on mobile.
+• Use subtle translucent backgrounds if needed for visibility.
+• Keep the controls visually consistent with the existing premium Wedding Circle media viewer.
+Navigation behaviour
+• Left arrow opens the previous photo/video.
+• Right arrow opens the next photo/video.
+• Preserve the existing media ordering.
+• Preserve existing swipe navigation.
+• Correctly handle the first and last media items.
+• Hide or disable arrows when navigation is unavailable.
+• Ensure arrows do not cover important photo/video content unnecessarily.
+• Do not break video playback, zoom, close, download or fullscreen controls.
+The same viewer navigation design must apply when media is opened from:
+• Wedding Chat.
+• Group Chat.
+• Pre-wedding sections.
+• Wedding Album.
+• Any other existing album/media viewer using the shared component.
+Reuse the existing shared viewer if one exists. Do not create separate viewers for different sections.
+3. Fix existing Album thumbnails showing "Couldn't load"
+Current problem
+Some photos that were uploaded successfully earlier are showing a "Couldn't load" error in the Album thumbnail grid.
+Other thumbnails load normally.
+Do not assume these are missing files. The underlying original media may still exist.
+Investigation
+Inspect the complete thumbnail-loading pipeline:
+• Album media database records.
+• Stored thumbnail paths and object keys.
+• Main media object paths.
+• Cloudflare R2 storage references.
+• Existing private media gateway or signed URL generation.
+• Authentication and wedding membership checks.
+• Thumbnail URL generation and expiration.
+• Image loading errors and retry handling.
+• Content type and file-format mismatches.
+• Any old media records created before thumbnail generation was introduced.
+• Any differences between older uploads and newer uploads.
+Determine whether the problem is caused by:
+• Missing thumbnail objects.
+• Incorrect object keys.
+• Expired signed URLs.
+• Incorrect media paths.
+• Permission or membership checks.
+• Old records without thumbnail metadata.
+• Incorrect response headers.
+• Thumbnail generation or upload failures.
+• Browser image decoding errors.
+Required behaviour
+• Existing uploaded photos must continue to display.
+• If a thumbnail exists, load it.
+• If a thumbnail is missing or invalid but the main photo exists, use a safe fallback to the main photo or generate a replacement thumbnail through the existing authorized pipeline.
+• Do not expose private R2 objects publicly.
+• Do not bypass membership verification.
+• Do not generate duplicate media records or duplicate main photo uploads.
+• Add sensible retry behaviour for temporary loading failures.
+• Avoid repeatedly retrying permanently missing files.
+• Preserve the existing album grid design and layout.
+If older media requires a thumbnail repair or backfill process, first identify the affected records and propose a safe repair approach. Do not run a bulk destructive migration.
+4. Testing requirements
+Test all three fixes.
+Chat
+• Android Chrome with keyboard open.
+• Send several consecutive messages without closing the keyboard.
+• Test empty messages.
+• Test failed message submission and retry.
+• Confirm no duplicate messages.
+Media viewer
+• Open photos from Chat and Album.
+• Open videos from Chat and Album.
+• Test left/right arrows.
+• Test swipe navigation.
+• Test first and last media items.
+• Confirm all existing viewer controls still work.
+Album thumbnails
+• Test older uploaded photos.
+• Test newer uploaded photos.
+• Test records with missing thumbnail references.
+• Test expired media links.
+• Test temporary network failures.
+• Confirm private access restrictions remain intact.
+Run relevant automated tests, typecheck and production build.
+5. Strict implementation rules
+• Inspect existing code before changing it.
+• Check Git history for earlier fixes.
+• Reuse existing working components and functions.
+• Fix root causes instead of adding superficial workarounds.
+• Do not redesign unrelated UI.
+• Do not change upload architecture or storage providers.
+• Do not change Cloudflare DNS, Worker routes or CDN configuration.
+• Do not delete existing media.
+• Do not deploy or publish without my approval.
+6. Final report
+Report each issue separately:
+• What caused the problem?
+• Was an earlier implementation or fix already present?
+• Was it disconnected, overwritten or incorrectly configured?
+• What exactly did you reuse or repair?
+• What new code, if any, was necessary?
+• Which tests passed?
+• What remains unverified on actual devices?
+Clearly distinguish implemented, tested and deployed changes.
+Do not claim a fix is complete just because the code was modified. Verify the actual user-facing behaviour.

@@ -1,0 +1,319 @@
+Wedding Circle — Premium Religion-Aware Digital Wedding Invitation + Album Swipe Fix
+
+Inspect the existing Wedding Circle application and implement the changes below directly in the existing project.
+
+The main priority is to transform the Home page inside each created wedding into a beautiful, personalized, interactive marriage invitation card. This is the most important page of the app and should feel like a premium digital version of a traditional wedding invitation, containing the couple's names, families, ceremonies, dates, timings, venues, dress codes and other important guest information.
+
+Also fix the existing Album swipe-navigation issue.
+
+Strict scope: The invitation redesign applies ONLY to the Home page inside an individual created wedding. Do not redesign the main login/landing page, Feed, Live, Album or More. The Album task is limited to fixing its swipe-navigation behavior.
+
+TASK 1 — Fix Album swipe navigation
+
+Swipe navigation currently works well in other sections but gets stuck in Album and does not reliably navigate to Live or More.
+
+Required behavior:
+
+- Swipe right from Album to navigate to Live.
+- Swipe left from Album to navigate to More.
+- Preserve the existing order: Home, Feed, Live, Album, More.
+- Preserve the working swipe implementation throughout the rest of the app.
+
+Inspect Album-specific touch handlers, gallery gestures, nested scrolling, event propagation and pointer events. Identify and fix the actual cause of the conflict rather than replacing the global swipe system unnecessarily.
+
+Preserve normal photo browsing, vertical scrolling, image zooming and gallery interactions. Ensure one valid swipe triggers one navigation event, the bottom navigation remains synchronized, and repeated swipes do not become stuck.
+
+Test both directions from different parts of the Album screen, including areas containing images and empty space.
+
+TASK 2 — Transform the wedding Home page into a premium invitation
+
+A. Overall design vision
+
+Use the supplied screenshot of the existing wedding Home page as the starting reference.
+
+Transform the current dashboard-style page into an elegant, immersive Indian marriage invitation. It should feel like opening a beautifully designed printed wedding card brought to life digitally.
+
+Use:
+
+- Elegant editorial typography and refined serif headings.
+- A tasteful color palette appropriate to the selected religion/tradition and the host's chosen theme.
+- Ivory, cream, champagne gold, blush or other suitable colors where appropriate.
+- Fine ornamental borders, floral details and culturally appropriate decorative motifs.
+- Beautiful dividers, balanced spacing and generous whitespace.
+- Subtle gradients, restrained shadows and premium visual details.
+
+Avoid generic dashboard styling, excessive rounded cards, crowded layouts, flashy effects and unnecessary app-like panels.
+
+Retain the existing wedding cover/background image where appropriate, integrating it into the invitation design with a suitable overlay for readable text.
+
+B. Couple names — the main focal point
+
+The bride's and groom's names must be the most prominent elements on the invitation cover.
+
+- Display both names in beautiful, premium wedding-card typography.
+- Arrange them with a tasteful ampersand, ornamental divider or other elegant visual treatment.
+- Make the names balanced, readable and immediately noticeable.
+- Display the wedding date and relevant location alongside or immediately beneath the names.
+- Include a suitable invitation heading or welcome message.
+- Use the actual couple names saved for that particular wedding.
+- If names are stored separately, combine them dynamically for display without modifying the underlying data.
+- Preserve spelling, capitalization and the hosts' chosen display names.
+- If a name is missing, gracefully use available information without inventing names.
+- Update the invitation automatically when authorized hosts change the saved names.
+
+When guests first open the page, the visual hierarchy should be:
+
+1. Bride's and groom's names.
+2. Wedding date and main venue, where available.
+3. Invitation message or welcome line.
+4. Upcoming ceremonies and complete wedding itinerary.
+5. Family introductions and additional guest information.
+
+Never hardcode example couple names.
+
+TASK 3 — Make the invitation adapt to the selected religion and tradition
+
+The invitation must reflect the religion or wedding tradition selected during creation of that specific wedding.
+
+Do not apply one generic Indian wedding design to every wedding.
+
+A. Use the actual saved selection
+
+- Read the religion/tradition and theme saved for the wedding.
+- Use them to determine suitable visual motifs, colors, decorative borders, invitation wording and optional traditional elements.
+- Keep the host's chosen theme customizable independently of religion.
+- If religion/tradition is unspecified, use a neutral, elegant invitation design.
+- Do not infer religion from names, photographs, location or other indirect clues.
+
+B. Respect different traditions
+
+Use these as design directions, not rigid templates:
+
+Sikh weddings
+
+- Consider refined Punjabi invitation styling, tasteful floral or phulkari-inspired patterns and appropriate Punjabi design elements.
+- Use terms such as Anand Karaj only when relevant to the actual wedding schedule.
+- Include religious symbols, prayers or blessings only when the host has chosen or approved them.
+
+Hindu weddings
+
+- Consider suitable Indian ornamental motifs, floral decoration and auspicious design elements appropriate to the selected wedding style.
+- Reflect the actual ceremonies configured by the host rather than assuming every ceremony is included.
+
+Muslim weddings
+
+- Consider elegant geometric patterns and tasteful arabesque-inspired decoration.
+- Use culturally appropriate invitation wording only where appropriate and approved.
+
+Christian weddings
+
+- Consider refined floral styling, elegant typography and understated religious motifs where desired.
+
+Other traditions or secular weddings
+
+- Use a respectful design suited to the selected tradition or a neutral premium invitation when appropriate.
+
+Avoid stereotypes and respect regional, family and cultural differences. Do not automatically insert religious symbols, prayers, scripture, blessings or ceremonial text without the host's approval.
+
+Different weddings should be able to display genuinely different invitation designs based on their saved settings.
+
+TASK 4 — Display the complete ceremony itinerary
+
+The Home page must serve as the central wedding invitation and schedule.
+
+Create a beautiful, organized itinerary containing every ceremony or event configured for the specific wedding.
+
+Each event should display all available information:
+
+- Ceremony/event name.
+- Date and day of the week.
+- Start and end times, where available.
+- Venue name.
+- Full address or location.
+- Dress code.
+- Event description.
+- Guest instructions or special notes.
+
+Examples of event types include Roka, engagement, Shagun, Mehndi, Maiyan, Haldi, Sangeet, Jaggo, Anand Karaj, wedding ceremony, reception, Doli and Vidaai. These are examples only. Display the events actually configured by the host.
+
+Itinerary design
+
+- Use an elegant invitation-style timeline or beautifully designed event sections.
+- Organize events chronologically when dates and times permit.
+- Clearly distinguish events occurring on different dates.
+- Make the next upcoming ceremony easy to identify without hiding the rest of the schedule.
+- Use tasteful icons or decorative dividers only where they complement the selected theme.
+- Make each ceremony's time, date and venue easy to scan on mobile screens.
+- Avoid turning every ceremony into a generic dashboard card.
+
+Do not invent missing information. Omit unavailable optional fields gracefully.
+
+TASK 5 — Introduce the bride's and groom's families
+
+Add a dedicated family-introduction section inspired by traditional wedding invitations.
+
+Display the information available and approved by the hosts:
+
+- Bride's full name.
+- Groom's full name.
+- Bride's parents' names.
+- Groom's parents' names.
+- Grandparents' names.
+- Other family members the hosts choose to include.
+- Family relationships and titles.
+- Optional family photographs where supported.
+- Optional Bride's Family and Groom's Family labels.
+
+Use a balanced layout with elegant typography and decorative dividers. On wider screens, a two-column composition may be appropriate; on mobile, use a graceful stacked layout.
+
+Do not automatically expose private guest information. Only display family details the hosts have chosen to include in the invitation and that the current visitor is authorized to see.
+
+TASK 6 — Add venue and travel information
+
+Display the main wedding venue and the venue for each individual ceremony where available.
+
+Include:
+
+- Venue name.
+- Full address.
+- City.
+- Associated ceremony.
+- Event date and time.
+- Existing directions or map links, if configured.
+
+If different ceremonies take place at different venues, make the distinction obvious.
+
+Use working directions links only when actual location information is available. Do not invent addresses, coordinates or map URLs.
+
+TASK 7 — Include dress codes and guest guidance
+
+Display dress codes prominently in the relevant ceremony entries and optionally in a dedicated invitation section.
+
+Support existing saved information such as:
+
+- Ceremony-specific dress codes.
+- Wedding theme colors.
+- Attire instructions.
+- Guest arrival guidance.
+- Parking instructions.
+- Venue-specific notes.
+- Other host-provided guest information.
+
+Do not apply one dress code to every ceremony unless the host's saved data specifies that.
+
+Make the information useful and easy to find without cluttering the invitation.
+
+TASK 8 — Add the invitation message and additional wedding details
+
+Where supported by the existing app, include:
+
+- A personal invitation or welcome message.
+- Wedding hashtag.
+- RSVP details and deadlines.
+- Contact details intentionally shared with guests.
+- Special guest instructions.
+- Other invitation details saved by the host.
+
+Present these as part of the invitation design rather than unrelated dashboard panels.
+
+Do not fabricate missing details or create nonfunctional buttons.
+
+TASK 9 — Reuse the existing data and editing system
+
+Before implementing the design, inspect the current wedding data model, creation flow, editing screens and saved ceremony information.
+
+- Reuse existing fields and data wherever possible.
+- Bind every displayed detail to the correct wedding's saved information.
+- Never hardcode sample names, dates, ceremonies, venues or family members.
+- If required fields already exist but are not displayed, connect them to the invitation.
+- If essential fields are genuinely missing, add only the necessary fields and integrate them into the existing authorized wedding-editing flow.
+- Avoid duplicate data structures or multiple competing sources of truth.
+- Ensure authorized host edits persist and update the correct wedding invitation.
+- Do not reset, overwrite or delete existing wedding records or uploaded media.
+
+Do not invent missing information. Show available details and use graceful empty states for unavailable fields.
+
+TASK 10 — Apply the existing iPhone-style entrance animation
+
+Reuse the iPhone-unlock-style entrance animation already implemented in Wedding Circle.
+
+Apply it appropriately to the invitation cover and its sections:
+
+- Gently reveal the invitation cover.
+- Introduce the couple's names with a subtle entrance.
+- Reveal the ceremony itinerary and family sections in a gentle staggered sequence.
+- Use restrained fade, scale and spring-like easing effects.
+
+Keep the animation consistent with the existing Wedding Circle animation language.
+
+Do not introduce a completely separate animation system if the existing one can be reused. Avoid heavy rendering, layout shifts, excessive animation or blocking interaction. Do not replay the full animation unnecessarily on every state update. Respect reduced-motion accessibility settings.
+
+TASK 11 — Mobile-first presentation
+
+The supplied reference is a mobile screenshot. Optimize the invitation for mobile screens first.
+
+- Make the couple's names and wedding date immediately noticeable.
+- Keep typography readable.
+- Prevent horizontal overflow and clipped content.
+- Make ceremony details easy to scan.
+- Ensure family introductions and venue information adapt to narrow screens.
+- Allow the complete invitation to scroll naturally.
+- Preserve the existing bottom navigation for Home, Feed, Live, Album and More.
+- Preserve the existing header, notification behavior and host controls, changing only their layout where necessary to accommodate the invitation.
+- Maintain the working swipe navigation.
+
+The Home page may be long enough to contain the full invitation, but it must remain organized, elegant and practical.
+
+TASK 12 — Preserve privacy, security and all other app features
+
+This redesign applies ONLY to the Home page inside each created wedding.
+
+Do not redesign:
+
+- Main login/landing page.
+- Feed.
+- Live.
+- Album.
+- More.
+
+Preserve:
+
+- Wedding IDs and saved wedding data.
+- Couple names and existing wedding details.
+- Host and co-host permissions.
+- Guest authentication and access controls.
+- Family privacy restrictions.
+- Wedding backgrounds and uploaded media.
+- Live-streaming functionality.
+- Existing routes, integrations and backend behavior.
+
+Do not expose private family details or guest-only information to unauthorized visitors. Maintain backend and storage access controls; hiding content in the UI alone is not sufficient.
+
+Do not rebuild the app, remove working features or reset existing data.
+
+TASK 13 — Test the completed implementation
+
+Verify the following before reporting completion:
+
+1. Album swipes left to More and right to Live.
+2. Global swipe navigation remains functional in all five sections.
+3. The invitation prominently displays the correct bride's and groom's names.
+4. Different weddings display their own saved couple names, dates and details.
+5. Religion/tradition and theme selections produce suitable invitation styling.
+6. The itinerary displays all configured ceremonies with accurate dates, times, venues and dress codes.
+7. Family introductions use the correct saved details and respect privacy permissions.
+8. Missing optional fields do not break the layout.
+9. Host edits persist and update the correct invitation.
+10. The invitation animation works smoothly on mobile.
+11. Bottom navigation, host controls, Feed, Live and Album remain functional.
+12. No existing wedding data is deleted, overwritten or reset.
+
+Report the changes actually implemented, the existing fields reused, any genuinely necessary new fields, and any remaining limitations. Do not claim a fix has been verified unless it has been tested.
+
+FINAL OBJECTIVE
+
+When a guest opens a created wedding, the Home page should feel like opening a beautiful, premium, personalized digital marriage invitation.
+
+The couple's names must be the centerpiece. The design must reflect the selected religion/tradition and theme. Guests should be able to find the complete ceremony itinerary, timings, dates, venues, dress codes, family names and invitation message in one elegant, mobile-friendly experience.
+
+Implement these changes directly in the existing project, preserving all other functionality and data.

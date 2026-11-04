@@ -1,0 +1,104 @@
+Add Cloudflare CDN Configuration to Developer → Infrastructure
+
+Inspect the existing Wedding Circle source code and implement a new Cloudflare CDN section inside the existing Developer → Infrastructure dashboard.
+
+1. Important: Preserve existing infrastructure
+
+- Do not modify, replace, or break the existing Cloudflare R2 configuration.
+- Keep the current R2 bucket, credentials, upload logic, download logic, and private storage behaviour intact.
+- Do not change database schemas or existing media records unnecessarily.
+- Do not modify unrelated app features or UI.
+- This task is specifically to add CDN configuration and integrate it safely with the existing R2 media delivery architecture.
+
+2. Add a Cloudflare CDN configuration panel
+
+Include these fields:
+
+1. CDN Status: Enabled / Disabled.
+2. Media Domain: e.g. "media.theweddingcircle.in".
+3. CDN Base URL: The base URL used for media delivery.
+4. Cloudflare Account ID: Reuse the existing account configuration where appropriate; do not expose secrets.
+5. R2 Bucket: Show the currently configured bucket, "wedding-circle-media".
+6. Cache Policy: Configurable secure cache behaviour.
+7. Private Media Access: Must remain enabled.
+
+Include:
+
+- Save Configuration button.
+- Test CDN Connection button.
+- Configuration status.
+- Clear error and success messages.
+- Last tested timestamp.
+
+3. Private media security — mandatory
+
+Wedding Circle media must remain private.
+
+- Never make the R2 bucket public just to enable CDN delivery.
+- Never expose R2 access keys or secret keys in frontend code.
+- Do not generate permanent public URLs for private wedding photos or videos.
+- Use authenticated access or short-lived signed delivery URLs.
+- Verify wedding membership and permissions before issuing access.
+- Prevent users from accessing media belonging to another wedding.
+- Do not cache private media in a way that allows one wedding's content to be served to another wedding's users.
+- Use appropriate private cache-control headers and cache-key isolation.
+- If secure CDN delivery cannot be implemented with the current Cloudflare configuration, clearly show the missing requirement instead of weakening privacy.
+
+4. Integrate CDN with existing media delivery
+
+When CDN is enabled and correctly configured:
+
+- Use the CDN domain for eligible media viewing, thumbnails, and downloads.
+- Keep uploads going directly to the existing private R2 upload flow. CDN is primarily for delivery, not upload acceleration.
+- Preserve the existing upload fallback behaviour.
+- Preserve membership checks and download permissions.
+- If CDN is disabled or unavailable, automatically fall back to the existing secure R2 delivery method.
+- Do not break existing wedding media URLs or records.
+
+5. Configuration validation
+
+The Test CDN Connection button must perform a real server-side validation.
+
+Check:
+
+- Whether the domain is configured.
+- Whether the domain resolves and responds.
+- Whether the configured delivery route can access an authorised test object.
+- Whether unauthorised access is rejected.
+- Whether the CDN configuration is actually usable for private media delivery.
+
+Do not report a successful test merely because a domain responds with HTTP 200.
+
+If a Cloudflare-side action is required, such as connecting a custom domain, configuring a Worker, or setting up DNS, show the exact outstanding requirement in the dashboard. Do not pretend to configure Cloudflare externally.
+
+6. Developer diagnostics
+
+Display:
+
+- CDN enabled/disabled.
+- Domain configuration status.
+- R2 connection status.
+- Private access validation status.
+- Last successful test.
+- Clear actionable error messages.
+
+Never display secrets.
+
+7. Implementation and verification
+
+Inspect the existing infrastructure code before making changes.
+
+Implement the feature in the existing project architecture. Reuse existing configuration patterns and avoid duplicate infrastructure settings.
+
+After implementation:
+
+- Run type checking.
+- Run the production build.
+- Test configuration save and reload.
+- Test CDN disabled fallback.
+- Test authorised and unauthorised media access.
+- Verify that existing R2 uploads and downloads still work.
+
+Do not claim production verification unless actual Cloudflare credentials, domain configuration, and real media access have been tested.
+
+Important: Implement this in the source code now. Do not merely describe the plan or provide a summary. Do not publish or deploy the app. At the end, report exactly what was implemented, what tests passed, and what Cloudflare-side setup I still need to complete.

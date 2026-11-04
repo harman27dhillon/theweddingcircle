@@ -1,0 +1,89 @@
+Modify the existing Developer tab of my web app.
+
+I do NOT want the current "Run Command" and "AI Editor" to work primarily as prompt-based AI interfaces anymore. Convert them into a proper developer coding environment / mini IDE, while keeping all existing app functionality intact.
+
+1. Code Editor
+
+Replace the current prompt-based AI Editor with a real code editor where I, as the developer, can:
+
+- Browse the project's files and folders.
+- Open and edit actual source files.
+- Write JavaScript/TypeScript/React/HTML/CSS code directly.
+- Have syntax highlighting, line numbers, search, and undo/redo.
+- Save changes directly to the project.
+- Clearly show modified/unsaved files.
+- Add/create new files and folders where appropriate.
+
+2. Command Center
+
+Convert the existing Run Command section into a real developer terminal/command interface.
+
+It should allow me to enter commands such as:
+
+- npm install
+- npm run build
+- npm run dev
+- npm test
+- git status
+- git diff
+
+Commands should actually execute in the project's development environment and display:
+
+- stdout
+- stderr
+- exit code
+- execution status
+- execution time
+
+Add a Stop/Cancel button for running commands.
+
+3. AI Editor
+
+Do NOT remove AI completely.
+
+Instead, make AI an optional developer tool alongside the code editor.
+
+For example:
+
+- "Ask AI"
+- "Explain Code"
+- "Find Bug"
+- "Suggest Fix"
+- "Apply AI Fix"
+
+AI should be able to inspect the currently opened file/project context and propose or apply code changes, but direct code editing must work without requiring an AI API call.
+
+4. Live Preview
+
+Add/retain a live application preview inside the Developer tab.
+
+After I modify code:
+
+1. Save the file.
+2. Run/build the project when necessary.
+3. Refresh/update the preview.
+4. Show build/runtime errors clearly.
+
+I should be able to go from:
+
+Code → Save → Run/Build → Preview
+
+without leaving the Developer tab.
+
+5. Developer-only access
+
+Keep this entire environment restricted to the existing developer/admin authentication.
+
+Do NOT expose the terminal, source-code editor, filesystem access, or command execution to ordinary users.
+
+6. Important architecture requirement
+
+Do not fake the terminal or editor with a UI that merely displays text.
+
+The editor must modify the actual project files, and the command center must execute commands in the actual development environment.
+
+Do not break the existing application, routes, authentication, database, APIs, UI, or user-facing features.
+
+Before making changes, inspect the existing project architecture and identify how the current Developer tab, Run Command, and AI Editor work. Then modify those existing components rather than creating an unrelated replacement.
+
+The final Developer tab should feel like a lightweight VS Code-style environment contained entirely inside my web app.

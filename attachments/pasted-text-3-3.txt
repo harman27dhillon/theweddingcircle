@@ -1,0 +1,40 @@
+Update Host Control → Wedding Bar settings — minimal change only
+
+Modify the existing Wedding Circle source code directly.
+
+1. Remove text-position controls
+
+Inside Host Control → Wedding Bar, remove the controls that allow users to reposition these elements on the wedding card:
+
+- Couple names
+- Wedding date
+- Location
+- Venue
+
+These elements must retain their existing positions and styling. Do not remove the actual name, date, location, or venue information from the wedding card.
+
+2. Keep cover-image positioning and framing
+
+The Wedding Bar settings must allow the host and authorized co-host to:
+
+- Drag the cover image to reposition it within the wedding card.
+- Adjust the image framing to suit the selected picture.
+- Zoom in or out to achieve the desired crop, if supported by the existing image component.
+- Preview the result before saving.
+- Save the image position, zoom, and crop so they remain consistent after refreshing or reopening the wedding.
+
+Image adjustments must work with both preset themes and Classic themes. Changing the cover image framing must not move the couple's names, wedding date, location, or venue.
+
+3. Preserve existing functionality
+
+- Keep existing cover-image upload and selection functionality.
+- Preserve current card dimensions, aspect ratios, theme styling, and responsive layouts.
+- Respect the existing host and co-host permissions.
+- Ensure dragging the image does not accidentally drag the entire page or trigger navigation, especially on mobile touchscreens.
+- Do not introduce changes to the landing page, other Host Control sections, authentication, database structure, or unrelated components.
+
+4. Verify before finishing
+
+Test image dragging, framing, saving, and reloading on desktop and mobile Chrome. Confirm that the text-position controls are gone and all text elements remain in their original positions.
+
+Important: Inspect the existing implementation first and make the smallest safe changes possible. Do not rewrite working components or remove code unless it is directly related to these controls. Run the available type checks, tests, and production build, and report the exact files changed and results.

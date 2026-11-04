@@ -1,0 +1,27 @@
+Fix the visible refresh/flicker that occurs when the Chat page opens in The Wedding Circle.
+
+First inspect the existing Chat component lifecycle, route/tab navigation, message-fetching logic, React keys, state management, subscriptions, theme updates, and loading conditions. Identify the actual cause before making changes.
+
+Requirements:
+
+1. No visible refresh: Opening Chat should display its existing layout immediately without flashing blank, resetting the page, showing the entire loading screen again, or visibly rebuilding the interface.
+
+2. Preserve the existing Chat component: Prevent unnecessary unmount/remount cycles and full-list re-renders. Check parent keys, conditional rendering, route changes, and state updates. Do not keep duplicate Chat instances mounted as a workaround.
+
+3. Use cached data: If a reliable message cache already exists, render it immediately while fetching updates in the background. Keep the current message list visible during background requests.
+
+4. Incremental updates: Fetch only new or changed messages when supported by the existing backend. Do not clear and reload the complete conversation whenever Chat opens. Avoid duplicate messages and out-of-order updates.
+
+5. Stable loading behaviour: Show a small, non-blocking loading indicator only when necessary. Do not replace the whole Chat screen with a spinner during background refreshes.
+
+6. Preserve user state: Keep scroll position, draft text, composer state, attachment state, and current theme intact during refreshes. Do not unexpectedly jump to the top or bottom.
+
+7. Media performance: Avoid re-downloading existing images, videos, and voice notes unnecessarily. Reuse cached media and load thumbnails or media content lazily where supported.
+
+8. Subscriptions and requests: Prevent duplicate fetches, duplicate event subscriptions, memory leaks, and race conditions. Clean up subscriptions correctly and handle failed requests without blanking the existing conversation.
+
+9. Preserve functionality: Do not change message ordering, permissions, message delivery, unread counts, existing chat features, wedding data, or backend records.
+
+10. Test repeated Chat opening and closing, switching between all five navigation tabs, receiving messages while Chat is open, switching themes, slow network conditions, and failed background requests.
+
+Make the smallest targeted changes to fix the verified root cause. Run the relevant tests, type checks, and production build if available. Report the actual cause and the fixes implemented. Do not merely provide a diagnosis or rewrite the entire Chat system.

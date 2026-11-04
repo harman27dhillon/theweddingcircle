@@ -1,0 +1,83 @@
+Fix Desktop Layout — The Wedding Circle
+
+Problem
+
+When I open The Wedding Circle on a desktop computer, the website displays the same narrow, mobile-style layout as on a phone instead of its intended desktop layout.
+
+1. Inspect Before Changing Anything
+
+- Inspect the existing responsive CSS, layout components, viewport configuration, media queries, breakpoints, and recent changes that could have caused this issue.
+- Identify the actual root cause before editing anything.
+- Check for incorrect breakpoints, fixed widths, restrictive "max-width" values, mobile-only wrappers, and CSS rules that override desktop styles.
+- Check whether the browser's actual viewport width is being detected correctly.
+- Do not guess, rebuild the application, or introduce a new layout system.
+
+2. Fix Only the Desktop Layout
+
+Restore the existing intended desktop layout at desktop screen sizes.
+
+Ensure that the existing desktop design displays correctly, including its intended:
+
+- Content width and alignment
+- Navigation and page structure
+- Wedding cards and their sizing
+- Columns, spacing, and component positioning
+- Desktop-specific presentation and responsive behavior
+
+Preserve the existing design decisions. Restore the intended desktop experience rather than inventing a new design.
+
+3. Preserve Mobile and Tablet Layouts
+
+- Keep the current mobile layout and mobile usability unchanged.
+- Do not simply stretch the mobile layout across a desktop screen.
+- Ensure tablet screens remain usable and responsive.
+- Change shared styles only when strictly necessary to fix the desktop regression, and verify that they do not damage the existing mobile or tablet experience.
+
+4. Test the Responsive Layout
+
+Test or inspect the application at these viewport widths:
+
+- Mobile: 390px
+- Tablet: 768px
+- Desktop: 1366px
+- Wide desktop: 1920px
+
+Verify that:
+
+- Mobile retains its existing layout and behavior.
+- Tablet remains usable and properly arranged.
+- Desktop displays the intended desktop layout rather than a narrow phone-style layout.
+- Wide desktop uses the available space appropriately without breaking the existing design.
+
+Run available relevant checks and report the actual results. Do not claim a viewport has been tested unless it has genuinely been inspected or tested.
+
+5. STRICT SCOPE — DO NOT CHANGE ANYTHING ELSE
+
+Only fix the desktop responsive-layout issue described in this prompt. No other changes are authorized.
+
+- Inspect the existing code first and make the smallest targeted change possible.
+- Do not redesign, refactor, rename, remove, replace, or reorganize unrelated code or components.
+- Do not change existing colors, typography, themes, animations, buttons, navigation, content, or functionality unless a specific change is strictly necessary to fix this desktop-layout bug.
+- Do not modify working mobile or tablet designs unnecessarily.
+- Do not change backend logic, database connections, API integrations, secrets, authentication, user accounts, wedding data, memberships, permissions, or media storage.
+- Do not reset data, delete existing code, replace working components, or introduce duplicate implementations.
+- Preserve all existing features, settings, and design decisions.
+- If an unrelated issue is discovered, leave it untouched and report it separately.
+- If fixing the issue requires a change outside the authorized scope, stop and explain why before making that change.
+- Do not perform unrelated cleanup, optimization, modernization, or improvements.
+
+6. Final Report
+
+After the targeted fix, report:
+
+1. The confirmed root cause.
+2. Every modified file and why its modification was necessary.
+3. The specific changes made.
+4. Actual test results for each viewport width.
+5. Any remaining issue or limitation.
+
+Do not claim success without verification.
+
+Final acceptance criteria: The Wedding Circle must retain its existing mobile experience while restoring its intended desktop layout. Everything unrelated to this specific issue must remain unchanged.
+
+Inspect first. Make the smallest possible fix. Verify the result. Do not change anything else.

@@ -1,0 +1,50 @@
+GROK BUILD IMPLEMENTATION PROMPT — @SEEK CHAT ASSISTANT
+
+TASK
+Implement @seek as a production-ready, conversational search assistant embedded in the existing wedding app group chat. Inspect the existing repository, chat components, authentication, database, media storage, message search and real-time architecture before making changes. Reuse existing infrastructure and design conventions. Do not create a mockup or rebuild unrelated features.
+
+CORE EXPERIENCE
+1. Users invoke Seek by typing @seek in the normal group chat composer. Include Seek in @mention suggestions, clearly identified as the assistant.
+2. Intercept @seek requests before sending: by default, the user's request and Seek's response are PRIVATE to the requesting member, even though both render inline in their group-chat view. Do not broadcast either as ordinary group messages. Label the response as a private Seek result and provide an explicit 'Share with Group' action, with a preview and confirmation before posting selected content publicly.
+3. Seek's responses use a distinctive but subtle assistant bubble, with concise answers, source snippets, and actionable 'Jump to message' or 'Open photo' controls. Preserve the user's current chat scroll position and provide a way to return to the latest messages.
+4. Support follow-up questions within a scoped conversation, e.g. '@seek show photos from Friday' followed by '@seek only those Rahul posted'. Follow-ups should be scoped to the current user and group, with clear reset behavior.
+
+SEARCH CAPABILITIES
+- Find messages by words, semantic meaning where available, sender, relative/absolute dates, and topic.
+- Find photos, videos, files, shared locations and links using existing metadata/captions. Only claim visual-content recognition if an actual image-indexing capability is implemented; otherwise explain the limitation.
+- Answer questions such as 'Where did Aman share the hotel address?', 'Show photos from the Mehndi', and 'What did we finally decide about departure time?'
+- Summarize relevant conversations, distinguishing proposals from confirmed decisions, and link to exact source messages. If evidence is missing, conflicting, or incomplete, say so instead of inventing an answer.
+- Support natural-language queries in English, Hindi and Punjabi where the available search/model infrastructure allows; handle common transliterated queries where feasible.
+- If the existing app already supports transcription, optionally enable voice-to-Seek queries without introducing a second voice system.
+
+SECURITY AND PRIVACY — CRITICAL
+- Seek may search ONLY content the requesting user is currently authorized to access in the selected group.
+- Never search, index, summarize, quote, retrieve, or expose deleted/expired Whisper messages. Ensure Whisper expiration also removes any associated searchable copies, embeddings, caches, and excerpts according to the existing retention policy.
+- Do not leak private messages, other groups' content, or restricted media through AI prompts, API endpoints, search indexes, real-time events, logs, notifications, or shared answers.
+- Enforce authorization server-side for every search and source-link open; do not rely on client-side filtering.
+- Do not expose an @seek query to other members merely because it was typed into the group composer.
+- If using a third-party AI service, use secure server-side credentials, minimize data sent, and follow the app's privacy settings. Never hardcode API keys.
+- Ensure a shared Seek result cannot accidentally reveal content not visible to the receiving group.
+
+ARCHITECTURE AND PERFORMANCE
+- Prefer existing full-text search, database indexing, and media metadata first; add semantic retrieval/AI summarization only where it genuinely improves results.
+- Use retrieval-augmented responses grounded in source messages with stable IDs and timestamps.
+- Respect message edits, deletions, pagination, group membership changes and permission revocations; update indexes accordingly.
+- Use bounded retrieval, pagination, debouncing, timeouts, error states and rate limits to prevent high cost and spam.
+- Show a lightweight loading state and clear no-results/error messages. Work on mobile and desktop.
+- Preserve existing chat, polls, group activity bar, voice features, public Reply and disappearing Whisper behavior.
+
+UI DETAILS
+- Typing '@' shows Seek in the mention list; selecting it inserts '@seek '.
+- On sending an @seek request, show a private inline query card and an assistant response card in the current group conversation view.
+- Display result types clearly: messages, photos, files, or summaries. Include a source count and direct navigation to the original authorized item.
+- 'Share with Group' is opt-in; show exactly what will be shared, and do not share the underlying private query automatically.
+- Keep Seek visually sophisticated, accessible, and consistent with existing wedding app styling.
+
+TESTS AND DELIVERY
+Test mention autocomplete, interception/private visibility, message and media searches, relative dates, multilingual queries, follow-ups, source navigation, summaries with conflicting evidence, empty results, offline/reconnect behavior, cross-group isolation, membership revocation, Whisper deletion and index removal, share-preview permissions, real-time synchronization, mobile layout, and regression tests for existing chat features.
+
+Implement the necessary code, migrations, indexes, API routes and UI components. Afterward report files changed, setup/environment variables, migrations, tests actually run, any unsupported search modes, and remaining limitations. Do not claim tests passed unless executed.
+
+PRODUCT NAME: Seek
+TAGLINE: Don't scroll. Just ask.

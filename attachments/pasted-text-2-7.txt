@@ -1,0 +1,284 @@
+
+import React from "react";
+import {
+  Bell, UserRound, CalendarDays, Clock3, MapPin,
+  ChevronRight, Home, MessageCircle, Radio, Clapperboard,
+  Menu
+} from "lucide-react";
+import "./PastelBlushCeremonies.css";
+
+type Ceremony = {
+  id: string;
+  name: string;
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+  artwork: "roka" | "mehndi" | "anand";
+};
+
+const ceremonies: Ceremony[] = [
+  {
+    id: "01",
+    name: "Roka",
+    date: "Saturday 14 November",
+    time: "10:00",
+    location: "majhitha",
+    description: "Both families sit together. Keep the guest list short.",
+    artwork: "roka",
+  },
+  {
+    id: "02",
+    name: "Mehndi",
+    date: "Saturday 14 November",
+    time: "11:00",
+    location: "majhitha",
+    description: "Henna for the bride's side. The time should be the time you mean.",
+    artwork: "mehndi",
+  },
+  {
+    id: "03",
+    name: "Anand Karaj",
+    date: "Saturday 14 November",
+    time: "14:00",
+    location: "majhitha",
+    description: "The ceremony itself. Seats in front are for the elders.",
+    artwork: "anand",
+  },
+];
+
+function FloralCorner({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={`pbc-floral ${className}`}
+      viewBox="0 0 150 150"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path d="M8 142C40 105 35 63 91 12" stroke="#AD8067" strokeWidth="1.3"/>
+      <path d="M17 122C49 115 60 92 69 68" stroke="#AD8067" strokeWidth="1"/>
+      <path d="M42 91C17 83 18 65 42 69C58 74 52 86 42 91Z" fill="#D9B5A4"/>
+      <path d="M57 61C36 43 46 31 61 43C71 52 65 59 57 61Z" fill="#E8C5C0"/>
+      <path d="M83 37C66 23 78 8 91 22C99 31 91 37 83 37Z" fill="#C58A91"/>
+      <g transform="translate(102 35)">
+        <ellipse cy="-13" rx="8" ry="13" fill="#DDA5AF"/>
+        <ellipse cy="13" rx="8" ry="13" fill="#E8BAC1"/>
+        <ellipse cx="-13" rx="13" ry="8" fill="#DDA5AF"/>
+        <ellipse cx="13" rx="13" ry="8" fill="#E8BAC1"/>
+        <ellipse cx="-9" cy="-9" rx="8" ry="12" transform="rotate(-40 -9 -9)" fill="#F0D0CC"/>
+        <ellipse cx="9" cy="-9" rx="8" ry="12" transform="rotate(40 9 -9)" fill="#C77E8D"/>
+        <circle r="6" fill="#C58D54"/>
+        <circle r="2.5" fill="#F8E5B6"/>
+      </g>
+      <g transform="translate(38 109) scale(.65)">
+        <ellipse cy="-12" rx="8" ry="12" fill="#D99AA8"/>
+        <ellipse cy="12" rx="8" ry="12" fill="#EBC2C7"/>
+        <ellipse cx="-12" rx="12" ry="8" fill="#E7B5BE"/>
+        <ellipse cx="12" rx="12" ry="8" fill="#D99AA8"/>
+        <circle r="5" fill="#C7955B"/>
+      </g>
+      <path d="M91 83Q114 63 129 78Q112 98 91 83Z" fill="#A9AA83"/>
+      <path d="M56 111Q72 89 86 103Q74 122 56 111Z" fill="#B7B393"/>
+    </svg>
+  );
+}
+
+function CeremonyArtwork({ type }: { type: Ceremony["artwork"] }) {
+  return (
+    <div className={`pbc-artwork pbc-artwork-${type}`} aria-hidden="true">
+      <svg viewBox="0 0 220 240" className="pbc-art-svg" fill="none">
+        <path
+          d="M24 221V105Q24 43 110 16Q196 43 196 105V221"
+          stroke="#D8A66D"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M37 220V108Q37 55 110 31Q183 55 183 108V220"
+          stroke="#E6C5A9"
+          strokeWidth="1"
+        />
+        <path d="M45 221H175" stroke="#D8A66D" strokeWidth="1.5"/>
+
+        {type === "roka" && (
+          <g>
+            <path d="M51 151L108 128L174 151L116 178Z" fill="#C88C85" stroke="#98634F" strokeWidth="2"/>
+            <path d="M51 151L51 188L116 218L116 178Z" fill="#E2B5A8" stroke="#98634F" strokeWidth="2"/>
+            <path d="M116 178L174 151L174 186L116 218Z" fill="#B87575" stroke="#98634F" strokeWidth="2"/>
+            <path d="M54 148L107 96L169 147L116 172Z" fill="#F6DCCB" stroke="#B88B58" strokeWidth="2"/>
+            <path d="M68 146L108 111L155 146L116 164Z" fill="#FCECE0" stroke="#D8AE7C" strokeWidth="1.5"/>
+            <ellipse cx="104" cy="153" rx="13" ry="7" transform="rotate(25 104 153)" stroke="#B88B35" strokeWidth="5"/>
+            <ellipse cx="128" cy="159" rx="13" ry="7" transform="rotate(-25 128 159)" stroke="#D6AD55" strokeWidth="5"/>
+            <circle cx="94" cy="147" r="3" fill="#FFF0C2"/>
+            <circle cx="137" cy="153" r="3" fill="#FFF0C2"/>
+            <path d="M60 177L108 199M126 184L165 166" stroke="#F2D3A5" strokeWidth="2"/>
+          </g>
+        )}
+
+        {type === "mehndi" && (
+          <g>
+            <path d="M51 137Q109 161 168 137L155 184Q109 211 64 184Z" fill="#B98A56" stroke="#96623D" strokeWidth="2"/>
+            <ellipse cx="110" cy="138" rx="59" ry="19" fill="#E9D0A6" stroke="#A87743" strokeWidth="2"/>
+            <ellipse cx="110" cy="135" rx="46" ry="12" fill="#687448"/>
+            <path d="M69 135Q110 150 151 135" stroke="#8F9B60" strokeWidth="2"/>
+            <path d="M91 115L126 61L140 70L107 127Z" fill="#C68A50" stroke="#85552F" strokeWidth="2"/>
+            <path d="M126 61L140 70L134 78L121 69Z" fill="#F0D7AD"/>
+            <path d="M91 115L87 127L107 127" fill="#6B5739"/>
+            <path d="M98 107L117 76M103 112L123 81M94 102L113 71" stroke="#F0D7AD" strokeWidth="1.5"/>
+            <circle cx="105" cy="159" r="3" fill="#F1D4A6"/>
+            <circle cx="128" cy="153" r="2.5" fill="#F1D4A6"/>
+          </g>
+        )}
+
+        {type === "anand" && (
+          <g>
+            <path d="M59 190V123Q59 96 80 96V79Q80 65 95 65Q110 65 110 79V96Q131 96 131 123V190Z" fill="#E4C4A4" stroke="#A97D54" strokeWidth="2"/>
+            <path d="M48 126Q95 105 142 126V136Q95 119 48 136Z" fill="#C49A6B"/>
+            <path d="M73 124V155M95 111V155M117 124V155" stroke="#A97D54" strokeWidth="2"/>
+            <path d="M84 190V165Q95 146 106 165V190" fill="#F7E7D6" stroke="#A97D54" strokeWidth="1.5"/>
+            <path d="M43 193L95 176L151 193L95 212Z" fill="#A84560" stroke="#D9AE71" strokeWidth="2"/>
+            <path d="M54 195L95 183L139 195" stroke="#E8C58D" strokeWidth="2"/>
+            <path d="M64 202V208M80 207V213M111 207V213M129 202V208" stroke="#E8C58D" strokeWidth="2"/>
+            <path d="M95 49V63M89 56H101" stroke="#B78D58" strokeWidth="2"/>
+          </g>
+        )}
+      </svg>
+
+      <span className="pbc-art-flower pbc-art-flower-one">✿</span>
+      <span className="pbc-art-flower pbc-art-flower-two">✿</span>
+      <span className="pbc-art-leaf">❧</span>
+    </div>
+  );
+}
+
+function CeremonyCard({
+  ceremony,
+  featured,
+  onOpen,
+}: {
+  ceremony: Ceremony;
+  featured: boolean;
+  onOpen?: (ceremony: Ceremony) => void;
+}) {
+  return (
+    <article className={`pbc-card ${featured ? "pbc-card-featured" : ""}`}>
+      <FloralCorner className="pbc-card-floral" />
+
+      {featured && (
+        <div className="pbc-up-next">
+          <span>✦</span> UP NEXT
+        </div>
+      )}
+
+      <div className="pbc-card-art">
+        <CeremonyArtwork type={ceremony.artwork} />
+      </div>
+
+      <div className="pbc-card-content">
+        <div className="pbc-eyebrow">
+          {ceremony.id} <span>|</span> {ceremony.name.toUpperCase()}
+        </div>
+
+        <h3>{ceremony.name}</h3>
+
+        <div className="pbc-event-meta">
+          <span><CalendarDays /> {ceremony.date}</span>
+          <i />
+          <span><Clock3 /> {ceremony.time}</span>
+        </div>
+
+        <div className="pbc-location">
+          <MapPin /> <span>{ceremony.location}</span>
+        </div>
+
+        <p className="pbc-description">{ceremony.description}</p>
+      </div>
+
+      <button
+        className="pbc-arrow"
+        aria-label={`View ${ceremony.name}`}
+        onClick={() => onOpen?.(ceremony)}
+      >
+        <ChevronRight />
+      </button>
+    </article>
+  );
+}
+
+type Props = {
+  events?: Ceremony[];
+  onOpenCeremony?: (ceremony: Ceremony) => void;
+  onNavigate?: (tab: string) => void;
+  activeTab?: string;
+};
+
+export default function PastelBlushCeremonies({
+  events = ceremonies,
+  onOpenCeremony,
+  onNavigate,
+  activeTab = "Home",
+}: Props) {
+  const next = events[0];
+  const remaining = events.slice(1);
+
+  return (
+    <div className="pastel-blush-ceremonies">
+      <header className="pbc-header">
+        <div>
+          <div className="pbc-couple-name">Surajpal &amp; Rekha</div>
+          <div className="pbc-role"><span>●</span> Circle developer</div>
+        </div>
+        <div className="pbc-header-actions">
+          <button aria-label="Notifications"><Bell /><span>40</span></button>
+          <button aria-label="Host controls"><UserRound /><span>Host</span></button>
+        </div>
+      </header>
+
+      <main className="pbc-main">
+        <section className="pbc-intro">
+          <FloralCorner className="pbc-intro-left" />
+          <FloralCorner className="pbc-intro-right" />
+          <h1>Our Celebrations</h1>
+          <div className="pbc-divider"><span>✿</span></div>
+          <p>A JOURNEY OF LOVE, FAMILY AND TOGETHERNESS</p>
+        </section>
+
+        {next && (
+          <section className="pbc-list" aria-label="Wedding ceremonies">
+            <CeremonyCard
+              ceremony={next}
+              featured
+              onOpen={onOpenCeremony}
+            />
+            {remaining.map((event) => (
+              <CeremonyCard
+                key={event.id}
+                ceremony={event}
+                featured={false}
+                onOpen={onOpenCeremony}
+              />
+            ))}
+          </section>
+        )}
+      </main>
+
+      <nav className="pbc-bottom-nav" aria-label="Wedding navigation">
+        {[
+          { name: "Home", Icon: Home },
+          { name: "Chat", Icon: MessageCircle },
+          { name: "Live", Icon: Radio },
+          { name: "Album", Icon: Clapperboard },
+          { name: "More", Icon: Menu },
+        ].map(({ name, Icon }) => (
+          <button
+            key={name}
+            className={activeTab === name ? "active" : ""}
+            onClick={() => onNavigate?.(name)}
+          >
+            <span className="pbc-nav-icon"><Icon /></span>
+            <span>{name}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+}

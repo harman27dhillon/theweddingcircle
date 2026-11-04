@@ -1,0 +1,170 @@
+Implement a Unified Premium Wedding Entitlement System
+
+Update the existing Wedding Circle application so that Premium status is recognized consistently across billing, voucher activation, wedding ownership, media storage and all premium features.
+
+1. One unified Premium status
+
+The system must recognize two valid ways to activate Premium:
+
+A. Real payment
+
+- A verified and successfully completed payment for a Premium plan.
+- Do not grant Premium merely because checkout was opened or payment was initiated.
+- Verify payment using the existing payment provider's trusted server-side confirmation or webhook.
+
+B. Voucher activation
+
+- A valid voucher code successfully redeemed for a Premium plan.
+- Verify the voucher server-side.
+- Once activated, grant the same Premium entitlement as a successful payment.
+
+Both methods must produce the same effective entitlement:
+
+"premium = active"
+
+There must be no difference in feature access based on whether Premium came from payment or voucher redemption.
+
+2. Attach Premium status to the wedding
+
+Every wedding must have a persistent, server-side entitlement record linked to its wedding ID.
+
+Store information such as:
+
+- Wedding ID
+- Plan ID and plan name
+- Entitlement status: active, expired, cancelled or revoked
+- Activation source: payment or voucher
+- Activation timestamp
+- Expiry timestamp, if applicable
+- Payment or voucher reference for audit purposes
+
+Mark eligible weddings explicitly as Premium weddings.
+
+The backend must be able to reliably answer:
+
+"Is this wedding currently entitled to Premium features?"
+
+3. Centralized authorization for Premium features
+
+Create or improve one central server-side entitlement check.
+
+All premium features must use the same authorization logic, including:
+
+- Photo uploads
+- Video uploads
+- Wedding albums
+- Premium media storage through Cloudflare R2
+- Premium themes and backgrounds
+- Other features already designated as Premium
+
+Do not implement separate, inconsistent Premium checks in different parts of the application.
+
+The backend must check the wedding's entitlement, not merely whether the current user has a Premium account.
+
+A valid host or authorized member of an active Premium wedding should receive the appropriate feature access according to existing wedding roles and privacy permissions.
+
+4. Preserve existing weddings and historical Premium activations
+
+This is extremely important.
+
+Before the fixed billing system existed, the application automatically created some weddings with Premium access.
+
+Inspect the existing database and identify legacy weddings created under that previous system.
+
+Do not automatically classify them as unpaid or non-Premium simply because they lack a new payment or voucher record.
+
+Preserve their existing legitimate Premium access and migrate their entitlement records safely.
+
+Where existing ownership or Premium status is ambiguous, flag the record for review instead of silently revoking access.
+
+Do not delete, recreate or reset existing weddings, members, posts, messages, albums or media references.
+
+5. Entitlement lifecycle
+
+Implement consistent handling for:
+
+- Successful payment
+- Successful voucher redemption
+- Duplicate payment notifications
+- Duplicate voucher redemption attempts
+- Expiration
+- Cancellation
+- Refunds and chargebacks
+- Voucher revocation, where supported
+- Plan renewal or upgrade
+
+Use idempotent processing so duplicate webhook notifications or repeated requests cannot create duplicate entitlements.
+
+Never grant Premium from an unverified client-side response.
+
+6. Connect Premium entitlement with R2 uploads
+
+The existing Cloudflare R2 uploader must use this centralized wedding entitlement check.
+
+When an authorized member uploads media:
+
+1. Validate the user's wedding membership and role.
+2. Check the wedding's active Premium entitlement.
+3. Validate file type and size.
+4. Generate the signed upload request.
+5. Store the file in the private R2 bucket.
+6. Save the object reference against the correct wedding.
+7. Allow authorized wedding members to retrieve the media.
+
+Do not reject a legitimate Premium wedding because it was created before the new billing system.
+
+Do not weaken wedding membership, privacy or cross-wedding access protections to solve entitlement problems.
+
+7. Developer diagnostics
+
+Add a reliable way for the developer to inspect a wedding's entitlement:
+
+- Wedding ID
+- Current plan
+- Premium status
+- Activation source
+- Expiry
+- Membership authorization result
+- Premium feature authorization result
+
+Do not expose payment secrets, voucher secrets or R2 credentials.
+
+8. Testing and verification
+
+Test all of these cases:
+
+1. Wedding activated through a verified real payment.
+2. Wedding activated through a valid Premium voucher.
+3. Both activation methods grant identical feature access.
+4. Existing legacy Premium wedding retains legitimate access.
+5. Non-Premium wedding cannot access restricted features.
+6. Expired or revoked Premium entitlement is rejected.
+7. Authorized member of a Premium wedding can upload a photo.
+8. Authorized member of a Premium wedding can upload a video.
+9. Uploaded media persists after refresh and appears in the correct private R2 bucket.
+10. A member of another wedding cannot access the media.
+
+Important implementation rules
+
+- Inspect the existing billing, voucher, wedding, membership and R2 code before changing anything.
+- Reuse the existing database and payment architecture.
+- Do not create a second competing Premium system.
+- Do not invent new billing routes or payment providers.
+- Do not modify unrelated UI or app functionality.
+- Use safe database migrations and preserve existing data.
+- Do not grant Premium to every existing wedding indiscriminately.
+- Do not claim success based only on typechecking or mocked tests.
+
+Implement this as a unified, production-ready entitlement system.
+
+At completion, report:
+
+1. Database changes.
+2. Payment and voucher integration changes.
+3. Legacy wedding migration results.
+4. Premium authorization logic.
+5. R2 integration results.
+6. Tests actually performed.
+7. Any remaining blockers.
+
+Clearly distinguish implemented, tested and production-verified functionality.

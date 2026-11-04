@@ -1,0 +1,208 @@
+Wedding Circle — Complete Mobile UX, Animation and Performance Refinement
+
+Inspect the existing Wedding Circle app and implement all the improvements below. The app already exists, and some features have already been implemented. Refine the existing implementation rather than rebuilding the app.
+
+Priority: Fix responsiveness, improve swipe navigation, eliminate hidden UI elements, speed up loading, and apply consistent iPhone-style entrance animations without changing the existing design.
+
+1. Fix the hidden Feed text bar and bottom controls
+
+The Feed text/post input bar sometimes becomes hidden or covered by the bottom navigation or Android system navigation area.
+
+- Keep the Feed composer fully visible at the bottom of the Feed, directly above the app's bottom navigation.
+- Ensure the text input, Upload, Camera, Function, Audience and Information controls remain completely visible and tappable.
+- Prevent the composer from being clipped, pushed off-screen or covered by other elements.
+- When the keyboard opens, move the composer above the keyboard and keep the input and posting controls usable.
+- When the keyboard closes, restore the composer's correct position.
+- Make the Feed post history scroll naturally within the available space above the composer.
+- Eliminate unnecessary blank space and ensure the final post can be accessed without being covered by the composer.
+- Inspect viewport-height calculations, fixed positioning, nested scrolling, overflow, keyboard resize behavior and safe-area insets.
+- Fix the underlying cause instead of adding arbitrary margins or hiding other controls.
+
+2. Make swipe navigation extremely fast and responsive
+
+The app has five main sections: Home, Feed, Live, Album and More.
+
+The current swipe functionality is not responsive enough. I want quick, natural finger flicks to trigger navigation almost immediately.
+
+Swipe detection
+
+- Detect swipes across the entire usable screen, including ordinary content areas and empty spaces, rather than only a small designated area.
+- Recognize short, fast finger flicks using both movement distance and gesture velocity.
+- Do not require a long drag or a large movement before recognizing a swipe.
+- Start processing touch input immediately, without unnecessary timeouts or confirmation delays.
+- Tune thresholds for real mobile touchscreen use.
+- Make swiping feel natural, effortless and consistent.
+- Trigger exactly one section change for each completed swipe.
+- Prevent duplicate events, accidental double navigation and conflicting gesture handlers.
+
+Directional behavior
+
+- Swipe left: immediately navigate to the next section.
+- Swipe right: immediately navigate to the previous section.
+- Do not loop from More to Home or from Home to More.
+- At the first or last section, ignore swipes that would move beyond the available sections.
+- Update the active bottom-navigation indicator and displayed section together.
+- Use a very short, lightweight transition or no transition if animation causes noticeable delay.
+- Make navigation independent of slow network requests.
+
+Gesture compatibility
+
+- Support swipes throughout non-interactive screen areas.
+- Do not accidentally trigger navigation when the user is typing, selecting text, interacting with a dropdown, tapping buttons, controlling the camera, playing a video, dragging an element or using album/gallery gestures.
+- Preserve smooth vertical scrolling. A vertical scroll must not trigger horizontal section navigation.
+- Handle diagonal gestures intelligently by identifying the dominant direction.
+- Inspect event propagation, pointer and touch handlers, nested containers and existing gesture libraries.
+- Remove duplicate listeners and resolve conflicting handlers.
+- Where content consumes touch events, implement compatible gesture handling where technically safe.
+
+Preserve app state
+
+When navigating between sections, preserve drafts, scroll positions, selected options and relevant UI state.
+
+Never interrupt an active livestream or camera session because of a swipe. Do not break Feed replies, album browsing, privacy controls or other existing interactions.
+
+Swipe acceptance test
+
+A single quick finger flick should reliably navigate exactly one section in the intended direction, with an immediate response and no noticeable lag. Test short, fast flicks, longer swipes, diagonal movements, rapid consecutive swipes and gestures from different screen areas.
+
+3. Reduce latency throughout the entire app
+
+Investigate actual performance bottlenecks before changing the implementation.
+
+- Identify slow startup, delayed section transitions, repeated API calls, slow database queries, unnecessary component re-renders and inefficient media loading.
+- Avoid fetching the same data repeatedly when it can be safely reused.
+- Avoid unnecessary full-page reloads when switching sections or returning to a page.
+- Fetch only the data needed for the currently displayed section.
+- Load additional Feed posts and album media progressively when appropriate.
+- Optimize image and video thumbnails, image decoding and media rendering.
+- Reduce expensive calculations and rendering during swipes and scrolling.
+- Clean up obsolete event listeners, subscriptions, timers and requests.
+- Use appropriate request cancellation, caching, loading states and controlled retries.
+- Avoid aggressive polling and unnecessary background requests.
+- Keep navigation responsive even when network requests are slow.
+- Preserve authentication, backend persistence, family privacy restrictions, guest permissions and livestream functionality.
+- Do not introduce unnecessary libraries or replace the app architecture without a demonstrated need.
+
+Measure performance before and after wherever possible. Report actual causes and results rather than claiming unverified improvements.
+
+4. Apply the existing iPhone-style animation to the main landing page
+
+An iPhone-unlock-style entrance animation has already been implemented on the Home page inside Wedding Circle.
+
+I now want the same animation style applied to the main landing page, where visitors select login options or explore sample wedding options.
+
+Reuse the existing animation
+
+- Inspect the existing Home page animation and reuse its implementation, timing, easing, opacity, scaling and staggered entrance behavior wherever practical.
+- Do not create an unrelated animation style.
+- Preserve the existing Home page animation exactly as it is, except for necessary performance or compatibility fixes.
+
+Animate the main landing page
+
+Apply the same entrance animation to the existing visible elements, including:
+
+- Existing logo and branding.
+- Login and sign-in options.
+- Sample wedding cards and preview options.
+- Existing headings and descriptions.
+- Other visible landing-page elements that are part of the current design.
+
+Elements should start subtly scaled down, around 90% of their final size, with low opacity, then smoothly reach their original size and full opacity. Use natural, spring-like easing and a gentle staggered sequence.
+
+Preserve the existing design
+
+- Do not redesign, rearrange or replace the main landing page.
+- Keep the current layout, colors, typography, text, icons, login methods, sample wedding previews and navigation unchanged.
+- Add animation only.
+- Do not let animation block interaction or delay access to login options.
+- Keep animations lightweight and prevent layout shifts.
+- Do not replay the full animation unnecessarily after every minor state update.
+- Handle returning to the landing page consistently and respect reduced-motion accessibility settings.
+
+Both pages should feel like parts of the same product, using consistent animation quality.
+
+5. Speed up main landing-page loading
+
+The main landing page still takes too long to open.
+
+Investigate the actual cause, including JavaScript initialization, authentication checks, database queries, blocking network requests, duplicate requests, image loading and unnecessary rendering.
+
+- Render the existing landing-page structure as quickly as possible.
+- Make the page usable before every image or background request has completed.
+- Avoid loading information that is not needed for the initial screen.
+- Reduce unnecessary component re-renders and repeated initialization.
+- Optimize startup without breaking login, sample wedding previews, existing wedding access or authentication.
+- Ensure the entrance animation never delays initial interaction or requires users to wait for it to finish.
+- Avoid unnecessary full reloads when returning to the landing page.
+
+Do not solve loading delays by removing existing features or displaying incomplete or unauthorized wedding information.
+
+6. Make cover pictures of existing weddings load faster
+
+Cover pictures for already-created weddings currently load slowly on the main landing page.
+
+Inspect the complete image-loading pipeline, including database queries, image-storage requests, image dimensions, file sizes, decoding, caching and rendering.
+
+Image-loading optimization
+
+- Retrieve only the wedding-card data and image URLs required for the landing page.
+- Use appropriately sized, compressed thumbnails for wedding cards instead of downloading unnecessarily large original images.
+- Preserve image quality, aspect ratios and the existing card design.
+- Define image dimensions in advance to prevent cards from jumping around while images load.
+- Prioritize images visible on the screen.
+- Lazy-load images farther down the page.
+- Cache suitable image responses and reuse already-loaded images when safe.
+- Avoid downloading the same cover image repeatedly during re-renders or when returning to the landing page.
+- Use a visually consistent placeholder or existing fallback image while a cover picture loads.
+- Replace placeholders smoothly when the actual image becomes available.
+- Handle failed image requests gracefully and retry only when appropriate.
+
+Preserve wedding data and privacy
+
+- Do not delete, overwrite, reset or modify existing weddings, wedding IDs, cover pictures, guest information or account data.
+- Preserve existing wedding visibility and access rules.
+- Enforce permissions through the existing backend and storage security.
+- Never expose private wedding information or image URLs to unauthorized visitors.
+- Do not replace actual wedding covers with sample images, except for temporary placeholders or existing fallback behavior.
+
+Image-loading acceptance test
+
+On a mobile device, verify that the landing page becomes usable sooner, visible wedding cards and their covers appear faster, and scrolling or returning to the page does not cause unnecessary reloads or repeated image downloads.
+
+Test under both fast and slower network conditions.
+
+7. Keep the existing design and functionality intact
+
+This is a refinement of the existing Wedding Circle application, not a redesign.
+
+- Do not redesign the Home page or main landing page.
+- Do not change existing colors, text, layouts, icons or branding unless required for one of the specific fixes.
+- Do not remove existing functionality.
+- Do not reset or delete existing data.
+- Do not break login, authentication, wedding creation, sample wedding previews, Feed posting, replies, albums, privacy restrictions, guest access, camera controls or livestreams.
+- Preserve existing routes, integrations and backend functionality.
+- Do not replace working components unnecessarily.
+- Avoid introducing regressions while optimizing performance.
+
+8. Verify all changes before reporting completion
+
+Test the application on mobile-sized screens, including Android Chrome and installed/PWA-style views where supported.
+
+Verify all of the following:
+
+1. The Feed text bar and every associated control remain visible.
+2. The keyboard does not cover the composer.
+3. Feed content scrolls correctly without excessive blank space.
+4. Fast swipes reliably navigate between Home, Feed, Live, Album and More.
+5. Vertical scrolling and interactive elements do not trigger accidental navigation.
+6. Section transitions are immediate and do not cause unnecessary reloads.
+7. Active livestreams remain uninterrupted.
+8. The existing Home page animation remains unchanged.
+9. The main landing page uses the same iPhone-style entrance animation.
+10. The main landing page becomes interactive quickly.
+11. Existing wedding cover pictures load progressively and efficiently.
+12. Authentication, privacy, wedding data and all existing features continue to work.
+
+Report the actual issues found, the changes implemented, the tests performed and measured performance improvements where available. Clearly disclose anything that could not be verified.
+
+Final instruction: Make targeted improvements to the existing project. Do not simply describe proposed changes—implement them, test them, and report honestly what was completed. If a change requires a backend or infrastructure modification that the current environment cannot perform, explain that limitation instead of pretending it has been completed.

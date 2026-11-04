@@ -1,0 +1,99 @@
+THE WEDDING CIRCLE — REMOVE CHAT HEADING AND FIX CHAT STYLING ACROSS ALL 13 THEMES
+
+Inspect the existing implementation and make the following targeted changes.
+
+1. Remove the Chat heading for every theme
+
+Remove the large standalone “Chat” heading and its dedicated decorative underline/divider from the Chat screen.
+
+- Apply this to all 13 themes.
+- Remove the unnecessary vertical space previously occupied by the heading.
+- Keep the wedding header, wedding name, notification button, Host button, and bottom navigation intact.
+- Position the conversation area correctly beneath the wedding header.
+- Do not remove the Chat navigation tab or rename the section elsewhere.
+
+This must be a shared Chat layout change, not a theme-specific fix.
+
+2. Correct the Chat design in every theme
+
+Update the actual Chat styling configuration inside each of the 13 existing theme definitions. Do not fix only the currently displayed Midnight Emerald theme.
+
+The themes are:
+
+1. Royal Burgundy
+2. Pastel Blush
+3. Sage Green
+4. Royal Blue
+5. Classic Ivory
+6. Midnight Emerald
+7. Terracotta Sunset
+8. Lavender Dream
+9. Classic Default
+10. Blossom Pink
+11. Sky Blue
+12. Rose Romance
+13. Peach Garden
+
+For each theme individually, ensure the real Chat screen uses its own complete visual configuration, including:
+
+- Background colours, gradients, and decorative artwork.
+- Message bubble backgrounds, text colours, borders, and highlights.
+- Sender names and timestamps.
+- Composer background, border, input text, and placeholder.
+- Plus, microphone, attachment, and Post buttons.
+- Auxiliary Chat controls.
+- Bottom navigation background, icons, labels, and selected-tab styling.
+- Appropriate shadows, floral details, and decorative effects.
+
+Do not use one universal Chat palette for all themes.
+
+Preserve the established identities of the original nine themes. Keep Classic Default distinct from Classic Ivory. Make the four additional light themes visually distinct from one another.
+
+3. Fix the empty Chat state in every theme
+
+Restyle “Nothing posted yet.” using the active theme's own design configuration.
+
+- Use theme-appropriate colours, borders, typography, and spacing.
+- Remove the oversized dark-green appearance when the active theme is not green.
+- Ensure the empty-state message does not overlap the header, decorations, or composer.
+- Hide the empty state when messages are present.
+
+4. Preserve Chat functionality
+
+Keep the existing:
+
+- Right-aligned messages sent by the current user.
+- Left-aligned messages from other participants.
+- Bride/groom sparkle effects.
+- Compact photo and video previews.
+- Per-file upload progress indicators.
+- Full-screen media viewing.
+- Message history and scrolling.
+- Composer and keyboard behaviour.
+- Existing permissions, storage, and real-time messaging.
+
+Do not change message alignment, media dimensions, or backend behaviour as part of this update.
+
+5. Use one consistent theme system
+
+Use the existing applied wedding theme as the source of truth.
+
+- Do not create a separate Chat theme selector.
+- Do not create separate Chat theme persistence.
+- Do not hard-code colours that override the applied theme.
+- Do not add theme-specific CSS hacks that fix one theme while breaking another.
+- Ensure all relevant Chat components consume their corresponding theme configuration.
+- Preserve the existing Apply Theme and Cancel workflow.
+- Keep theme settings isolated between weddings.
+
+6. Test all 13 themes
+
+Verify that the standalone Chat heading is absent in every theme and that each theme renders its own Chat styling.
+
+At minimum, inspect the actual rendered Chat screens for all 13 themes, including both dark and light themes and Classic Default.
+
+If any theme has incomplete styling, fix its theme definition and the components consuming it rather than claiming success based only on the presence of configuration values.
+
+Report which themes were actually rendered and tested.
+
+Implement directly in the existing project. Preserve existing functionality and avoid unrelated modifications.

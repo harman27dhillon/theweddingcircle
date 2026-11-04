@@ -1,0 +1,97 @@
+Fix the existing Classic theme implementation in The Wedding Circle. This is a targeted bug-fixing and consistency task. Inspect the current code and correct the problems below without removing features or changing unrelated themes.
+
+1. Fix blurry wedding cover images
+
+The cover images for the new Classic themes are currently so blurred that their wedding scenes are barely recognizable.
+
+- Keep the actual uploaded cover image sharp and recognizable.
+- Do not apply a heavy blur to the main image.
+- If a blurred background layer is used for atmosphere, separate it from the foreground image: use the image twice, with a softly blurred background layer and a sharp foreground image where appropriate.
+- For the wedding bar, preserve the intended wide crop and ensure the main subject remains visible.
+- For the Home page's main wedding invitation card, display the cover image clearly and at high visual quality.
+- Use subtle theme-colored overlays only when needed for text contrast.
+- Do not reduce image opacity so much that the scene disappears.
+- Apply the same image-quality correction to every new Classic theme.
+
+2. Apply the background consistently to Chat and all pages
+
+The new Classic theme background is not appearing in Chat, which still displays a plain, flat page.
+
+Make the theme-specific background work consistently across:
+
+- Home
+- Chat
+- Live
+- Album
+- More
+- Host Control and relevant subpages
+
+Implementation requirements:
+
+- Inspect the shared layout and page-specific background styles to find why Chat is excluded.
+- Use a shared wedding-level background component or the existing global layout.
+- Ensure page-specific opaque backgrounds do not unintentionally cover the shared image.
+- Keep chat messages and the composer readable using appropriately translucent surfaces.
+- Keep chat bubbles, controls, text, and navigation sharp.
+- Ensure the background persists while switching pages and does not flicker.
+- Preserve live-stream, camera, album, scrolling, and touch interactions.
+- Do not force the image onto unrelated screens outside the wedding experience.
+
+3. Restore the correct Home page design for every Classic theme
+
+The third uploaded screenshot shows the correct Wedding Circle Home page design. The second screenshot shows an incorrect alternative layout that must not replace it.
+
+Use the third screenshot as the authoritative reference for how the Home page should look under every Classic theme.
+
+Preserve the established layout:
+
+- Wedding cover/background treatment around the main invitation card.
+- Couple's names, cultural details, wedding date, location, and countdown.
+- The existing rounded invitation card and its spacing.
+- The "Next" ceremony card and the ceremony list below it.
+- The established bottom navigation and its active-state styling.
+
+Apply each Classic theme's own palette and matching image to this existing layout. The themes should change colors, decorative styling, and imagery—not replace the Home page with a different design.
+
+Do not copy the exact screenshot's temporary text or countdown values. Continue using the wedding's actual saved data.
+
+The first and second screenshots are useful for identifying the image-blur and background problems. The third screenshot is the reference for the intended Home page design.
+
+4. Fix independent image positioning and dragging per theme
+
+The wedding cover image drag/reposition feature currently changes images belonging to other themes as well. This must be fixed.
+
+Each theme must have its own independent image configuration.
+
+Requirements:
+
+- Store image positioning, crop, scale, and drag offsets separately for each theme.
+- Use a stable theme identifier as part of the configuration key.
+- When a user repositions an image in Classic Sunset Romance, for example, only that theme's image positioning should change.
+- Changes must not affect Classic Celestial Ivory, Classic Crimson Sunset, Classic Marigold Palace, Classic Rose Bridal, Classic Royal Lakeside, Classic Default, or any other theme.
+- Switching themes must load that theme's own saved image settings.
+- Saving or reopening the wedding must preserve the correct settings for each theme.
+- Changing the active theme must not overwrite another theme's configuration.
+- Avoid shared mutable image-position objects, reused state references, or a single global drag offset for every theme.
+- Keep existing drag controls and permissions working.
+
+Use a separate configuration structure for each theme, conceptually:
+
+"themeId → coverImage → position, scale, crop"
+
+Adapt this to the existing project's architecture instead of introducing a duplicate theme system.
+
+5. Regression testing
+
+Test the following before considering the work complete:
+
+1. Open every new Classic theme and verify its cover image is sharp and recognizable.
+2. Navigate through Home, Chat, Live, Album, and More and verify the background remains consistent.
+3. Confirm Chat no longer shows an unintended flat background.
+4. Compare every Classic theme's Home page with the third screenshot's layout.
+5. Drag and reposition one theme's cover image, switch to another theme, and confirm the other image remains unchanged.
+6. Return to the first theme and confirm its custom position is preserved.
+7. Reload the wedding and verify the settings persist.
+8. Confirm existing themes, wedding data, navigation, chat, live streaming, and album functionality remain intact.
+
+Inspect the relevant components, CSS, and theme-state persistence before making changes. Implement the fixes directly in the existing project. Do not merely describe the solution. Report the actual changes made and any tests that could not be performed.

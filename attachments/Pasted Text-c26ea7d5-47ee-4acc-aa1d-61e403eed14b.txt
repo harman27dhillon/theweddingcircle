@@ -1,0 +1,126 @@
+Wedding Circle — Compact Controls and ChatGPT-Style Feed Layout
+
+Update the existing Wedding Circle app without rebuilding it, resetting data, or changing unrelated features.
+
+1. Live Page: Move Both Icon Buttons Next to Start Live
+
+Replace the large Function and Who can watch dropdowns with the compact icon-only buttons already specified.
+
+Place both buttons directly beside the Start Live button on the Wedding Circle Live page.
+
+Layout:
+
+- Start Live button.
+- Small circular calendar-heart icon for selecting the ceremony function.
+- Small circular users icon for selecting the livestream audience.
+
+Keep all three controls on the same horizontal row whenever screen width allows. On narrow screens, keep them compact and prevent horizontal overflow.
+
+Button styling:
+
+- Approximately 36 × 36 px.
+- Soft ivory background.
+- Muted rose icons (#873542).
+- Minimal borders and no oversized containers.
+- Consistent vertical alignment and spacing.
+
+Interactions:
+
+- Calendar-heart opens the existing Function selector.
+- Users opens the existing Who can watch selector.
+- Display the current selection inside the opened selector.
+- Preserve every existing function option and audience privacy permission.
+- Add accessible labels and tooltips.
+- Do not make the icons decorative or non-functional.
+
+Remove the old large dropdown fields from their previous positions so they do not appear twice.
+
+2. Feed Page: Move Both Icon Buttons Beside Upload and Camera
+
+On the Feed page, place the same compact Function and audience/privacy icon buttons directly beside the Upload and Camera controls.
+
+Desired control row:
+
+[Upload] [Camera] [Function icon] [Audience icon]
+
+- Keep all controls aligned in one compact row when space allows.
+- On narrow screens, use responsive spacing or horizontal scrolling rather than making the buttons oversized.
+- Keep Upload and Camera fully functional.
+- The Function icon must open the existing function selector.
+- The Audience icon must open the existing "Who can see this" selector.
+- Preserve all family privacy and selected-person permissions.
+- Do not create duplicate selectors or duplicate state.
+
+3. Move the Feed Information Icon to the End
+
+Move the existing information (ⓘ) icon on the Feed composer to the far right, after the Upload, Camera, Function, and Audience controls.
+
+The information icon must be the final control in this row.
+
+- Keep it compact and visually secondary.
+- Preserve its existing information popover or modal.
+- Do not duplicate the icon or remove its functionality.
+- Ensure the icon remains visible on mobile screens.
+
+4. Move the Feed Composer to the Bottom
+
+Currently, the Feed text composer ("Write a post...") appears near the top of the Feed page. Change the layout so the composer sits at the bottom of the screen, similar to ChatGPT's message composer.
+
+Requirements:
+
+- Keep the post composer fixed or sticky near the bottom of the Feed viewport.
+- Make it slim and compact, with minimal vertical height.
+- Use a single-line input by default.
+- Expand the input naturally when the user types a longer post.
+- Keep the Post button compact and aligned with the input.
+- Place Upload, Camera, Function, Audience, and Information controls inside or immediately adjacent to the bottom composer area.
+- Respect Android system navigation bars and safe-area insets.
+- Ensure the keyboard does not cover the input or Post button.
+- When the keyboard opens, move the composer above it.
+- Do not use a fixed-height container that hides typed text or buttons.
+- Keep the design consistent with Wedding Circle's ivory and muted rose theme.
+
+The composer must remain usable on small mobile screens.
+
+5. Move Feed History Upward
+
+The existing Feed posts and history should occupy the main scrollable area above the bottom composer.
+
+- Move the post history upward in the layout.
+- Display the latest posts near the top of the visible Feed content.
+- Keep older posts accessible by scrolling.
+- Do not push the post history below the composer or leave a large empty region above it.
+- Preserve existing post ordering, timestamps, comments, replies, and privacy settings.
+- Ensure users can scroll through the full history without the bottom composer covering post content.
+- Automatically adjust the scrollable content area when the keyboard opens or closes.
+
+Use a layout structure with a flexible, independently scrollable Feed history and a compact bottom composer.
+
+6. Preserve Posting and Privacy Behavior
+
+- Posts must continue saving through the existing backend.
+- Upload and Camera must continue working.
+- The audience selector must continue enforcing the selected visibility settings.
+- The function selector must preserve the existing selected function.
+- Do not reset or modify existing posts, wedding information, media, or accounts.
+- Do not weaken the privacy system or expose restricted family content.
+- Do not change the separate YouTube Live section or unrelated pages.
+
+7. Technical Implementation and Verification
+
+Inspect the existing mobile layout, navigation structure, and composer implementation before making changes.
+
+Use responsive layout techniques and appropriate safe-area handling. Avoid overlapping fixed elements, nested scroll conflicts, and keyboard-related layout jumps.
+
+Verify:
+
+1. Function and audience icons appear beside Start Live on the Live page.
+2. The same icons appear beside Upload and Camera on the Feed page.
+3. The information icon is the last control in the Feed toolbar.
+4. The Feed composer is slim and positioned at the bottom.
+5. The composer moves above the keyboard.
+6. Feed history scrolls above the composer, with recent posts appearing first.
+7. Upload, Camera, Post, privacy selectors, and function selectors remain functional.
+8. Existing data and unrelated functionality remain unchanged.
+
+Implement these changes directly in the existing project. Do not provide only a mockup. Report any browser or installed-app limitations that prevent the requested bottom-composer behavior from working correctly.

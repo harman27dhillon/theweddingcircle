@@ -1,0 +1,85 @@
+8. SHOW SELECTED PHOTOS AND VIDEOS IMMEDIATELY WITH PER-ITEM UPLOAD PROGRESS
+
+When a user selects one or more photos or videos to post in Chat, display each selected item immediately as a compact media thumbnail in the conversation, in the same position and style as a posted media message.
+
+Do not make the user wait for every file to finish uploading before showing the thumbnails.
+
+A. Immediate thumbnail display
+
+- As soon as the user selects media, create a temporary message or upload-preview item in the conversation.
+- Display each selected photo or video using the same compact dimensions as normal posted media.
+- Show the thumbnail on the correct side according to the current user's message alignment.
+- If multiple files are selected, display each one separately within the appropriate message layout.
+- Preserve the existing Chat theme and bubble styling.
+- Do not create duplicate messages when the upload completes.
+
+B. Circular 0–100% progress indicator
+Display a circular progress indicator over or beside each individual media thumbnail.
+
+The indicator must:
+
+- Start at 0% when uploading begins.
+- Progress smoothly as actual upload progress becomes available.
+- Show the percentage from 0% to 100%, either inside the circle or clearly alongside it.
+- Update independently for each photo or video.
+- Reach 100% only when that file has finished uploading successfully and the server has confirmed success.
+- Disappear or transition into a subtle completed state after successful upload.
+- Remain visible during slow uploads so the user understands that the file is still processing.
+
+Do not use a fake timer or simulated percentage that reaches 100% regardless of the actual upload result. Use real upload progress events from the existing upload provider or storage SDK whenever supported. If the provider does not expose byte-level progress, display an honest indeterminate progress indicator rather than inventing an exact percentage.
+
+C. Upload states
+Support these states for each media item:
+
+1. Selected: display the local thumbnail immediately.
+2. Uploading: show the circular percentage indicator.
+3. Processing: if the backend performs additional processing after upload, show an appropriate processing state.
+4. Completed: show the uploaded media as a normal Chat attachment.
+5. Failed: keep the thumbnail visible, show an error indicator, and provide a Retry action.
+6. Cancelled: remove the pending item or mark it cancelled according to the existing UI behaviour.
+
+Do not mark a failed or interrupted upload as successfully posted.
+
+D. Posting and persistence
+
+- Use a temporary client-side identifier to associate each upload with its pending Chat item.
+- Replace the temporary upload state with the confirmed server record after success.
+- Ensure completion updates the existing item instead of appending a duplicate message.
+- Preserve the original file, uploaded URL, message ownership, wedding ID, and relevant metadata.
+- Prevent duplicate uploads caused by repeated taps or retries.
+- Preserve the selected files and recoverable state when possible if a temporary network interruption occurs.
+- Do not store large media files directly inside database documents.
+
+E. Multiple uploads
+When several photos or videos are selected:
+
+- Display all their compact thumbnails immediately.
+- Show a separate circular progress indicator for each file.
+- Update each percentage independently.
+- Allow completed files to become normal posted attachments while other files continue uploading, where supported by the existing message architecture.
+- Ensure one failed upload does not incorrectly mark the other files as failed.
+
+F. Interaction and layout
+
+- Keep thumbnails within the existing compact media-preview size limits.
+- Do not expand the Chat message to full screen.
+- Keep the composer and bottom navigation in their proper positions.
+- Do not let progress circles block scrolling or cause layout shifts.
+- Preserve the existing photo/video full-screen viewer when a thumbnail is tapped.
+- Provide accessible upload-status labels.
+- Ensure progress remains readable in all 13 wedding themes.
+
+G. Verification
+Test a single photo, a single video, multiple files, a slow connection, a failed upload, a retry, and a successful upload.
+
+Verify that:
+
+- Thumbnails appear immediately after selection.
+- Each item has its own progress indicator.
+- Percentages reflect actual upload progress.
+- Successful uploads reach 100%.
+- Failed uploads never display false success.
+- Retrying does not create duplicate messages.
+- The compact media layout and Chat composer remain intact.
+
+Implement this in the existing Chat upload flow. Do not create a separate uploader that bypasses the current storage provider, permissions, or wedding-specific data model.

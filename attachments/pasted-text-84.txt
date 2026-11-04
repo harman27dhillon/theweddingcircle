@@ -1,0 +1,38 @@
+Investigate and fix the Cloudflare R2 media upload failure in The Wedding Circle.
+
+The R2 connection test previously succeeded, but actual uploads from the mobile app fail with:
+
+"The upload could not reach private storage. Nothing else was changed."
+
+Cloudflare dashboard confirms:
+
+- Bucket: "wedding-circle-media"
+- Objects: 0
+- Storage: 0 B
+
+Your task:
+
+1. Trace the complete upload flow from the mobile client to the backend and then to Cloudflare R2.
+2. Inspect the signed-upload URL generation, signing configuration, request headers, content type, HTTP method, bucket name, endpoint, and object key.
+3. Capture and inspect the actual server-side error and R2 response. Do not hide the underlying error behind a generic message.
+4. Check whether the signed URL is generated correctly and whether the browser/mobile client can PUT the file to it.
+5. Verify that the backend uses the correct R2 credentials and S3-compatible endpoint.
+6. Check CORS configuration if the upload is being blocked by the browser.
+7. Check that the database record is created only after a successful upload.
+8. Preserve private bucket access. Do not enable public access or expose R2 credentials to the client.
+9. Fix the actual root cause, not just the error message.
+
+Testing requirements:
+
+- Test a real image upload.
+- Test a short video upload.
+- Confirm both objects appear inside "wedding-circle-media".
+- Confirm uploaded media displays in the app after refreshing.
+- Confirm unauthorized users cannot access another wedding's media.
+- Verify that existing media and unrelated app functionality remain intact.
+
+Do not delete existing data, regenerate credentials, change bucket permissions, or modify unrelated features unless the root cause proves it necessary.
+
+Important: Do not report success based only on typechecking, mocked tests, or a successful connection test. If real R2 uploads cannot be tested, clearly state that and provide the exact remaining blocker.
+
+Inspect the existing source code, implement the necessary fix, and report the actual error, root cause, files changed, and tests performed.

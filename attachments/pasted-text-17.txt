@@ -1,0 +1,360 @@
+The Wedding Circle — Chat, Entry, Media, Background Sync & Live Screen Improvements
+
+Implement the following changes in the existing The Wedding Circle application. These changes apply to mobile and desktop wherever relevant, while respecting the separate desktop and mobile layouts already established.
+
+Before editing, inspect the existing components, database structure, authentication, guest entry flows, chat rendering, media preview, synchronization logic, live-stream state, and spectator chat transport. Make targeted changes to the existing implementation rather than rebuilding unrelated features.
+
+1. Replace separate family and guest entry buttons
+
+Remove the separate Enter as Family and Enter as Guest buttons from the wedding entry interface.
+
+Replace them with one prominent primary button:
+
+Enter Wedding Code
+
+Requirements:
+
+- Use one clear, visually prominent button consistent with The Wedding Circle's premium wedding design.
+- Open the appropriate code-entry interface when selected.
+- Accept every currently supported type of wedding access code, including family access codes, guest codes, and other existing valid wedding invitation/access codes.
+- Automatically determine the appropriate entry flow from the supplied code.
+- Preserve existing access validation, host/co-host permissions, membership rules, and privacy restrictions.
+- Do not grant access simply because a code was entered. Validate the code against the existing server-side authorization rules.
+- Display clear errors for invalid, expired, revoked, or unauthorized codes.
+- Preserve existing valid codes and do not change their format unnecessarily.
+- Do not delete or bypass any existing family or guest access functionality; consolidate its entry interface only.
+
+2. Fix the thin outline around shared media
+
+Inspect the supplied screenshot. The shared photo appears inside a large rounded rectangular outline with empty space surrounding the actual image. The “Shared a photo” label also appears awkwardly positioned against the media and background.
+
+Fix the underlying layout and styling rather than merely changing the border color.
+
+Requirements:
+
+- Remove the unwanted enclosing rectangular outline completely.
+- Remove unnecessary container backgrounds, padding, borders, pseudo-elements, and reserved space responsible for the visible box.
+- Display the actual photo or video as a standalone floating media element within the chat.
+- Keep only a subtle, thin frame directly around the media if necessary.
+- Eliminate empty colored or white strips beside the image when those strips are caused by incorrect container sizing.
+- Ensure the media container automatically fits the rendered image rather than maintaining an oversized fixed width or height.
+- Position the “Shared a photo” or “Shared a video” label neatly as a floating overlay on the media itself.
+- Give the label a compact, legible background with appropriate contrast.
+- Keep the label inside the media bounds and prevent it from appearing detached, clipped, or overlaid on unrelated timestamps.
+- Ensure these changes work with all wedding themes and both light and dark modes.
+
+Do not remove actual media, alter uploaded files, or break existing downloads.
+
+3. Reduce chat media size by approximately 70%
+
+The photos and videos shown directly inside the chat timeline are currently too large.
+
+Reduce their displayed dimensions by approximately 70% relative to the current rendered size, using the current implementation as the baseline.
+
+Requirements:
+
+- Reduce the media width and height proportionally rather than distorting the image.
+- Preserve the original aspect ratio.
+- Apply the sizing consistently to photo and video messages on mobile and desktop, with suitable maximum dimensions for each viewport.
+- Use responsive constraints so media does not overflow the chat area.
+- Keep media recognizable and usable, but substantially smaller than in the supplied screenshot.
+- Avoid reserving the old, larger media dimensions in message containers.
+- Do not scale down the actual uploaded file or reduce its source quality.
+- Preserve download functionality and existing media permissions.
+
+Use a responsive maximum-size rule rather than hardcoding dimensions that break on smaller devices.
+
+4. Full-screen media preview with an exit button
+
+When a user taps a photo or video in the chat, open a dedicated full-screen media preview.
+
+Requirements:
+
+- Display the selected media prominently against a clean full-screen background.
+- Remove chat bubbles, media frames, enclosing boxes, padding, and other chat decorations from the preview.
+- Fit the media to the available screen while preserving its aspect ratio.
+- Use a visible X close button in the top corner.
+- Close the preview when the X button is selected.
+- Support the appropriate existing back-navigation behavior on mobile and desktop.
+- For videos, preserve playback controls and existing playback behavior.
+- Prevent the preview from accidentally triggering message reactions, downloads, or other chat actions.
+- Restore the user's previous chat position when the preview closes.
+- Respect the device's safe areas and desktop window dimensions.
+
+The full-screen preview must not be a larger version of the same bordered chat card.
+
+5. Use a female cartoon profile avatar
+
+Change the default temporary cartoon avatar used for guests to a friendly female cartoon character.
+
+Requirements:
+
+- Use a tasteful, attractive, wedding-appropriate animated female cartoon avatar.
+- Keep the animation subtle and lightweight, such as gentle blinking or a small idle movement.
+- Keep the avatar consistent across re-renders and chat refreshes during the guest's participation.
+- Preserve custom uploaded profile pictures; the female cartoon is only the default when no custom picture is available.
+- Ensure the avatar is cropped correctly in circular profile images and next to chat messages.
+- Do not overwrite an existing user's selected picture or saved profile.
+- Maintain appropriate performance on lower-powered mobile devices.
+
+6. Remove the Link option from profile settings
+
+Remove the Link option from the profile settings interface.
+
+Requirements:
+
+- Remove the visible control and its associated profile-editing UI where it is used solely for that option.
+- Do not remove unrelated links, invitation links, wedding access codes, or app navigation.
+- Preserve existing profile fields and other supported editing functions.
+- If existing profile records contain link values, do not delete those values or run a destructive data migration unless a separate, explicit requirement calls for it.
+
+7. Remove the “Chats” button from More
+
+Inside the More section, remove the separate Chats button.
+
+Requirements:
+
+- Remove the button from the visible More interface on mobile and desktop.
+- Keep the main shared Chat section intact.
+- Do not delete private conversations, messages, database records, or private messaging services.
+- Do not break any other functionality that depends on the existing private-message data.
+- Do not introduce a replacement Chats button elsewhere unless required by an existing workflow.
+
+8. Remove “Your Wedding Profile” from More
+
+Remove the Your Wedding Profile button from the More section.
+
+Requirements:
+
+- Remove only the specified button and its corresponding entry from that interface.
+- Preserve existing profile data and the new profile-editing access point through the circular profile-picture control in the chat top bar.
+- Do not delete the underlying profile-editing component if it is still needed elsewhere.
+- Do not affect wedding membership, guest identity, or host/co-host permissions.
+
+9. Make individual chat bubbles point directly towards the profile picture
+
+Improve the appearance of individual message bubbles so they look visually connected to the sender's profile photo.
+
+Requirements:
+
+- Add a small, clean speech-bubble tail to incoming individual chat messages.
+- Position the tail so its tip points precisely towards the sender's profile-picture area.
+- The tail must appear to emerge naturally from the bubble edge closest to the avatar.
+- Keep the avatar and bubble aligned vertically and horizontally.
+- Avoid tails floating between the avatar and bubble or pointing in the wrong direction.
+- Ensure tail placement adapts to different bubble widths, multiline messages, and screen sizes.
+- Do not let tails overlap the profile image, text, timestamps, reactions, or adjacent messages.
+- Preserve the existing alignment rules for incoming and outgoing messages.
+- Ensure outgoing messages retain their existing correct alignment and do not point towards the wrong participant.
+
+Use CSS borders, pseudo-elements, or the existing message-bubble component as appropriate. Avoid adding unnecessary images or heavy assets.
+
+10. Hide timestamps from individual chat messages
+
+Hide the individual message time labels currently displayed inside or underneath each chat message.
+
+Requirements:
+
+- Remove visible timestamps from individual message bubbles on mobile and desktop.
+- Preserve message creation timestamps in the database and message objects.
+- Do not change message ordering, synchronization, delivery status, or retention behavior.
+- Keep any separate information or diagnostics that genuinely require timestamps working.
+- Ensure hiding timestamps does not leave awkward empty space in the message layout.
+
+Do not remove timestamps from unrelated screens or system logs.
+
+11. Make bride/groom message bubbles fully golden
+
+Bride/groom messages must have a fully golden appearance.
+
+Requirements:
+
+- Apply a solid, premium gold or champagne-gold fill to the entire bride/groom chat bubble, not merely a gold outline or partial background.
+- Ensure the full bubble body and any speech-bubble tail match visually.
+- Use readable, high-contrast text.
+- Keep the styling consistent across mobile and desktop and across the available wedding themes.
+- Apply the treatment only to messages identified as belonging to the bride or groom by the existing verified role or identity system.
+- Do not let ordinary guests impersonate the couple through a client-side display-name change.
+- Preserve incoming/outgoing message alignment and all existing message actions.
+- Ensure reactions and media controls remain legible against the gold background.
+
+12. Run background synchronization whenever the app opens
+
+Whenever a user opens or reopens the application, initiate a background synchronization process so that available changes can be detected and retrieved.
+
+Requirements:
+
+- Trigger synchronization during app initialization or when the application returns to the foreground.
+- Authenticate the current session before retrieving private wedding data.
+- Identify the actual authoritative server source for each data category.
+- Retrieve authorized updates for the current account and its wedding memberships.
+- Synchronize eligible pending local changes safely.
+- Detect new messages, wedding-setting updates, membership changes, invitations, and other supported wedding data changes.
+- Refresh stale cached data when safe.
+- Use stable IDs, versions, change tracking, or server timestamps as appropriate to the existing architecture.
+- Avoid downloading every media file or retransferring the entire database on every app opening.
+- Use incremental synchronization wherever supported.
+- Use request deduplication, sensible retry backoff, and cancellation or coalescing of redundant sync operations.
+- Do not block the user from opening the app while ordinary synchronization runs.
+- Display an appropriate syncing or offline indicator only when useful.
+- Preserve pending offline changes until the server confirms they have been processed.
+- Detect conflicts rather than blindly overwriting newer server or local changes.
+- Do not overwrite newer destination records or delete destination-only wedding data.
+- Do not expose data belonging to another account or wedding.
+- Keep the current Neon, Supabase, and Firebase architecture intact. Use the verified authoritative provider for each relevant service rather than assuming all data is in one database.
+- Do not switch production routing or migrate databases as part of this feature.
+
+If a sync fails, preserve local changes, report the error appropriately, and retry safely when connectivity returns.
+
+13. Redesign the Live screen's Start Live control
+
+When an authorized user opens the Live screen and is not currently streaming, display the Start Live button prominently in the exact center of the main live-screen area.
+
+Requirements:
+
+- Center the button horizontally and vertically within the live-screen content area, accounting for the app's navigation and safe areas.
+- Use a visually distinct, premium live-streaming animation, such as a subtle pulsing live indicator or an animated broadcast ring.
+- Keep the button easy to recognize and operate.
+- Respect existing host/co-host or streaming permissions.
+- Prevent duplicate stream creation from repeated taps.
+- Preserve the current camera and microphone permission flow.
+
+When a live stream successfully starts:
+
+- Display a compact notification that drops down from the top of the Live screen.
+- Show the message “Live started” with a subtle success indicator.
+- Animate the notification smoothly into view.
+- Keep it visible for approximately two seconds, then dismiss it automatically.
+- Do not show a success notification if stream creation failed or the stream is not actually active.
+- Ensure the notification does not obscure important live controls.
+
+14. Make Stop Live entirely red
+
+When a stream is active, show a clearly visible Stop Live button.
+
+Requirements:
+
+- Use a solid red background across the entire button.
+- Use legible contrasting text and an appropriate stop/end-stream icon.
+- Do not use a neutral, gold, or partially red style for this control.
+- Ensure it remains visible against every supported wedding theme.
+- Clearly distinguish it from the Start Live button.
+- Require an appropriate confirmation if necessary to prevent accidental termination.
+- Stop the actual active live session when confirmed.
+- Ensure the UI updates only after the server confirms the stop operation, or clearly communicates if stopping is still in progress or has failed.
+
+Do not let a UI-only change falsely indicate that a live session has ended.
+
+15. Fix delayed and flickering spectator chat on the Live screen
+
+Investigate and fix the existing live-session chat problems. These include:
+
+- Spectator messages appearing on the live screen very late.
+- Old chat messages repeatedly flickering or reappearing.
+- New messages rendering inconsistently.
+- Messages appearing out of order.
+- The visible chat overlay behaving differently between live viewers.
+
+Do not attempt to fix these symptoms solely by adding animation or forcing component re-renders. Inspect the actual message transport, event subscriptions, state updates, message identifiers, timestamps, cleanup behavior, and rendering logic.
+
+Reliable message delivery
+
+- Use the existing real-time transport wherever possible.
+- Verify that the live host and spectators are subscribed to the correct live-session channel.
+- Check for duplicate subscriptions after reconnects, screen changes, or live-session restarts.
+- Clean up obsolete listeners when leaving a session or switching streams.
+- Deduplicate incoming events using stable message IDs.
+- Avoid repeatedly appending the same message when both an optimistic local event and a server event arrive.
+- Handle connection interruptions and reconnects without replaying the entire chat overlay unnecessarily.
+- Preserve message ordering using an authoritative timestamp or sequence number.
+- Update UI state predictably rather than recreating the entire message list for every event.
+- Keep the underlying persisted chat history unchanged unless the existing retention policy says otherwise.
+- Separate the temporary live overlay from the permanent chat history so automatic overlay expiry does not delete actual messages.
+
+Live chat overlay: one-minute lifetime
+
+Show spectator messages and live-controller messages on the Live screen for 60 seconds from the time they are received by the live overlay, using a reliable timestamp policy.
+
+Requirements:
+
+- Newly received messages appear near the bottom of the live chat overlay.
+- Older visible messages move upwards as newer messages arrive.
+- Each message automatically disappears from the overlay after 60 seconds.
+- Messages that expire must disappear from the live overlay only; do not delete them from the permanent chat history.
+- Reconnecting or receiving a duplicate event must not reset an old message's lifetime indefinitely.
+- Remove expired messages without causing the remaining messages to flicker or jump unnecessarily.
+- Use stable message keys and predictable list updates.
+- Avoid rendering expired messages again after a reconnect or screen refresh.
+- Ensure the overlay remains readable without covering essential live controls or the main video.
+
+Live chat consistency
+
+- Display messages from spectators and authorized live controllers according to the existing access model.
+- Ensure the same live session does not accidentally show stale messages from a previous stream.
+- Associate each message with the correct live-session ID.
+- Do not mix live-overlay messages with unrelated wedding chat messages.
+- Ensure newly arriving messages appear promptly and older ones move upwards smoothly.
+- Preserve any existing moderation, reporting, or privacy features.
+
+Use the existing backend's real-time capabilities and reliable server timestamps or sequence identifiers where available. If the current transport cannot support the required reliability, identify the specific limitation and implement the smallest safe improvement supported by the current architecture.
+
+16. Performance and responsive behavior
+
+Apply the relevant changes to both mobile and desktop.
+
+- Keep media rendering lightweight.
+- Avoid repeated full-list re-renders in live chat.
+- Avoid excessive background network requests.
+- Ensure the one-minute live-message expiry mechanism does not create unnecessary timers for every message if a shared scheduler or efficient cleanup mechanism is more appropriate.
+- Keep the desktop two-panel layout, top navigation, and independent mobile layout intact.
+- Preserve wedding themes, animation preferences, and existing accessibility behavior.
+- Avoid introducing layout shifts when media loads or messages expire.
+
+17. Testing and safeguards
+
+Before modifying code:
+
+- Inspect the existing entry buttons and access-code validation.
+- Inspect chat message and media components.
+- Inspect profile and temporary guest identity handling.
+- Inspect the More section.
+- Inspect live-session creation and stop operations.
+- Inspect the real-time chat transport and message retention logic.
+- Inspect the existing background synchronization architecture.
+
+After implementation, verify:
+
+1. A single Enter Wedding Code button accepts all currently supported valid code types.
+2. Invalid codes remain blocked.
+3. Media cards have no unwanted outer box or empty strips.
+4. Inline media is approximately 70% smaller than the current display.
+5. Full-screen media preview opens and closes correctly.
+6. The female cartoon avatar appears only when no custom picture exists.
+7. The profile Link option, More > Chats button, and More > Your Wedding Profile button are removed from their specified interfaces.
+8. Chat bubble tails point towards the correct profile picture.
+9. Individual message timestamps are hidden without affecting stored timestamps.
+10. Bride/groom bubbles use a fully golden treatment.
+11. Background sync starts when the app opens or returns to the foreground and preserves pending changes.
+12. Start Live is centered and animated.
+13. The two-second Live started notification appears only after a successful start.
+14. Stop Live uses a fully red button and ends the actual session.
+15. Live chat messages appear promptly, in the correct order, without flickering or duplicates.
+16. Live overlay messages expire after 60 seconds without deleting permanent chat history.
+17. Existing wedding data, membership permissions, authentication, media, and mobile/desktop layouts remain intact.
+
+Run relevant tests, type checks, and build checks. Use isolated test data for destructive or stateful tests. Do not reset production databases, clear local storage, or switch production routing during implementation.
+
+18. Required completion report
+
+Report:
+
+- Files and components modified.
+- The root cause found for the live-chat flickering and delays.
+- Whether background sync is connected to the actual authoritative backend.
+- Tests run and their real results.
+- Any remaining limitations or configuration requirements.
+- Confirmation that existing wedding records, messages, media, and access permissions were preserved.
+
+Do not report a feature as complete if only its appearance has changed while its underlying behavior remains broken.
+
+Final objective: Deliver a cleaner, smaller floating-media chat; simplified wedding entry; intuitive profile editing; polished golden couple messages; automatic safe background synchronization; and a stable Live screen with reliable, time-limited spectator chat.

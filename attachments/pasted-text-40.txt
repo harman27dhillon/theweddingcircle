@@ -1,0 +1,32 @@
+Fix Classic Default floral PNG transparency and visibility
+
+Inspect the actual four floral PNG assets and the CSS/component code rendering them. Fix the source of the visible halo and incorrect blending rather than adding another decorative border.
+
+1. Preserve genuine transparency
+
+- Render each PNG using its original alpha channel.
+- Ensure transparent pixels reveal the actual page background, including the blush gradient.
+- Remove any black, white, checkerboard-like, noisy, or colored halo around transparent edges.
+- Inspect whether the PNG contains premultiplied-alpha artifacts, an incorrect matte background, or damaged semi-transparent pixels. Correct the asset or its rendering pipeline if necessary.
+- Do not use "mix-blend-mode", filters, masks, or opacity changes as a blind workaround. Avoid filters that damage flower colors or transparency.
+
+2. Correct the floral placement
+
+- Make all four corner decorations clearly visible and naturally integrated with the page edges.
+- Scale and position each corner independently for desktop and mobile.
+- Allow the flowers and leaves to extend inward from the page corners while preserving the central content area.
+- Keep the flowers decorative only, with "pointer-events: none".
+
+3. Preserve the existing design
+
+- Do not add an outline, frame, shadow, or background behind the floral PNGs.
+- Do not change the actual cover image, wedding-card borders, page layout, or other themes.
+- Do not replace the existing artwork with CSS-drawn flowers.
+- Keep the original flower colors and detail intact.
+
+4. Verify before finishing
+
+- Inspect all four PNGs and their alpha channels.
+- Test the rendered result against the actual Classic Default blush background at desktop and mobile sizes.
+- Confirm there are no black, white, jagged, or noisy halos and no rectangular image boundaries.
+- Report which asset or rendering rule caused the issue and which files were changed.

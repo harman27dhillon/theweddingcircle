@@ -1,0 +1,274 @@
+The Wedding Circle — Desktop Leaderboard, Premium Wedding Vouchers, Home Layout Refinement & Navigation Improvements
+
+Implement the following targeted updates directly in my existing The Wedding Circle project.
+
+Inspect the existing source code, components, database structure, theme system, developer section, wedding creation flow and responsive layouts before modifying anything.
+
+Do not rebuild the application, redesign unrelated screens, remove working features or overwrite existing wedding data. Preserve the current premium editorial design, theme-specific behavior and mobile experience unless a change below explicitly requires otherwise.
+
+1. Desktop-Only Leaderboard Redesign
+
+Redesign the Leaderboard entry/button on the main app landing page, using the supplied screenshots as reference.
+
+Desktop requirements
+
+- Give Leaderboard a distinctive, premium appearance that stands apart from ordinary navigation rows.
+- Use refined typography, a subtle burgundy or champagne-gold accent, an appropriate leaderboard/crown visual and a carefully balanced background or border.
+- Maintain clear text hierarchy, spacing and a visible hover/focus state.
+- Keep the design sophisticated and consistent with The Wedding Circle's existing identity.
+- Make the entire intended entry surface clickable and ensure it navigates to the existing Leaderboard screen.
+- Do not invent ranking information or change the current leaderboard data logic.
+
+Strict scope
+
+Apply this visual redesign to desktop layouts only. Preserve the existing mobile Leaderboard appearance and behavior. Verify the breakpoint so the desktop styling does not accidentally affect phones or smaller layouts.
+
+2. Developer Section — Secure Premium Wedding Voucher Generator
+
+Add a protected Wedding Voucher Management section inside the existing developer area.
+
+Its purpose is to let authorized developers generate voucher codes that allow users to create a premium wedding without paying the normal price.
+
+Voucher generation
+
+- Generate cryptographically random, unique codes containing exactly 12 alphanumeric characters.
+- Use uppercase letters and digits for a consistent presentation.
+- Avoid easily confused characters where practical.
+- Never generate predictable sequential codes.
+- Provide a Generate Voucher action and, if practical, an option to generate multiple codes in one operation.
+- Show a newly generated code clearly, with a Copy Code action.
+- Do not display or expose internal secrets or privileged credentials.
+
+Voucher management
+
+Provide a table or list showing:
+
+- Voucher code or a safe display representation.
+- Status: Unused, Redeemed, Expired or Revoked.
+- Creation date.
+- Expiration date, if configured.
+- Redemption date.
+- Associated wedding ID after successful use.
+
+Allow authorized developers to revoke unused codes and inspect redemption history. Do not allow already redeemed codes to grant another premium wedding.
+
+Store vouchers in the application's trusted backend/database. Prefer storing a cryptographic hash of each code rather than a plaintext code, while displaying the actual code to the developer when generated.
+
+Permissions
+
+- Only a genuine, server-authorized Circle Developer may generate, inspect or revoke vouchers.
+- Do not authorize developer access using a mutable display name or client-controlled role.
+- Enforce permissions in backend endpoints as well as the frontend.
+- Record administrative actions in a suitable audit log without leaking secrets.
+
+If the project lacks the necessary database tables, API routes or infrastructure, implement those components using the existing architecture. Do not merely create a decorative voucher-management screen or mock records.
+
+3. Add Voucher Entry to the Wedding Creation Payment Page
+
+On the payment/pricing step of wedding creation, add a clearly labelled voucher input:
+
+Enter your voucher code
+
+The input should fit the existing payment page design and work on desktop and mobile.
+
+Include a button such as Apply Code.
+
+Required behavior
+
+1. The user enters a 12-character voucher code.
+2. The backend validates the code and confirms whether it is eligible for redemption.
+3. A valid unused code grants the user the ability to create one free premium wedding.
+4. Clearly communicate that the premium wedding price is covered by the voucher.
+5. Update the payment summary to show the applicable amount due as ₹0 for the covered wedding.
+6. Let the user continue through the normal wedding creation process without completing a paid checkout.
+7. Consume the voucher only when the wedding has been successfully created and the premium entitlement has been securely assigned.
+8. If creation fails, preserve the voucher's unused status unless the transaction has already completed successfully.
+9. If a code is invalid, expired, revoked or previously redeemed, show a helpful error without revealing unnecessary internal information.
+
+Security and consistency
+
+- Verify vouchers exclusively through a trusted backend.
+- Make redemption atomic or transactionally safe so two simultaneous requests cannot redeem the same code.
+- Prevent repeat submissions and duplicate entitlement grants.
+- Associate the redeemed voucher with the specific wedding it covers.
+- Do not turn the user's entire account into a premium account unless the product's existing entitlement design explicitly requires it.
+- Do not let the user bypass normal payment for unrelated weddings or features.
+- Keep the paid purchase flow unchanged for users without valid vouchers.
+
+Test voucher redemption against failed creation, duplicate requests, invalid codes, simultaneous requests and already-used vouchers.
+
+4. Automatic Redirect After Successful Wedding Creation
+
+Update the wedding creation completion flow for both free and paid weddings.
+
+Required behavior
+
+- For a free wedding, wait until the wedding has been successfully saved and its status is confirmed.
+- For a paid wedding, wait until payment is actually confirmed by the existing trusted payment flow.
+- For a voucher-funded wedding, wait until the wedding and its premium entitlement have been successfully committed.
+- Once the wedding is officially created and live, automatically redirect the user to the main The Wedding Circle app landing page.
+- Use the existing application route for the main landing page rather than inventing a new route.
+- Do not redirect users prematurely while payment, saving or voucher redemption is pending.
+- If creation or payment fails, keep the user on an appropriate error/recovery screen.
+
+Display a brief success confirmation before or during navigation if appropriate. Preserve the wedding ID and ensure the newly created wedding remains discoverable through the existing app interface.
+
+The redirect must work consistently on desktop and mobile and must not create repeated redirects or a navigation loop.
+
+5. Wedding Home — Move the Family Information Panel
+
+Use the supplied Wedding Home screenshots to understand the current layout.
+
+The current The families panel appears below ceremony cards such as Sangeet and Jaggo. Move it upward into the main Home details area, immediately before the Baraat ceremony in the visual sequence.
+
+Required layout
+
+- Place the family information panel above the Baraat ceremony entry rather than leaving it at the bottom of the ceremony list.
+- On desktop, position it within the upper Home layout, using the available right-side ceremony area where appropriate.
+- Keep the couple-name/cover card and family-information card visually coordinated.
+- The couple-name card and family-information card must use the same selected wedding cover image as their background, with appropriate overlays so all text remains legible.
+- Maintain clear distinction between the two cards' content.
+- Keep the family names, family labels, edit action and permissions intact.
+- Keep the Baraat ceremony and all other ceremonies available; relocating the family panel must not delete or replace a ceremony.
+- Preserve the existing responsive design and ensure the layout does not overflow on narrow screens.
+
+Do not replace the individual ceremony cover photos with the shared couple/family cover image. That shared background applies only to the couple-name card and family-information card.
+
+6. Ceremony Container — Default Light Pink for Classic Themes Only
+
+In the existing Wedding Home, the area containing the collection/grid of ceremony cards is visually separate from the main page background.
+
+For the applicable Classic themes only, set the ceremony container/window's default background to a subtle, elegant light pink.
+
+The light-pink styling must apply to the container that groups the ceremony cards, not to the whole Home page.
+
+Theme rules
+
+- Classic themes: use the light-pink ceremony container background by default.
+- Preset themes: preserve their existing ceremony container backgrounds and theme-specific appearance.
+- Do not let a Classic background override leak into preset themes.
+- Do not confuse Classic Default with Classic Ivory or modify other theme assignments.
+- Ensure switching between themes updates the container background immediately and persists correctly after refresh.
+
+Use the existing theme configuration or a proper theme-level property, not broad global CSS or fragile theme-name substring matching.
+
+7. Developer Section — Separate Background Controls
+
+Add a new Appearance & Backgrounds settings panel in the protected developer section.
+
+The purpose is to let the authorized developer change the main landing-page background and the ceremony-container background independently.
+
+Setting A: Main Landing-Page Background
+
+- Let the developer select or assign an available background image from the existing system image/assets library.
+- Apply it only to the intended main app landing-page background.
+- Preserve text readability, existing layout and responsive behavior.
+
+Setting B: Wedding Ceremony Container Background
+
+- Provide a separate control to choose a background image from the existing system image/assets library.
+- Allow the developer to select the same image used for the main landing-page background when desired.
+- Alternatively, allow the developer to choose a different image specifically for the ceremony-card container.
+- Apply it only to the ceremony container/window that holds the ceremony cards.
+- Do not apply this selection to the entire wedding page or replace individual ceremony cover images.
+- Respect theme-specific configuration, including the Classic-only light-pink default and the existing preset-theme appearance.
+
+Asset reuse and persistence
+
+- Reuse existing image asset records and upload handling wherever possible.
+- Do not duplicate large images unnecessarily.
+- Persist settings using the existing trusted configuration/database mechanism.
+- Ensure changes appear immediately where appropriate and remain after refreshing.
+- Include a reset-to-default option for each background setting independently.
+
+Permissions and safety
+
+Only the authenticated, server-authorized developer may modify these global appearance settings. Enforce authorization on the backend and do not allow guests or hosts to change developer-wide settings.
+
+If the project needs additional configuration fields, storage references or API routes, implement them cleanly without disturbing existing wedding-specific customization.
+
+8. DESKTOP ONLY- Chat and Live — Temporary Panel Position-Swap Control
+
+Use the supplied fourth screenshot, where Chat occupies the main panel and Wedding Circle Live appears in a narrower panel beside it.
+
+Whenever the interface displays Chat and Live together in the split-view layout, add a small, recognizable swap-position icon button between their navigation controls.
+
+Default layout
+
+- Chat remains on the left.
+- Live remains on the right.
+
+After tapping Swap
+
+- Move Live into the larger left-side panel.
+- Move Chat into the right-side panel.
+- Update the corresponding layout and active-panel state consistently.
+- Show a clear indication of the current arrangement and provide an easy way to switch back.
+
+The swap should be temporary for the current viewing session unless the existing app already has an appropriate preference-persistence mechanism. Do not permanently change the app's default layout or global navigation order.
+
+Interaction requirements
+
+- Show the swap control only when the Chat and Live split view is actually active.
+- Do not show it in unrelated single-page views.
+- Make it accessible, with a tooltip or accessible label such as “Swap Chat and Live positions.”
+- Ensure the button does not overlap the Home, Chat or Live navigation items.
+- Preserve the current chat history, livestream state, comments and media playback while changing panel positions.
+- Recalculate panel widths after the swap so Live receives the larger area as intended.
+- Add appropriate transitions without introducing visible lag or resetting either panel.
+- On small screens, retain the existing mobile navigation and behavior unless the current design already provides a compatible split view.
+
+9. Remove the “Before” Button From More
+
+Inspect the existing More page and identify the button labelled Before.
+
+Remove that specific button from the More interface and remove its dedicated handler if it is no longer used anywhere.
+
+Do not remove other buttons, change the More page structure unnecessarily or delete shared functionality used by other screens. If the relevant control uses a slightly different label internally, confirm the matching UI element before modifying it.
+
+10. Testing and Regression Checks
+
+After implementation:
+
+Desktop
+
+- Confirm Leaderboard has a distinctive desktop-only design.
+- Confirm mobile Leaderboard is unchanged.
+- Test voucher creation, validation and redemption.
+- Verify free, paid and voucher-funded wedding creation each redirect after successful creation and activation.
+- Confirm the family panel appears before Baraat and both the couple and family cards use the same cover image.
+- Verify the Classic-only light-pink ceremony container.
+- Verify the main page and ceremony-container backgrounds can be changed independently.
+- Verify Chat/Live panel swapping in both directions without interrupting messages or video.
+
+Permissions and data
+
+- Confirm unauthorized users cannot access developer voucher or background controls.
+- Confirm guests cannot gain access to developer functions through frontend manipulation.
+- Verify one voucher cannot be redeemed more than once.
+- Preserve existing weddings, themes, backgrounds and purchase records.
+
+Build and quality
+
+- Run existing automated tests, TypeScript checks, linting and production build where available.
+- Check browser console errors, API failures and relevant database behavior.
+- Test mobile regressions.
+- Fix defects introduced by these changes.
+
+Do not use mocked success states to claim the features work. Report any external configuration that remains incomplete.
+
+11. Final Report
+
+When finished, report:
+
+1. Files and modules changed.
+2. Whether desktop-only Leaderboard styling was verified.
+3. Whether voucher generation, secure redemption and the payment-page input work.
+4. Whether all three wedding-creation paths redirect at the correct time.
+5. Whether the family layout and shared cover image were corrected.
+6. Whether the Classic-only ceremony container and separate developer background settings work.
+7. Whether Chat/Live swapping preserves state.
+8. Whether the “Before” button was removed without unrelated changes.
+9. Actual test results, build status and any unresolved limitations.
+
+Implementation priority: first protect existing data and build the voucher backend correctly; then implement the creation redirect and Home layout changes; then background controls, Chat/Live swapping and the desktop-only Leaderboard polish. Preserve all unrelated working functionality.

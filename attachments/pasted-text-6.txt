@@ -1,0 +1,244 @@
+The Wedding Circle — Complete Supabase Integration and Migration Plan
+
+Objective
+
+Complete the safe integration of Supabase as the primary database for The Wedding Circle, migrating the existing wedding-related database data from Neon only after all prerequisites are verified.
+
+The Supabase PostgreSQL connection has successfully passed a read-only connection test using the Session Pooler. The current schema inspection and dry run report these five tables as missing in Supabase:
+
+- "circles"
+- "circle_members"
+- "circle_auth"
+- "ceremony_invites"
+- "couple_access"
+
+The actual Neon database may contain additional tables and dependencies. Do not assume these five tables represent the complete application schema.
+
+Current state: Neon remains the active database. No wedding records have been copied, and no traffic has been switched to Supabase.
+
+Your task is to inspect, prepare, migrate, validate, and integrate Supabase in controlled stages while preserving all existing application behavior.
+
+PHASE 1 — Inspect the existing application and configuration
+
+Before editing code or changing databases:
+
+1. Inspect the complete repository, current database architecture, existing migration dashboard, backend routes, database clients, schema definitions, and deployment configuration.
+2. Identify every environment variable and secret used by the application.
+3. Confirm which variable is used for the Neon connection and which is used for the Supabase PostgreSQL connection.
+4. Confirm that "DATABASE_URL" continues to point to Neon and "SUPABASE_DB_URL" is used for the Supabase server-side PostgreSQL connection.
+5. Inspect how "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", and "SUPABASE_SERVICE_ROLE_KEY" are used, if configured.
+6. Determine whether the published application runtime actually receives the required secrets. Never assume that a secret visible in a dashboard is available to every runtime.
+7. Identify whether the app uses Supabase Auth, a custom authentication system, Neon Auth, or a combination of these.
+8. Identify how sessions, user identities, password verification, memberships, wedding ownership, and authorization currently work.
+
+Do not display secret values, tokens, passwords, private connection strings, or private keys in logs, reports, or the UI.
+
+Preserve every existing secret and its value. Do not delete, rename, reset, replace, or overwrite saved keys or URLs. Only request a specific configuration change if the investigation proves it is necessary, and explain the reason first.
+
+PHASE 2 — Complete read-only schema audit
+
+Use the verified Neon connection to inspect the actual source database.
+
+Discover every relevant database object, including:
+
+- All tables and schemas
+- Columns, types, defaults, nullability, and generated columns
+- Primary keys and unique constraints
+- Foreign keys and relationship dependencies
+- Indexes and check constraints
+- Sequences, triggers, views, and database functions
+- Row-level security policies, grants, and ownership requirements
+- Migration history and any application-specific database dependencies
+
+Inspect the application code to identify all tables required by existing features, even if they contain zero records.
+
+Check dependencies for:
+
+- User accounts and authentication
+- Wedding creation and wedding details
+- Bride/groom roles and access
+- Family and guest memberships
+- Invitations and access codes
+- Chat and messages
+- Feed and posts
+- Albums and media references
+- Live-stream metadata, if stored in the database
+- Host and co-host permissions
+- Themes and wedding settings
+- Notifications, reports, and other existing features
+
+These are inspection categories, not permission to invent tables or redesign the schema. Include only objects actually required by the existing implementation.
+
+Compare the complete source schema against Supabase. Produce a detailed report listing missing objects, incompatible definitions, dependencies, risks, and the exact proposed changes.
+
+This phase must be read-only. Do not create or alter schema objects, copy rows, change routing, or modify application behavior.
+
+PHASE 3 — Prepare a safe migration plan
+
+Using the audit results:
+
+1. Determine the correct dependency order for schema creation.
+2. Prepare explicit, version-controlled SQL migrations for the required schema.
+3. Preserve primary keys, identifiers, relationships, uniqueness rules, defaults, constraints, and required indexes.
+4. Review authentication dependencies before migrating any identity-related records.
+5. Review RLS policies and grants so existing users cannot gain unauthorized access.
+6. Ensure that server-only privileged credentials are never exposed to browser code.
+7. Identify schema differences that cannot be migrated automatically and explain how they should be resolved.
+8. Confirm that existing Supabase tables or data will not be overwritten or destroyed.
+
+Do not blindly copy a Neon schema into Supabase if the application relies on provider-specific features. Resolve compatibility differences deliberately.
+
+Return the proposed migration plan and wait for my approval before making schema changes.
+
+PHASE 4 — Prepare Supabase tables only
+
+After approval of the audit and migration plan:
+
+1. Use the existing Developer Center migration controls where appropriate.
+2. Create only the verified destination schema and required database objects.
+3. Do not copy wedding rows in this phase.
+4. Do not drop, truncate, rename, or destructively recreate existing objects.
+5. Do not delete or modify data in Neon.
+6. Do not switch application traffic.
+7. Make the operation safe to retry. If a migration has already been applied, detect that state rather than duplicating or destroying objects.
+
+After preparation, inspect the resulting Supabase schema and compare it with the approved plan.
+
+Report the migration files or SQL statements used, objects created, objects skipped, and any remaining incompatibilities.
+
+Stop if a destructive change appears necessary.
+
+PHASE 5 — Migrate wedding data safely
+
+Do not begin until the schema is prepared and validated, the authentication strategy is understood, and the migration plan is approved.
+
+When authorized:
+
+1. Take a consistent snapshot or otherwise establish a reliable source baseline.
+2. Record source row counts and relevant integrity checks for every table to be migrated.
+3. Copy data from Neon to Supabase in dependency-safe order.
+4. Preserve existing identifiers and foreign-key relationships.
+5. Handle duplicate records, retries, unique constraints, and partial failures explicitly.
+6. Use transactions or safe resumable batches where appropriate.
+7. Avoid creating duplicate weddings, users, memberships, invitations, or access records.
+8. Preserve timestamps and relevant metadata.
+9. Verify sequences or identity generators will not generate conflicting identifiers.
+10. Never delete source rows from Neon.
+
+Do not migrate passwords or authentication records into an incompatible authentication system without a verified, secure migration strategy. Preserve current login behavior until the chosen identity strategy is tested.
+
+If a migration fails partway through, report exactly what succeeded and failed. Make retries safe and do not claim completion based solely on a successful command response.
+
+PHASE 6 — Validate migrated records
+
+After data copying, compare Neon and Supabase for every migrated table.
+
+Verify:
+
+- Row counts
+- Primary-key coverage
+- Foreign-key integrity
+- Required fields and null values
+- Duplicate identifiers
+- Unique constraints
+- Relationships between weddings, members, invitations, and access records
+- Authentication and authorization dependencies
+- Representative records and application-critical queries
+
+For each table, report source count, destination count, match status, and any differences.
+
+Do not declare the migration successful while unexplained differences remain. Resolve discrepancies before requesting permission for cutover.
+
+PHASE 7 — Integrate the application with Supabase
+
+Once schema and data validation succeed, inspect and prepare the application changes required to use Supabase.
+
+Requirements:
+
+1. Identify every server-side read and write operation involving wedding data.
+2. Route those operations through a consistent, secure database-access layer.
+3. Preserve existing application interfaces, API contracts, validation rules, and error handling.
+4. Preserve signup, login, sessions, user identities, account recovery, and existing authentication behavior.
+5. Preserve wedding ownership, bride/groom roles, host/co-host permissions, guest memberships, invitations, and access restrictions.
+6. Verify authorization on the server for every sensitive operation.
+7. Use parameterized queries and safe transaction handling.
+8. Keep database passwords, service-role credentials, and privileged database access server-side.
+9. Never expose "SUPABASE_SERVICE_ROLE_KEY" or "SUPABASE_DB_URL" to the browser or public build variables.
+10. Do not switch database providers for an operation until its Supabase equivalent has been verified.
+
+Keep photo and video storage in the existing media library/storage system. Do not migrate media files, upload them again, change their URLs, or alter existing media references unless a separate approved task explicitly requires it.
+
+Preserve all existing features and UI. Do not redesign the app, remove features, or make unrelated improvements.
+
+PHASE 8 — Test before cutover
+
+Run the available tests and add focused tests where necessary for the migration.
+
+Test at minimum:
+
+- Account creation and login
+- Existing account access and session persistence
+- Wedding creation and retrieval
+- Membership and invitation flows
+- Bride/groom and host/co-host permissions
+- Chat reads and writes
+- Feed, album metadata, and existing media references
+- Theme and wedding-setting persistence
+- Unauthorized-access attempts
+- Database errors, retries, and duplicate submissions
+- Cross-device persistence where the existing architecture supports it
+
+Verify that existing users can still access their correct weddings and that one wedding's private data cannot be accessed by unauthorized users.
+
+Run type checks, linting, and relevant automated tests where available. Report any missing test coverage instead of claiming unverified behavior works.
+
+PHASE 9 — Controlled cutover
+
+Do not switch active traffic automatically.
+
+Only propose cutover after all of these conditions are satisfied:
+
+- Complete schema audit is finished.
+- Required Supabase objects are present.
+- Data migration has completed.
+- Source and destination records have been validated.
+- Authentication and authorization have been tested.
+- Critical application flows pass.
+- Existing media references still work.
+- A rollback plan is documented.
+- The migration status and any remaining risks are clearly reported.
+
+Then explain the proposed cutover, expected impact, rollback procedure, and verification steps. Wait for my explicit approval before changing active database routing.
+
+Keep Neon intact and available for rollback until the new system has been verified and a separate retention decision has been approved.
+
+STRICT SAFETY AND SCOPE RULES
+
+- Inspect first; make the smallest necessary changes.
+- Preserve all existing secrets, URLs, accounts, data, features, permissions, settings, and media references.
+- Never invent schema objects or assume the five displayed tables are exhaustive.
+- Never expose credentials in logs, reports, frontend code, or chat.
+- Never disable TLS certificate verification.
+- Never drop, truncate, or overwrite production data as a shortcut.
+- Never copy rows or switch traffic before the required approval and validation gates.
+- Do not modify unrelated UI or functionality.
+- Do not report a test, migration, or deployment as successful unless it actually succeeded.
+- If any step is ambiguous, destructive, or depends on a missing credential, stop and explain the blocker instead of guessing.
+- Maintain an accurate record of changes and migration status.
+
+Required final report
+
+Report:
+
+1. Current verified database connection status.
+2. Complete schema audit findings.
+3. Proposed or completed schema changes.
+4. Data migration counts and validation results.
+5. Authentication and authorization status.
+6. Application tests performed and their actual results.
+7. Files changed and why.
+8. Any action still requiring my approval.
+9. Whether Neon is still active.
+10. Confirmation that media storage and existing secrets were preserved.
+
+Work in stages. Stop at each approval gate. Do not perform the next stage until its prerequisites are satisfied and approval is obtained.

@@ -1,0 +1,115 @@
+CRITICAL: PREVIOUS REDESIGN FAILED — MODIFY THE ACTUAL WEDDING HOME PAGE NOW
+
+The last TWO update attempts reported completion, but the actual wedding Home page looks unchanged. This is an implementation failure. Stop giving generic explanations, repeating the same instructions, or claiming success without visible evidence.
+
+I do not want another plan or a description of what you intend to do. I want you to inspect the existing code, identify the exact problem, implement the changes and verify the result.
+
+STEP 1 — FIND THE REAL COMPONENT
+
+Identify the exact route, component and source files that render the Home page when a user opens an already-created wedding.
+
+The page I mean is the one currently displaying:
+
+- The floral cover/background.
+- The heading "Man & Woman".
+- The wedding date and location.
+- The Change Background button.
+- The next-ceremony card, such as Vidaai.
+- The Pre-Wedding section.
+- The existing bottom navigation.
+
+Do NOT confuse this with the main login landing page, sample wedding selection page or another component named Home.
+
+Inspect the actual render path. Check for duplicate components, route mismatches, conditional rendering, stale bundles, failed builds and preview caching.
+
+Determine why the previous changes did not appear.
+
+STEP 2 — MAKE A VISIBLE CHANGE FIRST
+
+Before proceeding, modify the exact component used by the existing wedding Home page.
+
+Replace the current generic "Man & Woman" presentation with the actual saved bride's and groom's names, prominently displayed in elegant wedding-invitation typography.
+
+Use the real saved wedding data. Do not hardcode sample names.
+
+Apply the modification to the active project, rebuild or refresh the running preview as required, and verify that the visible page has changed.
+
+If this first change does not appear, stop and investigate why. Do not proceed by editing unrelated components or claiming success.
+
+STEP 3 — REPLACE THE DASHBOARD-STYLE HOME DESIGN
+
+Once the correct component is verified, transform its existing layout into a premium, interactive digital Indian marriage invitation.
+
+The couple's names must be the visual centerpiece, followed by the wedding date, venue and invitation message.
+
+Include beautifully designed sections for:
+
+- Invitation cover: Couple names, wedding date, main venue and welcome message.
+- Complete ceremony itinerary: Every configured ceremony, its date, start/end time, venue, dress code and guest instructions.
+- Family introductions: Bride's parents, groom's parents, grandparents and other family members provided by the hosts.
+- Venue information: Venue names, addresses and available directions.
+- Dress codes: Correct dress code for each individual ceremony.
+- Additional details: Host-provided invitation text, RSVP information, wedding hashtag and other existing invitation details where supported.
+
+Create a coherent, beautifully designed wedding invitation—not a generic dashboard with ordinary app cards.
+
+Use elegant typography, appropriate decorative borders, tasteful cultural motifs, refined spacing and subtle ornamental details. Make the couple's names immediately noticeable.
+
+STEP 4 — MATCH THE SELECTED RELIGION AND THEME
+
+Read the actual religion/tradition and visual theme saved for the wedding.
+
+Use culturally appropriate colors, patterns, decoration and ceremony terminology. Let the host's chosen visual theme take precedence where appropriate.
+
+Do not infer religion from names. Do not insert unapproved religious symbols, scripture, blessings or ceremonial text.
+
+If religion or theme is missing, use a neutral, premium invitation design.
+
+Every wedding must display its own saved couple names, ceremonies, family information and theme.
+
+STEP 5 — CONNECT THE DESIGN TO REAL DATA
+
+Inspect the existing wedding data model and editing flows.
+
+Reuse real saved data wherever possible. If essential fields do not exist, identify the missing fields and integrate only the necessary additions into the existing authorized editing system.
+
+Do not create a static mockup, hardcoded demonstration, unused component or separate page that guests never see.
+
+Do not invent names, dates, times, venues, family members or ceremonies.
+
+Preserve all existing wedding records, wedding IDs, uploaded media and host edits.
+
+STEP 6 — APPLY THE EXISTING ANIMATION
+
+Reuse the existing iPhone-unlock-style entrance animation.
+
+Apply it to the invitation cover, couple names and relevant invitation sections with subtle fade, scale and staggered reveals.
+
+Preserve the existing animation style, keep interactions responsive and avoid unnecessary replay. Do not let animation delay page loading.
+
+STEP 7 — STRICT SCOPE
+
+Change ONLY the Home page inside an individual created wedding.
+
+Do not redesign the main login landing page, Feed, Live, Album or More.
+
+Preserve bottom navigation, swipe gestures, wedding creation, authentication, host/co-host permissions, guest access, family privacy rules and livestream functionality.
+
+Do not rebuild the application, reset data or make unrelated changes.
+
+STEP 8 — PROVE THAT THE CHANGE WORKS
+
+After implementation:
+
+1. Open the actual Home page of an existing created wedding.
+2. Verify that the generic old layout has been replaced by the invitation design.
+3. Confirm that the real couple names appear prominently.
+4. Verify the ceremony, family, venue and dress-code sections using the actual saved wedding data.
+5. Test a second wedding to ensure its own names and details appear correctly.
+6. Check mobile rendering and confirm that navigation still works.
+7. Provide the exact source files and components modified.
+8. Show a screenshot of the updated page if the environment supports it.
+
+If the result still looks unchanged, do not report completion. Explain the precise blocker, the diagnostic evidence and what prevents the running preview from reflecting the source-code changes.
+
+FINAL DIRECTIVE: Stop producing updates that merely claim success. Modify the exact rendered component, apply the actual changes, and verify that the wedding Home page visibly changes before reporting completion.

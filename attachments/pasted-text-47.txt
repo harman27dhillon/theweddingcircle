@@ -1,0 +1,52 @@
+URGENT BUG FIX — MOBILE LANDING PAGE BUTTONS NOT RESPONDING
+
+Fix only the broken touch interactions on the mobile version of The Wedding Circle that appeared during recent updates.
+
+Current problems
+
+On mobile:
+
+- Landing-page buttons do not respond to taps.
+- Users cannot enter or open a wedding.
+- Other landing-page buttons cannot be activated.
+- Three-dot menus and their options do not respond.
+- The app may display the landing page normally, but the controls are not interactive.
+
+Strict scope — DO NOT MODIFY ANYTHING ELSE
+
+1. Inspect and identify the exact cause first. Check recent changes to CSS, JavaScript/React event handlers, overlays, stacking contexts, "z-index", "pointer-events", touch handlers, and mobile-specific layouts.
+2. Fix only the specific issue preventing taps and touch events from reaching the intended controls.
+3. Verify that every existing mobile landing-page button works, including:
+   - Opening and entering weddings.
+   - Create New Wedding.
+   - Join a Wedding / Enter Wedding Code.
+   - Discover and Leaderboard.
+   - Profile button.
+   - Three-dot menus and all existing menu options.
+   - Any other existing landing-page actions.
+4. Check whether an invisible overlay, decorative layer, loading screen, or incorrectly positioned element is blocking taps. If one is responsible, correct only that element's interaction behavior and layering.
+5. Ensure buttons and menus work with ordinary finger taps on Android phones, including repeated taps and opening/closing menus. Do not rely on desktop hover behavior.
+6. Preserve existing authentication, wedding access codes, navigation, permissions, and all current button functionality. Do not replace working handlers with fake actions or temporary workarounds.
+7. Test the mobile layout at narrow viewport widths and verify that the actual actions execute—not merely that buttons appear clickable.
+
+ABSOLUTELY DO NOT
+
+- Redesign, restyle, resize, reposition, rename, add, or remove any UI element.
+- Change desktop behavior or desktop styling.
+- Modify wedding cards, themes, photos, flower decorations, backgrounds, animations, typography, colors, or aspect ratios.
+- Modify the database, authentication logic, API routes, environment variables, or deployment configuration unless a specific change is proven essential to this exact bug.
+- Refactor unrelated code, clean up other files, or introduce new features.
+- revert unrelated recent updates.
+
+Required workflow
+
+- Inspect the existing implementation and recent changes.
+- Make the smallest possible targeted code change.
+- Review the diff and confirm that every change is directly related to restoring mobile tap functionality.
+- Run the available build, type checks, and relevant tests.
+- Test the mobile interactions and confirm that wedding entry and three-dot menus work.
+- If the cause cannot be isolated safely, report the specific finding and ask before making broader changes.
+
+Success criteria: The mobile landing page works exactly as it looked before this fix, but all existing buttons, wedding-entry actions, and three-dot menus respond correctly to taps. Everything else remains unchanged.
+
+Do not report the fix as complete unless the relevant checks have actually passed.

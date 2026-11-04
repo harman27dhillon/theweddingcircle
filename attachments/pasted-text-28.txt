@@ -1,0 +1,135 @@
+Implement a Production-Ready Service Worker in The Wedding Circle
+
+Inspect my existing Wedding Circle application and implement a reliable, production-ready service worker directly in the actual codebase.
+
+Website: https://theweddingcircle.in
+
+The goal is to improve repeat-visit performance, reliability on unstable mobile networks, and offline handling without breaking any existing features.
+
+Important: Inspect the actual framework, build configuration, routing, deployment environment, and existing PWA setup before making changes. Do not assume the project uses a particular service worker library. Reuse an existing implementation if one is present rather than registering duplicate workers.
+
+1. Service worker installation and registration
+
+- Create or configure the service worker using the project's existing architecture.
+- Register it only in production, unless the existing development setup explicitly supports safe testing.
+- Ensure the worker is served from the correct origin and scope so it can control the intended application pages.
+- Integrate registration into the correct application entry point.
+- Handle installation, activation, updates, registration failures, and unsupported browsers gracefully.
+- Ensure the worker updates when a new application version is deployed.
+- Do not force-reload users while they are composing messages, uploading media, or participating in a live stream.
+- Prevent duplicate service worker registrations and conflicting cache systems.
+
+2. Cache static application assets
+
+Cache suitable, versioned resources such as:
+
+- Application JavaScript bundles and CSS.
+- Local fonts and icons.
+- Essential local images and interface assets.
+- Other immutable build assets referenced by the production build.
+
+Use the actual build output and asset manifest where available.
+
+Requirements:
+
+- Prefer cache-first handling for immutable, versioned assets.
+- Use network-first handling where freshness is more important.
+- Give caches versioned names and remove obsolete caches during activation.
+- Do not delete caches belonging to unrelated features or systems.
+- Avoid caching unnecessary large assets.
+- Handle failed requests and unavailable network connections gracefully.
+
+3. Offline experience
+
+Implement a useful offline fallback for The Wedding Circle.
+
+When the network is unavailable:
+
+- Display a clear offline indicator.
+- Allow cached application resources and supported previously visited screens to load where feasible.
+- Show a dedicated offline fallback page when a requested navigation page cannot be loaded.
+- Explain that some functions require an internet connection.
+- Preserve locally held, unsent message drafts where feasible.
+- Restore normal network behavior when connectivity returns.
+
+Do not imply that new chats, live broadcasts, uploads, or payment operations succeeded while offline.
+
+4. Protect live application data
+
+The application contains wedding-specific information, private chats, images, videos, notifications, and host/co-host controls.
+
+Never apply generic offline caching to all API requests.
+
+- Do not cache authentication responses, session tokens, payment requests, private API responses, or authorization-sensitive data indiscriminately.
+- Do not cache private chat or wedding API responses in a shared cache.
+- Do not cache personalized HTML responses in a way that could expose one user's wedding data to another user.
+- Use network-only behavior for authentication, payments, live-stream signaling, authorization checks, and other security-sensitive endpoints.
+- Keep private media subject to the application's existing access controls and storage policies.
+- Do not allow an offline cache to bypass access revocation or wedding expiry/deletion rules.
+- If a user signs out, ensure sensitive locally cached data is handled according to the app's security policy.
+
+Inspect the actual API routes and storage providers before defining caching rules.
+
+5. Improve performance on mobile
+
+Optimize for Android phones and unstable mobile networks.
+
+- Avoid downloading all application assets, wedding images, or videos during service worker installation.
+- Cache only necessary resources.
+- Use appropriate expiration and size limits for runtime caches.
+- Avoid caching huge files or full media libraries.
+- Keep the worker lightweight and avoid unnecessary background work.
+- Prevent repeated fetching of the same immutable assets.
+- Avoid introducing noticeable delays during app startup or navigation.
+
+6. Chat, Album, and media safeguards
+
+- Keep chat messages and their authoritative server state synchronized through the existing backend.
+- Do not automatically replay potentially duplicate message submissions after reconnecting.
+- Do not claim that a photo or video is uploaded until the existing upload process confirms success.
+- Do not intercept or interfere with multipart uploads, signed storage URLs, video playback, or live-stream connections.
+- Do not cache live-stream video segments or real-time signaling unless the existing streaming architecture explicitly supports it.
+- Ensure the service worker cannot resurrect expired or deleted weddings from stale cached data.
+
+7. PWA compatibility
+
+Inspect the existing web app manifest and installation setup.
+
+If needed, add or correct the manifest, application icons, theme color, and standalone display configuration using existing project assets.
+
+Do not replace existing branding or modify unrelated Android/iOS installation behavior.
+
+Do not claim that the service worker alone makes the app fully installable; verify the actual browser and manifest requirements.
+
+8. Testing and verification
+
+Implement the feature and run the available build and type checks.
+
+Verify:
+
+1. The production build succeeds.
+2. The service worker registers successfully on the deployed origin.
+3. Repeat visits can reuse appropriate cached assets.
+4. The app displays an offline fallback when appropriate.
+5. The app recovers correctly after connectivity returns.
+6. New deployments update the worker and static assets without stale-bundle errors.
+7. Authentication, wedding access permissions, chat, Live, Album, media uploads, and payments still work.
+8. Logging out or switching accounts does not expose another user's private data.
+9. Expired or deleted weddings are not restored from cache.
+10. Mobile navigation and existing animations remain functional.
+
+Use the project's existing test tools and a safe test environment. Do not delete production data or change database schemas unnecessarily.
+
+9. Final report
+
+After implementation, report:
+
+- Which service worker file was created or modified.
+- How and where it is registered.
+- Which assets are cached and which requests bypass caching.
+- How offline behavior works.
+- How update activation is handled.
+- Build and test results.
+- Any remaining deployment configuration required.
+
+Do not merely explain how to add a service worker. Implement it in the actual application, verify the build, and clearly identify anything that could not be tested.

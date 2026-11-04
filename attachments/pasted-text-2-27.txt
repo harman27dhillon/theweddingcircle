@@ -1,0 +1,199 @@
+# TASK: Implement Group Polls with a Persistent Activity Bar in Existing Chat
+
+I want to add a fully functional, real-time Group Polls feature to my existing wedding app.
+
+IMPORTANT: First inspect the existing codebase, chat architecture, database, authentication, real-time messaging system, and UI components. Reuse the existing technologies, styling, and infrastructure wherever possible.
+
+Do not rebuild the chat system or break existing functionality.
+
+## 1. Poll Creation
+
+Allow group members to create polls directly from the chat attachment/action menu using a new Create Poll option.
+
+The poll creation interface should include:
+- Poll question (required).
+- Minimum 2 and maximum 12 answer options.
+- Add/remove answer options dynamically.
+- Single-choice or multiple-choice voting.
+- Anonymous voting toggle.
+- Allow participants to change their votes (toggle).
+- Allow participants to add new options (toggle).
+- Optional poll expiration: 15 minutes, 1 hour, 24 hours, or custom date/time.
+- Results visibility: immediately, after voting, or after the poll closes.
+
+Use a clean, modern interface consistent with the existing app.
+
+## 2. Polls as Interactive Chat Messages
+
+When a poll is created:
+- Display it as an interactive message card inside the group chat.
+- Show the question, options, vote counts, and progress bars according to the poll's visibility settings.
+- Allow users to vote without navigating to another page.
+- Update votes and results in real time.
+- Show the total number of participants who voted.
+- Prevent duplicate voting while allowing vote changes if enabled.
+- Clearly distinguish active polls from completed polls.
+- Preserve poll messages in chat history after expiration.
+
+Poll messages must work correctly with the existing message ordering, pagination, scrolling, and real-time subscriptions.
+
+## 3. Persistent Group Activity Bar (VERY IMPORTANT)
+
+Problem: In an active group chat, new messages quickly push polls out of view.
+
+Solution: Create a compact, persistent, collapsible Group Activity Bar directly below the existing chat header.
+
+Example: Group Activity · 2 Active Polls · 1 Live Huddle
+
+Requirements:
+- The bar must remain visible while scrolling through chat messages.
+- It must not interfere with the message list or message composer.
+- Use only one compact row, even when multiple polls exist.
+- Show the number of active polls.
+- Show a subtle indicator if the current user has not voted in an active poll.
+- Tapping the bar opens a bottom sheet on mobile or an appropriate panel on desktop.
+- The panel displays all active polls for the current group.
+- Users can vote directly inside the panel.
+- Polls must remain accessible regardless of how many messages are sent.
+- Automatically remove expired polls from the active list.
+- If there are no active polls or live activities, hide the bar to preserve screen space.
+- Make the bar expandable and collapsible with smooth, lightweight animations.
+
+Important: Design the activity bar as a reusable component so additional features can be integrated later.
+
+## 4. Active Polls Panel
+
+When users tap the activity bar, display a panel containing:
+- All currently active polls.
+- Poll questions.
+- Voting options.
+- Total participant counts.
+- Remaining time, where applicable.
+- Current user's voting status.
+- Live results when permitted.
+- A way to view the original poll message in chat.
+
+Sort polls by creation time, newest first.
+
+Allow users to close the panel easily and return to chatting without losing their scroll position.
+
+## 5. Poll Expiration and Results
+
+When a poll expires:
+- Disable further voting.
+- Calculate final results.
+- Highlight the option with the highest vote count.
+- Handle ties correctly.
+- Keep the completed poll in chat history.
+- Remove it from the Active Polls panel.
+- Optionally display a lightweight result announcement inside the group chat.
+
+Expired polls must stay expired even after page refreshes, server restarts, or reconnects.
+
+## 6. Real-Time Synchronization
+
+All poll interactions must synchronize across connected users.
+
+Requirements:
+- New polls appear immediately for all group members.
+- Votes update in real time.
+- Vote changes update correctly.
+- Poll expiration is synchronized.
+- The activity bar updates automatically.
+- Handle connection interruptions and reconnections.
+- Avoid duplicate events, race conditions, and incorrect vote counts.
+- Use the existing real-time infrastructure instead of introducing unnecessary dependencies.
+
+## 7. Database and Security
+
+Create or extend the required database structures for:
+- Polls.
+- Poll options.
+- Votes.
+- Poll settings.
+- Expiration timestamps.
+
+Follow the project's existing database conventions.
+
+Security requirements:
+- Only authenticated members of a group can create or participate in its polls.
+- Users cannot vote on behalf of another user.
+- Enforce single-choice/multiple-choice restrictions on the server.
+- Validate all submitted data.
+- Enforce expiration and vote-change settings on the server.
+- Prevent duplicate votes and race conditions using appropriate database constraints and transactions.
+- Enforce anonymous voting privacy in API responses, database access policies, and real-time events.
+- Never expose individual voter identities for anonymous polls.
+- Respect the existing group permissions and membership rules.
+
+## 8. Responsive Design
+
+The implementation must work on:
+- Desktop browsers.
+- Mobile browsers.
+- Tablets.
+- Narrow mobile screens.
+
+Use the app's existing design system, colors, typography, spacing, and components.
+
+Do not introduce a completely different visual style.
+
+The poll UI should feel native to the current wedding app.
+
+## 9. Preserve Existing Features
+
+Do not break or modify unrelated functionality, including:
+- Existing group messaging.
+- Private messaging, if supported.
+- Voice rooms and microphone controls.
+- Existing games.
+- Message notifications.
+- Authentication.
+- Group membership and permissions.
+- Message scrolling and pagination.
+
+If an existing live voice session is active, display its status in the Group Activity Bar using the existing voice-session state.
+
+Do not rebuild the voice system.
+
+## 10. Testing and Verification
+
+After implementation, test:
+1. Creating a poll.
+2. Voting from multiple accounts.
+3. Changing votes.
+4. Anonymous voting.
+5. Multiple-choice voting.
+6. Real-time vote synchronization.
+7. Poll expiration.
+8. Multiple active polls.
+9. Activity bar visibility during rapid chatting.
+10. Refreshing the page while a poll is active.
+11. Reconnecting after losing internet.
+12. Group access restrictions.
+13. Mobile responsiveness.
+14. Existing chat functionality.
+
+Also verify that hidden results cannot be retrieved through API responses or real-time events before they are supposed to become visible.
+
+## FINAL INSTRUCTIONS
+
+Implement this as a production-ready feature, not a visual mockup.
+
+Before making changes, inspect the existing project and identify the relevant components, database tables, and real-time infrastructure.
+
+Use the existing architecture and follow established coding patterns.
+
+Make the necessary code and database changes.
+
+Do not introduce unnecessary libraries.
+
+After implementation, provide:
+1. Summary of changes.
+2. Files created or modified.
+3. Database migrations, if any.
+4. Environment variables or setup steps, if required.
+5. Tests performed and their results.
+6. Any remaining limitations.
+
+PRIMARY GOAL: Create a seamless group polling experience where guests can continue chatting normally while active polls remain easily accessible through a compact, persistent Group Activity Bar.

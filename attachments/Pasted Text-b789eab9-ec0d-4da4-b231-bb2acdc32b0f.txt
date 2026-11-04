@@ -1,0 +1,26 @@
+Update the existing Wedding Circle landing/feed page using my attached screenshot as the visual reference. Combine both changes into one focused implementation: the Chat and Live shortcuts inside each wedding card, plus a Sign in / Sign up entry directly below each card.
+
+First inspect the current page, wedding-card component, routing, and authentication flow. Reuse the existing components, wedding data, actions, and account system. Do not rebuild the page or alter unrelated functionality.
+
+WEDDING CARD LAYOUT
+- Preserve each card’s existing cover artwork, couple names, date, location, rounded shape, and overall proportions.
+- Add two compact, clearly labeled Chat and Live buttons INSIDE the card, positioned in its lower-right area like the screenshot.
+- Keep both buttons fully within the card’s rounded border—not above the card, outside it, or underneath it.
+- Use the existing Chat and Live destinations/actions; do not create dummy pages or placeholder behavior.
+- Ensure buttons do not overlap or obscure the couple’s names, date, or location. Keep the layout responsive on narrow mobile screens.
+
+SIGN IN / SIGN UP ENTRY
+- Add a separate, full-width rounded entry immediately BELOW each wedding card, with modest spacing before the next card.
+- Include an account icon and this exact label:
+  “Sign in / Sign up to join this wedding”
+- Style it to complement the current blush, burgundy, cream, and gold interface, without changing the wedding card artwork.
+- On tap, open the existing sign-in/sign-up flow and carry the correct wedding ID/context through it, so the user can continue joining or accessing that specific wedding after authentication.
+- If the user is already signed in and has access, show the appropriate existing state instead of unnecessarily asking them to sign in.
+- Do not create a second authentication system or send users to a generic account page.
+
+SCOPE AND VERIFICATION
+- Do not apply selectable wedding themes yet.
+- Preserve existing wedding data, roles, membership, navigation, and functionality.
+- Make the smallest appropriate changes to the existing components.
+- Test the mobile layout and verify that Chat, Live, and Sign in / Sign up each perform the correct action. Check both signed-out and signed-in states.
+- Report what was actually verified and disclose any untested behavior. Do not claim success without testing.

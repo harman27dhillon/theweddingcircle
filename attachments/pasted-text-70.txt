@@ -1,0 +1,80 @@
+URGENT: FIX DUPLICATED WEDDING COVER IMAGES AND CHAT HEADER LAYOUT
+
+The latest update has introduced visible UI problems on BOTH mobile and desktop.
+
+Inspect the supplied screenshots and the actual current source code. Fix the root causes directly.
+
+BUG 1 — Duplicate wedding cover images
+
+The same wedding cover/mandap image is appearing twice:
+
+- On the Home screen, two identical wedding cover images appear one after another.
+- On the Chat screen, the wedding cover image is repeated twice at the top.
+
+Investigate whether:
+
+- The same image is being rendered by two separate components.
+- A background image and an img element are displaying the same asset simultaneously.
+- The shared wedding header is being mounted twice.
+- Both a page-level cover and a wedding-level cover are being rendered.
+- Recent changes introduced duplicate image containers or background layers.
+
+Keep the intended original wedding cover image and remove only the unintended duplicate rendering.
+
+Do not simply hide the second image with CSS without identifying why it is being rendered twice.
+
+BUG 2 — Chat header controls are misaligned
+
+The Chat arrow and microphone appear on the left below the header, while the speaker appears separately on the right.
+
+Correct the layout.
+
+DESKTOP:
+Place Notification, Filter, Microphone, Speaker and Arrow together at the right side of the Chat top bar, in that exact order.
+
+MOBILE:
+Preserve the intended compact mobile layout. Keep the controls properly aligned within the Chat header and prevent them from floating independently or becoming detached from their control group.
+
+Keep the existing microphone and speaker functionality and their real state indicators.
+
+BUG 3 — Chat conversation spacing
+
+After correcting the duplicate cover image:
+
+- Reduce unnecessary vertical space above the Chat conversation.
+- Keep the participant header compact.
+- Ensure the message history starts at the correct position.
+- Keep the Chat composer and bottom navigation in their existing positions.
+- Preserve scrolling and keyboard behavior.
+
+BUG 4 — Home screen layout
+
+Check the Home screen after removing the duplicate image.
+
+- Preserve the existing wedding card design.
+- Preserve the floral page decoration.
+- Ensure the wedding cover appears exactly once in its intended container.
+- Check image aspect ratio, cropping and responsive sizing.
+
+STRICT RESPONSIVE REQUIREMENTS
+
+Test both mobile and desktop.
+
+Do not apply a mobile-only workaround.
+Do not redesign the existing Wedding Circle theme.
+Do not remove decorative assets that are supposed to appear.
+Do not change wedding data, authentication, Supabase or LiveKit functionality.
+
+VERIFICATION
+
+1. Open Home and confirm the wedding cover appears once.
+2. Open Chat and confirm the wedding cover appears once.
+3. Verify the Chat controls are correctly aligned on mobile.
+4. Verify the five controls are grouped at the right of the desktop Chat header.
+5. Verify the conversation is not pushed unnecessarily down.
+6. Verify the Chat composer and bottom navigation still work.
+7. Run the production build and test the actual rendered application.
+
+Inspect the component tree and identify the exact cause of duplicate image rendering before fixing it.
+
+Do not repeatedly summarize the task. Implement the fixes and report the files changed and actual verification results. Do not claim completion based only on a successful build.

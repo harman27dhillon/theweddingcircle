@@ -1,0 +1,41 @@
+APPROVED — IMPLEMENT THE CHROME CACHE AND SERVICE WORKER FIX.
+
+Apply the five proposed fixes exactly as described.
+
+STRICT REQUIREMENTS:
+
+1. Fix server routing so missing "/assets/*" requests return genuine 404 responses with "Cache-Control: no-store". Never return the application HTML shell for missing assets.
+2. Fix service-worker caching so only valid 200 JavaScript, CSS and other expected assets are cached. Never cache HTML responses under asset URLs.
+3. Use safe network requests to avoid reusing poisoned HTTP cache entries.
+4. Correct offline navigation fallback so it never serves an unrelated route's HTML.
+5. Implement safe service-worker activation and one-time page reload without reload loops.
+6. Bump the shell worker cache version to invalidate old v6 file-cache entries.
+
+PROTECT EXISTING DATA:
+
+- Do not clear localStorage.
+- Do not clear IndexedDB.
+- Do not unregister the push notification worker.
+- Do not log users out.
+- Do not delete wedding data or offline snapshots.
+
+PROTECT THE UI:
+
+- Do not redesign or reposition any components.
+- Do not modify themes, typography, spacing, colours or page layouts.
+- Do not remove or disable existing features.
+- Keep Supabase, LiveKit, Seek, polls and whispers working.
+
+TEST BEFORE PUBLISHING:
+
+- Test valid CSS and JS requests.
+- Test missing CSS and JS requests.
+- Confirm missing assets return 404 and no-store.
+- Confirm valid hashed assets return correct content types.
+- Test service-worker upgrades from v6.
+- Test existing and newly opened tabs.
+- Test offline navigation.
+- Verify login and wedding data remain intact.
+- Run the production build.
+
+Do not publish automatically. Show me the changed files, test results and build result first. Wait for my approval before deployment.

@@ -1,0 +1,82 @@
+TASK: Preserve The Wedding Circle UI Offline With Minimal Local Storage
+
+This is the current task. Do not return to previous tasks or merely summarize this request. Inspect the existing source code and implement the changes directly in the current project.
+
+1. Main objective
+
+When a user loses internet access, The Wedding Circle must retain its existing UI instead of replacing the entire application with a full-screen “Offline” page.
+
+The app shell, navigation, layout, fonts, icons, colors, selected theme, and locally available decorative assets should remain visible wherever possible.
+
+2. Storage budget
+
+Keep the essential offline application shell target at 10 MB or less, excluding optional theme backgrounds, user content, and browser-generated overhead.
+
+Measure the actual production build and identify the largest assets before choosing what to cache. Do not claim the target has been met without measuring it.
+
+3. Inspect and implement
+
+- Inspect the existing Vite configuration, React entry points, routing, service worker, PWA configuration, asset imports, and current offline detection.
+- Reuse the existing architecture and dependencies wherever possible. Do not rebuild the app or introduce a second PWA system unnecessarily.
+- Cache the production HTML, required JavaScript and CSS, essential fonts, icons, and minimal UI assets needed to display the application.
+- Implement or repair the service worker and precaching strategy if required.
+- Ensure supported application routes can load the cached app shell when offline, including after a page refresh.
+- Render the UI immediately without waiting for Supabase or other network requests to finish.
+- Keep the current design and functionality intact. Do not redesign any screen or remove existing features.
+
+4. Optimize cache size
+
+- Audit asset sizes and remove unnecessary duplication only when safe.
+- Avoid caching every image or every theme by default. Cache the essential UI assets first.
+- Keep large wedding photos, videos, live-stream media, and other user-generated content out of the essential app-shell cache.
+- Cache the selected theme’s required backgrounds only if necessary and within a separate, controlled asset budget.
+- Use Cache Storage for application assets and IndexedDB for appropriate structured offline data.
+- Use "localStorage" only for small preferences, not large files or image data.
+- Do not store images as Base64 strings in localStorage.
+- Apply cache versioning, cleanup of obsolete assets, and sensible storage limits. Never delete unsynced user changes or drafts.
+
+5. Offline behavior
+
+- Do not use a full-screen offline page if the application shell can load.
+- Show a subtle connection-status indicator within the existing UI.
+- Display cached wedding details and recent messages when available.
+- Keep unavailable network-dependent features visibly unavailable rather than pretending they work.
+- Preserve typed messages and drafts locally where appropriate, but never report a message as sent until the server confirms it.
+- When the internet returns, refresh server data and restore subscriptions safely.
+
+6. Security and data integrity
+
+- Keep Supabase as the existing source of truth.
+- Do not bypass authentication or treat cached user data as proof of a valid session.
+- Do not indiscriminately cache authenticated API responses, access tokens, private data, or privileged information in the service worker.
+- Respect existing Supabase row-level security and account boundaries.
+- Do not clear or overwrite existing user data during implementation.
+
+7. Verify the actual result
+
+After implementing, run the available production build and relevant tests. Inspect the actual production asset sizes.
+
+Verify these scenarios:
+
+1. Open the app online and navigate through its existing screens.
+2. Load the app once, disconnect the internet, and navigate between supported screens.
+3. Refresh a supported route while offline.
+4. Confirm the existing UI and selected theme remain visible.
+5. Reconnect and confirm data refreshes without duplicate messages or lost drafts.
+6. Confirm login, permissions, and private data remain secure.
+7. Confirm online functionality and the existing design have not regressed.
+
+8. Final response requirements
+
+Do not repeatedly summarize the task or return a plan instead of implementation. Make the code changes first.
+
+Afterward, report:
+
+- Files actually changed.
+- Whether offline UI retention was verified.
+- Measured production app-shell size.
+- What is included and excluded from the cache.
+- Build and test results.
+- Any remaining limitations or blockers.
+
+Do not claim success for anything you have not implemented and verified. If something cannot be completed, explain the exact blocker instead of claiming it is finished.

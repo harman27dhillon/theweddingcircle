@@ -1,0 +1,165 @@
+Wedding App — Feed UI Optimization and App-Wide Performance Update
+
+Update the existing wedding app using the requirements below. Modify the existing implementation; do not rebuild the app from scratch.
+
+1. Header Layout — Side Colors and Information Buttons
+
+- Move the Side colors button to the top-right header area, immediately next to the existing circular information (i) button.
+- Keep both controls on the same horizontal line.
+- Make them compact and properly aligned on mobile screens.
+- Preserve the existing Side colors functionality, permissions, and color-selection behavior.
+- Do not overlap the wedding title, notification button, or host controls.
+- Use responsive spacing to prevent wrapping on smaller mobile screens.
+
+2. Move Upload Information Into the Information Button
+
+- Hide the visible text: "Up to 50 photos and 5 videos at once."
+- Move this information into the existing information (i) button as a small popover, tooltip, or modal.
+- Position the information button immediately next to the Camera button in the upload composer.
+- When clicked, show the existing upload limits clearly:
+  - Up to 50 photos per upload.
+  - Up to 5 videos per upload.
+- Preserve all current upload limits and validation logic.
+- Do not duplicate this information elsewhere in the composer.
+- Save vertical space by removing the separate informational text line.
+
+3. Remove the Side Label From Post Headers
+
+Currently, a post displays information such as:
+"Circle developer · Groom's side"
+
+Remove the visible "Groom's side" and "Bride's side" labels from post headers.
+
+The post header should display only the author's existing name and relevant role or developer badge, without redundant side labels.
+
+Important:
+
+- Do not remove the underlying groom/bride side information from the database.
+- Preserve side-specific permissions, filtering, privacy, and post ownership.
+- Do not change the author's actual identity or role.
+- Apply the change to every post type, including text, photos, videos, and replies.
+
+4. Correct Groom-Side and Bride-Side Posting
+
+Ensure that the feed correctly identifies which side a post belongs to using the existing user-side assignment.
+
+- Posts created by groom-side members must retain their internal groom-side association.
+- Posts created by bride-side members must retain their internal bride-side association.
+- Members from either side must be able to post according to their existing permissions.
+- Do not assign every post to the groom's side by default.
+- Do not infer a member's side from their display name or manually entered text.
+- If a wedding supports separate groom-side and bride-side spaces, preserve that functionality.
+- When both sides share or merge the same wedding circle, preserve the existing merged-circle behavior.
+
+The side association must remain correct internally even though the visible side label is removed from the post header.
+
+5. Move the Post Time Next to Report
+
+Currently, the Delete and Report actions appear on one line, while the post time appears underneath.
+
+Reorganize the post footer so that the post timestamp appears on the same horizontal line as the Report action.
+
+Preferred layout:
+
+"Delete    Report    8:46 pm"
+
+Requirements:
+
+- Keep Delete visible only to users who currently have permission to delete the post.
+- Keep Report visible according to the existing reporting rules.
+- Place the timestamp after Report, aligned to the right when space permits.
+- On narrow screens, allow a clean responsive layout without overlapping or clipping.
+- Remove unnecessary vertical spacing below the footer.
+- Preserve the actual post timestamp and existing time-formatting behavior.
+
+6. Make the Feed More Compact
+
+Optimize the feed screen to use less vertical space without making text difficult to read.
+
+- Reduce unnecessary padding and margins inside post cards.
+- Tighten spacing between the author header, post content, reply field, action buttons, and timestamp.
+- Keep the post composer compact.
+- Preserve comfortable touch targets for mobile controls.
+- Maintain the existing colors, typography, rounded corners, and wedding theme.
+- Ensure text, photos, videos, replies, and action controls remain fully visible.
+- Avoid introducing horizontal scrolling.
+
+Do not shrink text excessively or make buttons difficult to tap.
+
+7. Improve Feed Smoothness
+
+Optimize the feed so that scrolling, posting, replying, and opening media feel immediate and smooth.
+
+- Eliminate unnecessary component re-renders.
+- Avoid reloading the entire feed after every interaction when only one post needs updating.
+- Use efficient pagination or incremental loading for large feeds.
+- Load images and video thumbnails efficiently.
+- Use lazy loading for media that is not currently visible.
+- Prevent repeated network requests for the same feed data.
+- Add suitable caching while ensuring newly created posts and replies appear promptly.
+- Prevent flickering, layout shifts, duplicate posts, and unnecessary loading indicators.
+- Preserve real-time updates if they already exist.
+- Keep optimistic UI updates consistent with server responses and roll them back safely if a request fails.
+
+Do not sacrifice data accuracy or reliability for perceived speed.
+
+8. Improve Main Home Page Loading Speed
+
+The main Home page currently opens slowly and the interface feels laggy. Optimize the entire application, not just the feed.
+
+Inspect and improve:
+
+- Initial application loading.
+- Home page rendering.
+- Navigation between Home, Feed, Live, Album, and More.
+- Database requests and API calls.
+- Authentication and session restoration.
+- Image and video loading.
+- Large JavaScript bundles and unnecessary dependencies.
+- Expensive calculations and repeated state updates.
+- Unnecessary background requests.
+- Blocking operations during the initial render.
+
+Implementation requirements:
+
+- Display the basic application shell immediately while nonessential content loads.
+- Load noncritical components and media only when needed.
+- Fetch only the data required for the current screen.
+- Reuse cached data where safe.
+- Avoid refetching unchanged information when navigating between screens.
+- Optimize database queries and request frequency without weakening security rules.
+- Use appropriate loading placeholders rather than freezing the entire interface.
+- Keep animations lightweight and avoid blocking the main UI thread.
+- Ensure the app remains responsive on mid-range Android phones and slower mobile networks.
+
+Do not simply add a loading spinner and call the problem fixed. Identify and address the actual bottlenecks.
+
+9. Preserve Existing Functionality and Data
+
+This is an optimization update, not a redesign or migration.
+
+- Do not delete or overwrite existing wedding posts, photos, videos, replies, user profiles, wedding settings, or permissions.
+- Do not change the database schema unless absolutely necessary.
+- Do not replace the current backend, authentication system, storage provider, or routing architecture.
+- Do not introduce mock data or sample posts.
+- Do not change existing upload limits, host/co-host permissions, guest roles, or wedding-circle behavior.
+- Do not remove working features unrelated to these requirements.
+- Do not hardcode temporary UI state that resets existing user settings.
+- Preserve the current design language and responsive layout.
+
+10. Test Before Completing
+
+After implementing the update, verify:
+
+1. Side colors and the header information button appear together on the same line.
+2. The upload information text is hidden and accessible through the information button beside Camera.
+3. Groom-side and bride-side posts both work correctly without visible side labels in post headers.
+4. Delete, Report, and timestamp appear together in a compact footer.
+5. Feed scrolling and replies remain smooth with multiple posts.
+6. Home page and screen navigation are faster without breaking authentication or data loading.
+7. Media uploads, existing posts, permissions, and real-time features still work.
+8. Mobile layouts do not overlap or clip content.
+
+Make the smallest safe changes needed. Check the existing code before editing, reuse current components and services, and report any performance issue that cannot be fixed without backend or infrastructure changes.
+
+Final priority: Preserve all existing functionality and data. Reduce wasted screen space, correct the feed UI, and improve actual application performance without introducing unrelated changes.

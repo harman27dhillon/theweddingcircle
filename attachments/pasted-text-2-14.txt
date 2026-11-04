@@ -1,0 +1,35 @@
+FIX WEDDING INTERIOR BACKGROUNDS — RESTORE ORIGINAL THEME STYLING
+
+In The Wedding Circle, remove the unwanted blurry background effects inside the wedding interface and restore the background styling defined by each theme's original setup.
+
+1. Remove unwanted blur
+
+- Remove unintended background blur, backdrop blur, frosted-glass effects, and excessive image softening from the interior wedding pages.
+- Inspect "backdrop-filter", "filter: blur()", pseudo-elements, translucent overlays, and inherited CSS rules that are making the wedding background look blurry.
+- Remove only the effects responsible for the unwanted blur.
+- Keep intentional blur that is explicitly part of a theme's original design, if any.
+
+2. Restore each theme's original background
+
+- Inspect the existing theme definitions and restore the background colors, images, gradients, opacity, and overlays originally specified for each theme.
+- When a wedding uses a preset theme, render its intended original background exactly as defined by that theme.
+- When a wedding uses a Classic theme, preserve and apply that Classic theme's own original background settings.
+- Do not apply one universal background to every theme.
+- Ensure the selected theme controls the wedding interior background consistently across mobile and desktop.
+- Preserve the original background image's intended clarity, positioning, scaling, and aspect ratio.
+
+3. Preserve all other features
+
+Do not redesign the interface or change unrelated components. Preserve wedding cards, ceremony sections, chat, live streaming, albums, controls, theme colors, typography, decorative flowers, animations, and navigation.
+
+Do not modify the landing-page background or developer background-upload feature. This task concerns the background inside an opened wedding only.
+
+4. Safe implementation
+
+1. Inspect the existing theme configuration and CSS before editing.
+2. Identify the exact rules causing unwanted blur or overriding the original theme backgrounds.
+3. Make the smallest targeted changes; do not rewrite the theme system.
+4. Check all existing preset and Classic themes on mobile and desktop.
+5. Run the available build and relevant tests.
+
+Success criteria: Wedding interiors display crisp, clear backgrounds matching each selected theme's original setup, without unintended blur or changes to unrelated features. Report which rules were changed and confirm only tests that actually passed.

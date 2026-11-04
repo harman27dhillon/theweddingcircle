@@ -1,0 +1,96 @@
+The Wedding Circle — Replace Google Photos API Setup with Google Drive API Setup
+
+Update the existing application to remove the Google Photos API setup and replace it with a complete, secure Google Drive API setup.
+
+Work directly on the existing project. Do not redesign unrelated screens or modify unrelated features.
+
+1. Remove Google Photos API integration
+
+- Find all Google Photos API setup screens, configuration fields, connection logic, OAuth scopes, API calls, callbacks, and related settings.
+- Remove the Google Photos-specific setup and integration cleanly.
+- Remove obsolete Google Photos environment variables and configuration references only after verifying that nothing else depends on them.
+- Preserve unrelated Google authentication and other Google API integrations if they are still required.
+- Do not delete existing wedding photos, videos, albums, database records, or uploaded assets.
+- Do not break existing wedding media functionality while replacing the integration.
+
+2. Add Google Drive API setup
+
+Create a dedicated Google Drive integration setup in the existing Developer section, using the app's current settings and design conventions.
+
+Include the appropriate fields and actions for:
+
+- Google Cloud project configuration.
+- Google Drive API enablement instructions.
+- OAuth client ID and any other credentials genuinely required by the selected authentication flow.
+- Authorized JavaScript origins and redirect URIs, where applicable.
+- A secure Connect Google Drive action.
+- Connection status, account identification where permitted, and a Disconnect action.
+- A test-connection or authorization-validation action.
+- Clear error messages for missing credentials, rejected permissions, expired authorization, and failed API requests.
+
+Do not ask users to paste a Google account password or OAuth access token into ordinary settings fields.
+
+3. Use the correct Google Drive OAuth permissions
+
+Use the minimum permissions needed for the actual features.
+
+- Prefer "drive.file" when the app only needs to access files it creates or files the user explicitly selects or grants access to.
+- Request broader Drive access only if a documented feature genuinely requires it and the user explicitly authorizes that access.
+- Do not request full Drive access by default.
+- Implement Google's current supported OAuth authorization flow, including consent, callback handling, token expiry, and reauthorization where needed.
+- Keep client secrets and long-lived refresh tokens on the server; never expose them in frontend code or public build assets.
+
+If the project requires a Google Cloud Console configuration, provide accurate instructions for enabling the Google Drive API and configuring OAuth consent and redirect URIs.
+
+4. Define the intended Drive storage behavior
+
+Integrate Google Drive only for the media and storage functions that actually need it.
+
+- Store and retrieve supported wedding photos and videos through the authorized Drive connection.
+- Use the existing wedding and album structure wherever possible.
+- Preserve file metadata and the association between files and the correct wedding.
+- Handle upload progress, failures, retries, permissions, and unavailable files.
+- Do not make wedding media publicly accessible by default.
+- Do not silently upload a user's entire Drive or scan unrelated private files.
+- Do not claim that Drive storage is connected until a real authorization and API test succeeds.
+
+Before changing existing storage behavior, inspect the current implementation and identify which features should use Drive. Preserve existing storage providers and functionality unless a change is explicitly necessary.
+
+5. Secure configuration and data handling
+
+- Store server-side secrets in the project's existing secure environment configuration.
+- Do not commit secrets to source control.
+- Avoid logging access tokens, refresh tokens, client secrets, or sensitive file contents.
+- Validate OAuth state and callback requests.
+- Handle revocation and disconnection safely.
+- Preserve database security and existing user/wedding access permissions.
+- Do not weaken Supabase policies, authentication, or authorization to make Drive work.
+
+6. Update the UI and configuration
+
+- Replace Google Photos-specific labels with Google Drive terminology.
+- Update relevant setup instructions, connection statuses, validation messages, and developer documentation.
+- Remove obsolete Photos-specific settings only after confirming that the new Drive setup works.
+- Keep the interface responsive on mobile and desktop.
+- Do not change unrelated Developer settings or the overall application design.
+
+7. Test before declaring completion
+
+Verify:
+
+1. Google Photos setup references have been removed where no longer needed.
+2. Google Drive setup saves and reloads its configuration correctly.
+3. OAuth connection and callback handling work with the configured Google Cloud project.
+4. The authorized account can perform the intended file operations.
+5. Unauthorized users cannot access another wedding's files.
+6. Expired or revoked authorization produces a clear recovery path.
+7. Existing chat, albums, live streaming, wedding creation, themes, and other unrelated features remain intact.
+8. Type checks, relevant tests, and the production build pass.
+
+Report the exact files changed, required Google Cloud Console settings, required environment variables, and actual test results.
+
+Important: Do not simulate a successful Google Drive connection or claim uploads work without verifying them. If a credential or external configuration is missing, identify exactly what is needed and leave the integration in a clearly reported setup-pending state.
+
+Success criteria
+
+The app no longer depends on the Google Photos API setup, and a secure Google Drive API setup replaces it for the explicitly identified storage functions, without breaking unrelated Wedding Circle features.

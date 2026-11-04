@@ -1,0 +1,130 @@
+Complete Firebase Authentication Integration — The Wedding Circle
+
+The latest code inspection identified three remaining problems. Stop repeating diagnostics and implement the actual fixes.
+
+Use the latest updated source archive as the starting point. Inspect the relevant files, understand the existing architecture, and directly implement the changes.
+
+1. Unify Firebase configuration
+
+Currently, browser Firebase configuration in "cloud.server.ts" reads hosting variables or the separate "developer_cloud_public" settings instead of using the shared configuration resolver.
+
+Fix this.
+
+Requirements:
+
+- Use one shared Firebase configuration resolver.
+- Browser and server must resolve the same Firebase project.
+- Eliminate conflicting configuration sources and silent fallbacks.
+- Use the Firebase Web App configuration for browser initialization.
+- Use "FIREBASE_API_KEY" for the server-side Identity Toolkit requests where required.
+- Keep "FIREBASE_SERVICE_ACCOUNT_JSON" exclusively for Firebase Admin SDK credentials.
+- Preserve the existing "resolvedInfraEnv()" approach for server configuration.
+- Never expose service-account credentials or private keys to browser code.
+
+2. Implement actual Firebase registration and login
+
+The current "extra-screens.tsx" login flow still hashes passwords and checks the app's own account system.
+
+Replace this authentication path with actual Firebase Authentication.
+
+Implement:
+
+- Email/password registration using Firebase.
+- Email/password sign-in.
+- Sign-out.
+- Password reset.
+- Email verification sending.
+- Verification status refresh.
+- Appropriate loading, success and error states.
+- Persistent authenticated sessions.
+- Correct handling of expired or invalid sessions.
+
+Do not merely initialize Firebase. The actual registration and login buttons must call Firebase Authentication.
+
+3. Enforce email verification
+
+The current membership verifier reads the Firebase "email_verified" claim but does not enforce it.
+
+Implement:
+
+- Require a valid Firebase ID token.
+- Verify the token server-side.
+- Require "email_verified === true" before granting access to protected wedding features.
+- Return a clear verification-required response for unverified accounts.
+- Refresh the user's ID token after email verification.
+- Never trust a client-supplied verification flag.
+
+4. Preserve existing Supabase architecture
+
+This is critical.
+
+Supabase remains the database and wedding membership system.
+
+Do not:
+
+- Delete existing accounts.
+- Delete or recreate wedding memberships.
+- Replace Supabase with Firebase Firestore.
+- Break existing wedding IDs, invitations, roles or permissions.
+- Remove existing account data.
+- Create duplicate user records during login.
+- Automatically migrate or overwrite existing passwords.
+
+Establish a safe mapping between Firebase UIDs and existing Supabase users. Handle existing accounts and account linking carefully, with no destructive migration.
+
+Preserve existing wedding authorization and role checks after Firebase authentication.
+
+5. Security requirements
+
+- Keep service-account JSON server-only.
+- Never expose private keys or secret values in logs.
+- Verify ID tokens on protected server endpoints.
+- Prevent unauthorized access to another wedding's data.
+- Preserve existing Supabase Row Level Security.
+- Do not weaken authentication to make tests pass.
+- Do not bypass email verification.
+
+6. Testing — mandatory
+
+Test the actual implementation, not just configuration presence.
+
+Verify:
+
+1. Firebase browser initialization uses the shared configuration.
+2. New user registration creates a Firebase account.
+3. Login authenticates through Firebase.
+4. Verification email can be sent.
+5. Unverified users cannot access protected wedding features.
+6. Verified users can access authorized wedding features.
+7. Invalid and expired ID tokens are rejected.
+8. Logout invalidates the application session.
+9. Existing Supabase users and wedding memberships remain intact.
+10. Existing wedding permissions and roles still work.
+
+Run typecheck, relevant unit tests and production build.
+
+If real Firebase credentials or email access are required for an integration test, clearly distinguish tests actually performed from tests that remain unverified. Never claim a live test passed without performing it.
+
+7. Scope control and final report
+
+Do not modify unrelated features, UI themes, media storage, Cloudflare R2, RealtimeKit or livestream functionality.
+
+Before finishing:
+
+- Review every modified file.
+- Check for conflicting Firebase configuration paths.
+- Check that no old login path silently bypasses Firebase.
+- Check that all protected endpoints enforce server-side authentication.
+- Check for regressions in existing wedding membership.
+
+Deliver the implemented changes, not just recommendations or another inspection report.
+
+Report:
+
+- Files changed.
+- What was implemented.
+- Tests passed and failed.
+- Any remaining blockers.
+- Exact additional setup required from me, if any.
+
+Do not report completion until the code changes and verification are actually done.

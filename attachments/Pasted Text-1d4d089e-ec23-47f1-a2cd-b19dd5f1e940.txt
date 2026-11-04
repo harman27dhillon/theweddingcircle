@@ -1,0 +1,57 @@
+URGENT: WEDDING CIRCLE LANDING PAGE IS STILL LAGGY AFTER A PREVIOUS OPTIMIZATION ATTEMPT
+
+We already attempted to fix the Landing page latency once, but the problem remains. Do NOT repeat the previous generic optimization checklist, make random CSS changes, shorten the animation and call it fixed, or claim success without evidence.
+
+Your task is to investigate why the previous fix failed and identify the actual root cause in the current code.
+
+PHASE 1 — AUDIT THE PREVIOUS ATTEMPT
+Inspect the current Landing page implementation and the changes made during the previous optimization attempt. Determine which changes were actually applied, which are used by the rendered route, and whether the previous changes addressed the real bottleneck. Check for ineffective optimizations, changes made to unused components, regressions, and bottlenecks that were never investigated. Do not assume the previous changes worked merely because they compile.
+
+PHASE 2 — REPRODUCE AND LOCALIZE THE DELAY
+Trace the complete startup path from opening the app to seeing a usable Landing page. Separate these timings wherever the available tools permit:
+A. Initial page and route rendering.
+B. Authentication/session initialization.
+C. Fetching wedding card data.
+D. Loading visible cover images.
+E. JavaScript execution and component rendering.
+F. Entrance animation and transition effects.
+G. Time until taps and scrolling actually respond.
+
+Determine whether the delay is caused by the frontend, backend, database, network, image delivery, repeated renders, or a combination. Inspect real network requests, console errors, performance traces, loading indicators, and component behavior when available. Do not guess based on appearance alone.
+
+PHASE 3 — INVESTIGATE SPECIFIC FAILURE MODES
+Check for:
+- Requests firing multiple times because of effects, remounts, or unstable dependencies.
+- Sequential requests that unnecessarily wait for one another.
+- Authentication or session checks blocking the whole page.
+- Database queries retrieving excessive records or fields.
+- Images loading at full resolution instead of using suitable thumbnails.
+- Hidden images or backgrounds downloading unnecessarily.
+- Expensive blur filters, animation effects, synchronous work, and repeated layout calculations.
+- Infinite loading states, retry loops, polling, or requests that never resolve.
+- State updates causing the entire Landing page or every wedding card to re-render.
+- Cache problems, incorrect cache invalidation, or duplicate image downloads.
+- A slow backend or database query that frontend styling cannot solve.
+- The entrance animation hiding content or blocking interactions while the page is already rendered.
+
+PHASE 4 — FIX THE VERIFIED ROOT CAUSE
+Once evidence identifies the bottleneck, make the smallest effective changes to the actual files responsible. If several independent causes exist, fix each one. Do not rebuild the application or introduce unnecessary dependencies.
+
+The Landing page must render its layout and usable controls without waiting for every wedding card image. Prioritize visible images, lazy-load images below the fold, avoid redundant requests, and keep appropriate caching. Optimize database queries only when the evidence indicates they are contributing to the delay. Keep the iPhone-style animation on both Landing and wedding Home pages, but never let it delay rendering or user interaction.
+
+Preserve the BackgroundsN theme system, glass panels, square wedding cards, correct wedding cover associations, authentication, privacy, navigation, and all saved data. Do not remove features simply to make the page appear faster.
+
+PHASE 5 — VERIFY THE FIX
+Reproduce the original problem before and after the changes using the same conditions wherever possible. Measure the actual startup stages and time until the page becomes interactive if the environment supports it. Test both a cold opening and a subsequent opening. Check that visible wedding covers load correctly, the page responds to taps and swipes, and no console errors or duplicate requests remain.
+
+If the environment does not provide profiling or network inspection, say so explicitly. Do not invent timings, test results, or improvements. Use the strongest available evidence and identify what still needs real-device testing.
+
+MANDATORY FINAL REPORT:
+1. What was actually causing the latency?
+2. What evidence confirmed the cause?
+3. Why did the previous optimization attempt fail?
+4. Which actual files and code paths were changed?
+5. What before/after measurements or observable tests support the fix?
+6. What remains unresolved, if anything?
+
+Do not respond with another list of suggestions. Investigate the existing implementation, make the verified fix, and report the evidence. If you cannot access the required runtime or backend, identify the exact limitation rather than pretending the issue is resolved.

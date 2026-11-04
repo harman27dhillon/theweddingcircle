@@ -1,0 +1,143 @@
+FEATURE: DEVELOPER CONTROLS FOR WEDDING CARD ASPECT RATIOS AND PINNED CARD FULL-SCREEN MODE
+
+Implement these settings directly in the existing Wedding Circle project.
+
+IMPORTANT:
+The pinned wedding landing-page feature is already implemented. Extend the existing implementation instead of rebuilding it.
+
+This task is limited to developer controls for wedding-card dimensions and pinned-card display mode.
+
+Do not modify the theme system, Chat, Live, wedding creation, authentication, premium subscriptions, or unrelated features.
+
+PHASE 1 — DEVELOPER SETTINGS
+
+Add a section to the existing Developer Control panel named:
+
+"WEDDING CARD DISPLAY"
+
+Provide separate configuration groups:
+
+A. NORMAL LANDING-PAGE WEDDING CARDS
+
+Allow the authorized developer to select the aspect ratio of wedding cards shown on the normal landing page.
+
+Provide these options:
+- Portrait: 3:4
+- Tall Portrait: 9:16
+- Square: 1:1
+- Landscape: 4:3
+- Wide Landscape: 16:9
+
+If the existing architecture supports custom ratios safely, also allow a custom width-to-height ratio.
+
+Show a preview of the selected ratio before saving.
+
+Apply the setting to normal landing-page wedding cards only.
+
+B. PINNED WEDDING CARD
+
+Create a separate configuration group for the pinned wedding opening screen.
+
+Provide:
+- Pinned Card Aspect Ratio
+- Full-Screen Card: ON/OFF
+- Preview
+- Save Changes
+
+Use the same available aspect-ratio options, but store this setting separately from the normal landing-page card ratio.
+
+Changing the normal landing-page ratio must not change the pinned card ratio.
+
+Changing the pinned card ratio must not change normal landing-page cards.
+
+The Full-Screen Card option must control the pinned wedding presentation only.
+
+PHASE 2 — FULL-SCREEN PINNED CARD
+
+When Full-Screen Card is enabled:
+
+1. Expand the pinned wedding presentation to fill the available application viewport.
+2. Avoid unnecessary margins, oversized empty spaces, or a small card floating in the middle of the screen.
+3. Preserve the existing wedding cover image, couple's names, wedding details, and theme styling.
+4. Preserve existing Chat, Feed, Live, Album, and Enter Wedding shortcuts.
+5. Keep the pin/unpin control accessible in the top-left corner.
+6. Ensure important text and controls remain visible and accessible.
+7. Adapt the layout to the actual viewport and orientation.
+8. Do not stretch or distort photos, artwork, text, or decorative assets.
+9. Use appropriate cover cropping or responsive layout adjustments where necessary.
+10. Respect existing Android system insets and the app's navigation conventions.
+
+When Full-Screen Card is disabled:
+- Display the pinned card using its separately configured aspect ratio.
+- Preserve the existing pinned-page layout and navigation.
+- Do not change the normal landing-page card dimensions.
+
+Full-screen mode must remain an in-app presentation. Do not open an external browser or use Android system overlays.
+
+PHASE 3 — PERSISTENCE AND PERMISSIONS
+
+These are developer-level configuration settings.
+
+Requirements:
+- Only an authorized developer may modify them.
+- Do not grant developer permissions based only on a display name or client-side flag.
+- Reuse the project's existing trusted role and authorization mechanism.
+- Guests, hosts, and co-hosts must not gain access to developer-only settings unless the existing authorization policy explicitly grants them that capability.
+- Persist the settings using the existing project configuration or backend architecture.
+- Settings must survive refreshes and app restarts.
+- Do not overwrite wedding data or user preferences unrelated to card dimensions.
+- If saving fails, retain the previously saved configuration and show an accurate error.
+- Apply changes only after a successful save.
+- Do not confuse these global developer display settings with a user's personal pinned-wedding selection.
+
+PHASE 4 — PRESERVE EXISTING DESIGN AND FUNCTIONALITY
+
+Do not modify:
+- Existing wedding creation or wedding cards' data.
+- Wedding codes, invitations, or membership.
+- Theme selection and Apply Theme behavior.
+- The nine existing themes.
+- The pinned-wedding startup behavior.
+- Chat, Feed, Live, Album, or More functionality.
+- Authentication, premium eligibility, or payment systems.
+- Existing animations or shortcut functionality.
+
+The aspect-ratio changes must affect presentation, not wedding data or permissions.
+
+Keep card content readable at every supported ratio.
+
+For normal landing-page cards, preserve the existing card arrangement where possible. Adjust the responsive grid only when necessary to accommodate the selected ratio.
+
+For the pinned card, preserve direct entry into the wedding and the existing unpin behavior.
+
+PHASE 5 — TESTING
+
+Verify:
+
+1. Changing the normal landing-page ratio changes normal wedding cards.
+2. Changing the normal landing-page ratio does not change the pinned card.
+3. Changing the pinned-card ratio does not change normal landing-page cards.
+4. Enabling Full-Screen Card fills the available pinned-page viewport.
+5. Disabling Full-Screen Card restores the configured pinned-card presentation.
+6. Couple's names and wedding details remain readable.
+7. Images and decorations are not distorted.
+8. All existing wedding shortcuts continue to work.
+9. The pin/unpin control remains accessible.
+10. Settings persist after app restart.
+11. Unauthorized users cannot change developer settings.
+12. Portrait and landscape layouts remain usable.
+13. Existing theme styling and navigation remain intact.
+
+Do not claim a test passed unless it was actually performed. Distinguish code inspection from browser testing and physical-device testing.
+
+FINAL REPORT
+
+Explain:
+- Which developer controls were added.
+- Where the settings are stored.
+- How normal and pinned card ratios are kept independent.
+- How Full-Screen Card behaves.
+- Which tests were actually completed.
+- Any remaining limitations.
+
+Implement the changes in the existing project. Do not rewrite unrelated features.

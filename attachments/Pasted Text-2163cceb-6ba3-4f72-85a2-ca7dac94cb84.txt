@@ -1,0 +1,196 @@
+Wedding Circle — Compact Post Cards, Chat-Style Replies and Swipe Navigation
+
+Update my existing Wedding Circle app directly in the current project.
+
+Strict rules: Do not rebuild the app, reset existing data, remove existing functionality, or modify unrelated features. Inspect the current code and reuse the existing routing, database, authentication, and comment system wherever possible.
+
+PART 1 — Remove the Large Reply Section
+
+On the Feed page, remove the permanently visible, oversized Reply text input and Reply button currently displayed beneath each post.
+
+- Remove the large input completely.
+- Remove unnecessary empty space left behind.
+- Do not delete existing comments or replies.
+- Do not display a reply composer until the user taps Reply.
+
+PART 2 — Add a Small Reply Button
+
+Add a compact Reply button with a small reply-arrow icon beneath each post or comment.
+
+- Keep it aligned with the existing Delete, Report, and timestamp controls where appropriate.
+- Use minimal padding, subtle colors, and small text.
+- Do not use a large outlined button or full-width input.
+- When tapped, open a slim inline reply composer beneath the relevant post or comment.
+- Include a compact Send button and a cancel option.
+- Focus the input automatically when practical.
+
+Make the controls visually consistent with Wedding Circle's existing ivory and muted-rose theme.
+
+PART 3 — Implement Modern Chat-Style Replies
+
+Make replies work like replying to a specific message in modern messaging apps such as WhatsApp.
+
+When a user taps Reply:
+
+1. Show a compact quoted preview of the original post or comment.
+2. Display the original author's name.
+3. Display a short excerpt of the original message.
+4. Place the reply input directly beneath the quoted preview.
+5. Allow the user to cancel without submitting.
+
+Example layout:
+
+↳ Replying to Circle developer
+
+«yo»
+
+[Write a reply…] [Send]
+
+The quoted preview must be visually attached to the reply composer using a subtle vertical line, background tint, or similar treatment.
+
+After submission, display the reply beneath the correct parent post or comment. Show a subtle quotation preview or connecting indicator so users can understand which message the reply references.
+
+Do not merely add a visual quotation while storing every reply as an unrelated standalone post. Replies must reference the correct parent content in the existing data model.
+
+PART 4 — Support Replies to Individual Comments
+
+Allow users to reply directly to either a post or an individual comment.
+
+- Associate each reply with the correct parent post or comment.
+- Display replies beneath the correct parent.
+- Preserve author names, timestamps, and existing comment functionality.
+- Support nested replies if compatible with the existing implementation.
+- Avoid excessive indentation on mobile.
+- Ensure reply submission does not create duplicate comments.
+- Show a clear error if a reply fails to save.
+
+PART 5 — Make Feed Post Cards Smaller
+
+The current post cards take up too much vertical space.
+
+- Reduce unnecessary internal padding and vertical gaps.
+- Remove the permanent Reply input from every post.
+- Keep the author's name, post text, timestamps, and action controls readable.
+- Arrange Reply, Delete, and Report compactly.
+- Preserve existing information icons and privacy controls.
+- Avoid large blank areas within or between posts.
+- Keep rounded corners, subtle borders, and the current Wedding Circle design.
+- Ensure the layout works on narrow Android screens.
+
+The Feed should show more posts within the same screen height.
+
+PART 6 — Preserve Existing Posts and Privacy
+
+- Do not delete, overwrite, or reset existing posts, comments, replies, wedding data, accounts, or media.
+- Preserve the existing authentication and database implementation.
+- Maintain all bride-side and groom-side privacy restrictions.
+- Replies must inherit the appropriate access restrictions of their parent content.
+- Unauthorized users must not be able to view or reply to restricted posts or comments.
+- Do not weaken existing host, co-host, or guest permissions.
+- Do not expose private content through direct links or API requests.
+- Reuse existing database structures where possible. If a schema change is necessary, make a safe, backward-compatible migration instead of resetting data.
+
+PART 7 — Add Swipe Navigation Between the Five Main Sections
+
+The app currently has five main sections in the bottom navigation:
+
+1. Home
+2. Feed
+3. Live
+4. Album
+5. More
+
+Allow users to move between these sections by swiping horizontally across the screen.
+
+Navigation behavior
+
+- Swipe left to navigate to the next section.
+- Swipe right to navigate to the previous section.
+- Follow this exact order: Home → Feed → Live → Album → More.
+- Do not loop from More back to Home or from Home back to More.
+- At the first and last sections, ignore swipes that would go beyond the available sections.
+- Use smooth, natural horizontal transitions.
+- Avoid excessive animations or noticeable delays.
+
+Keep bottom navigation synchronized
+
+- When a swipe changes sections, automatically highlight the correct bottom navigation icon and label.
+- When a user taps a bottom navigation item, navigate normally to that section.
+- Tapping and swiping must use the same existing navigation state and routing system.
+- Do not create duplicate pages or separate navigation stacks for the same sections.
+
+Preserve section state
+
+When moving between sections, preserve state wherever practical, including:
+
+- Unsent Feed post drafts.
+- Unsent comment and reply drafts.
+- Feed scroll position.
+- Selected album content.
+- Selected wedding function and audience settings.
+- Active livestream sessions and their camera or audio state.
+
+Navigation must not reload the entire application, restart a livestream, submit a draft, or reset user data.
+
+PART 8 — Prevent Swipe Conflicts
+
+Swipe navigation must not interfere with normal interactions.
+
+- Vertical scrolling must continue to work naturally.
+- Ignore gestures that begin on text inputs, the Feed composer, reply inputs, dropdowns, sliders, drawing areas, or other interactive controls.
+- Do not interrupt camera controls, livestream interactions, or video players.
+- Preserve normal horizontal swiping inside the Album image gallery.
+- If a nested component handles its own horizontal gestures, allow that component to handle them instead of changing the main section.
+- Use a sensible minimum horizontal swipe distance and direction threshold to prevent accidental navigation.
+- Do not trigger section changes from small movements or primarily vertical gestures.
+- Avoid navigation when the user is typing or interacting with the keyboard.
+
+Implement swipe navigation using the existing framework and routing architecture.
+
+PART 9 — Mobile UI and Performance
+
+- Optimize the reply composer and swipe gestures for Android phones and other touch-enabled devices.
+- Keep controls easy to tap while remaining compact.
+- Avoid unnecessary rerenders or reinitialization of the camera and media streams.
+- Ensure the bottom navigation remains visible and functional.
+- Avoid scroll locking, layout jumps, and accidental gesture conflicts.
+- Maintain compatibility with the existing installed web app and supported mobile browsers.
+
+PART 10 — Strict Change-Scope Rules
+
+- Modify only the Feed post/reply UI and the main section navigation required by this prompt.
+- Do not redesign unrelated pages.
+- Do not remove the existing bottom navigation.
+- Do not modify the YouTube Live section or livestream implementation unnecessarily.
+- Do not change payment systems, authentication, or database architecture unless required for these changes.
+- Do not replace working features with static mockups.
+- Do not introduce fake comments, replies, or navigation behavior.
+- Do not claim a feature works unless it has been implemented and tested.
+
+PART 11 — Required Testing
+
+Replies and Feed
+
+1. The oversized permanent Reply input is removed.
+2. Each applicable post and comment has a compact Reply control.
+3. Tapping Reply opens a compact composer with the original message displayed as a quotation preview.
+4. Replies appear beneath the correct parent post or comment.
+5. Replies persist after refreshing the app.
+6. Duplicate replies are prevented.
+7. Post cards are visibly more compact.
+8. Existing comments, Delete, Report, timestamps, and privacy permissions continue working.
+9. Restricted content and its replies remain inaccessible to unauthorized users.
+
+Swipe navigation
+
+10. Swiping left moves through Home, Feed, Live, Album, and More in the correct order.
+11. Swiping right moves in reverse order.
+12. Swiping beyond Home or More does not loop around.
+13. The bottom navigation updates correctly after each swipe.
+14. Tapping bottom navigation items continues to work.
+15. Vertical scrolling and Album gallery gestures continue working.
+16. Typing in the Feed composer or a reply does not trigger section navigation.
+17. Active livestreams are not restarted or disconnected by section navigation.
+18. Unsent drafts and existing data are preserved wherever practical.
+
+Implement these changes directly in the existing Wedding Circle project. Inspect for errors and report which features were actually tested. If any requirement cannot be implemented with the current architecture, explain the specific limitation instead of simulating success.

@@ -1,0 +1,206 @@
+I want you to finish the Developer Center properly. Do NOT redesign the existing app and do NOT change any existing user-facing functionality.
+
+There are currently 3 major things missing:
+
+1. REAL PROJECT WORKSPACE CONNECTION
+2. REAL CODE EDITOR
+3. REAL TERMINAL / COMMAND EXECUTION
+
+Build all three together.
+
+━━━━━━━━━━━━━━━━━━━━━━
+1. CONNECT THE DEVELOPER CENTER TO THE ACTUAL PROJECT
+━━━━━━━━━━━━━━━━━━━━━━
+
+The Developer Center currently shows:
+
+"Not connected"
+"Project files are not writable from the published server."
+
+Fix this at the architecture level.
+
+The Developer Center must connect to the actual project source/workspace instead of displaying a simulated filesystem.
+
+I need:
+
+- Real project file access.
+- Read access to the existing source code.
+- Write access to the existing source code.
+- Create files.
+- Create folders.
+- Rename files/folders.
+- Delete files/folders.
+- Save modifications permanently.
+- Detect unsaved changes.
+- Refresh/reload the workspace.
+
+Do NOT fake this functionality.
+
+If the published Grok environment cannot directly access its own source filesystem, determine the smallest viable backend/workspace solution that can provide the Developer Center with a real writable workspace.
+
+The existing application must remain unchanged.
+
+━━━━━━━━━━━━━━━━━━━━━━
+2. REAL CODE EDITOR
+━━━━━━━━━━━━━━━━━━━━━━
+
+The Editor tab must become a genuine code editor.
+
+I need to be able to:
+
+- Browse the actual project files.
+- Open any source file.
+- Edit JavaScript/TypeScript/React/HTML/CSS/etc.
+- Syntax highlighting.
+- Line numbers.
+- Search within files.
+- Undo/redo.
+- Create new files.
+- Save files.
+- See modified/unsaved status.
+- Switch between multiple files.
+- Preserve the existing project's coding structure and formatting.
+
+The editor must modify the REAL project files.
+
+Do NOT create a fake text box that only stores code in browser state.
+
+━━━━━━━━━━━━━━━━━━━━━━
+3. REAL TERMINAL / COMMAND CENTER
+━━━━━━━━━━━━━━━━━━━━━━
+
+The Terminal tab must execute REAL commands against the connected project workspace.
+
+Examples:
+
+npm install
+npm test
+npm run build
+npm run dev
+git status
+git diff
+
+The terminal must show:
+
+- Actual stdout.
+- Actual stderr.
+- Exit code.
+- Running/completed/failed status.
+- Execution time.
+- Stop/Cancel button for running processes.
+- Command history.
+
+Do NOT simulate terminal output.
+
+Commands must execute against the same project workspace that the Editor modifies.
+
+Therefore this must work:
+
+EDIT FILE
+↓
+SAVE
+↓
+RUN COMMAND
+↓
+BUILD/TEST
+↓
+PREVIEW UPDATED APP
+
+━━━━━━━━━━━━━━━━━━━━━━
+4. LIVE PREVIEW
+━━━━━━━━━━━━━━━━━━━━━━
+
+The Preview tab must use the same project/workspace.
+
+After changes are saved and the project is rebuilt/restarted:
+
+- Refresh the preview.
+- Show the updated application.
+- Display build/runtime errors if something fails.
+
+Do not use a separate fake preview.
+
+━━━━━━━━━━━━━━━━━━━━━━
+5. AI TAB
+━━━━━━━━━━━━━━━━━━━━━━
+
+Keep the AI tab, but make AI optional.
+
+The AI must NOT be required for normal coding.
+
+I should be able to manually write code in Editor and execute it in Terminal.
+
+When AI is used, it should be able to:
+
+- Inspect relevant project files.
+- Understand the existing architecture.
+- Suggest code changes.
+- Show a diff before applying changes.
+- Apply approved changes to the actual project files.
+
+The AI should modify the existing project rather than regenerate the application.
+
+━━━━━━━━━━━━━━━━━━━━━━
+6. DEVELOPER-ONLY SECURITY
+━━━━━━━━━━━━━━━━━━━━━━
+
+Everything above must remain restricted to the existing Developer/Admin authentication.
+
+Normal users must NEVER have access to:
+
+- Project source files.
+- Terminal.
+- Command execution.
+- Filesystem operations.
+- Developer workspace.
+- AI code modification.
+
+If arbitrary commands are supported, run them in a secure isolated development workspace/container and prevent access to unrelated server data.
+
+━━━━━━━━━━━━━━━━━━━━━━
+7. IMPORTANT — DO NOT FAKE OR HIDE LIMITATIONS
+━━━━━━━━━━━━━━━━━━━━━━
+
+Do NOT simply remove the message:
+
+"Project files are not writable from the published server."
+
+Do NOT hide it with CSS.
+
+Do NOT hardcode fake files.
+
+Do NOT return fake terminal results.
+
+Do NOT pretend commands executed when they did not.
+
+If the current published Grok environment fundamentally prevents this functionality, explicitly determine what infrastructure is missing and implement the smallest possible backend/workspace layer that can provide it.
+
+━━━━━━━━━━━━━━━━━━━━━━
+8. DO NOT REBUILD MY APP
+━━━━━━━━━━━━━━━━━━━━━━
+
+This is extremely important.
+
+Do NOT recreate the application.
+
+Do NOT redesign the UI.
+
+Do NOT replace existing components unnecessarily.
+
+Do NOT change the existing wedding functionality.
+
+Do NOT change existing authentication, database, APIs, layouts, colors, buttons, navigation, or user-facing behavior.
+
+Modify only what is necessary to give the existing Developer Center genuine workspace, editor, terminal, build and preview capabilities.
+
+Before making architectural changes, inspect the existing project and reuse the current architecture wherever possible.
+
+FINAL TARGET:
+
+My Developer Center should function as a lightweight VS Code-style development environment INSIDE my existing app:
+
+Files → Edit Code → Save → Terminal → Build/Test → Preview
+
+And AI should be an optional coding assistant rather than the thing controlling the entire development environment.
+
+Most importantly, the Developer Center must operate on the REAL project/workspace, not a simulation.

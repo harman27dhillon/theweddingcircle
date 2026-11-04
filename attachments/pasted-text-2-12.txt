@@ -1,0 +1,72 @@
+Wedding Circle — Fix More Screen Interactions and Mobile Leaderboard UI
+
+Work on the existing Wedding Circle project. Diagnose and fix the actual implementation, not just the styling. Preserve all existing features and the current visual design except for the specific changes below.
+
+1. Critical: Fix the More screen interaction and scrolling bugs
+
+Currently, buttons inside the More section often respond only after multiple taps. After entering some of these sections, their controls appear frozen, and the page cannot scroll down.
+
+Inspect the actual root causes before making changes. Investigate:
+
+- Invisible overlays or decorative layers intercepting pointer and touch events.
+- Incorrect "z-index", "pointer-events", positioning, and stacking contexts.
+- Parent containers using "overflow: hidden", fixed heights, or incorrect scroll locking.
+- Nested scroll containers that prevent the intended page from scrolling.
+- Touch and click handlers firing twice, stale event handlers, or incorrect event propagation.
+- Loading states or invisible elements that leave buttons disabled.
+- Global touch handlers, swipe gestures, and navigation transitions interfering with taps.
+
+Required behaviour:
+
+- Every More tile responds to a single normal tap.
+- Every button, dropdown, checkbox, input, and action inside More sections is usable.
+- Users can scroll vertically through the complete contents of every More section on mobile and desktop.
+- Scrolling must work with touch gestures on mobile and a mouse wheel or trackpad on desktop.
+- Back navigation and switching between Home, Chat, Live, Albums, and More continue to work.
+- Repeated tapping must not be required.
+- No invisible element may block controls.
+- Do not fix this by disabling all touch events or removing existing overlays indiscriminately.
+
+Check Host Control, Background customization, Privacy, Ceremonies, Guests, Places, Services, Checklist, Planner, Invitations, and every other existing More destination. Fix the shared root cause wherever possible rather than adding isolated workarounds.
+
+2. Fix the mobile Leaderboard button
+
+In the supplied screenshot, the Leaderboard pill occupies too much horizontal space and the crown icon sits beside the text.
+
+Redesign only its mobile presentation:
+
+- Reduce its width and horizontal padding so it looks compact and balanced beside the Wedding Circle brand.
+- Put the crown icon above the word “Leaderboard,” centred as a small vertical icon-and-label arrangement.
+- Keep the label legible and avoid clipping.
+- Use a restrained ivory background, fine champagne-gold border, and subtle shadow consistent with the current wedding aesthetic.
+- Keep the three-dot menu visible and accessible.
+- Ensure the header fits narrow mobile screens without horizontal scrolling or overlap.
+- Keep the button easy to tap, with an appropriate touch target despite its smaller visual appearance.
+
+On desktop, retain the existing layout unless a minor adjustment is essential to prevent a regression. Do not remove or disable the Leaderboard feature.
+
+3. Preserve the rest of the application
+
+Do not change:
+
+- Wedding themes, cover images, floral decorations, or theme persistence.
+- Chat messages, chat composer, chat music, or sound-wave effects.
+- Live streaming, camera, albums, invitations, or wedding data.
+- Authentication, database configuration, or host permissions.
+- Existing button destinations, business logic, or navigation features.
+
+4. Test before finishing
+
+After implementing the fix:
+
+1. Open More and tap several different tiles once each.
+2. Scroll from the top to the bottom of multiple More sections.
+3. Test forms, dropdowns, toggles, save buttons, and back navigation.
+4. Verify that scrolling and tapping work on both mobile and desktop layouts.
+5. Verify the compact mobile Leaderboard button at narrow screen widths.
+6. Check that the desktop header and other navigation remain intact.
+7. Run the available type checks, tests, and production build.
+
+Do not report a test as passed unless it was actually run. Do not replace working components unnecessarily.
+
+Deliver the actual code changes in the existing project, then report the root cause found, files changed, and tests performed.

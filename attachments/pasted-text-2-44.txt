@@ -1,0 +1,64 @@
+Task: Add Firebase SMS Infrastructure Section + Phone OTP Integration
+Inspect the existing The Wedding Circle source code and implement the following changes directly.
+1. Create a separate SMS section in Developer → Infrastructure
+Add a dedicated section named Firebase SMS Authentication, separate from:
+• Firebase email authentication
+• Firebase email verification
+• Web Push Notifications / VAPID
+• Cloudflare infrastructure
+Use the existing premium Infrastructure UI design.
+Display:
+• Firebase Phone Authentication status
+• Firebase project connection status
+• SMS region configuration status, if verifiable
+• Authorized domain status, if verifiable
+• Phone OTP integration status
+• reCAPTCHA integration status
+• SMS verification test status
+• Clear diagnostic messages for configuration or implementation problems
+Do not show a successful status merely because Phone Authentication is enabled in Firebase Console. Distinguish console configuration from working application integration.
+2. Implement phone-number OTP verification
+Inspect the existing Firebase configuration and implement Firebase Phone Authentication using the official Firebase SDK.
+Required flow:
+• User enters their phone number with country code.
+• Validate the number.
+• Render and execute Firebase reCAPTCHA.
+• Send SMS verification code through Firebase.
+• User enters the received OTP.
+• Verify OTP with Firebase.
+• Update the user's verified phone status securely.
+• Synchronize the result with the existing application account.
+Support India's +91 country code and international numbers.
+3. Preserve existing architecture
+Critical restrictions:
+• Keep Better Auth as the existing authentication system.
+• Keep Supabase as the existing database.
+• Preserve existing Firebase email authentication and Google sign-in.
+• Do not create duplicate user accounts.
+• Do not change wedding ownership, membership, roles, or permissions.
+• Do not replace the existing login or registration flow without checking its current implementation.
+• Do not store OTP codes in frontend state or plaintext database records.
+• Do not expose Firebase Admin credentials or other secrets.
+Inspect how phone verification should be synchronized with the existing user record before implementing it.
+4. Infrastructure diagnostics
+Add a Test SMS Configuration action.
+It should:
+• Check Firebase client configuration.
+• Check Phone Authentication integration.
+• Check reCAPTCHA initialization.
+• Report whether the app can initiate an SMS verification request.
+• Clearly distinguish configuration errors, quota limits, and actual SMS delivery failures.
+Do not send SMS automatically during page loading or background diagnostics. Only send a test SMS after an explicit user action and phone-number confirmation.
+5. SMS quota and billing
+Firebase currently displays a warning that new projects have a daily SMS quota of 10 messages.
+Display this limitation clearly in the Infrastructure section where possible.
+Do not enable billing, change Firebase billing settings, or attempt to increase quotas automatically.
+6. Verification requirements
+Before reporting completion:
+• Inspect the actual source code.
+• Implement the changes.
+• Run TypeScript checks and production build.
+• Test the relevant authentication logic.
+• Report what is implemented, what passed testing, and what still requires a real phone/device test.
+Do not claim SMS delivery works unless a real SMS verification test confirms it.
+Important: This is a focused infrastructure and phone OTP task. Do not redesign unrelated sections, modify Cloudflare/CDN settings, change VAPID configuration, or touch unrelated authentication functionality.

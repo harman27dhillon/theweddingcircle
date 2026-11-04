@@ -1,0 +1,197 @@
+The Wedding Circle — Targeted Chat, Desktop Layout, Live Page & Mobile Performance Fixes
+
+Inspect the existing code, components, CSS, layout structure, and state management before making changes. Implement only the fixes listed below.
+
+Use the supplied screenshots as visual references for the existing desktop and mobile layouts. The goal is to fix the identified issues while preserving the current design, features, data, and behaviour everywhere else.
+
+1. Chat message bubbles — smooth curved tails
+
+Refine the existing chat message bubbles to achieve the appearance discussed in the reference screenshots.
+
+- Give each message bubble a smooth, sloping, curved tail that looks like a natural extension of the bubble and points directly toward the sender's profile picture.
+- The transition from the bubble body into its tail must be gradual and rounded.
+- Avoid sharp triangular tips, abrupt corners, detached-looking tails, or awkward gaps.
+- Align the tail correctly with the corresponding sender's avatar, accounting for different message lengths, text wrapping, and media messages.
+- Keep the profile avatar the same height as the message bubble or slightly smaller. Never make the avatar larger than the bubble.
+- Preserve the existing message alignment and layout.
+- Retain the existing peach floral wedding theme, delicate gold accents, white/cream incoming bubbles, and solid golden bride/groom bubbles.
+- Maintain readable text, adequate contrast, and responsive sizing across desktop and mobile.
+
+Do not redesign the entire chat interface. Make targeted changes to the existing bubble and avatar styling.
+
+2. Remove Heart, Joy, and Bless reaction buttons
+
+- Remove the Heart, Joy, and Bless reaction buttons displayed beneath individual chat messages.
+- Apply this consistently to text, photo, video, and voice messages wherever these controls appear.
+- Remove the unnecessary space left behind so messages remain visually compact.
+- Remove only the associated visible reaction controls and any functionality used exclusively by those controls, after checking for dependencies.
+- Preserve message content, timestamps in stored data, media, profiles, chat history, and unrelated functionality.
+- Do not remove other controls, including media downloads, message sending, or profile editing.
+
+3. Desktop profile editor — prevent overlap with top navigation
+
+The profile editor currently opens partly behind the desktop navigation bar. Its upper content is obscured, as shown in the supplied screenshot.
+
+Fix the underlying layout and positioning problem.
+
+- Position the profile editor below the appropriate desktop navigation/header area.
+- Keep the editor's top edge, introductory text, avatar, and upper fields visible.
+- Ensure the entire editor can be accessed even on short laptop screens and at different browser zoom levels.
+- If its content exceeds the available viewport height, make the editor content vertically scrollable.
+- Keep its save, cancel, and close controls accessible.
+- Correct any relevant positioning, stacking-context, fixed-header, or parent-overflow issues instead of relying solely on arbitrary z-index increases.
+- Keep the editor visually consistent with the current wedding theme.
+- Preserve all existing profile fields, validation, saving behaviour, and data.
+
+Do not change the mobile profile editor unless a shared implementation requires a carefully scoped fix. The existing mobile layout must remain intact.
+
+4. Desktop Live page — make all lower controls reachable
+
+The desktop Live panel does not scroll far enough to reveal the YouTube link option and other lower controls.
+
+Fix the Live panel's scrolling behaviour.
+
+- Make the Live panel vertically scrollable when its content exceeds the available height.
+- Ensure the YouTube link option and all existing lower controls can be reached without being clipped.
+- Correct restrictive fixed heights, overflow settings, nested scrolling problems, or other underlying layout constraints.
+- Keep the desktop shared navigation in its intended position.
+- Ensure the Live panel scrolls independently from the Chat panel.
+- Avoid making the entire application jump or unexpectedly scroll when the user interacts with the Live panel.
+- Preserve the existing Live features, YouTube linking functionality, camera controls, comments, and theme.
+
+Do not remove or replace the YouTube option as a workaround.
+
+5. Desktop navigation — keep the Chat header inside Chat
+
+The desktop layout currently shows the Chat-specific header in a way that makes it appear to be the main header across multiple pages.
+
+Correct the component structure and rendering logic.
+
+- Keep the shared desktop navigation containing Home, Chat, Live, Albums, and More in its intended position.
+- Render Chat-specific headers and controls only inside the Chat panel.
+- Do not display the Chat header as a common page header above Live, Albums, More, Home, or unrelated content.
+- Identify and fix the source of the misplaced or duplicated header instead of adding page-specific CSS patches that hide it.
+- Preserve the intended desktop two-panel arrangement, with Chat on the left and the selected secondary section on the right.
+- Keep both panels' content and scrolling independent.
+- Ensure switching the right-hand panel does not incorrectly replace or duplicate the Chat panel's own header.
+- Preserve the active-tab indicator and existing navigation behaviour.
+
+Keep the mobile navigation and mobile page layout unchanged, apart from the specific mobile performance fix described in Section 8.
+
+6. Desktop wedding Home page — correct ceremony-card flow
+
+On desktop, the couple's main wedding header is displayed in the left column while ceremony cards remain in the right column. As the user scrolls down, this leaves unnecessary empty space beneath the main header because the remaining ceremony cards stay confined to the right-hand column.
+
+Implement the intended responsive layout flow.
+
+Initial view
+
+- Keep the couple's main wedding header on the left.
+- Keep the first/top ceremony section on the right, parallel to the main header.
+- Preserve the current visual hierarchy, approximate sizing, theme, and alignment in the initial view.
+
+Content beneath the main header
+
+- Once the couple's main header ends, allow the remaining ceremony cards to begin immediately beneath it.
+- Arrange the remaining ceremony cards in a responsive horizontal row or grid that uses the available width below the main header.
+- Do not keep all remaining ceremony cards trapped in a separate right-hand column after the main header has ended.
+- Let cards flow naturally into the available space using a suitable grid or layout structure.
+- Avoid fixed coordinates, excessive absolute positioning, arbitrary margins, and fragile viewport-specific offsets.
+- Prevent overlapping cards, clipped content, unexpected column jumps, or unnecessary empty space.
+- Preserve the existing ceremony information, dates, times, locations, descriptions, directions, countdown, and styling.
+
+The layout should remain sensible across different desktop widths and heights. Keep the mobile Home page layout unchanged.
+
+7. Live page — centre Start Live inside the camera preview
+
+The Start Live control is currently positioned outside and below the preview area in some layouts. The intended appearance is shown in the supplied mobile screenshot: the Start Live button is centred within the large preview area.
+
+Correct its placement and state transitions.
+
+Before the stream starts
+
+- Place the Start Live button centrally inside the existing camera-preview area.
+- Centre it horizontally and vertically within the preview, not within the whole Live page.
+- Keep the preview's dimensions and surrounding Live page layout stable.
+- Preserve the existing wedding theme and button styling.
+- Ensure the button remains visible and usable on desktop and mobile.
+- Do not create a duplicate Start Live button outside the preview.
+
+Starting and stopping the stream
+
+- Use the existing live-stream startup flow and camera permissions.
+- Do not display a successful-live state or confirmation before the stream has actually started successfully.
+- After successful startup, show a brief drop-down notification reading “Live started” for approximately two seconds.
+- If startup fails or permission is denied, show the appropriate error and keep the state accurate.
+- When the stream is active, display a clearly red Stop Live button.
+- Ensure Stop Live stops the actual active stream and follows the existing confirmation behaviour where appropriate.
+- Restore the correct preview and button state after stopping.
+- Do not break spectator playback, comments, live history, or the existing streaming transport.
+
+Keep the Start Live control inside the preview throughout the idle state. Do not fix the problem merely by moving the button closer to the preview while leaving it outside.
+
+8. Mobile — eliminate bottom-navigation flicker when opening a wedding
+
+When opening a wedding on a phone, the bottom navigation bar takes a noticeable moment to settle and flickers during loading. The navigation should appear promptly and remain visually stable.
+
+Investigate the underlying cause before modifying the implementation. Check for issues such as delayed component mounting, changing layout dimensions, late theme initialization, conditional rendering, duplicated navigation instances, or loading-state transitions.
+
+Implement a targeted fix:
+
+- Render the bottom navigation shell immediately when the wedding interface is available.
+- Keep the navigation's height, position, background, and layout stable while wedding data loads.
+- Prevent the navigation from flashing, disappearing briefly, shifting vertically, or changing styles during initialization.
+- Avoid rendering two competing navigation bars during transitions.
+- Preserve the existing Home, Chat, Live, Album/Albums, and More navigation items, icons, active-tab styling, and tap behaviour.
+- Preserve the current premium wedding theme and supported theme colours.
+- Ensure the navigation remains correctly positioned above the phone's system navigation area and respects safe-area insets.
+- Prevent loading transitions from causing content to jump behind or over the bottom navigation.
+- Do not add an arbitrary delay or hide the flicker with a timer.
+- Do not bypass authentication, permissions, or required data-loading checks to make the interface appear faster.
+- Avoid unnecessary re-renders and duplicate event listeners if these are contributing to the flicker.
+
+The mobile navigation should feel immediate and stable when opening a wedding and when switching between sections.
+
+9. Preserve existing functionality and data
+
+These are targeted fixes, not a general redesign.
+
+- Inspect the existing implementation and identify the root cause of each issue before editing.
+- Make the smallest practical set of changes.
+- Preserve all wedding records, memberships, permissions, messages, media, profiles, themes, settings, and persistent backend state.
+- Do not reset, truncate, migrate, or replace databases.
+- Do not change database providers, authentication configuration, or live data-routing settings.
+- Do not remove existing functionality as a workaround for a layout or performance issue.
+- Avoid duplicate components, unnecessary dependencies, broad CSS overrides, and unrelated refactoring.
+- Keep mobile and desktop behaviour appropriately separated.
+- Preserve the current visual design except for the specific improvements described above.
+
+Explicit exclusions
+
+- Do not modify the Leaderboard's appearance, animation, numbering, or behaviour.
+- Do not introduce older, unrelated feature requests.
+- Do not redesign unrelated chat features or other wedding sections.
+- Do not generate placeholder data or replace real wedding data during testing.
+
+10. Test and report the results
+
+After making the changes, run relevant existing tests, type checks, lint checks, and build checks where available.
+
+Verify the following:
+
+1. The desktop profile editor opens fully below the navigation and remains usable on short screens.
+2. The desktop Live panel scrolls far enough to reveal the YouTube link option and all lower controls.
+3. The desktop Chat header appears only within Chat.
+4. The desktop Chat and Live panels scroll independently.
+5. The wedding Home page keeps its initial header/ceremony side-by-side arrangement and flows remaining ceremonies beneath the main header.
+6. Chat bubble tails have a smooth curved transition and point toward avatars of appropriate size.
+7. Heart, Joy, and Bless controls no longer appear beneath messages, without loss of message history or unrelated functionality.
+8. Start Live is centred inside the preview before streaming begins.
+9. Live-start success notifications appear only after successful startup, and Stop Live is red and stops the actual stream.
+10. The mobile bottom navigation appears promptly without flickering, shifting, or duplicated rendering.
+11. Existing mobile navigation and page layouts remain intact.
+12. No unrelated functionality, persistent data, or Leaderboard behaviour has changed.
+
+In the final report, list the root cause of each issue, the files changed, the checks actually run, their results, and any remaining problems. Be honest about anything that could not be tested. Do not claim a fix is verified unless it has actually been verified.
+
+Scope rule: Implement only the changes listed in this prompt. Preserve the existing application and its data. Do not make unrelated changes.

@@ -1,0 +1,134 @@
+The Wedding Circle — Fix Slow Theme Loading, Add Floating Apply Button, and Improve Swipe Smoothness
+
+Inspect the actual Wedding Circle codebase and implement all three improvements directly. These issues affect multiple themes and pages, not just Pastel Blush.
+
+Do not merely provide recommendations. Identify the root causes, make the code changes, and test the actual implementation.
+
+1. Fix slow theme loading across the entire application
+
+Currently, Pastel Blush loads very slowly, and switching between other themes and navigating through wedding pages also feels sluggish.
+
+Audit the complete theme system and identify what is causing the delays.
+
+Investigate
+
+- Whether theme changes trigger unnecessary full-page rerenders or component remounts.
+- Whether theme artwork, background images, fonts, decorative assets, or other resources load synchronously on every theme change.
+- Whether the app reloads theme configuration or downloads the same assets repeatedly.
+- Whether theme selection causes duplicate API requests, database reads, or unnecessary persistence operations.
+- Whether large CSS files, expensive visual effects, repeated animations, filters, shadows, or background rendering are blocking the main thread.
+- Whether theme changes trigger unnecessary work in Chat, Live, Album, Home, More, and Host Control.
+- Whether previous theme implementations contain duplicated rendering logic, excessive effects, or expensive theme-specific computations.
+- Whether asynchronous theme loading or state updates cause the previous theme to flash before the new theme appears.
+
+Implement the performance fixes
+
+- Optimize the shared theme architecture so changing a theme does not reload the entire wedding application.
+- Load only the assets needed by the active theme and the current screen.
+- Reuse already-loaded assets and cache suitable immutable resources instead of downloading them repeatedly.
+- Lazy-load nonessential decorative assets when appropriate.
+- Optimize large background images, fonts, and visual effects without degrading the premium appearance.
+- Avoid unnecessarily recreating theme objects, CSS styles, animation instances, and event listeners on every render.
+- Avoid redundant backend requests and persistence writes during theme previews and application.
+- Use efficient CSS variables or the existing theme-token architecture to update colors, backgrounds, borders, typography, and decorations.
+- Keep theme configuration and UI rendering synchronized so the old theme does not flash after selection.
+- Preserve the unique artwork and complete visual structure of every existing theme. Do not simplify themes into basic color changes merely to improve speed.
+- Ensure media, chat messages, the current navigation position, and other user state remain intact when applying a theme.
+
+Performance goal: switching to Pastel Blush or any other theme should feel immediate and smooth after its required assets have loaded. First-time asset loading should show a graceful transition instead of freezing or making the interface unresponsive.
+
+Do not introduce a new theme registry or parallel theme-loading system if the existing architecture can be fixed.
+
+2. Add a floating Apply button over the selected theme thumbnail
+
+In Host Settings → Theme selection, improve the theme-selection interaction.
+
+Required behavior
+
+- Keep all existing theme thumbnails and their current design.
+- When the user taps a theme thumbnail, select it as the pending choice and display a clearly visible floating Apply button over that selected thumbnail.
+- Position the button near the top of the selected thumbnail, within its boundaries, with sufficient contrast against both light and dark theme previews.
+- Use a premium design consistent with The Wedding Circle: a compact burgundy button with readable ivory text and a subtle champagne-gold border or accent.
+- The button must remain legible even when the thumbnail has a dark background, detailed artwork, or decorative elements.
+- Make the selected thumbnail visibly distinct from unselected thumbnails.
+- Keep the Apply button positioned correctly when the theme grid scrolls, the screen resizes, or the interface is viewed on a mobile phone.
+- Prevent the overlay from clipping outside the thumbnail or covering the most important preview details.
+
+Selection and Apply logic
+
+- Selecting a thumbnail must not immediately commit the theme.
+- Show the floating Apply button for the currently selected pending theme.
+- When the user taps Apply, apply the exact theme selected at that moment—not a previously selected theme.
+- Display the resulting theme consistently across the wedding pages.
+- Prevent older asynchronous save requests or stale React state from reverting the theme to an earlier selection.
+- While applying, provide subtle loading feedback and prevent accidental duplicate submissions.
+- After successful application, update the selected/applied indicator and persist the theme using the existing authoritative storage system.
+- If applying the theme fails, show an understandable error without silently reverting to another theme.
+- If the currently active theme is selected again, handle the interaction sensibly without unnecessary reloads or redundant asset downloads.
+
+Do not add Apply buttons to unrelated areas of the app. This floating button belongs specifically to the theme thumbnails in Host Settings.
+
+3. Improve swipe navigation and page-transition smoothness
+
+The swipe transitions between the five main wedding sections still need improvement:
+
+Home → Chat → Live → Album → More
+
+Audit the existing gesture handling and animation implementation before changing it.
+
+Swipe behavior
+
+- Make horizontal swiping feel smooth, responsive, and predictable on mobile.
+- Use consistent transition timing and easing across all five sections.
+- Preserve the intended swipe direction and the correct destination tab.
+- Prevent a swipe from jumping unexpectedly to the wrong page or returning to the previous page.
+- Avoid multiple simultaneous transitions, duplicate gesture handlers, and conflicts between swipe navigation and ordinary vertical scrolling.
+- Ensure horizontal swipes do not accidentally activate photo controls, chat messages, buttons, or Live controls.
+- Preserve ordinary vertical scrolling inside Chat, Album, Home, and other vertically scrollable sections.
+- Keep the bottom navigation tab indicator synchronized with the page reached by swiping.
+- Ensure taps on the bottom navigation and swipe gestures use the same navigation state.
+- Preserve the existing iPhone-like transition style and wedding-specific animations where they already exist.
+
+Rendering and animation performance
+
+- Avoid unmounting and remounting all five sections unnecessarily when switching tabs.
+- Preserve important state such as chat drafts, scroll position, album position, and active controls wherever appropriate.
+- Prefer efficient transform and opacity animations instead of expensive layout-triggering animations.
+- Avoid expensive blur, shadow, or decorative effects running continuously during transitions.
+- Ensure swipe gestures remain smooth even when a theme has complex backgrounds or decorative artwork.
+- Handle interrupted gestures, rapid repeated swipes, and slow devices gracefully.
+- Respect reduced-motion accessibility preferences.
+- Do not add unnecessary waiting periods or loading screens between pages.
+
+The goal is smooth, native-feeling navigation—not simply faster animation that causes content to disappear or skip.
+
+4. Preserve the existing product
+
+Do not remove or rename themes, change the artwork, modify wedding data, redesign unrelated pages, or change existing permissions and features.
+
+Preserve:
+
+- All existing themes and their unique designs.
+- Theme music and mute/unmute functionality, if already implemented.
+- Chat, Live streaming, Album, Host Control, and the bottom navigation.
+- Existing mobile and desktop layouts.
+- Authentication, backend persistence, storage integrations, and wedding memberships.
+
+Inspect the current implementation and adapt to its real architecture. Do not assume a specific file path or introduce a second animation or theme system unnecessarily.
+
+5. Test and report
+
+Test the actual app after implementing the changes.
+
+1. Open Host Settings, select different themes, and confirm the floating Apply button appears over the selected thumbnail.
+2. Apply Pastel Blush and other themes repeatedly; verify the correct theme always applies and does not revert.
+3. Navigate between all five sections using both swipes and bottom navigation.
+4. Test rapid swipes, interrupted swipes, vertical scrolling, and navigation after switching themes.
+5. Check that Chat drafts, album content, Live controls, and scroll positions are not unexpectedly lost.
+6. Test on mobile and desktop, including a lower-powered mobile device if available.
+7. Run the available production build, type checks, and relevant tests.
+8. Identify performance bottlenecks using available profiling tools rather than claiming improvements without evidence.
+
+At the end, report the root cause of the slow theme loading, the navigation fixes implemented, the files modified, and the test results. Distinguish verified improvements from any issues that remain.
+
+Deliver the actual implementation, not only an audit or proposed plan.

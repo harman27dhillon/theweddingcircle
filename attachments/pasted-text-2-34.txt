@@ -1,0 +1,41 @@
+Wedding Circle — Reduce Leaderboard Button Width
+
+The recently restored Leaderboard button is too wide on mobile.
+
+Inspect the current header component and adjust only the Leaderboard button.
+
+Required changes
+
+1. Reduce the current button width by approximately 15–20%.
+2. Make its width content-based rather than unnecessarily fixed.
+3. Slightly reduce the crown icon size.
+4. Slightly reduce the text size while keeping it clearly readable.
+5. Reduce the spacing between the crown and "Leaderboard".
+6. Keep the existing white pill-shaped background.
+7. Preserve the champagne-gold border, subtle glow and shimmer animation.
+8. Keep the crown and text vertically centred.
+
+Layout requirements
+
+- The button must fit naturally between the app title and three-dot menu.
+- Do not unnecessarily truncate or overlap the app title.
+- Keep the three-dot menu in its current position.
+- Maintain proper spacing on narrow Android screens.
+- Ensure the button remains comfortably tappable.
+
+Restrictions
+
+- Do not redesign the button.
+- Do not remove the crown or animation.
+- Do not change the header height.
+- Do not modify the wedding cards or other landing-page elements.
+- Inspect existing CSS and responsive rules before changing them.
+- Avoid adding fixed widths that break on other screen sizes.
+
+Verification
+
+Test on narrow and wider mobile screens and desktop.
+
+Confirm that the button is visibly narrower, the title has more room, and nothing overlaps.
+
+Do not deploy or publish without my approval.

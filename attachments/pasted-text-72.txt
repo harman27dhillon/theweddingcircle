@@ -1,0 +1,89 @@
+TASK: RESTORE THE OCTOBER 30, 2026 WEDDING CIRCLE UI
+
+We have identified that the recent layout changes happened because we mistakenly believed the original UI had been lost. We subsequently discovered that much of the visual problem was caused by Chrome caching.
+
+I now want the complete October 30 UI restored — specifically the latest design immediately before the October 30 morning layout edits (approximately 08:13 UTC).
+
+This is NOT a request to restore the older October 24 or October 25 project.
+
+PHASE 1 — REFERENCE INSPECTION
+
+Inspect:
+
+- chat-mic-on-desktop.png
+- chat-controls-mobile.png
+- Current shell.tsx
+- Current home-screen.tsx
+- Current styles.css
+- Current chat-voice.tsx
+- Existing page components, design tokens, themes and styling.
+
+Identify the original October 30 layout structure and visual styling.
+
+PHASE 2 — UI RECOVERY
+
+Reconstruct the original October 30 interface across all five sections:
+
+1. Home
+2. Chat
+3. Live
+4. Albums
+5. More
+
+Restore the original:
+
+- Page structure and spacing.
+- Navigation and header arrangements.
+- Wedding cover placement and backgrounds.
+- Chat header and floating voice controls.
+- Typography, colours, borders and visual hierarchy.
+- Mobile and desktop responsive arrangements.
+- Theme consistency.
+
+Use the surviving screenshots as authoritative references wherever applicable.
+
+For sections without sufficient historical screenshots, use existing component structure, design tokens and available visual references. Do not invent a different design.
+
+PHASE 3 — PROTECT EXISTING FEATURES
+
+Do not remove, replace or break:
+
+- Supabase integration.
+- LiveKit group voice.
+- Seek / Who Said game.
+- Whispers and polls.
+- Ceremony cover functionality.
+- Scene themes.
+- Existing authentication, wedding membership and database operations.
+
+Only modify the UI and layout code necessary for recovery.
+
+Do not revert the entire project to commit c65475d.
+Do not replace the newer application with an October 24 or October 25 version.
+Do not modify database migrations or production data.
+Do not remove working features to simplify the layout.
+
+PHASE 4 — TESTING
+
+Verify:
+
+- All five sections on mobile and desktop.
+- All nine wedding themes.
+- Chat controls and voice functionality.
+- Home and Chat cover-image rendering.
+- Navigation and existing interactions.
+- Production build and asset loading.
+
+Do not claim a successful recovery unless the actual build and visual checks pass.
+
+FINAL REPORT
+
+Tell me:
+
+1. Which files you modified.
+2. What layout was recovered.
+3. Which elements were reconstructed rather than exactly recovered.
+4. Whether any functionality was affected.
+5. Actual build and visual test results.
+
+Preserve the existing project and its newer features throughout this task.

@@ -1,0 +1,71 @@
+Add Affiliate API Credentials to Developer Section
+
+Extend the existing The Wedding Circle → Developer → Discover Bot Management section. This is an additive change only. Preserve all existing features, bot configurations, data, layouts, and integrations.
+
+1. Create an Affiliate Credentials panel
+
+Add a clearly organized Affiliate & API Credentials panel inside the existing Developer section, with separate configuration fields for these services.
+
+Amazon India — Product Advertising API (PA-API)
+
+- Amazon PA-API Access Key
+- Amazon PA-API Secret Key
+- Amazon Partner Tag
+
+Flipkart Affiliate
+
+- Flipkart Affiliate ID
+- Flipkart Affiliate Token
+
+Meesho Catalog
+
+- Meesho Catalog Token
+
+Use password-style masked inputs for secret keys and tokens. Provide Show/Hide controls and a Save/Update action for each service. Never display saved secrets in plain text by default.
+
+2. Secure credential storage
+
+- Store secret credentials only in a trusted server-side secrets manager or secure server-side environment configuration.
+- Never store secret keys or tokens in browser local storage, session storage, client-readable database rows, frontend bundles, URLs, analytics, or logs.
+- The frontend must never receive the saved secret values again after submission.
+- After saving, show only a status such as Configured, Not configured, or Connection needs attention.
+- If the existing deployment cannot securely save secrets through its interface, provide a clear configuration method using server-side environment variables or an appropriate secrets manager. Do not pretend the credentials were saved.
+- Restrict access to authorized developers using server-side authorization checks, not merely hidden buttons.
+- Do not expose credentials to wedding hosts, co-hosts, guests, ordinary users, or product discovery pages.
+
+3. Validation and connection testing
+
+For each service, provide:
+
+- A Save Credentials action.
+- A Test Connection action where the relevant official API supports a valid test.
+- A clear success or failure message.
+- Useful configuration guidance for missing credentials, invalid credentials, unsupported permissions, or unavailable APIs.
+
+Do not log submitted credentials, include them in error messages, or send them to third-party services except the intended authorized API.
+
+4. Connect credentials to the correct bots
+
+Use the saved credentials only for their respective integrations:
+
+- Amazon PA-API credentials → Amazon India Bridal Trends bot.
+- Flipkart Affiliate ID and token → Flipkart Bridal Trends bot, subject to the access and authentication requirements of the actual affiliate API.
+- Meesho Catalog token → Meesho Bridal Trends bot only if a valid, authorized catalog API or integration is available.
+
+The Bridal Dress Research and Bridal Jewellery Research bots should continue using their separately configured, permitted data sources.
+
+Do not assume that a credential alone grants API access. Verify the current API requirements, eligibility, permissions, supported endpoints, and affiliate-program terms before activating each integration. If a service does not provide an available or authorized API for the intended use, mark that connection as Unavailable / Additional access required rather than scraping restricted pages or fabricating results.
+
+5. Preserve existing functionality
+
+- Do not recreate the Discover Bot Management dashboard.
+- Add the credential panel to the existing dashboard.
+- Preserve existing bot schedules, keywords, product records, source attribution, ranking settings, and published Discover products.
+- Do not automatically migrate data, reset configurations, or activate an integration merely because credentials were entered.
+- Require explicit confirmation before enabling a newly configured integration.
+
+6. Verification
+
+Verify that credentials can be entered and securely submitted, saved status persists after reload, unauthorized users cannot access or modify credentials, and secrets never appear in frontend responses or logs.
+
+Report which credential fields were implemented, where the secrets are stored, and which integrations were genuinely tested successfully.

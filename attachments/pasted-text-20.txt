@@ -1,0 +1,89 @@
+The Wedding Circle — Fix Bottom Navigation Position and Restore Live Preview Design
+
+Make only the two changes described below. Inspect the existing implementation first, identify the root causes, make targeted changes, test them, and report the results. Do not repeatedly summarize the conversation instead of implementing the fixes.
+
+1. Correct the mobile bottom navigation bar position
+
+Actual issue
+
+On mobile, the bottom navigation bar is no longer positioned at its original, correct location. It sits too high above the bottom of the screen, leaving a noticeable black space between the navigation bar and the bottom of the display.
+
+The navigation bar should return to its original position at the bottom of the app, with no unintended black gap beneath it.
+
+Required solution
+
+- Inspect the bottom navigation component, its CSS, parent containers, positioning rules, viewport calculations, transforms, margins, padding, and safe-area handling.
+- Identify exactly what is moving the navigation bar away from its intended position.
+- Correct the positioning so the bar sits flush with the intended bottom edge of the app, eliminating the unwanted black space.
+- Account for Android system navigation and device safe-area behavior correctly. Do not blindly add or remove safe-area padding; determine whether the current implementation is applying it incorrectly or twice.
+- Keep the navigation bar fixed in its original position while users scroll through Home, Chat, Live, Albums, and More.
+- Ensure the navigation bar does not jump, shift, or change position when switching pages or opening a wedding.
+- Preserve the existing bar height, colors, icons, labels, spacing, styling, and five-tab layout.
+- Do not hide the Android system navigation controls or force the browser into fullscreen.
+- Do not redesign the wedding content or change the chat composer unless testing proves a separate change is necessary.
+
+Verification
+
+Test on mobile:
+
+- Open and reopen a wedding.
+- Check that the navigation bar sits at the correct bottom position with no unintended black gap.
+- Scroll through Home and Chat and switch between all five tabs.
+- Verify that the navigation bar remains correctly positioned and does not cover essential controls.
+
+2. Restore the original Live preview design
+
+Actual issue
+
+The Live page currently displays a separate Start Live button instead of the original centered plus-sign control inside the camera preview.
+
+Required solution
+
+- Restore the previous design: a circular "+" icon centered inside the existing Live camera preview, with the label Go Live directly underneath.
+- Remove the standalone Start Live button from the Live page.
+- Keep the plus-sign control inside the preview area, not below it, outside the card, or elsewhere on the page.
+- Preserve the existing preview dimensions, rounded corners, floral decorations, surrounding Live controls, comments area, and overall layout.
+- Ensure clicking the plus-sign control continues to invoke the existing camera/live-start flow. Do not make it decorative or break actual live-stream functionality.
+- Display the correct interface for each camera and streaming state. Never indicate that a live stream has started unless it has actually started.
+
+3. Fix incomplete theme application on the Live page
+
+Actual issue
+
+Wedding themes are not consistently applied throughout the Live page. Some elements retain the original colors and styling even after a different wedding theme is selected.
+
+Required solution
+
+- Inspect the existing theme system and identify Live page components using hardcoded colors, default styles, or theme values that fail to update.
+- Connect the Live page and its nested components to the existing active wedding theme.
+- Apply the selected theme consistently to:
+  - Live page background and surrounding surfaces.
+  - "Wedding Circle Live" header.
+  - Camera preview and surrounding card.
+  - Centered plus-sign and "Go Live" control.
+  - Borders, buttons, comment input, text, and supporting controls.
+  - Decorative elements wherever supported by the existing theme system.
+- Preserve each theme's intended colors, contrast, typography, and visual identity. Do not force all themes to use the default peach theme.
+- Ensure theme changes apply throughout the Live page, not just the wedding landing page or a few color tokens.
+- Preserve floral decorations where appropriate while respecting the selected theme.
+- Verify the existing themes, including light and dark themes. Reuse the current theme system rather than introducing duplicate theme logic.
+
+Safety constraints
+
+- Inspect the existing implementation before editing and make the smallest targeted changes.
+- Preserve all wedding records, user profiles, messages, media, memberships, host/co-host permissions, settings, and database state.
+- Do not reset, delete, migrate, or overwrite data.
+- Do not alter desktop navigation or unrelated desktop layouts.
+- Do not introduce a new navigation design, change the five tabs, or redesign other pages.
+- Run relevant build checks, type checks, and available tests.
+- Report any issue that remains unresolved honestly.
+
+Final report
+
+Briefly state:
+
+1. The root cause of the misplaced navigation bar and black gap, and what changed.
+2. Whether the original centered plus-sign Live preview control has been restored and tested.
+3. Which Live page theme components were fixed and which themes were verified.
+4. The files changed and tests/build checks completed.
+5. Any remaining issues.

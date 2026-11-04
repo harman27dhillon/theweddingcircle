@@ -1,0 +1,75 @@
+The Wedding Circle — Separate Developer Authentication and Restore Existing Developer Access
+
+Fix the current developer sign-in failure following the Firebase and Cloudflare infrastructure update.
+
+1. Keep Developer Login Separate
+
+Maintain two distinct authentication flows:
+
+Regular users
+
+- Use the application's normal registration and sign-in process.
+- Follow the configured email-verification requirements.
+- Use the existing password-reset and account-recovery flow.
+- Retain their normal user profiles and wedding memberships.
+
+Circle Developer
+
+- Use a separate developer login screen or dedicated developer login route.
+- Use the existing, verified developer credentials and developer identity.
+- Do not require the regular user's email-verification step for developer sign-in.
+- Do not force the developer through ordinary user registration.
+- Do not require creation of a duplicate ordinary user account just to access the developer section.
+- After successful authentication, load the developer's authorized permissions and open the developer area.
+
+2. Diagnose the Existing Login Failure
+
+Inspect the recent Firebase, backend, database and authentication changes.
+
+Determine whether the developer account is missing from Firebase, exists in the previous authentication system, or is failing during developer-profile or role lookup.
+
+Do not assume the account was deleted.
+
+Restore access using the existing developer identity and credentials wherever possible. Do not delete accounts, reset passwords, create duplicate accounts or change Firebase projects without first identifying the correct authentication source.
+
+3. Separate Authentication Without Breaking the Application
+
+Keep developer identity and authorization logically separate from ordinary user accounts.
+
+- Use a dedicated developer authentication provider or isolated developer identity store if the existing architecture supports it.
+- If Firebase is used for both flows, maintain distinct developer authorization and routing rather than incorrectly assuming that a separate screen requires a separate Firebase project.
+- Do not allow ordinary user registration to create a developer account.
+- Do not infer developer status from a display name, client-side flag, editable email field or URL parameter.
+- Keep developer-only APIs protected by server-side authorization.
+- Preserve existing ordinary user accounts, wedding records and permissions.
+
+4. Developer Verification Policy
+
+The developer must not be forced through the normal user's email-verification process.
+
+However, developer access must still require valid authentication, such as the existing developer password or another explicitly configured secure credential. Do not introduce a hardcoded password, public bypass, automatic developer login or unauthenticated access.
+
+If additional verification is genuinely required by the authentication provider or security configuration, report that limitation rather than silently bypassing it.
+
+5. Protect Developer Features
+
+Once signed in, the authorized developer must retain access to the existing developer controls, infrastructure configuration, appearance settings, voucher management and other authorized developer features.
+
+Verify that the developer's role is loaded correctly after sign-in and remains available after refreshing the application or restoring a valid session.
+
+Ordinary users and wedding hosts must not gain developer permissions.
+
+6. Test Before Declaring Success
+
+Test:
+
+- Existing developer sign-in without the regular user's email-verification requirement.
+- Incorrect developer credentials are rejected.
+- A normal user cannot sign in through the developer route to obtain developer privileges.
+- Developer controls and APIs remain protected.
+- Regular user registration, email verification, sign-in and password recovery continue working.
+- Existing wedding ownership, memberships and user data remain intact.
+
+Run the available tests and production build. Report the actual root cause, changes made and test results.
+
+Priority: restore the existing developer's access while keeping developer authentication separate from the ordinary user experience and preserving all existing data.

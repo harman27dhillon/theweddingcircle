@@ -1,0 +1,24 @@
+Add Automatic Ceremony Cover Images for Nikah, Anand Karaj, and Doli
+
+Integrate the three attached images as permanent, built-in default ceremony cover assets in The Wedding Circle.
+
+Image mapping — follow this order exactly:
+
+1. First image → Nikah
+2. Second image → Anand Karaj
+3. Third image → Doli
+
+Requirements:
+
+1. Automatically apply the corresponding image whenever a user adds the relevant ceremony, including recognized alternative spellings and culturally equivalent ceremony names.
+2. Apply these defaults to both Classic themes, consistently across existing and newly created weddings.
+3. Preserve each image's original composition, colors, and decorative details. Keep the left side suitable for text and the ceremony artwork recognizable on the right.
+4. Keep all ceremony text and interactive elements above the image layer, including the ceremony name, date, time, location, description, and Directions link. Text must never disappear behind the image.
+5. Use appropriate image positioning and a subtle readability gradient if needed. Do not excessively blur the image or distort its proportions.
+6. Store the images as permanent application assets rather than temporary upload URLs.
+7. Isolate each image and its configuration. Changing, dragging, or replacing one ceremony's cover must never affect another ceremony or theme.
+8. Preserve user-selected custom covers. Once a user chooses a custom image, do not silently overwrite it; provide an option to restore the default.
+9. Keep these defaults restricted to their matching ceremonies and the two Classic themes. Do not alter other ceremonies, themes, the overall wedding background, or unrelated features.
+10. Ensure the design works on mobile and desktop, with readable text, correct cropping, and existing rounded corners and typography preserved.
+
+Implementation and testing: Implement this in the actual application logic, not just a visual preview. Verify the three image mappings, automatic selection, both Classic themes, existing and new weddings, custom cover preservation, text layering, and image isolation before considering the task complete.

@@ -1,0 +1,101 @@
+WEDDING CIRCLE — FEATURE UPDATE: LIVE VIEWER, LEADERBOARD, CEREMONY EDITING, AND FEED UI
+
+Implement all eight changes directly in the existing Wedding Circle application. Inspect the real components and data models first. Preserve existing wedding data, permissions, styling, and working features. Do not create mockups, hardcode fake data, or claim success without testing.
+
+1. LIVE STREAM FULL-SCREEN VIEWING
+Spectators can see the live stream but have no option to open it full screen. Add a clear expand/full-screen control on the spectator's live video player. Tapping it should open an immersive player that uses as much available screen space as possible, supports portrait and landscape where appropriate, and provides an obvious close/restore control. Hide unnecessary page elements while in full screen. Preserve the live connection, audio/video playback, and stream state when entering or leaving full screen. Handle browser/WebView full-screen restrictions and orientation limitations gracefully. Do not restart the broadcast when expanding the player.
+
+2. INSTAGRAM-STYLE LIVE COMMENTS
+When a spectator sends a comment during a live stream, display it as an overlay inside the live video area, similar to Instagram Live. Show the sender's display name and comment text in a readable, semi-transparent overlay near the bottom of the video. New comments should appear promptly and stack vertically, with newer comments appearing below or near the latest visible comment. Fade older comments out after a reasonable period to keep the video unobstructed. Keep the existing comment input usable and synchronize comments for authorized participants using the existing backend/realtime infrastructure. Do not cover essential video controls, flood the screen, or persist duplicate comments. Preserve appropriate moderation and wedding privacy rules. If comments are already stored in a separate list, retain the underlying records and render a synchronized overlay rather than creating a disconnected fake chat.
+
+3. REMOVE THE DUPLICATE YOUR WEDDINGS SECTION
+On the official landing page, remove the redundant “Your weddings” section because the wedding cards are already displayed at the top. Remove only the duplicate section and its redundant heading/container. Preserve the existing wedding cards, their ordering, selection actions, permissions, and data. Reclaim the unused vertical space so the landing page feels cleaner. Do not remove the primary wedding list.
+
+4. RENAME MOST ACTIVE WEDDINGS TO LEADERBOARD
+Rename the existing “Most active weddings” section to “Leaderboard”. Retain the existing activity-based ranking logic if it is already implemented; do not invent activity counts or fake rankings.
+
+Display each ranked wedding with:
+- Its current rank number.
+- The wedding's actual selected cover photo as a small circular avatar/DP.
+- The wedding name and existing relevant activity information.
+- A compact, polished layout that works on mobile.
+
+Award distinctive crown treatments to the top three:
+- Rank 1: gold crown with subtle diamond accents.
+- Rank 2: silver crown.
+- Rank 3: bronze crown.
+
+Keep crowns small and tasteful, clearly distinguishable, and accessible. Other positions should show ordinary rank numbers without crowns. Load the actual cover associated with each wedding ID, use a neutral fallback if none is selected, and prevent one wedding's image from appearing on another wedding's row. Ensure the ranking is derived from genuine activity data. If no reliable activity metric exists, identify that gap instead of manufacturing scores.
+
+5. REMOVE FAMILY THREADS FROM THE WEDDING HOME PAGE
+Remove the “Family threads” button from the bottom action/tools area of the Home page inside an individual wedding. Remove only this visible button from that location. Do not delete the underlying family-thread feature, messages, data, or access routes unless separately required. Preserve family privacy and existing navigation.
+
+6. ADD CEREMONY EDITING FOR HOSTS AND CO-HOSTS
+On every ceremony card in the wedding Home page itinerary, add a compact Edit option visible only to authorized hosts and co-hosts.
+
+Authorized users must be able to:
+- Edit ceremony date and time.
+- Edit venue name, location, and directions/address fields that already exist.
+- Update other existing ceremony details supported by the current data model.
+- Remove a ceremony, with a confirmation step before deletion.
+
+Requirements:
+- Save edits to the real persistent data source and refresh the displayed itinerary after saving.
+- Validate required fields and show useful success or error feedback.
+- Keep ceremonies correctly associated with their wedding and preserve chronological ordering where appropriate.
+- Ensure guests cannot edit or delete ceremonies by manipulating the UI or making direct requests. Enforce permissions in the backend or existing authorization layer, not just by hiding the button.
+- Never delete a ceremony on a single accidental tap. Confirm destructive actions.
+- Preserve unrelated ceremony fields, comments, and other data when updating a record.
+- Do not introduce duplicate ceremony records or reset existing itineraries.
+
+7. FIX FEED IMAGE AND VIDEO SIZING
+Currently, a photo or video attached to a Feed chat/post can occupy nearly the entire chat area. Constrain inline media to a compact preview with a maximum displayed length of approximately one inch (about 96 CSS pixels) and a portrait 9:16 aspect ratio.
+
+Requirements:
+- Apply the same inline-preview rule to both photos and videos.
+- Use a consistent portrait frame with appropriate object-fit/object-position behavior. Do not stretch media or distort faces.
+- Keep the preview visually clear and tappable. If a video is selected, show a small play icon.
+- Tapping the preview should open the existing full-size image viewer or video player, where users can view the media at a larger size.
+- Keep the chat message, sender information, caption, replies, and surrounding messages visible without a large media item pushing them out of view.
+- Do not resize or recompress the original stored media merely to constrain its on-screen preview.
+- Preserve upload functionality, permissions, media URLs, and the correct wedding association.
+- On very narrow screens, maintain the compact portrait preview without horizontal overflow.
+
+8. SIMPLIFY FEED REPLY AND MESSAGE ACTIONS
+Hide the permanently visible Reply button under every Feed message and make the message composer/input bar slimmer.
+
+When a user opens the message's contextual action window, provide the available actions together:
+- Reply.
+- Delete, only when permitted by message ownership and existing policy.
+- Report, where supported.
+
+Requirements:
+- Open the contextual action window with the existing long-press interaction, or reuse the app's current message-action trigger if one already exists.
+- Do not show these action buttons permanently under every message.
+- Include a clearly visible close (X) button at the top of the contextual window.
+- Tapping X or tapping outside the window should dismiss it.
+- Selecting Reply should open the existing inline reply composer with the correct parent message and author context, then close the action window.
+- Selecting Delete should use the existing authorization rules and a confirmation step where appropriate.
+- Selecting Report should use the existing reporting flow.
+- Prevent accidental actions from ordinary scrolling, text selection, links, or media controls.
+- Keep the composer compact, responsive to the mobile keyboard, and usable with the existing send behavior.
+- Preserve reply threading, message ordering, persistence, and privacy restrictions.
+
+IMPLEMENTATION AND TESTING REQUIREMENTS
+
+First inspect the actual code paths and current implementation for Live playback, live comments, the landing page, activity ranking, ceremony records and permissions, Feed media rendering, and message-action menus.
+
+Implement the changes in the components currently used by the running application. Reuse existing backend services, data models, routes, and UI patterns wherever possible. Avoid duplicate components, hardcoded demo data, unnecessary dependencies, and unrelated refactoring.
+
+After implementing, verify:
+1. A spectator can enter and exit full-screen playback without losing the live stream.
+2. A spectator's live comment appears as an overlay for the intended participants.
+3. The duplicate Your weddings section is removed without removing the primary wedding list.
+4. Leaderboard entries show correct rankings, actual circular wedding cover images, and gold/silver/bronze crowns for positions 1–3.
+5. Family threads is absent from the wedding Home page tools area, while the underlying feature remains intact.
+6. Hosts and co-hosts can edit and remove ceremonies, while ordinary guests cannot.
+7. Feed photos and videos use compact 9:16 inline previews and open correctly when tapped.
+8. Reply, Delete, and Report are hidden by default and accessible through the contextual window with an X close button.
+9. Existing live state persistence, Album swipes, Feed delivery, bottom navigation, and wedding privacy remain functional.
+
+Do not stop at a successful typecheck or a visual mockup. Test the real rendered application and actual persistence where possible. For backend-dependent features, use separate authenticated sessions when needed. Report the actual files changed, tests performed, and anything blocked by unavailable credentials, services, or device capabilities. Never claim a feature passed without verifying it.

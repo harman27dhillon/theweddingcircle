@@ -1,0 +1,37 @@
+I am about to provide you with two code files that implement a redesigned Ceremony section for The Wedding Circle app.
+
+Your task is to integrate this code into my EXISTING project safely, not build a new application.
+
+Follow these instructions carefully:
+
+1. Inspect the existing project first. Identify the framework, current Wedding Home page, ceremony component, theme configuration, navigation system, event data structure, and existing CSS conventions.
+
+2. Scope the redesign exclusively to Pastel Blush. The new design must activate only when Pastel Blush is selected. All other eight themes must remain unchanged in appearance and functionality.
+
+3. Integrate, don't blindly replace. The provided "PastelBlushCeremonies.tsx" and "PastelBlushCeremonies.css" are reference implementations. Adapt them to the existing architecture. Do not replace the entire Wedding Home page or introduce duplicate headers, ceremony lists, or bottom navigation.
+
+4. Preserve existing functionality. Keep real ceremony data, dynamic event ordering, date and time formatting, directions links, event navigation, host/co-host permissions, theme switching, notifications, and existing backend integrations. Replace sample data with the real data source.
+
+5. Preserve shared components. Reuse the app's existing header and bottom navigation wherever possible. Do not break swipe navigation between Home, Chat, Live, Album, and More.
+
+6. Match the reference design. Implement the pastel blush background, premium serif headings, champagne-gold borders, floral corner decorations, featured “UP NEXT” ceremony card, ceremony-specific illustrations, elegant spacing, and responsive mobile layout.
+
+7. Check dependencies and styling conflicts. Reuse existing icon and animation libraries where available. Do not install unnecessary packages. Avoid global CSS changes and prevent styles from leaking into other themes.
+
+8. Improve the provided implementation where necessary. Correct any TypeScript errors, missing imports, data-type mismatches, responsive layout issues, or integration problems. Do not copy code mechanically if doing so would break the project.
+
+9. Optimize performance. Keep animations lightweight, support reduced-motion settings, avoid unnecessary rerenders, and ensure the ceremony list scrolls smoothly without covering the bottom navigation.
+
+10. Verify the result. Run the available build and type checks. Inspect the changes and confirm that all other themes and existing app features remain intact.
+
+Workflow:
+
+- First inspect the existing project and identify the exact files that need modification.
+- Then wait for me to provide the two code files.
+- After receiving them, integrate the implementation into the existing project and make the changes directly.
+- Do not overwrite unrelated files, delete existing functionality, or redesign other sections.
+- If an essential integration detail is unclear, ask me before making a risky change.
+
+When finished, report the files changed, what was integrated, whether the build passed, and any remaining issues.
+
+For now, inspect the project and wait for my code. Do not make any changes yet.

@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Wedding Circle",
+      "hasCanvas": false,
+      "bodyTextLen": 426,
+      "bodyTextHash": "51226ec913b627e4d86d8c528ef6e85f0e2d9c9599d2c6bbc6a238df31d13d3c",
+      "bodyTextPrefix": "The Wedding Circle + Create New Wedding Design your wedding spac",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Wedding Circle",
+      "hasCanvas": false,
+      "bodyTextLen": 300,
+      "bodyTextHash": "6f3c4c07d51a99be54a7c891f3a7540731ca3d392d7b40e850f8bc90671f60aa",
+      "bodyTextPrefix": "The Wedding Circle Leaderboard Create New Wedding Join a Wedding",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

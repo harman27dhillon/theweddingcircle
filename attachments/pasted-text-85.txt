@@ -1,0 +1,23 @@
+Critical diagnostic evidence from the actual mobile app:
+
+The upload error now explicitly identifies:
+
+"POST /api/infra/media returned no HTTP status (Failed to fetch)."
+
+The app itself reports: "The phone never reached the app server, so Cloudflare R2 was not asked to store this piece."
+
+This means the failure occurs before R2.
+
+Prioritize investigating the backend API connectivity:
+
+1. Inspect how the mobile client resolves its API base URL.
+2. Check whether "/api/infra/media" is being sent to the correct production backend origin or incorrectly to the frontend/static hosting origin.
+3. Verify that the production Express server is deployed, running, and serving "/api/infra/media".
+4. Inspect Vercel deployment configuration, rewrites, serverless routing, and environment variables.
+5. Test the exact endpoint from an external mobile network and inspect server logs.
+6. Check HTTPS, CORS, DNS, and browser fetch errors.
+7. Return a clear HTTP error with diagnostic details if the server is reachable but the route fails.
+
+Do not modify R2 credentials or bucket permissions. Do not rewrite the upload system unnecessarily.
+
+Fix the actual backend connectivity problem and verify that a phone request reaches the server before attempting an R2 upload. Then test a real image and confirm it appears in the private R2 bucket.

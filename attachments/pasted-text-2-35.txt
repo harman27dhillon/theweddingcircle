@@ -1,0 +1,23 @@
+Wedding Circle — Remove ANIMATION FROM LEADERBOARD Button.
+
+(Dont remove Button and its crown at all, dont change its size shape etc, just animation removal)
+
+The Leaderboard button's size and appearance are now corrected. However, there is still a small animation playing inside the button, which I do not want.
+
+Required change
+
+- Remove the internal ranking-number animation.
+- Remove the shimmer, moving numbers and any animated effects inside the button.
+- Keep the crown icon completely static.
+- Keep the "Leaderboard" text completely static.
+- Preserve the current white pill shape, dimensions, spacing, gold border and styling.
+- Preserve the existing tap interaction and subtle press feedback, if present.
+
+Restrictions
+
+- Do not redesign or resize the button.
+- Do not change the header or surrounding layout.
+- Remove only the unwanted internal animation.
+- Inspect existing animation CSS and components to ensure no animation remains active inside the button.
+
+Verify on mobile and desktop. Do not deploy or publish without my approval.

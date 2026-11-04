@@ -1,0 +1,159 @@
+Wedding Circle — Six Targeted Updates and Regression-Safe Fixes
+
+Work directly on the existing Wedding Circle project and implement the following six updates. These are targeted fixes, not a redesign.
+
+Critical constraint: Preserve all existing features, wedding data, routes, access controls, permissions, theme designs and working interactions. Do not replace existing components unnecessarily. Inspect the current implementation first, identify root causes, then make the smallest maintainable changes.
+
+1. Fix vertical scrolling on the wedding home page
+
+Bug: The wedding home page behaves like a fixed screen. Users cannot scroll down to view all ceremony cards and content.
+
+Requirements:
+
+- Identify the component or CSS rule preventing vertical scrolling.
+- Check fixed heights, "100vh" or "100dvh" constraints, "overflow: hidden", nested scroll containers, and desktop/mobile layout wrappers.
+- Allow the wedding home page to scroll vertically whenever its content exceeds the viewport.
+- Ensure all ceremonies, ceremony details, directions, and content below the initial screen remain reachable.
+- Preserve the existing horizontal navigation and any intentional horizontal swipe behavior between the main sections.
+- Keep the main navigation usable and avoid nested scrollbars where possible.
+- Handle mobile browser viewport changes, including the on-screen keyboard and browser chrome.
+- Do not globally remove overflow restrictions that are intentionally required by Live, camera, chat, or other full-screen features.
+
+Acceptance test: On a phone and desktop, open a wedding with multiple ceremonies, scroll to the bottom, open ceremony details, and scroll back to the top. All content must remain accessible without breaking navigation.
+
+2. Remove the three landing-page desktop navigation buttons only
+
+On the desktop landing page, remove these three top navigation buttons:
+
+- Home
+- Discover
+- Leaderboard
+
+Important:
+
+- Remove only these buttons from the desktop landing-page top navigation.
+- Do not delete their pages, features, routes, data, components or functionality.
+- Keep Discover and Leaderboard accessible through their existing alternative entry points, including the mobile interface where applicable.
+- Do not remove the Home landing page itself.
+- Preserve the wedding creation flow, Join a Wedding flow, wedding cards, authentication, and all other landing-page content.
+- Ensure there is no awkward empty navigation bar or leftover spacing after removing the buttons.
+- Do not remove the separate Home, Chat, Live, Albums and More navigation inside an active wedding.
+
+3. Fix saved weddings remaining visible after sign-out
+
+Bug: After signing out on mobile or desktop, previously saved or created weddings remain visible even after refreshing.
+
+Expected behavior:
+
+- When a user signs out, immediately clear the authenticated user's wedding data from the current UI state and any user-specific client-side cache.
+- The signed-out landing page must show only the intended sample/demo wedding content, not the previous user's private or saved weddings.
+- Refreshing the page must not restore the previous user's wedding list.
+- On the next sign-in, load the authenticated user's weddings from the correct persistent database.
+- Ensure one user's wedding list cannot appear in another user's session, including on shared devices.
+- Clear relevant in-memory state, cached queries, persisted client stores and user-specific local/session storage entries where appropriate.
+- Do not delete the actual wedding records from the database during sign-out.
+- Do not indiscriminately erase unrelated preferences, theme settings, application configuration or data belonging to other users.
+- If a wedding is intentionally publicly discoverable, handle that through the existing public-discovery rules, not by exposing private saved-wedding lists.
+- Ensure the same behavior on desktop browsers, mobile browsers and installed/PWA sessions.
+
+Investigate the current authentication and database architecture before implementing this. Do not treat hiding cards visually as a security fix. All private wedding queries must still enforce the authenticated user's authorization.
+
+Acceptance test: Sign in, create or open a saved wedding, sign out, refresh, close and reopen the app, and confirm only the sample/demo wedding is shown. Sign in again and verify the correct user's saved weddings return.
+
+4. Improve the mobile Leaderboard button UI
+
+Upgrade the existing mobile Leaderboard entry point to look polished and consistent with Wedding Circle's premium wedding design.
+
+Design direction:
+
+- Refined editorial typography.
+- Elegant, balanced spacing and rounded surfaces.
+- Subtle champagne-gold detailing and tasteful use of the application's established visual language.
+- Clear distinction for the top three positions, using restrained crown or ranking treatments.
+- Proper alignment of wedding cover photos, wedding names and ranking information.
+- Clear pressed, selected, loading and empty states.
+- Readable text and accessible contrast in both supported light and dark appearances.
+- Responsive sizing for small and large phones.
+
+Requirements:
+
+- Keep the existing Leaderboard functionality, ranking calculations, data source, navigation and access rules.
+- Reuse existing leaderboard data and cover images.
+- Do not invent rankings or display placeholder scores as real data.
+- If no rankings are available, show an intentional empty state.
+- Do not change the desktop landing page to add the removed buttons back.
+- Avoid excessive animations or effects that affect scrolling or performance.
+
+5. Replace the short music clips with five proper wedding-atmosphere tracks
+
+Bug: Current chat music tracks last only two or three seconds.
+
+Create a shared library of exactly five distinct wedding-atmosphere music tracks, each approximately 3–4 minutes long. The music should suit a wedding environment rather than being selected solely according to the currently applied visual theme.
+
+Suggested musical directions:
+
+1. Gentle romantic instrumental with piano and strings.
+2. Warm Indian wedding ambience with subtle traditional instrumentation.
+3. Elegant celebratory instrumental suitable for guests chatting.
+4. Calm, dreamy background music for intimate wedding moments.
+5. Soft cinematic wedding instrumental with a gradual, graceful progression.
+
+Implementation requirements:
+
+- Inspect the existing music player, track assets, playback state and theme-to-track mapping.
+- Replace the current 2–3-second clips with five complete, properly licensed tracks that are actually long enough.
+- Prefer complete audio assets already available in the project or appropriately licensed audio that may legally be bundled or streamed.
+- Do not simply rename a short clip, artificially report a longer duration, or repeat a short clip to pretend it is a full-length composition.
+- Do not introduce copyrighted commercial songs without permission.
+- If suitable full-length audio assets are unavailable, report that limitation clearly rather than presenting placeholder clips as complete tracks.
+- Use these same five tracks across all existing visual themes. Remove the rule that restricts music to individual themes.
+- Assign the five tracks across themes according to their wedding atmosphere and intended mood, allowing each track to be associated with several themes if the existing UI needs a theme association. The music must remain available regardless of the selected visual theme.
+- Preserve existing music controls, including play/pause, mute, volume and track selection where available.
+- Avoid starting audio unexpectedly. Respect the user's explicit playback choice and browser autoplay restrictions.
+- Ensure track changes and repeated playback work without duplicate audio instances.
+- Keep playback state consistent with the existing app's intended behavior across navigation.
+- Handle loading errors and missing audio assets gracefully.
+
+Acceptance test: Verify that exactly five selectable tracks are available, inspect each real audio file's duration, and confirm playback continues beyond four seconds without stopping unexpectedly.
+
+6. Add subtle sound-wave animation around the four edges of the Chat screen
+
+Add a minimal decorative animation to the existing Chat page that activates when the speaker control is unmuted.
+
+Visual behavior:
+
+- Soft, elegant sound-wave pulses emerge inward from all four screen edges: top, bottom, left and right.
+- Keep the animation close to the outer edges, subtle and premium.
+- Use low-opacity strokes or restrained glow, with gentle continuous movement.
+- Coordinate the motion so it suggests ambient sound without distracting from conversations.
+- The animation must continue while the speaker is unmuted and stop promptly when the speaker is muted.
+- Do not add a full-screen overlay, a modal, a new control panel or large animated objects.
+
+Technical and accessibility requirements:
+
+- Attach the animation to the actual speaker mute/unmute state. Do not create an unrelated animation toggle.
+- The animation must be purely decorative and must never intercept clicks, taps, typing, scrolling or gestures.
+- Use "pointer-events: none" and appropriate stacking order so chat controls remain interactive.
+- Keep the composer, send button, message bubbles, replies, media controls and navigation above or independent from the animation.
+- Do not alter audio playback or microphone permissions just to display the animation.
+- Keep rendering lightweight and avoid excessive layout recalculation.
+- Stop or simplify animation when the Chat page is inactive or unmounted.
+- Respect "prefers-reduced-motion" by disabling or substantially reducing movement while preserving normal chat functionality.
+- Ensure the animation is responsive on mobile and desktop and does not introduce horizontal or vertical overflow.
+
+Acceptance test: Unmute the speaker and confirm subtle waves appear from all four edges. Type and send messages, scroll through chat, navigate away and back, then mute the speaker. The animation must never block interaction and must stop when muted.
+
+Final regression checks
+
+Before finishing:
+
+1. Review the existing implementation before editing.
+2. Run the available type checks, tests and production build.
+3. Verify the wedding home page scrolls on both mobile and desktop.
+4. Confirm only the three specified desktop landing-page buttons were removed.
+5. Test sign-out, refresh and sign-in with actual user-specific data.
+6. Verify all five audio assets are complete and their durations are real.
+7. Verify sound-wave animation responds to the speaker state and does not block the Chat UI.
+8. Confirm existing wedding themes, navigation, ceremony data, albums, live streaming, access permissions and database behavior remain intact.
+
+Make changes in the actual source files. Do not claim a fix is complete merely because the code compiles. Report the files changed, tests run, results, and any work that still requires actual browser or device testing.

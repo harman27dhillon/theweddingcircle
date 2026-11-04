@@ -1,0 +1,179 @@
+TASK: MAKE IPHONE-STYLE ANIMATIONS AND GLASSMORPHISM THE PERMANENT DEFAULT UI SYSTEM FOR THE WEDDING CIRCLE.
+
+I want The Wedding Circle to retain a premium, modern iPhone-inspired user experience, including smooth transitions, translucent glass panels, background blur, and fluid navigation.
+
+IMPORTANT DISTINCTION:
+The eight wedding themes control the wedding's visual identity, colors, typography, floral decorations, and ornamental styling.
+
+The iPhone-style animations, glassmorphism, interface behavior, and navigation transitions must remain the DEFAULT DESIGN SYSTEM across all eight themes.
+
+Changing a wedding theme must NOT remove, disable, or replace these effects.
+
+1. GLASSMORPHISM AS THE DEFAULT
+
+Apply a consistent glass-style design to suitable interface elements throughout the app:
+
+- Top header and account controls
+- Bottom navigation bar
+- Floating buttons and action controls
+- Chat composer and attachment menus
+- Chat message panels where appropriate
+- Modal windows and dialogs
+- Bottom sheets, dropdowns, and contextual menus
+- Live-stream controls and floating player controls
+- Album controls and media overlays
+- Host Control panels and settings windows
+- Loading indicators and transient notifications
+
+Use:
+- Translucent backgrounds
+- Background blur using backdrop-filter where supported
+- Subtle translucent borders
+- Soft, restrained shadows
+- Layered depth and gentle highlights
+- Carefully controlled transparency
+- Readable text and icons with sufficient contrast
+
+Do not make every component transparent. Important content cards, wedding artwork, text, and media should remain clear and legible.
+
+Apply glass effects where they improve the interface, not indiscriminately.
+
+2. IPHONE-INSPIRED ANIMATIONS
+
+Make the app feel fluid and responsive, inspired by iOS interface transitions without attempting to reproduce Apple's proprietary interface exactly.
+
+Implement smooth, consistent animations for:
+
+- Opening the app and entering a wedding
+- Landing-page transitions
+- Switching between Home, Chat, Live, Album, and More
+- Opening and closing modal windows
+- Opening dropdowns and bottom sheets
+- Expanding and minimizing the Live player
+- Selecting wedding cards and shortcut buttons
+- Pressing buttons and selecting navigation items
+- Opening media previews and returning to the previous screen
+
+Use appropriate combinations of:
+- Fade transitions
+- Smooth sliding transitions
+- Subtle scale transitions
+- Spring-like easing for selected interactions
+- Gentle opacity changes
+- Short, responsive micro-interactions
+
+Transitions should feel continuous and natural, not slow or excessively animated.
+
+Suggested timing:
+- Button feedback: 120–200 ms
+- Small menus and dialogs: 180–280 ms
+- Main navigation transitions: 220–350 ms
+- Larger page transitions: 250–400 ms
+
+Adjust timing when necessary to keep the interface responsive.
+
+3. PRESERVE THE EXISTING SWIPE AND NAVIGATION BEHAVIOR
+
+Keep all existing navigation functionality.
+
+- Preserve the current bottom navigation actions.
+- Preserve any existing swipe gestures between sections.
+- Avoid gesture conflicts with scrolling, the camera, media viewers, and live streams.
+- Do not introduce extra navigation layers or unnecessary loading screens.
+- Ensure transitions work on Android browsers, installed PWAs, and supported mobile devices.
+
+Use smooth transform and opacity animations where appropriate instead of unnecessarily re-rendering entire pages.
+
+4. ALL EIGHT THEMES MUST INHERIT THIS DEFAULT SYSTEM
+
+Keep the existing themes:
+
+1. Royal Burgundy
+2. Pastel Blush
+3. Sage Green
+4. Royal Blue
+5. Classic Ivory
+6. Midnight Emerald
+7. Terracotta Sunset
+8. Lavender Dream
+
+Each theme should define its own:
+- Color palette
+- Text and icon colors
+- Decorative accents
+- Borders and ornamental details
+- Wedding-card artwork and styling
+
+However, all eight themes must inherit the same default glassmorphism behavior, motion system, navigation transitions, and interaction principles.
+
+Theme changes must not reset animation settings or remove glass effects.
+
+Keep the ornate wedding-card shortcut buttons consistent with the established reference design. Adapt their colors and decorative accents to the selected theme without replacing their existing appearance with generic glass pills.
+
+5. IMPLEMENT A SHARED SYSTEM
+
+Inspect the current project before changing anything.
+
+Create or extend shared design tokens and reusable utilities for:
+- Glass panel styling
+- Blur intensity
+- Transparency
+- Border and shadow treatment
+- Transition durations
+- Animation easing
+- Button interaction feedback
+- Page transition behavior
+
+Reuse these shared styles across existing components rather than implementing unrelated animations and glass effects separately on every page.
+
+Keep the existing eight-theme configuration compatible with this system.
+
+Do not create duplicate theme systems or hard-code the same animation values throughout the application.
+
+6. PERFORMANCE AND ACCESSIBILITY
+
+- Keep animations smooth on mid-range Android phones.
+- Avoid excessive blur over large, continuously moving camera previews.
+- Avoid unnecessary animations during live streaming.
+- Use lightweight effects and respect available browser capabilities.
+- Provide readable fallback backgrounds if backdrop-filter is unsupported.
+- Maintain accessible contrast and visible focus states.
+- Respect the user's reduced-motion preference.
+- Prevent animations from blocking buttons or delaying user actions.
+- Avoid layout shifts and preserve scrolling behavior.
+
+7. PRESERVE EXISTING FUNCTIONALITY
+
+Do not redesign or remove working features.
+
+Preserve:
+- Wedding data and membership
+- Authentication and permissions
+- Chat and media functionality
+- Camera and live-stream behavior
+- Album and uploads
+- Host Control
+- Wedding-specific theme selection
+- Existing navigation and swipe behavior
+
+Make targeted changes to the shared styling and animation system.
+
+8. TESTING
+
+Verify:
+- Glass styling across all existing wedding sections
+- Navigation animations between all five main sections
+- Dialog, popup, and bottom-sheet transitions
+- All eight themes with glass effects enabled
+- Wedding theme persistence after refresh
+- Camera and live-stream performance
+- Android mobile responsiveness
+- Reduced-motion behavior
+- Fallback styling when background blur is unavailable
+
+Do not claim that animations work on every device unless tested.
+
+FINAL REQUIREMENT:
+The Wedding Circle must retain its smooth iPhone-inspired animations and glass-blur design as its permanent default interface behavior.
+
+The eight wedding themes should change the wedding's colors and decorative identity while preserving the shared animation system, glassmorphism, interaction behavior, and navigation experience.

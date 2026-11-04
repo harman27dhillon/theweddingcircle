@@ -1,0 +1,19 @@
+Investigate the actual cause of delayed swipe navigation in the existing Wedding Circle app.
+
+Observed problem: In both directions, across Home, Feed, Live, Album and More, the old page remains visible briefly after a swipe before the destination page appears. Previous swipe refinements produced little noticeable improvement.
+
+Do not change swipe sensitivity blindly. Diagnose the delay in the actual implementation first.
+
+1. Trace the shared gesture handler from finger release through gesture recognition, navigation-state update, rendering and the first visible frame of the destination page.
+2. Add temporary performance timestamps or profiling instrumentation to measure each stage separately.
+3. Inspect the shared navigation function for timers, unnecessary awaits, promises, data-fetching dependencies, debounce logic and expensive synchronous operations.
+4. Determine whether the destination section is rendered only after an asynchronous operation or whether a long JavaScript task blocks the browser.
+5. Check whether every section change unnecessarily remounts the whole page, reinitializes components or repeats database and image requests.
+6. Inspect CSS transitions and animations to determine whether they contribute to the perceived delay.
+7. Fix the confirmed root cause. Update navigation state immediately after a valid gesture is recognized, then load destination content independently without blocking the initial visual response.
+8. Preserve the five-section order, boundary behavior, bottom-navigation taps, vertical scrolling, Feed drafts, nested horizontal gestures, privacy restrictions and active livestreams.
+9. Retest both swipe directions across multiple sections and report the measured timings before and after.
+
+Do not rebuild the app, replace the gesture system without evidence, or claim success merely because code was changed. If you cannot profile the running application, state that limitation and explain the next measurement needed.
+
+Keep instrumentation temporary or development-only, and remove it from the production build after verification.

@@ -1,0 +1,166 @@
+WEDDING CIRCLE — FIX INDEPENDENT SCROLLING AND INVESTIGATE THE RANDOM COUPLE PHOTOGRAPH
+
+Update the existing Wedding Circle application. I need two important fixes: the wedding Home page background must remain stationary while its information scrolls, and an unexplained couple photograph that keeps appearing across different weddings must be traced to its actual source and fixed.
+
+I WILL ATTACH A SCREENSHOT OF THE EXACT COUPLE PHOTOGRAPH. USE IT AS A VISUAL REFERENCE TO FIND THE MATCHING IMAGE IN THE ACTUAL PROJECT.
+
+Do not rebuild the application, create a separate mockup, reset wedding data, or change unrelated features. Implement the fixes in the real application code and verify them in the rendered mobile app.
+
+TASK 1 — Keep the Home page background stationary
+
+Currently, when I scroll through the Home page inside an individual wedding, the background and the wedding information move together. I want the information to scroll independently while the decorative page background stays stationary.
+
+Required behavior
+
+- Keep the decorative page background fixed within the visible app viewport.
+- Make the wedding information the vertically scrolling content layer.
+- The scrollable content must include the invitation card, couple names, ceremony itinerary, family information, and all other existing Home page content.
+- Keep the header and bottom navigation in their existing positions and preserve their current behavior.
+- The information must scroll smoothly over the stationary background without text becoming unreadable, cards getting clipped, or unwanted blank spaces appearing.
+- Respect mobile safe areas and the actual space available between the header and bottom navigation.
+- Maintain smooth touch scrolling on Android and iPhone.
+
+Implementation requirements
+
+1. Inspect the actual Home page component and determine which element owns the background and which element handles scrolling.
+2. Separate the decorative background layer from the scrollable information layer.
+3. Prefer a viewport-sized, fixed-position background layer with the correct stacking order and a separate vertically scrolling content container.
+4. Do not blindly rely on "background-attachment: fixed", which can behave inconsistently in mobile browsers and WebViews.
+5. Do not make the invitation card itself stationary. The invitation card and ceremony information must scroll normally; only the decorative page background stays fixed.
+6. Avoid creating competing vertical scroll containers or breaking existing swipe navigation between Home, Feed, Live, Album, and More.
+
+Verify the result
+
+- Scroll through several ceremonies and confirm the background remains stationary.
+- Confirm the invitation, ceremony cards, and family section scroll normally.
+- Confirm the header and bottom navigation remain usable.
+- Test on a narrow mobile viewport.
+- Check for scroll locking, flickering, blank areas, clipping, and accidental navigation.
+
+TASK 2 — Find the unexplained couple photograph using my screenshot
+
+The attached screenshot shows the exact photograph that keeps appearing on different weddings without my choosing it.
+
+The photograph depicts a couple during a Sikh wedding ceremony, with prominent red and gold clothing and a ceremonial setting.
+
+Your job is to find the matching photograph in the actual project's assets or data, identify why it is being reused, and fix the root cause. Do not simply replace or hide the photograph.
+
+Step A — Identify the matching image
+
+Use the attached screenshot as a visual reference.
+
+Search the actual project for:
+
+- Image files, bundled assets, public folders, and static resources.
+- Image filenames, URLs, storage keys, and image metadata.
+- Hardcoded image URLs and default cover-image constants.
+- Sample wedding cards, demo records, and placeholder content.
+- Database records and storage references associated with wedding IDs.
+- Components that render wedding cards or invitation covers.
+- Shared state variables or reusable components that may carry a cover from one wedding to another.
+- Local storage, session storage, persisted settings, and cached image-selection state.
+- Fallback logic that selects this photograph when a wedding has no cover.
+
+Do not search only by filename. The photograph might have an unrelated filename or a remote URL.
+
+Compare candidate assets against my screenshot using visual similarity, thumbnails, image previews, or metadata where available. If automatic visual matching is unavailable, inspect likely candidates manually.
+
+Step B — Trace why the photograph appears across different weddings
+
+Investigate whether the cause is:
+
+- A hardcoded default image.
+- A sample or demo wedding image accidentally being used in real weddings.
+- A shared global variable or component state.
+- An incorrect or missing wedding ID association.
+- A database query returning another wedding's cover.
+- A storage path shared across different weddings.
+- Cached data or stale component state.
+- A fallback that assigns the same photograph whenever a cover is missing.
+- Another issue discovered in the actual code.
+
+Trace the complete path from the source image to the component that displays it. Determine the actual root cause before changing the code.
+
+Step C — Fix the underlying problem
+
+Implement these rules:
+
+1. Every wedding must have an independent cover selection associated with its unique wedding ID.
+2. Selecting a cover for Wedding A must never change Wedding B's cover.
+3. Do not use a single mutable global cover variable or shared state to store selections for multiple weddings.
+4. Do not automatically assign the unexplained couple photograph to newly created weddings.
+5. When a wedding has no selected cover, display a neutral, attractive fallback, such as the existing champagne-and-rose gradient.
+6. Keep sample landing-page wedding cards separate from actual wedding cover settings. Sample data must never overwrite real wedding records.
+7. Preserve existing wedding-specific covers and other wedding data.
+8. Do not delete the original photograph or its asset during this investigation.
+9. Do not remove the photograph from a wedding where a host has legitimately selected it.
+10. If a cover is uploaded or selected by a host, persist that choice through the app's existing storage architecture and retrieve it using the correct wedding ID.
+
+The screenshot is a reference for locating the existing photograph. It is not permission to use that photograph as a default cover.
+
+TASK 3 — Report the exact source of the photograph
+
+After investigating, report where the photograph actually comes from.
+
+Depending on the evidence, identify:
+
+- Its exact asset filename and project path, if bundled.
+- Its actual URL or storage bucket and object key, if remotely stored.
+- Its database field and wedding association, if database-backed.
+- The component and code path responsible for displaying it.
+- The specific bug or configuration that caused it to appear across multiple weddings.
+
+Do not invent a filename, storage location, database field, or root cause.
+
+If the photograph cannot be located, explain exactly which assets, configuration, or data sources were inspected and what remains inaccessible. Do not claim an exact match unless you have verified it.
+
+Do not delete files, storage objects, or database records. Correct the unwanted reuse while preserving valid user-selected images.
+
+TASK 4 — Verify independent cover selection across weddings
+
+Test the following using the actual persistence mechanism:
+
+1. Open Wedding A and select a cover.
+2. Open Wedding B and select a different cover.
+3. Return to Wedding A and verify that its original cover remains unchanged.
+4. Refresh or reopen both weddings and verify that each selection persists.
+5. Open a wedding without a selected cover and verify that the neutral fallback appears.
+6. Confirm that the unexplained couple photograph is no longer assigned automatically.
+7. Confirm that sample wedding cards on the main landing page cannot overwrite real wedding covers.
+8. If possible, verify that two different user accounts cannot accidentally overwrite each other's wedding covers through shared state or incorrect record associations.
+
+Do not claim persistence is fixed based only on a temporary in-memory preview.
+
+TASK 5 — Preserve existing functionality
+
+Do not modify:
+
+- Couple names, wedding dates, locations, or religion/tradition settings.
+- Ceremony dates, timings, venues, directions, or notes.
+- Family information and privacy permissions.
+- The existing Change cover gallery or custom photo upload, except where needed to correct cover isolation.
+- Feed, Live, Album, More, or bottom navigation.
+- Existing swipe navigation between app sections.
+- Login, wedding membership, host/co-host permissions, or unrelated settings.
+
+FINAL IMPLEMENTATION AND VERIFICATION
+
+Work directly on the existing application.
+
+1. Identify the actual files and components involved.
+2. Implement the stationary background and independent scrolling.
+3. Trace the attached photograph to its real source.
+4. Fix the cross-wedding cover reuse at its root cause.
+5. Test the changes in the actual rendered mobile application.
+6. Check that existing wedding data and selected covers remain intact.
+7. Fix any regressions introduced by the update.
+
+At the end, provide a concise report containing:
+
+- Scrolling: What changed and whether the stationary background was verified.
+- Photograph source: The actual filename, URL, storage reference, or other verified source.
+- Root cause: Why the photograph appeared across different weddings.
+- Files changed: The actual files modified.
+- Tests: Which checks passed, which failed, and which could not be performed.
+
+Do not just provide recommendations or say the changes are complete. Implement the changes, verify what you can, and clearly disclose anything that remains unresolved.

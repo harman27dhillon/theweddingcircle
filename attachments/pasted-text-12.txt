@@ -1,0 +1,120 @@
+IMPLEMENT THE SUPABASE CUTOVER — COMPLETE THE ACTUAL INTEGRATION
+
+You are working on The Wedding Circle. Supabase is connected, its database connection has been tested successfully, and the five core wedding tables have been copied with matching row counts. However, live application traffic still uses Neon.
+
+Your task is to finish the implementation so Supabase becomes the active database for wedding data. Do not merely test, inspect, or write another migration report. Make the required code changes, deploy the schema, connect the application to Supabase, and complete the cutover once the mandatory safety checks pass.
+
+1. Preserve the existing application
+
+Before editing, inspect the actual code, current database adapters, schema, authentication, and migration implementation.
+
+- Make targeted changes to the existing architecture.
+- Preserve all existing UI, features, wedding access, accounts, memberships, permissions, settings, and user data.
+- Do not reset, truncate, or recreate existing databases or tables containing user data.
+- Do not remove or overwrite existing saved secrets.
+- Do not redesign unrelated parts of the application.
+- Do not create duplicate database adapters or parallel implementations when an existing one can be corrected.
+
+2. Use Supabase for persistent wedding data
+
+Implement and wire Supabase into the actual server-side application database layer.
+
+The following data must persist in Supabase and be used by the live application:
+
+- Wedding/circle records and their settings.
+- Wedding memberships and roles.
+- Family access codes and access permissions.
+- Ceremony invitations.
+- Couple access and associated permissions.
+- Chat messages and other wedding content currently stored in "circles.payload", including posts, notes, and related content.
+
+First inspect the actual schema and data-access code. Cover every relevant read, insert, update, delete, join, and authorization check. Do not update only the migration dashboard while leaving the website's real data-access functions on Neon.
+
+Use the existing Supabase PostgreSQL connection on the server. Keep the service-role key server-side only. Never expose database credentials or the service-role key to browser code.
+
+3. Keep unrelated services working
+
+Do not migrate unrelated data as part of this task.
+
+- Keep existing account sign-in and account/session management on Neon unless a separate, explicitly approved authentication migration is necessary.
+- Keep existing photo/video bytes, media libraries, Google Photos integration, and media URLs on their current storage systems.
+- Keep live-room state and live signaling on Neon for now.
+- Keep developer tools, discovery, affiliate, push, and other unrelated tables on their current database.
+- Do not break existing media references or wedding membership authorization.
+
+Where these services interact with wedding data, preserve their existing behavior and test the integration.
+
+4. Complete the database schema and data migration
+
+Use the existing migration framework and actual schema discovered in the codebase.
+
+1. Compare the source and destination schemas, including every required column, data type, default, primary key, unique constraint, foreign key, and index.
+2. Add missing Supabase schema objects through versioned, additive migrations.
+3. Correct any migration errors instead of merely reporting them.
+4. Preserve existing Supabase data and make copying safe to rerun.
+5. Copy and reconcile all relevant source records, including changes made since the earlier 14-row copy.
+6. Compare actual records and relevant fields, not just total row counts.
+7. Confirm foreign keys, permissions, row-level security, and required authorization behavior.
+
+Do not assume the five previously displayed tables are the entire application schema. Use the actual source schema and code.
+
+5. Make Supabase the live database
+
+Find the real routing switch or database adapter that currently sends wedding operations to Neon. Change the implementation so that, after migration and validation succeed, all designated wedding-data reads and writes use Supabase by default in production.
+
+- Remove the current default behavior that silently keeps wedding traffic on Neon.
+- Ensure the deployed production server reads the existing "SUPABASE_DB_URL" secret and uses the existing Supabase service-role key only where server-side operations require it.
+- Preserve Neon configuration and existing data for rollback.
+- Keep "DATABASE_URL" and other Neon-specific secrets unchanged.
+- Never substitute Neon credentials for Supabase credentials.
+- Do not claim a cutover occurred merely because a flag changed or a connection test succeeded.
+
+If the current runtime cannot access a required secret, fix the actual secret-to-server configuration or deployment wiring. Do not ask me to re-enter valid secrets unnecessarily, and never print secret values.
+
+6. Prevent lost writes and broken rollback
+
+Before switching traffic, implement a safe cutover procedure:
+
+- Ensure the latest source data has been reconciled.
+- Pause or coordinate wedding writes during the final synchronization.
+- Verify source and destination records and fields.
+- Verify that the application can read and write the required data on Supabase.
+- Confirm that rollback will not silently hide writes made after cutover. Implement a safe reverse-sync or another genuinely loss-preventing rollback procedure before offering rollback as safe.
+
+If a mandatory safety check fails, fix the underlying problem and retry. Do not bypass the check, falsely report success, or switch traffic with unverified data.
+
+7. Test the actual application, not just the database connection
+
+Run the relevant tests, type checks, and build. Add or update tests where necessary.
+
+Verify the following against Supabase:
+
+- Existing weddings load correctly.
+- Creating a wedding persists it after refresh and in a new browser session.
+- Updating wedding details persists correctly.
+- Memberships, roles, and access codes work.
+- Family/guest joining and invitations work.
+- Chat messages persist and reload correctly.
+- Existing permissions prevent unauthorized access.
+- Existing media and live features continue working.
+- The deployed application actually routes designated wedding-data operations to Supabase.
+
+Do not report a browser or production test as passed unless it was actually executed.
+
+8. Finish the task and report the real outcome
+
+Do not stop after generating SQL, displaying a migration checklist, or running another connection test.
+
+Complete every implementation step you can. Fix blockers in the code where possible. If an external action is genuinely required, explain the exact blocker and the single action needed from me.
+
+Your final report must state:
+
+1. Which files and database migrations were changed.
+2. Which data tables and operations now use Supabase.
+3. Whether the latest data was reconciled successfully.
+4. Whether production traffic was actually switched.
+5. Which create/read/update/join/chat tests passed.
+6. Whether rollback is genuinely safe.
+7. Any remaining blocker that prevented full activation.
+
+Success means the live application uses Supabase for the designated wedding data and persists real user changes—not merely that Supabase connects or that migration tests pass.

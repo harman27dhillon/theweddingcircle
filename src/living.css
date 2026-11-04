@@ -1,0 +1,220 @@
+.living-canvas {
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+}
+
+.living-fixed {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+}
+
+@media (min-width: 768px) {
+  .living-fixed {
+    left: 16.5rem;
+  }
+}
+
+.living-base,
+.living-pattern {
+  position: absolute;
+  inset: 0;
+}
+
+.living-classic .living-base { background: #f4efe8; }
+.living-ivory .living-base { background: linear-gradient(180deg, #f8f4ef, #f1e9e0); }
+.living-champagne .living-base { background: linear-gradient(165deg, #fbf6ec, #f3e6d2 60%, #ead9c2); }
+.living-pearl .living-base { background: radial-gradient(90% 70% at 15% 0%, #ffffff, #f3eee8 50%, #e6e0d8); }
+.living-silk .living-base { background: linear-gradient(120deg, #f7f2eb, #f4e6d8, #f8f3ec, #efe2d4); }
+.living-marble .living-base {
+  background:
+    radial-gradient(40% 30% at 20% 30%, rgba(255, 255, 255, 0.9), transparent 70%),
+    radial-gradient(30% 40% at 70% 60%, rgba(196, 184, 170, 0.35), transparent 70%),
+    linear-gradient(160deg, #f6f3ef, #e7e1da);
+}
+.living-cream .living-base { background: linear-gradient(180deg, #fbf6ee, #f6ead8); }
+.living-blush .living-base { background: linear-gradient(160deg, #fbf4f2, #f6e0e2 45%, #f3d5d4); }
+.living-petals .living-base { background: linear-gradient(180deg, #fbf6f4, #f6ebe6); }
+.living-bokeh .living-base { background: linear-gradient(180deg, #f7f1ec, #f3e4dc); }
+.living-hearts .living-base { background: linear-gradient(180deg, #fbf5f3, #f6e8e4); }
+.living-rosegold .living-base { background: linear-gradient(165deg, #fbf6f1, #f3e4d6); }
+.living-pink .living-base { background: linear-gradient(140deg, #fff5f6, #f8d5dc 50%, #f3e4d4); }
+.living-mehndi .living-base { background: #f6f1e8; }
+.living-mandala .living-base { background: #f7f1e6; }
+.living-phulkari .living-base { background: #f8f3ea; }
+.living-marigold .living-base { background: linear-gradient(180deg, #fbf6ea, #f6ead4); }
+.living-textile .living-base { background: #f6f0e6; }
+.living-paisley .living-base { background: #f7f2ea; }
+.living-leaves .living-base { background: linear-gradient(180deg, #f4f6ef, #e7eee2); }
+.living-blossom .living-base { background: linear-gradient(180deg, #fbf7f4, #f3e8e4); }
+.living-clouds .living-base { background: linear-gradient(180deg, #f7f5f2, #e7eef3 70%, #f6f1ea); }
+.living-rain .living-base { background: linear-gradient(180deg, #eef2f3, #e4ebe8); }
+.living-fireflies .living-base { background: linear-gradient(180deg, #1d2420, #243028); }
+.living-garden .living-base { background: linear-gradient(180deg, #f6f7f1, #e7f0e4); }
+.living-aurora .living-base { background: linear-gradient(120deg, #e7f3ef, #efe7f4, #f7efe4, #e5eef6); }
+.living-mesh .living-base { background: linear-gradient(135deg, #f6efe8, #e7eef2, #f3e4ea, #efe8d8); }
+.living-glass .living-base { background: linear-gradient(180deg, #f5f2ee, #ece7e2); }
+.living-geo .living-base { background: #f4efe8; }
+.living-field .living-base { background: linear-gradient(180deg, #f7f3ee, #efe6dc); }
+.living-starry .living-base { background: radial-gradient(80% 60% at 50% 0%, #3a3148, #16131c 70%); }
+
+.living-shift {
+  background-size: 180% 180%;
+}
+
+.living-mehndi .living-pattern {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(110, 90, 50, 0.16) 0 1px, transparent 1.6px) 0 0 / 28px 28px,
+    radial-gradient(circle at 70% 60%, rgba(140, 47, 57, 0.12) 0 1px, transparent 1.5px) 10px 12px / 36px 36px;
+  opacity: 0.9;
+}
+.living-mandala .living-pattern {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 42%, rgba(166, 132, 86, 0.18) 0 6deg, transparent 6deg 14deg),
+    radial-gradient(circle at 50% 42%, transparent 18%, rgba(166, 132, 86, 0.2) 19%, transparent 20%, transparent 34%, rgba(140, 47, 57, 0.12) 35%, transparent 36%);
+  opacity: 0.55;
+}
+.living-phulkari .living-pattern {
+  background:
+    linear-gradient(90deg, rgba(140, 47, 57, 0.1) 0 8px, transparent 8px 22px),
+    linear-gradient(rgba(166, 132, 86, 0.14) 0 8px, transparent 8px 22px);
+  background-size: 22px 22px;
+  opacity: 0.8;
+}
+.living-textile .living-pattern {
+  background:
+    repeating-linear-gradient(90deg, rgba(140, 47, 57, 0.08) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(0deg, rgba(166, 132, 86, 0.1) 0 2px, transparent 2px 10px);
+  opacity: 0.9;
+}
+.living-paisley .living-pattern {
+  background: radial-gradient(12px 18px at 20% 40%, rgba(140, 47, 57, 0.12), transparent 70%),
+    radial-gradient(10px 16px at 60% 70%, rgba(166, 132, 86, 0.16), transparent 70%),
+    radial-gradient(8px 14px at 80% 20%, rgba(110, 90, 50, 0.12), transparent 70%);
+  background-size: 120px 90px;
+  opacity: 0.9;
+}
+.living-geo .living-pattern {
+  background:
+    linear-gradient(rgba(140, 47, 57, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 47, 57, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.living-marigold .living-bit { filter: hue-rotate(55deg) saturate(1.5); }
+.living-mandala .living-bit { filter: sepia(1) saturate(5) hue-rotate(8deg); }
+.living-garden .living-bit { filter: hue-rotate(80deg); }
+
+.living-bit {
+  position: absolute;
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.living-cloud {
+  position: absolute;
+  width: 9rem;
+  height: 3.2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 2.2rem -0.8rem 0 -0.2rem rgba(255, 255, 255, 0.5);
+  opacity: 0.85;
+}
+
+.living-bit svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes living-fall {
+  from { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+  12% { opacity: 0.55; }
+  to { transform: translate3d(12px, 108vh, 0) rotate(28deg); opacity: 0.12; }
+}
+
+@keyframes living-glow {
+  0%, 100% { opacity: 0.12; transform: translate3d(0, 0, 0); }
+  50% { opacity: 0.7; transform: translate3d(6px, -8px, 0); }
+}
+
+@keyframes living-shift {
+  from { background-position: 0% 40%; }
+  to { background-position: 100% 60%; }
+}
+
+@keyframes living-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes living-cloud {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(36px, -8px, 0); }
+}
+
+.living-motion-subtle .living-fall { animation: living-fall 32s linear infinite; }
+.living-motion-motion .living-fall { animation: living-fall 18s linear infinite; }
+.living-motion-subtle .living-glow { animation: living-glow 7s ease-in-out infinite; }
+.living-motion-motion .living-glow { animation: living-glow 4.5s ease-in-out infinite; }
+.living-motion-subtle .living-shift { animation: living-shift 36s ease-in-out infinite alternate; }
+.living-motion-motion .living-shift { animation: living-shift 18s ease-in-out infinite alternate; }
+.living-motion-subtle .living-spin { animation: living-spin 90s linear infinite; }
+.living-motion-motion .living-spin { animation: living-spin 48s linear infinite; }
+.living-motion-subtle .living-cloud-drift { animation: living-cloud 42s ease-in-out infinite alternate; }
+.living-motion-motion .living-cloud-drift { animation: living-cloud 22s ease-in-out infinite alternate; }
+
+.living-dark-scope { color: #f6efe8; }
+.living-dark-scope .text-muted { color: #e4d6cc; }
+.living-dark-scope .bg-card,
+.living-dark-scope .bg-paper,
+.living-dark-scope .bg-ivory { color: #1c1412; }
+.living-dark-scope .bg-card .text-muted,
+.living-dark-scope .bg-paper .text-muted,
+.living-dark-scope .bg-ivory .text-muted { color: #7a6a62; }
+
+.feed-side-card { color: var(--feed-ink); }
+.living-dark-scope .feed-side-card,
+.living-dark-scope .feed-glass { color: var(--feed-ink, #1c1412); }
+.feed-side-card .text-muted,
+.living-dark-scope .feed-side-card .text-muted,
+.living-dark-scope .feed-glass .text-muted { color: color-mix(in srgb, var(--feed-ink, #1c1412) 68%, white); }
+
+.live-bar {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background-size: 180% 180%;
+  box-shadow: 0 8px 22px rgba(92, 58, 62, 0.08);
+}
+.live-bar-circle {
+  background-image: linear-gradient(110deg, rgba(244, 214, 214, 0.9), rgba(247, 232, 206, 0.82), rgba(230, 220, 242, 0.9));
+}
+.live-bar-youtube {
+  background-image: linear-gradient(110deg, rgba(255, 236, 214, 0.92), rgba(250, 214, 214, 0.78), rgba(255, 246, 230, 0.92));
+}
+@supports (backdrop-filter: blur(8px)) {
+  .live-bar { backdrop-filter: blur(14px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .live-bar { animation: live-shimmer 9s ease-in-out infinite alternate; }
+}
+@keyframes live-shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+@keyframes wc-float {
+  from { transform: translateY(8px); opacity: 1; }
+  to { transform: translateY(-140px); opacity: 0; }
+}
+.wc-float { animation: wc-float 1.6s ease-out forwards; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .living-fall,
+  .living-glow,
+  .living-shift,
+  .living-spin,
+  .living-cloud-drift,
+  .wc-float,
+  .live-bar {
+    animation: none;
+  }
+}

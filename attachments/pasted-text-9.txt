@@ -1,0 +1,54 @@
+The Wedding Circle — Fix Desktop Layout Properly
+
+The previous responsive update only enlarged the existing mobile layout. That is not an acceptable desktop layout. Fix the actual responsive structure, not merely element dimensions.
+
+1. Inspect before changing
+
+- Inspect the existing landing-page components, CSS, breakpoints, containers, grid/flex rules, and responsive styles.
+- Identify why the desktop viewport is still rendering the mobile-style single-column composition.
+- Make the smallest targeted changes needed to fix the layout.
+- Do not rebuild the page from scratch or introduce duplicate desktop components unnecessarily.
+
+2. Create a genuine desktop composition
+
+On desktop and wide laptop screens:
+
+- Use a centered, spacious content container with a sensible maximum width, approximately 1200–1400px.
+- Replace the narrow, vertically stacked mobile composition with a balanced multi-column layout.
+- Place the featured wedding card prominently in the main content area, without making it excessively tall.
+- Arrange the wedding card, Create New Wedding action, and Join a Wedding panel intelligently instead of stacking every element into one narrow column.
+- Place Discover and developer feedback in appropriate secondary sections, where space allows.
+- Use consistent alignment, spacing, margins, and typography throughout.
+- Keep the top navigation aligned across the desktop content width.
+- Prevent excessive empty space, oversized cards, stretched buttons, and awkwardly large gaps.
+- Preserve the existing premium wedding aesthetic, colours, borders, shadows, and typography.
+
+3. Responsive behaviour
+
+Implement real breakpoint-based layouts:
+
+- Mobile: preserve the existing compact, single-column experience.
+- Tablet: use an adaptive layout with sensible spacing and columns only where they fit.
+- Desktop: use a wider, balanced multi-column layout with appropriate card proportions and section placement.
+- Large desktop: increase available content width sensibly without stretching individual elements across the screen.
+
+Use CSS Grid and Flexbox where appropriate. Prefer "minmax()", "clamp()", sensible "max-width" values, and content-aware breakpoints rather than simply increasing fixed widths and heights.
+
+4. Important implementation rules
+
+- Do not change wedding data, database connections, authentication, storage, routes, permissions, or backend behaviour.
+- Do not change mobile styling except where necessary to prevent regressions.
+- Do not remove any existing landing-page features.
+- Do not solve this by merely increasing font sizes, card dimensions, or padding.
+- Avoid horizontal overflow, overlapping elements, and fixed widths that break intermediate screen sizes.
+- Reuse the existing components and design tokens wherever possible.
+
+5. Verify the actual result
+
+Test the landing page at representative viewport widths of 390px, 768px, 1024px, 1366px, and 1920px.
+
+Check the actual rendered layout at each width. Confirm that the desktop view has a visibly different, well-arranged composition from the mobile view, while mobile remains compact and usable.
+
+Report the files changed and explain what was corrected. Do not claim success based only on compilation or a successful deployment; verify the rendered page at desktop widths.
+
+Scope restriction: Fix only the responsive landing-page layout. Do not change anything else in the application.

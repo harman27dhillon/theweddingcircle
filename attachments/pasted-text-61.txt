@@ -1,0 +1,391 @@
+The Wedding Circle — Build “Who Said It?” Anonymous Chat Game
+
+Implement a fully functional interactive game called Who Said It? inside the existing Chat section of The Wedding Circle.
+
+This is a real-time multiplayer game for participants in the same wedding chat. Any participant can start a round, everyone can submit one anonymous statement, and only the person who started that round can guess who wrote each statement.
+
+Implement the complete feature, not just its UI. Inspect the existing React/Vite frontend, Express backend, database, authentication, wedding membership permissions and real-time chat system before making changes.
+
+Preserve all existing app functionality, wedding data, themes, navigation, chat history, permissions and visual design. Reuse the current infrastructure wherever possible. Do not create a separate application or replace the existing authentication or database.
+
+1. Floating Trophy Button in Chat
+
+Add the approved text-free burgundy-and-gold trophy icon as a small floating action button inside the Chat section.
+
+Position and appearance
+
+- Position it on the left side of the Chat screen, immediately above the existing “+” attachment button.
+- Keep it small and visually unobtrusive.
+- Use the approved trophy icon asset supplied for this feature.
+- Do not display the text “Who Said It?” beside the icon.
+- Add a subtle hover, focus and pressed state.
+- Provide an accessible label and tooltip: “Who Said It?”
+- Keep adequate spacing between the trophy button, the plus button, chat messages, message composer and mobile navigation.
+- Ensure the floating button remains correctly positioned when the chat scrolls or the keyboard opens.
+- Show it only in the relevant Chat interface, not on Home, Live, Albums or More.
+
+Tapping the trophy button opens the Who Said It? game panel and allows the participant to start a new round or see the current round's status.
+
+2. Anyone Can Start a Round
+
+Any authenticated participant with access to that wedding's Chat can start a new round.
+
+Do not restrict the start action to the wedding Host or Co-host. Do not require Circle Developer permissions.
+
+Starting a round
+
+When a participant taps the trophy button:
+
+- Open a compact, premium game panel or modal matching The Wedding Circle's burgundy, champagne-gold and ivory design.
+- Let the participant enter a short prompt or question.
+- Provide a Start Round button.
+- Show a clear one-minute countdown when the round begins.
+- Post a compact invitation/game card in the existing wedding Chat so participants know that a new round is active.
+
+Example prompts:
+
+- “Share a funny memory of the groom.”
+- “What is the bride's funniest habit?”
+- “Reveal a harmless secret about someone in this wedding.”
+- “Describe the couple in one sentence.”
+
+Allow custom prompts rather than limiting the feature to predefined questions.
+
+Prevent two rounds from starting simultaneously in the same wedding chat. If a round is already active, show its current phase and remaining time instead of creating another round.
+
+A different wedding may run its own independent round.
+
+3. Anonymous Statement Submission — 60 Seconds
+
+Once a round starts, all participants in that wedding's Chat can submit one short statement.
+
+Submission interface
+
+- Show the host's prompt, the remaining time and a compact text input.
+- Include a clear Submit button.
+- Limit each participant to one submitted statement per round.
+- Apply a sensible character limit, such as 200 characters.
+- Validate empty messages and reject submissions after the deadline.
+- Show the submitting user a private confirmation that their statement was received.
+- Do not show participants who has or has not submitted.
+
+Strict anonymity
+
+- Hide each statement's author from all participants during submission and guessing.
+- Do not include author IDs, email addresses, profile information or other identifying fields in the statement data returned to participants.
+- Store the actual author ID securely on the backend so the game can score guesses correctly.
+- Do not rely on frontend hiding alone to provide anonymity.
+- Ensure neither normal guests nor the round starter can retrieve author identities through API responses, database subscriptions, browser state or network requests before the reveal.
+
+The round starter may also submit a statement. If they do, include it in the game just like everyone else's submission.
+
+If the starter does not submit a statement, they can still play as the guesser.
+
+Deadline behavior
+
+The one-minute timer must use a server-authoritative deadline. Do not let refreshing the browser, changing the device clock or reconnecting extend the submission period.
+
+When the deadline arrives:
+
+- Automatically close submissions.
+- Reject any subsequent submission for that round.
+- Transition the round to the guessing phase.
+- Continue gracefully if a participant is offline.
+
+4. Automatic System-Bot Confession Card in Chat
+
+At the end of the submission minute, the system must automatically post a single compact Who Said It? game card inside the existing wedding Chat.
+
+This should be a system-generated chat message, not an ordinary message sent by a real user.
+
+Card contents
+
+- The game title and original prompt.
+- A numbered or clearly separated list of all submitted statements.
+- Statements shuffled into a random order.
+- The remaining guessing time.
+- The current game phase.
+
+Do not display author names, profile photos, usernames or any identifying metadata in this card before the reveal.
+
+Every participant in that wedding's Chat must see the same set of statements in the same order for that round.
+
+The game card must remain in chat history after the round finishes so participants can view the final result.
+
+Avoid flooding the chat with separate messages for each confession. One compact card containing all statements is required.
+
+If nobody submits a statement, close the round gracefully and show a helpful message rather than starting an empty guessing phase.
+
+5. Guessing Phase — 120 Seconds
+
+Only the participant who started the current round can submit or modify guesses.
+
+All other participants can view the game card and its countdown, but they cannot assign guesses or lock the starter's answers.
+
+Guessing interface
+
+- Start a two-minute countdown when the guessing phase begins.
+- Allow the starter to tap or click an individual anonymous statement.
+- When a statement is selected, open a compact dropdown, popover or modal containing the names of participants who submitted a statement in that round.
+- Allow the starter to select the person they believe wrote that statement.
+- Show the selected name next to that statement in the starter's private guessing interface.
+- Let the starter change a selection while the guessing period remains open.
+- Clearly distinguish statements that have been assigned a guess from those that remain unanswered.
+- Show progress, for example, “3 of 5 guesses completed.”
+
+Eligible authors
+
+The list of selectable authors must include only participants who actually submitted a statement for that round.
+
+Do not include people who merely viewed the chat or participated without submitting a statement.
+
+The starter can guess their own identity if they submitted a statement, because their identity must be treated like any other author for scoring.
+
+Multiple statements
+
+Do not assume each participant can author only one statement unless that is enforced by the one-submission-per-user rule.
+
+Each statement has exactly one true author. Guess assignments must be stored against individual statement IDs.
+
+A participant may be the selected guess for only one statement when the one-submission-per-user rule applies, but the system should still score each statement independently and correctly.
+
+Permissions
+
+- Only the round starter may save, update or lock guesses.
+- Enforce this permission on the backend.
+- Do not trust a client-provided starter ID or a frontend-only role check.
+- Reject attempts by other participants to submit guesses for the round.
+
+6. Early Completion — “Lock It” Button
+
+This is a critical part of the gameplay.
+
+When the starter has assigned a guess to every statement, show a small button labelled:
+
+Lock It
+
+Required behavior
+
+- Keep the button hidden or disabled until every statement has a selected author.
+- Show it only in the starter's guessing interface.
+- Place it unobtrusively near the guessing progress indicator or below the statement list.
+- Use a compact burgundy-and-gold button style consistent with The Wedding Circle.
+- When the starter taps Lock It, confirm that all guesses are complete, save the final selections and lock them immediately.
+- Transition straight to the results/reveal phase without waiting for the remaining two-minute countdown.
+- Immediately show the actual author for each statement, with correct/incorrect results.
+- Disable further guess editing once Lock It succeeds.
+- Ensure double-tapping or repeated requests cannot produce duplicate results or multiple score awards.
+
+The button must never unlock early if even one statement remains unanswered.
+
+The two-minute countdown remains the fallback deadline. If the starter has not completed every guess when the countdown reaches zero, automatically lock the guesses already submitted and mark all unanswered statements as Not guessed.
+
+Do not count unanswered statements as correct.
+
+7. Automatic Lock at the Two-Minute Deadline
+
+If the starter does not press Lock It, the server must automatically close guessing when the two-minute deadline expires.
+
+At that point:
+
+- Reject further guess modifications.
+- Lock all saved guesses.
+- Treat unassigned statements as unanswered.
+- Calculate the results.
+- Reveal the true authors to everyone in the wedding chat.
+- Ensure the game transitions only once, even if several clients trigger deadline checks simultaneously.
+
+The client countdown is a display only. The backend deadline and phase determine whether a guess can be accepted.
+
+8. Results and Reveal
+
+Once guesses are locked, publish the final results to everyone in that wedding's Chat.
+
+Visual design
+
+Present the result as a polished, compact chat-style game card.
+
+For each statement, display:
+
+- The statement itself.
+- The actual author's display name and, where appropriate, profile image.
+- The starter's selected guess.
+- A clear result indicator.
+
+Colors
+
+- Green: the guess matches the actual author.
+- Red: the guess is incorrect.
+- Neutral: no guess was submitted before the deadline.
+
+Use accessible contrast and avoid relying on color alone; include clear labels or icons for correct, incorrect and unanswered results.
+
+The actual author must only be revealed after guesses are locked. No participant should be able to force the reveal early through frontend manipulation or direct API calls.
+
+Score
+
+Calculate the starter's score using server-side logic:
+
+- One point for each correctly identified statement.
+- Zero points for incorrect guesses.
+- Zero points for unanswered statements.
+
+Display the result as, for example, “4 out of 6 correct.”
+
+Do not grant points based on client-provided scores. Avoid awarding points twice if the reveal request is repeated.
+
+The starter is the only person who guesses in this game mode, so the score belongs to that starter for the round. Do not award points to all chat participants merely for viewing the game.
+
+9. Multiple Rounds and Game History
+
+After the results are published:
+
+- Mark the round as completed.
+- Preserve the final game card and results in chat history.
+- Allow any participant to start a new round.
+- Keep each round's statements, author IDs, guesses, deadlines and results associated with its unique round ID.
+- Do not let a new round modify or overwrite the previous round.
+- Ensure old timers and subscriptions cannot affect a new round.
+
+Prevent accidental overlapping rounds within one wedding chat. Once a round is completed, a new one can begin normally.
+
+10. Real-Time Synchronization and Reconnection
+
+Use the existing application's real-time database or event mechanism wherever possible.
+
+Ensure that:
+
+- New rounds appear promptly for all wedding participants.
+- Statements are accepted and persisted securely.
+- The system-bot card appears consistently for everyone.
+- All clients show the same authoritative phase and remaining time.
+- Guess changes made by the starter persist.
+- Lock It and automatic timeout both lead to the same single results state.
+- Results become visible to everyone at the correct time.
+- Refreshing or reconnecting restores the correct round state.
+- No duplicate cards, statements, guesses or scores are created.
+
+Do not implement constant aggressive polling if the project already has suitable real-time subscriptions. Clean up listeners and timers when components unmount or a user leaves the chat.
+
+If the current infrastructure cannot support a required real-time operation, document the limitation and implement the best secure solution compatible with the existing architecture.
+
+11. Database and Backend Infrastructure
+
+Inspect the current database and backend before creating new tables or endpoints.
+
+Implement any required persistent records for:
+
+- Game rounds.
+- Starter account ID and wedding ID.
+- Prompt and authoritative phase.
+- Submission and guessing deadlines.
+- Statements and their private author IDs.
+- Guess assignments.
+- Locked status and final results.
+- Final score and reveal timestamp.
+
+Use unique IDs for rounds and statements.
+
+Use server-side authorization and transactional or otherwise concurrency-safe operations for:
+
+- Starting a round.
+- Accepting one submission per user.
+- Closing submission.
+- Saving guesses.
+- Locking guesses.
+- Publishing the reveal.
+- Awarding the final score.
+
+If using Supabase or another database with row-level security, add appropriate policies and ensure anonymous author identities cannot be read before reveal. If using a different database, implement equivalent server-side access controls.
+
+Never expose database service-role credentials in the frontend.
+
+Do not create a new database or replace the current provider unnecessarily.
+
+12. Security, Privacy and Moderation
+
+- Require an authenticated user who belongs to the relevant wedding.
+- Verify wedding membership on every protected game operation.
+- Prevent access to game records belonging to other weddings.
+- Validate prompt and statement lengths.
+- Sanitize rendered text to prevent script injection and unsafe HTML.
+- Add appropriate rate limiting and duplicate-request protection.
+- Never execute submitted text as code.
+- Keep anonymous author IDs private until reveal.
+- Do not expose private identity information through notifications, logs or frontend network responses.
+- Respect the app's existing blocking and moderation policies where applicable.
+
+The game should be playful and safe for wedding guests, without compromising account security or chat privacy.
+
+13. Visual and Responsive Requirements
+
+Use The Wedding Circle's existing premium design language:
+
+- Deep burgundy accents.
+- Champagne-gold details.
+- Ivory and blush surfaces.
+- Refined typography and restrained animations.
+- Compact chat-friendly cards.
+
+Keep the game usable on desktop and mobile, including Android Chrome.
+
+On mobile:
+
+- Ensure the floating trophy button does not overlap the plus button, message composer or keyboard.
+- Keep statement selection and author lists easy to tap.
+- Prevent popovers from being clipped by the screen edges.
+- Keep countdowns visible without taking over the chat screen.
+
+Do not redesign the existing Chat page or change unrelated chat behavior.
+
+14. Testing Requirements
+
+Add and run tests for the following cases:
+
+1. Any wedding participant can start a round.
+2. A non-starter can submit one statement but cannot submit a second.
+3. A participant cannot submit after the 60-second deadline.
+4. Statements are visible to all participants without author identities.
+5. The backend does not reveal author identities before guesses are locked.
+6. The system bot publishes exactly one combined card after the submission deadline.
+7. Only the round starter can submit or change guesses.
+8. Only actual submitters appear in the author-selection list.
+9. Lock It appears only when every statement has a selected author.
+10. Pressing Lock It reveals results immediately.
+11. Missing even one guess prevents early locking.
+12. The two-minute timeout locks incomplete guesses and marks missing answers correctly.
+13. Correct guesses are green and incorrect guesses are red, with accessible labels.
+14. The score is calculated correctly and cannot be awarded twice.
+15. Repeated requests cannot duplicate statements, results or score awards.
+16. Refreshing and reconnecting preserves the correct game state.
+17. Two weddings can run independent rounds without leaking data.
+18. The floating trophy icon appears only in Chat.
+19. Existing authentication, chat, wedding permissions and other app features continue to work.
+20. The production build and available type checks pass.
+
+Do not mark tests as passed unless they were actually executed. Do not replace real backend operations with mock success responses to make the feature appear functional.
+
+15. Implementation and Final Report
+
+Implement the complete feature directly in the existing project.
+
+Work in this order:
+
+1. Inspect the existing app and determine the correct database and real-time architecture.
+2. Build secure round and submission persistence.
+3. Implement server-authoritative timers and phase transitions.
+4. Implement guessing, Lock It and automatic reveal.
+5. Add the system-bot chat card and results display.
+6. Add the floating trophy button and responsive interface.
+7. Run tests, fix regressions and verify the production build.
+
+After implementation, report:
+
+- The files and database structures changed.
+- The APIs or real-time mechanisms implemented.
+- How anonymity is enforced before the reveal.
+- How Lock It and the automatic timeout work.
+- Which tests were actually run and their results.
+- Any configuration or deployment steps that remain.
+
+Final gameplay rule: One participant starts a round. Everyone can submit one anonymous statement during the first 60 seconds. The system posts all statements in one shuffled chat card. Only the starter guesses during the next 120 seconds. If every statement has a guess, Lock It ends the round immediately; otherwise, the timer automatically locks guesses at two minutes. The system then reveals the true authors and displays correct guesses in green and incorrect guesses in red.

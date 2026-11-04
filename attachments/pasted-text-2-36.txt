@@ -1,0 +1,129 @@
+The Wedding Circle — Recurring Chrome Browser UI Failure: Root-Cause Investigation & Permanent Fix
+
+Problem
+
+The Wedding Circle repeatedly suffers from layout disintegration and UI failures in Google Chrome.
+
+Observed behaviour:
+
+- The website layout breaks in normal Chrome.
+- Chrome Incognito generally works correctly (approximately 90%).
+- Clearing Chrome site data temporarily fixes the problem.
+- Sometimes clearing data causes an older version of the design to appear.
+- The issue has returned again after the latest application update.
+- The problem appears Chrome-specific.
+
+This is a recurring issue. I do not want another temporary workaround. I want the underlying cause identified and permanently fixed.
+
+1. Investigate the Existing Application
+
+Inspect the actual current source code and application behaviour.
+
+Identify why normal Chrome repeatedly loads or renders a broken UI.
+
+Investigate:
+
+- Service worker registration, lifecycle and update handling.
+- Cache Storage and outdated cached application shells.
+- Old HTML referencing outdated JavaScript or CSS bundles.
+- HTTP caching and Cache-Control headers.
+- Vite production asset loading.
+- Stale JavaScript and CSS chunks.
+- LocalStorage and IndexedDB compatibility after updates.
+- Old persisted UI settings and theme data.
+- CSS loading order and conflicting styles.
+- JavaScript runtime errors and failed component initialization.
+- Chrome-specific CSS, rendering and browser compatibility issues.
+- Race conditions during application startup.
+- Failed lazy-loaded components and dynamic imports.
+
+Do not assume the problem is caused by caching alone. Find evidence for the actual cause.
+
+2. Investigate Why Incognito Works
+
+Compare normal Chrome with Incognito.
+
+Determine:
+
+- Which cached files or stored values differ.
+- Whether an old service worker controls the normal browser session.
+- Whether outdated application assets are being loaded.
+- Whether existing local data conflicts with the latest code.
+- Whether Chrome extensions or browser-specific settings contribute.
+
+Identify the exact difference responsible for the failure.
+
+3. Fix the Root Cause
+
+Implement a permanent solution.
+
+Requirements:
+
+- Normal Chrome must consistently display the latest application UI.
+- Incognito and normal Chrome must load the same application version.
+- Old cached files must not override new deployments.
+- Service worker updates must activate and refresh safely.
+- Storage migrations must handle older data structures correctly.
+- Failed asset loading must recover gracefully.
+- Existing login sessions, wedding data, media and preferences must remain intact.
+- Users must not need to repeatedly clear browser data.
+
+Do not simply disable all caching or delete all browser storage.
+
+4. Protect the Existing Design
+
+This is a stability fix, not a redesign.
+
+Do not change:
+
+- Existing premium UI.
+- Themes and colour systems.
+- Layout dimensions and spacing.
+- Navigation and animations.
+- Wedding bars, chat, live, album or other features.
+
+Preserve the latest intended design exactly.
+
+5. Regression Testing
+
+Test:
+
+1. Normal Chrome with existing site data.
+2. Normal Chrome after an application update.
+3. Chrome Incognito.
+4. Normal Chrome after closing and reopening.
+5. Existing signed-in sessions.
+6. Repeat visits after deployment.
+
+Compare loaded asset versions, service worker state, console errors, failed network requests and storage state.
+
+Run typecheck, relevant tests and production build.
+
+If automated Chrome testing is available, use it. Otherwise provide a precise manual verification procedure.
+
+6. Strict Restrictions
+
+- Do not involve GitHub or Git setup.
+- Do not rebuild or redesign the application.
+- Do not remove features.
+- Do not force logout users.
+- Do not delete user data.
+- Do not use clearing all site data as the permanent fix.
+- Do not make unrelated changes.
+- Do not deploy or publish without my explicit approval.
+
+Final Report
+
+Tell me:
+
+1. The exact root cause.
+2. Why Incognito worked while normal Chrome failed.
+3. What recent update triggered the recurrence, if identifiable.
+4. Which files and components were fixed.
+5. What permanent solution was implemented.
+6. Actual test results.
+7. What remains unverified.
+
+Clearly distinguish implemented, tested and deployed.
+
+Final requirement: Do not declare success because the page works once after clearing cache. The fix must survive repeated visits, browser restarts and subsequent application updates in a normal Chrome profile.

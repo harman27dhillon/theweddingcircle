@@ -1,0 +1,355 @@
+IMPLEMENT THE 10 NEW WEDDING THEMES USING THE ORIGINAL ROYAL BURGUNDY DESIGN STRUCTURE
+
+Work directly in the existing The Wedding Circle codebase.
+
+The original Royal Burgundy and other original themes have a complete, premium wedding-card structure. The 10 newer themes must use that same level of structural detail, but each must have its own unique artistic design.
+
+Do not merely change colour variables. Do not create duplicate theme registrations. Inspect the existing Royal Burgundy implementation, its theme interface, CSS, background assets, decorative layers, and card-rendering components. Extend that implementation using the exact existing architecture.
+
+1. Add complete design definitions for these 10 existing/new themes
+
+Create the following configuration in the existing theme-definition file, adapting property names to the real interface already used by the application.
+
+The following TypeScript illustrates the required design information. Integrate it into the existing schema; do not replace the current theme registry or create a parallel theme system.
+
+export const NEW_WEDDING_THEME_DESIGNS = {
+  "butterfly-romance": {
+    name: "Butterfly Romance",
+    palette: {
+      background: "#FFF1F5",
+      surface: "#FFFAFC",
+      text: "#593548",
+      accent: "#C77A9A",
+      gold: "#D5B16C",
+      border: "#E9BFD0"
+    },
+    composition: {
+      backgroundStyle: "rose-garden-glow",
+      frameStyle: "delicate-champagne-frame",
+      ornamentStyle: "butterflies-and-blossoms",
+      typography: "romantic-editorial-serif",
+      coupleLayout: "left-aligned-editorial",
+      ampersandStyle: "gold-script",
+      dividerStyle: "butterfly-ornament",
+      shortcutStyle: "layered-rose-gold",
+      footerStyle: "elegant-bottom-row",
+      atmosphere: "soft-pink-glow"
+    },
+    motion: {
+      background: "slow-petal-drift",
+      ornament: "gentle-butterfly-float",
+      intensity: "subtle"
+    }
+  },
+
+  "moonlight-reverie": {
+    name: "Moonlight Reverie",
+    palette: {
+      background: "#10182F",
+      surface: "#1C2947",
+      text: "#F7F0E3",
+      accent: "#B8C5E0",
+      gold: "#D5C18A",
+      border: "#7E8EAE"
+    },
+    composition: {
+      backgroundStyle: "midnight-sky-and-moonlight",
+      frameStyle: "silver-champagne-double-frame",
+      ornamentStyle: "moon-stars-and-silver-florals",
+      typography: "cinematic-luxury-serif",
+      coupleLayout: "left-aligned-stacked",
+      ampersandStyle: "luminous-silver-script",
+      dividerStyle: "moon-and-stars",
+      shortcutStyle: "midnight-glass-and-silver",
+      footerStyle: "illuminated-bottom-row",
+      atmosphere: "soft-moonlight-and-bokeh"
+    },
+    motion: {
+      background: "slow-starlight-drift",
+      ornament: "subtle-twinkle",
+      intensity: "subtle"
+    }
+  },
+
+  "monsoon-romance": {
+    name: "Monsoon Romance",
+    palette: {
+      background: "#E9F1F0",
+      surface: "#F9FCFA",
+      text: "#294B50",
+      accent: "#568D8B",
+      gold: "#C5A66D",
+      border: "#A9C7C4"
+    },
+    composition: {
+      backgroundStyle: "misty-rainy-garden",
+      frameStyle: "mist-glass-and-champagne",
+      ornamentStyle: "rain-leaves-and-white-flowers",
+      typography: "soft-romantic-serif",
+      coupleLayout: "asymmetric-editorial",
+      ampersandStyle: "muted-gold-script",
+      dividerStyle: "flowing-water-ornament",
+      shortcutStyle: "mist-glass-teal",
+      footerStyle: "clean-bottom-row",
+      atmosphere: "soft-mist-and-rain-light"
+    },
+    motion: {
+      background: "gentle-rain-streaks",
+      ornament: "slow-water-ripple",
+      intensity: "subtle"
+    }
+  },
+
+  "anime-ever-after": {
+    name: "Anime Ever After",
+    palette: {
+      background: "#F4F0FF",
+      surface: "#FFFCFF",
+      text: "#453A68",
+      accent: "#9D85D4",
+      gold: "#D4B879",
+      border: "#D0C2F0"
+    },
+    composition: {
+      backgroundStyle: "dreamy-anime-sky",
+      frameStyle: "illustrated-luminous-frame",
+      ornamentStyle: "stars-clouds-and-cherry-blossoms",
+      typography: "storybook-display-serif",
+      coupleLayout: "cinematic-character-title",
+      ampersandStyle: "glowing-lavender-script",
+      dividerStyle: "starburst-and-blossom",
+      shortcutStyle: "illustrated-lavender-gold",
+      footerStyle: "storybook-bottom-row",
+      atmosphere: "pastel-sky-glow"
+    },
+    motion: {
+      background: "slow-cloud-drift",
+      ornament: "gentle-sparkle",
+      intensity: "subtle"
+    }
+  },
+
+  "royal-palace": {
+    name: "Royal Palace",
+    palette: {
+      background: "#2C1019",
+      surface: "#F8EEDB",
+      text: "#F8EEDB",
+      accent: "#BD9250",
+      gold: "#E6D0A3",
+      border: "#BD9250"
+    },
+    composition: {
+      backgroundStyle: "royal-palace-architecture",
+      frameStyle: "ornate-antique-gold",
+      ornamentStyle: "palace-arches-and-gold-filigree",
+      typography: "royal-calligraphy-and-serif",
+      coupleLayout: "grand-centered-editorial",
+      ampersandStyle: "antique-gold-calligraphy",
+      dividerStyle: "royal-filigree",
+      shortcutStyle: "burgundy-and-antique-gold",
+      footerStyle: "formal-ceremonial-bottom-row",
+      atmosphere: "warm-palace-light"
+    },
+    motion: {
+      background: "slow-gold-dust",
+      ornament: "subtle-light-sweep",
+      intensity: "subtle"
+    }
+  },
+
+  "heavens-embrace": {
+    name: "Heaven's Embrace",
+    palette: {
+      background: "#F0F6FF",
+      surface: "#FFFFFF",
+      text: "#41516C",
+      accent: "#9FB9DC",
+      gold: "#D6C28F",
+      border: "#D2DDEC"
+    },
+    composition: {
+      backgroundStyle: "luminous-cloudscape",
+      frameStyle: "pearl-and-champagne",
+      ornamentStyle: "white-florals-and-feathered-wings",
+      typography: "luminous-elegant-serif",
+      coupleLayout: "centered-airy-editorial",
+      ampersandStyle: "pale-gold-script",
+      dividerStyle: "pearl-star-ornament",
+      shortcutStyle: "pearl-glass-and-gold",
+      footerStyle: "airy-bottom-row",
+      atmosphere: "soft-heavenly-rays"
+    },
+    motion: {
+      background: "slow-cloud-drift",
+      ornament: "gentle-luminous-particles",
+      intensity: "subtle"
+    }
+  },
+
+  "enchanted-garden": {
+    name: "Enchanted Garden",
+    palette: {
+      background: "#EAF0E6",
+      surface: "#FAFCF6",
+      text: "#34483A",
+      accent: "#66876A",
+      gold: "#C8AD73",
+      border: "#B5C6A8"
+    },
+    composition: {
+      backgroundStyle: "enchanted-botanical-garden",
+      frameStyle: "foliage-and-champagne",
+      ornamentStyle: "layered-vines-ferns-and-flowers",
+      typography: "botanical-editorial-serif",
+      coupleLayout: "asymmetric-garden-editorial",
+      ampersandStyle: "botanical-gold-script",
+      dividerStyle: "leaf-and-flower-ornament",
+      shortcutStyle: "forest-green-and-gold",
+      footerStyle: "botanical-bottom-row",
+      atmosphere: "soft-garden-light"
+    },
+    motion: {
+      background: "slow-leaf-drift",
+      ornament: "gentle-bloom",
+      intensity: "subtle"
+    }
+  },
+
+  "cosmic-destiny": {
+    name: "Cosmic Destiny",
+    palette: {
+      background: "#17142F",
+      surface: "#242047",
+      text: "#F5F0FF",
+      accent: "#A99AE8",
+      gold: "#D5BD86",
+      border: "#6E63A6"
+    },
+    composition: {
+      backgroundStyle: "deep-cosmic-nebula",
+      frameStyle: "fine-starlight-frame",
+      ornamentStyle: "constellations-and-celestial-arcs",
+      typography: "cinematic-celestial-serif",
+      coupleLayout: "dramatic-stacked-editorial",
+      ampersandStyle: "luminous-lilac-script",
+      dividerStyle: "celestial-orbit",
+      shortcutStyle: "cosmic-glass-and-gold",
+      footerStyle: "celestial-bottom-row",
+      atmosphere: "soft-nebula-glow"
+    },
+    motion: {
+      background: "slow-nebula-drift",
+      ornament: "gentle-star-twinkle",
+      intensity: "subtle"
+    }
+  },
+
+  "velvet-rose": {
+    name: "Velvet Rose",
+    palette: {
+      background: "#3B1724",
+      surface: "#F5E9EC",
+      text: "#512737",
+      accent: "#A34E69",
+      gold: "#C9A56A",
+      border: "#B77D8F"
+    },
+    composition: {
+      backgroundStyle: "velvet-burgundy-gradient",
+      frameStyle: "rose-gold-double-frame",
+      ornamentStyle: "deep-rose-blooms-and-filigree",
+      typography: "luxury-fashion-editorial-serif",
+      coupleLayout: "dramatic-left-aligned",
+      ampersandStyle: "rose-gold-script",
+      dividerStyle: "rose-filigree",
+      shortcutStyle: "velvet-rose-and-gold",
+      footerStyle: "luxury-bottom-row",
+      atmosphere: "warm-velvet-light"
+    },
+    motion: {
+      background: "slow-velvet-light-shift",
+      ornament: "gentle-petal-fall",
+      intensity: "subtle"
+    }
+  },
+
+  "aurora-dreams": {
+    name: "Aurora Dreams",
+    palette: {
+      background: "#EAF5F3",
+      surface: "#FBFFFE",
+      text: "#34525B",
+      accent: "#68AFA7",
+      gold: "#D1BB82",
+      border: "#B3D8D1"
+    },
+    composition: {
+      backgroundStyle: "aurora-gradient-sky",
+      frameStyle: "pearl-iridescent-frame",
+      ornamentStyle: "aurora-ribbons-and-delicate-stars",
+      typography: "dreamlike-editorial-serif",
+      coupleLayout: "floating-asymmetric-editorial",
+      ampersandStyle: "iridescent-teal-script",
+      dividerStyle: "aurora-wave",
+      shortcutStyle: "teal-pearl-and-gold",
+      footerStyle: "soft-aurora-bottom-row",
+      atmosphere: "slow-moving-aurora-glow"
+    },
+    motion: {
+      background: "slow-aurora-wave",
+      ornament: "subtle-light-shimmer",
+      intensity: "subtle"
+    }
+  }
+} as const;
+
+2. Make these definitions render actual designs
+
+The configuration above defines the artistic direction. It is not sufficient to display these strings as text or apply them only as colours.
+
+Connect every design setting to the actual wedding-card renderer using the existing architecture.
+
+For each theme, implement its real visual elements:
+
+- Background gradients, textures, artwork, and lighting.
+- Decorative floral, botanical, celestial, architectural, or other theme-specific assets.
+- Individual border and corner treatments.
+- Couple-name typography, alignment, spacing, and ampersand placement.
+- A designed divider with the correct ornament.
+- Chat and Live shortcut buttons with the intended shape, layered borders, shadows, and accents.
+- A well-positioned date and location row.
+- Appropriate responsive layout and decorative depth.
+
+Use real assets already available in the project or add suitable, legally usable artwork. Do not invent asset paths or leave missing asset references. If a particular asset is unavailable, create an appropriate CSS/SVG treatment or report the missing asset.
+
+3. Follow the original Royal Burgundy implementation
+
+Use Royal Burgundy as the implementation-quality reference.
+
+Inspect how its complete card is constructed and reuse the proven rendering structure, but make the artwork, frame, composition, typography, and effects theme-specific.
+
+Do not copy Royal Burgundy's burgundy palette or floral artwork into every new theme.
+
+Do not render every theme using a single generic card with a different background colour.
+
+4. Preserve the existing application
+
+- Integrate the 10 definitions into the existing theme registry only when their corresponding IDs are not already present.
+- Do not duplicate or recreate themes that already exist.
+- Preserve all existing IDs, names, palettes, theme selection, saved preferences, wedding data, and access permissions.
+- Do not change Classic Default or Classic Ivory.
+- Do not change the Leaderboard or unrelated pages.
+- Keep the existing theme selector and restore the miniature previews for these 10 themes using their actual designs.
+- Keep mobile and desktop layouts working.
+- Respect reduced-motion settings and avoid heavy animations or performance regressions.
+
+5. Verify the result
+
+Render all 10 themes with the same couple names, date, and location, and inspect the actual card output.
+
+Confirm that each theme has a complete, individual composition comparable in quality to the Royal Burgundy reference. Check that none appears blank, uses a generic fallback, or loses its decorative assets.
+
+Run the existing type checks, tests, and production build where available. Fix implementation errors before reporting completion.
+
+Make the changes directly. Do not stop at creating the configuration object or describing a plan. Report the actual files changed, assets added, themes verified, and tests completed.

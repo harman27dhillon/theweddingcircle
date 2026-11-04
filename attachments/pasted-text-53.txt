@@ -1,0 +1,111 @@
+Update the existing The Wedding Circle application with the following six targeted changes. Use the attached screenshot as the reference for the current Chat interface.
+
+Inspect the existing components and state management before editing. Implement the changes directly. Do not redesign unrelated screens or remove existing features.
+
+1. Move the role button beside the profile icon
+
+Currently, the role button (Host, Family, Guest, or another role) appears on the far right of the top header.
+
+Change the header layout:
+
+- Place the profile/avatar icon at the far left.
+- Place the current user's role button immediately beside the profile icon.
+- Remove the small person icon currently inside the role button. Show only the role label, such as Host, Family, or Guest.
+- Apply this consistently to every role-based interface where this button appears.
+- Preserve existing role permissions and role-specific actions. This is a layout change, not a permission change.
+
+2. Reposition notifications and filter
+
+After moving the role button, use the available header space efficiently.
+
+- Move the notification button and filter button to the right side of the header.
+- Keep the notification count visible.
+- Remove the word "Filter" from the filter button and display only the filter icon.
+- Maintain appropriate spacing, touch targets, and alignment on mobile and desktop.
+- Preserve all existing notification and filter functionality.
+
+The intended header order is:
+
+"[Profile] [Role]                         [Filter icon] [Notifications]"
+
+Adjust spacing responsively so the header does not overflow on smaller screens.
+
+3. Remove the unwanted chat bubble pointer
+
+In the attached screenshot, the first message in a user's consecutive message group sometimes has a small extended pointer or tail. Other consecutive messages have plain rounded edges.
+
+Remove this unwanted pointer from all chat message bubbles.
+
+Requirements:
+
+- All message bubbles must use clean, rounded shapes without triangular tails or extended pointers.
+- Preserve the existing right alignment for the current user's messages and left alignment for other users' messages.
+- Keep the existing grouping, spacing, colors, timestamps, and message interactions.
+- Check every message type and grouping state so the pointer does not reappear on the first message, last message, or standalone message.
+- Do not change the overall chat design.
+
+4. Remove built-in music tracks and add developer-managed uploads
+
+Remove the music tracks that Grok added as default or sample tracks. Do not remove the music player itself.
+
+Add a music management section inside the existing Developer options.
+
+Developer requirements:
+
+- Allow the developer to upload and manage at least 10 music tracks.
+- Support adding, replacing, and removing tracks.
+- Display track title and basic playback controls in the management interface.
+- Validate supported audio formats and file sizes.
+- Store uploaded tracks in the project's existing persistent storage system. Do not rely on temporary browser memory or local-only state.
+- Persist the track library across sessions and application reloads.
+- Ensure uploaded tracks are available in every wedding Chat interface, regardless of the selected theme.
+- Keep the music selector synchronized with the developer-managed library.
+- If the library is empty, show a clean empty state instead of sample tracks.
+- Do not add copyrighted music automatically. Only make tracks available when uploaded by an authorized developer.
+
+Security and permissions:
+
+- Only authorized developers can upload, replace, or delete tracks.
+- Ordinary users can only access playback controls and tracks permitted by the existing application rules.
+- Validate uploads securely and avoid exposing private storage credentials.
+- Follow the existing project's backend and storage architecture rather than introducing an unnecessary new service.
+
+5. Default the speaker to muted
+
+The speaker/music playback control in Chat must start in the muted state.
+
+- Initialize the speaker as muted whenever a Chat session is opened.
+- Do not autoplay music or audio on page load.
+- Keep the existing music and mute/unmute controls functional.
+- When a user explicitly unmutes audio, allow playback according to browser and device restrictions.
+- Keep the mute icon and actual audio state synchronized.
+- Navigating between pages must not unexpectedly start music.
+- Persist user audio preferences only if compatible with the existing design, while ensuring the initial Chat state remains muted as requested.
+
+6. Add a mini crown to the Leaderboard button
+
+Add a small, elegant crown decoration to the existing Leaderboard button.
+
+- Position a miniature crown above the button or near its upper edge.
+- Use a refined gold color that matches the current premium wedding design.
+- Keep the crown small and unobtrusive.
+- Preserve the button's current dimensions, alignment, navigation, and functionality.
+- Ensure the crown does not overlap the button label or other controls.
+- Keep it responsive on mobile and desktop.
+
+If the Leaderboard entry is located inside More or another navigation area, apply the crown to that existing Leaderboard entry rather than creating a duplicate button.
+
+Final validation
+
+Test all six changes:
+
+1. The correct role label appears beside the profile icon for each applicable role.
+2. Filter and notifications align correctly on the right, and Filter displays only its icon.
+3. No chat bubble has an unwanted pointer.
+4. Default tracks are removed, and authorized developers can manage at least 10 persistent uploaded tracks.
+5. Chat opens muted and does not autoplay music.
+6. The Leaderboard button displays its miniature crown without breaking navigation.
+
+Preserve all existing wedding data, role permissions, chat history, theme backgrounds, live streaming, album functionality, and navigation.
+
+Implement the changes in the existing project. Report which files were changed, what was tested, and any remaining limitations. Do not claim a feature is working unless it has actually been verified.

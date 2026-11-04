@@ -1,0 +1,73 @@
+Update the existing wedding app with ONLY the five changes listed below. Preserve all existing functionality, data, permissions, and design outside these specific changes.
+
+1. Hide Side Colors behind a button
+
+The Side Colors panel currently takes up too much space at the top of the Wedding Feed.
+
+- Replace the permanently visible panel with a compact Side Colors button in the same location.
+- Keep the panel collapsed by default whenever the Feed opens or refreshes.
+- Tapping the button expands the existing Bride's side and Groom's side color options: Plum, Navy, Sage, Teal, and Ink.
+- Tapping again collapses the panel.
+- Preserve existing color selections and saving functionality.
+- Do not delete or redesign the existing color-selection system.
+
+2. Remove suggested reaction messages
+
+Remove the suggested reaction buttons displayed beneath Feed posts, including:
+
+- Love
+- Joy
+- Bless
+
+Requirements:
+
+- Remove these suggestion chips from all applicable Feed posts.
+- Do not replace them with other suggested messages.
+- Keep Reply inputs, Reply buttons, actual user comments, and replies fully functional.
+- Do not remove any existing post interactions other than the suggested reaction chips.
+
+3. Remove the dark navy line above Feed posts
+
+The Feed post cards currently display a thick, dark horizontal line along their top edge.
+
+- Remove this decorative line from every applicable Feed post card.
+- Remove only the specific element or styling responsible for the line.
+- Preserve the card background, rounded corners, borders, spacing, typography, and existing bride-side/groom-side color styling.
+- Ensure the line does not return after refreshing or reopening the app.
+
+4. Rename Gallery to Upload
+
+Change the Gallery label in the bottom navigation to Upload.
+
+- Keep the button in its existing position.
+- Preserve the existing icon and styling unless a minor adjustment is necessary to fit the new label.
+- Tapping Upload must open the exact same screen and workflow that Gallery currently opens.
+- Do not create a new screen or change existing photo/video selection and upload functionality.
+- Update directly associated visible navigation and accessibility labels where appropriate.
+
+5. Make the "What's just happened?" text bar clearly look like an input
+
+The text bar at the top of the Wedding Feed should immediately communicate that users can type and publish a post.
+
+- Replace the current placeholder "What's just happened?" with "✏️ Write a post...".
+- Give the input a clearly visible, rounded rectangular border.
+- Use subtle background contrast so it stands out from the Feed background.
+- Make the input slightly taller, with comfortable padding for mobile users.
+- Add a clear Post button or send icon within or beside the input.
+- Maintain a clean, modern appearance consistent with the existing wedding app theme.
+- Ensure the input remains visible and readable against both light and dark backgrounds.
+- Tapping the input must allow users to type and publish posts using the existing posting functionality.
+- Do not create a duplicate posting system or break the current post submission flow.
+
+Critical restrictions
+
+- Changes 1, 2, 3, and 5 apply only to the Wedding Feed screen.
+- Change 4 applies only to the existing bottom navigation label and its directly associated accessibility text.
+- Do not modify the Home, Live, Album, or More screens beyond the specified Gallery-to-Upload label change.
+- Do not change wedding roles, authorization codes, permissions, authentication, database structure, or saved data.
+- Do not reset existing side-color preferences.
+- Do not redesign unrelated UI or remove any existing features.
+- Preserve the mobile layout and bottom navigation.
+- Ensure the changes persist after refresh and reopening the app.
+
+Final instruction: Implement and test only these five changes. Do not modify anything else in the wedding app. Reuse existing components and functionality wherever possible.

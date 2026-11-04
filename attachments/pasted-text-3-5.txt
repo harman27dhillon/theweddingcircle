@@ -1,0 +1,23 @@
+Infrastructure section — dead code audit and cleanup
+
+While investigating the Firebase and Cloudflare Stream issues, audit the entire Infrastructure feature for dead, obsolete, duplicated, or unreachable code.
+
+Check:
+
+- Unused functions, imports, variables, components, and state.
+- Obsolete Firebase, Cloudflare Stream, CDN, R2, and gateway implementations.
+- Duplicate configuration and validation logic.
+- Old API endpoints, handlers, and test utilities that are no longer used.
+- Stale UI components and configuration fields.
+- Code paths that are unreachable or superseded by newer implementations.
+
+Cleanup rules:
+
+1. Confirm that code is genuinely unused before removing it.
+2. Do not remove working functionality, security checks, migrations, or compatibility logic just because it looks redundant.
+3. Do not delete credentials, database records, environment variables, or Cloudflare resources.
+4. Preserve existing Infrastructure features and their behavior.
+5. Remove only confirmed dead code.
+6. Run relevant tests, TypeScript checks, and production build after cleanup.
+
+First report the findings with exact file names and explain what is safe to remove. Do not perform broad refactoring or deploy without approval.

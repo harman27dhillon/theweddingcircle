@@ -1,0 +1,71 @@
+The Wedding Circle — Remove Google Drive and migrate media infrastructure to Cloudflare
+
+Inspect the entire existing source code and implement this change carefully.
+
+1. Remove Google Drive completely as a media-storage integration
+
+- Remove Google Drive upload, download, listing and retrieval logic.
+- Remove Google Drive authentication dependencies, OAuth flows, connection checks, API calls and related configuration fields.
+- Remove Google Drive setup cards and connection warnings from Developer Settings.
+- Remove Google Drive references from media upload and retrieval workflows.
+- Remove obsolete Google Drive environment variables and secrets from the app's configuration requirements.
+- Do not remove unrelated Google authentication or Google Play functionality.
+
+2. Make Cloudflare R2 the primary media storage
+
+Use the already-connected and verified R2 bucket:
+
+"wedding-circle-media"
+
+Move all new media storage and retrieval to R2, including:
+
+- Wedding photos and videos
+- Chat attachments and shared media
+- Wedding albums
+- Profile and cover images
+- Ceremony media
+- Other uploaded wedding files
+
+Requirements:
+
+- All uploads must go through secure server-side APIs.
+- Keep the bucket private.
+- Use secure signed upload/download URLs where appropriate.
+- Store object keys and metadata in the existing database.
+- Ensure media can be retrieved and displayed after refreshing or reopening the app.
+- Preserve existing permissions and wedding membership checks.
+- Never expose R2 secret keys in frontend code.
+
+3. Live streaming and recordings
+
+Inspect the existing live-stream implementation.
+
+- Do not attempt to use R2 as a live-streaming server.
+- Use Cloudflare Stream for live video ingestion, playback and recording if supported by the current architecture and configured credentials.
+- Store exported or completed stream recordings in R2 where technically supported.
+- Preserve existing spectator access, comments, privacy and host controls.
+- Do not claim live streaming is configured until the provider is actually connected and tested.
+
+4. Protect existing user data
+
+- Do not delete existing Google Drive files.
+- Do not delete existing wedding photos or videos.
+- Do not move or migrate old files without a verified migration plan.
+- Do not break existing media links until replacement storage is verified.
+- Do not enable public bucket access.
+
+5. Testing and verification
+
+Test the complete workflow:
+
+1. Upload a test photo.
+2. Upload a test video.
+3. Retrieve and display both files.
+4. Refresh and reopen the wedding to verify persistence.
+5. Confirm objects appear in the R2 bucket.
+6. Test authorization so one wedding cannot access another wedding's private media.
+7. Report the live-stream provider's actual configuration and test status separately.
+
+Inspect, implement and test the actual source code. Do not merely update labels or hide Google Drive settings. Do not claim completion without verifying the real upload and retrieval paths.
+
+Report clearly what is implemented, what passed testing and what still requires credentials or configuration.

@@ -1,0 +1,338 @@
+PROJECT: THE WEDDING CIRCLE
+UPDATE: FIX NEW THEME CARD DECORATIONS, PINNED WEDDING LAYOUT, LANDING-PAGE BUTTONS, SIGN-OUT PLACEMENT, NAME CROPPING, AND THEME PREVIEWS.
+
+IMPORTANT:
+Inspect the existing implementation and both provided screenshots before making changes.
+
+Make the smallest targeted changes necessary. Preserve existing functionality, saved wedding data, theme definitions, theme persistence, permissions, and navigation.
+
+Do not rebuild components unnecessarily or introduce unrelated redesigns.
+
+==================================================
+1. FIX THE FOUR NEW THEMES' WEDDING CARD DECORATIONS
+==================================================
+
+PROBLEM:
+The four newly added themes appear as plain colour backgrounds on the wedding card, without the floral artwork and decorative details visible in the other theme previews.
+
+FIX:
+Inspect the actual theme definitions and the component responsible for rendering wedding cards and theme previews.
+
+Ensure these four themes have complete wedding-card visual configurations:
+
+1. Blossom Pink
+2. Sky Blue
+3. Rose Romance
+4. Peach Garden
+
+Each must have its own appropriate decorative artwork, including floral or botanical elements, where appropriate.
+
+Suggested visual directions:
+
+BLOSSOM PINK:
+- Romantic pink and blush flowers.
+- Soft ivory or blush background.
+- Delicate champagne-gold accents.
+
+SKY BLUE:
+- Elegant pale-blue and ivory background.
+- Delicate white or blue flowers.
+- Refined silver or complementary decorative accents.
+
+ROSE ROMANCE:
+- Dusty-rose and warm-cream background.
+- Rich rose-coloured floral details.
+- Elegant rose-gold accents.
+
+PEACH GARDEN:
+- Peach and cream background.
+- Warm botanical or floral artwork.
+- Bronze or champagne accents.
+
+IMPORTANT IMPLEMENTATION REQUIREMENTS:
+
+- Use the existing wedding-card decoration architecture.
+- Inspect how floral artwork is assigned to the original themes that already work.
+- Reuse existing suitable assets where possible.
+- If new assets are necessary, provide suitable assets for these themes rather than relying on plain CSS colours alone.
+- Ensure the actual wedding card renders the artwork, not just the theme preview.
+- Preserve the four themes' existing colour palettes.
+- Ensure backgrounds, flowers, names, date, location, and Chat/Live shortcut tiles remain correctly layered.
+- Avoid stretched, missing, or incorrectly positioned images.
+- Use appropriate image sizing and positioning for mobile screens.
+- Ensure the artwork does not obscure text or interactive elements.
+
+Do not copy the same floral artwork into all four themes if suitable distinct assets are available.
+
+Do not modify the established artwork of Royal Burgundy, Pastel Blush, Sage Green, Royal Blue, Classic Ivory, Midnight Emerald, Terracotta Sunset, Lavender Dream, or Classic Default.
+
+==================================================
+2. HIDE THE BOTTOM BUTTON ROW WHEN A WEDDING IS PINNED
+==================================================
+
+PROBLEM:
+When a wedding is pinned and displayed as the user's full-screen or landing-page wedding card, the following buttons still appear underneath it:
+
+- Enter Wedding
+- Chat
+- Live
+- Album
+
+These buttons are redundant in the pinned presentation.
+
+REQUIRED BEHAVIOUR:
+
+When the user has a wedding pinned and the pinned wedding is being displayed in its dedicated pinned-card presentation:
+
+- Hide the bottom Enter Wedding button.
+- Hide the bottom Chat button.
+- Hide the bottom Live button.
+- Hide the bottom Album button.
+
+Keep the Chat and Live shortcut buttons that are already integrated into the wedding card itself.
+
+Those integrated Chat and Live shortcuts must remain visible and functional.
+
+Do not remove or disable their underlying navigation behaviour.
+
+PINNED WEDDING PRESENTATION:
+
+- Preserve the current pinned wedding card's appearance.
+- Preserve the selected pinned-card aspect ratio and full-screen settings.
+- Preserve the card's artwork, names, date, location, and existing decorations.
+- Keep the pin/unpin control accessible in its existing position.
+- Do not display duplicate navigation buttons beneath the pinned card.
+
+NORMAL LANDING PAGE:
+
+When no wedding is pinned, restore the normal landing-page layout with its existing Enter Wedding, Chat, Live, and Album buttons.
+
+Do not permanently delete these buttons from the application.
+
+Do not hide the normal landing-page controls simply because the user has previously pinned a wedding if the pinned presentation is not currently active.
+
+Determine the active presentation state using the existing pinned-wedding logic.
+
+Avoid introducing a second, conflicting pin-state system.
+
+==================================================
+3. REMOVE THE TOP-RIGHT SIGN-OUT BUTTON
+==================================================
+
+PROBLEM:
+The pinned wedding screen currently displays a Sign out button in the top-right corner.
+
+REQUIREMENT:
+Remove the visible Sign out button from this pinned wedding presentation.
+
+IMPORTANT:
+- Do not sign the user out automatically.
+- Do not remove the authentication system.
+- Do not disable the sign-out functionality elsewhere.
+- Do not change the user's authentication state.
+- Do not delete account settings.
+- Do not replace the button with another unnecessary control.
+
+Inspect the current header and remove the visible Sign out action from the pinned wedding screen.
+
+If sign-out remains available through an existing account or settings menu elsewhere, preserve that functionality.
+
+Do not modify unrelated headers unless they share the exact component and the change is necessary to prevent the same unwanted button from appearing in the pinned presentation.
+
+==================================================
+4. FIX CROPPED WEDDING NAMES
+==================================================
+
+PROBLEM:
+In the pinned wedding card screenshot, the couple's names are cropped. The letters J and P are examples of characters that can be clipped.
+
+Inspect the actual name-rendering component, typography, font loading, line-height, overflow rules, and decorative overlays.
+
+FIX THE ROOT CAUSE.
+
+Requirements:
+- Ensure all letters render completely.
+- Prevent top or bottom clipping caused by insufficient line-height.
+- Prevent clipping of decorative letter shapes, ascenders, descenders, and flourishes.
+- Ensure the J and P remain fully visible.
+- Preserve the existing font style and wedding-card design.
+- Do not arbitrarily shrink all names.
+- Do not remove decorative typography unnecessarily.
+- Do not allow names to overlap flowers, shortcut buttons, or card edges.
+
+RESPONSIVE BEHAVIOUR:
+
+- Support long couple names.
+- Support different font sizes and screen widths.
+- Keep names within the intended text area.
+- Use appropriate line-height and container sizing.
+- Adjust font size responsively only when necessary.
+- If names wrap onto multiple lines, ensure both lines remain fully visible.
+- Avoid fixed-height containers that clip the text.
+- Inspect overflow:hidden, line-clamp, transforms, padding, and font rendering for the actual cause.
+
+Preserve the existing name layout and visual hierarchy as closely as possible.
+
+Test with:
+- Names containing J.
+- Names containing P.
+- Long couple names.
+- Names that wrap onto two lines.
+- The existing sample wedding.
+
+Do not use hard-coded sample names as a fix.
+
+==================================================
+5. REMOVE THE CHAT MESSAGE-BUBBLE PREVIEW FROM THE THEME SELECTOR
+==================================================
+
+PROBLEM:
+The theme selector currently shows a wedding-card preview with an additional sample Chat/message-bubble preview layered over it.
+
+The user wants to see ONLY the wedding-card preview.
+
+REQUIRED CHANGES:
+
+For every theme preview:
+- Keep the wedding-card preview.
+- Remove the sample Chat message-bubble overlay.
+- Remove the sample "Hello" and "Hi" bubbles.
+- Remove any fake Chat text bar or message-composer preview.
+- Remove any extra sample-message decorations that are part of this overlay.
+
+The theme preview should show the wedding card itself, including:
+- Wedding-card background artwork.
+- Couple-name typography.
+- Existing Chat and Live shortcut tiles integrated into the card.
+- Date and location where supported by the current card design.
+- The theme's actual decorative artwork.
+
+Do not remove the real Chat and Live shortcut tiles that are integrated into the wedding card.
+
+Do not remove Chat styling from the theme definitions.
+
+Do not remove the actual Chat components or their functionality.
+
+IMPORTANT DISTINCTION:
+
+REMOVE ONLY THE ADDITIONAL SAMPLE CHAT/MESSAGE-BUBBLE PREVIEW FROM THE THEME SELECTOR.
+
+Keep the actual wedding-card preview intact.
+
+The full Chat design must still exist in the theme definition and be applied to the real Chat screen when that theme is applied.
+
+Apply this preview change consistently to all 13 themes.
+
+Do not create separate theme-preview logic that produces a different wedding-card appearance from the real wedding card.
+
+==================================================
+6. PRESERVE THE EXISTING THEME SYSTEM
+==================================================
+
+Do not change the existing theme-selection architecture.
+
+Preserve all 13 themes:
+
+1. Royal Burgundy
+2. Pastel Blush
+3. Sage Green
+4. Royal Blue
+5. Classic Ivory
+6. Midnight Emerald
+7. Terracotta Sunset
+8. Lavender Dream
+9. Classic Default
+10. Blossom Pink
+11. Sky Blue
+12. Rose Romance
+13. Peach Garden
+
+Preserve:
+- Existing theme identifiers.
+- Existing colour palettes.
+- Existing theme artwork that already works.
+- Complete Chat configurations inside theme definitions.
+- Theme persistence per wedding.
+- Existing Apply Theme and Cancel behaviour.
+- Host/co-host theme permissions.
+- Existing wedding data.
+
+Do not create a separate Chat theme setting.
+
+Do not reset saved wedding themes.
+
+Do not alter the existing Chat layout or message alignment as part of this task.
+
+==================================================
+7. TESTING
+==================================================
+
+Perform the following checks.
+
+NEW THEME DECORATIONS:
+1. Blossom Pink displays its intended wedding-card decorations.
+2. Sky Blue displays its intended wedding-card decorations.
+3. Rose Romance displays its intended wedding-card decorations.
+4. Peach Garden displays its intended wedding-card decorations.
+5. Their real wedding cards render artwork rather than plain colour-only backgrounds.
+6. Their text and integrated shortcut tiles remain readable and functional.
+
+PINNED WEDDING:
+7. The pinned presentation hides the bottom Enter Wedding button.
+8. The pinned presentation hides the bottom Chat button.
+9. The pinned presentation hides the bottom Live button.
+10. The pinned presentation hides the bottom Album button.
+11. The integrated Chat shortcut remains visible and functional.
+12. The integrated Live shortcut remains visible and functional.
+13. The pin/unpin control remains available.
+14. The normal landing-page buttons return when the pinned presentation is inactive.
+
+SIGN-OUT:
+15. The top-right Sign out button is absent from the pinned presentation.
+16. Authentication remains functional.
+17. Existing sign-out functionality elsewhere remains available.
+
+NAME RENDERING:
+18. Names containing J render without clipping.
+19. Names containing P render without clipping.
+20. Long names remain within the card.
+21. Multiline names remain fully visible.
+22. Name rendering remains responsive.
+
+THEME PREVIEWS:
+23. All 13 themes display a wedding-card preview.
+24. The extra sample Chat/message-bubble overlay is removed.
+25. Sample "Hello" and "Hi" bubbles are absent.
+26. The integrated Chat and Live shortcut tiles remain visible.
+27. The real Chat screen continues using its complete theme configuration.
+
+REGRESSION:
+28. Existing themes retain their established designs.
+29. Apply Theme and Cancel continue working.
+30. Pinned wedding persistence remains intact.
+31. Chat, Live, Album, and other navigation remain functional.
+32. No unrelated functionality is removed.
+
+Do not claim a test passed unless it was actually performed.
+
+Distinguish code inspection, automated tests, rendered UI tests, and physical-device tests.
+
+==================================================
+8. FINAL REPORT
+==================================================
+
+After implementation, report:
+
+1. How the four new themes' wedding-card decorations were fixed.
+2. How the pinned presentation now hides the redundant bottom buttons.
+3. How the integrated Chat and Live shortcuts were preserved.
+4. How the top-right Sign out button was removed from the pinned presentation.
+5. How the J/P name-clipping issue was corrected.
+6. How the extra sample Chat preview was removed from all theme cards.
+7. Which files and components changed.
+8. Which tests were actually completed.
+9. Any remaining limitations.
+
+IMPLEMENT DIRECTLY IN THE EXISTING PROJECT.
+
+Inspect first, make targeted changes, preserve existing functionality, and report honestly what was implemented and tested.

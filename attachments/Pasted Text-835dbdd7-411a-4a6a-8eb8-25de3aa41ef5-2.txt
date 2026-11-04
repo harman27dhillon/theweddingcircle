@@ -1,0 +1,280 @@
+The Wedding Circle — Leaderboard Relocation, Wedding Deletion Fix, and Bride-Focused Discover with Product Bots
+
+Work on the existing The Wedding Circle application. Inspect the current code, routes, components, database schema, authentication, permissions, and storage before making changes.
+
+This is a targeted enhancement to the existing app, not a rebuild.
+
+CRITICAL DEVELOPMENT RULES
+
+- Inspect existing implementation before editing.
+- Make the smallest safe changes and reuse existing components, routes, services, and backend infrastructure wherever possible.
+- Preserve existing weddings, wedding memberships, invitations, chat messages, albums, media, permissions, authentication, themes, and persistent backend data.
+- Never reset the database, clear existing user data, replace production stores, or introduce duplicate implementations.
+- Preserve the existing premium wedding design and responsive mobile layout.
+- Do not create fake product listings, fake popularity metrics, fake reviews, or fabricated shopping links.
+- Test every changed feature and report actual results honestly.
+
+PHASE 1 — Move All Leaderboard Data off the Landing Page
+
+Use the supplied screenshot as a reference for the current landing-page Leaderboard section.
+
+1. Landing page
+
+- Remove the entire Popular Wedding Circles / Leaderboard data section from the landing page, including the ranking explanation, point-scoring explanation, wedding rows, crowns, wedding images, rankings, and points.
+- Do not display leaderboard data anywhere else on the landing page.
+- Preserve the existing wedding creation, joining, Discover entry, and other landing-page functionality.
+- Do not delete or modify the actual weddings shown in the screenshot.
+
+2. Existing top-bar Leaderboard button
+
+Move the complete Leaderboard experience into the existing Leaderboard button in the top bar.
+
+When a user taps that button, open the Leaderboard screen, panel, or page using the app's existing navigation conventions.
+
+Move the existing leaderboard content and functionality into that destination, including:
+
+- Wedding rankings and positions.
+- Wedding cover images or profile circles.
+- Crown indicators for the top three positions.
+- Wedding names.
+- Remaining days until the wedding, where available.
+- Activity points and ranking explanations.
+- Existing scoring rules and activity data.
+- Existing sorting, refresh, and navigation behavior, where implemented.
+
+Use the actual existing backend data and scoring logic. Do not create a separate leaderboard database or duplicate scoring system.
+
+Preserve the existing top-bar button's appearance and position. Make the leaderboard destination work on mobile and desktop and respect the selected theme.
+
+PHASE 2 — Fix Wedding Deletion
+
+The delete-wedding button currently does not work. Investigate the actual failure and fix the complete deletion flow.
+
+Required behavior
+
+1. Identify where the existing Delete command is rendered and how its click handler, permissions, API/database operation, and UI refresh work.
+2. Check for swallowed errors, incorrect wedding IDs, missing callbacks, authorization failures, database constraints, stale state, and backend policy issues.
+3. Ensure only the existing authorized roles can delete a wedding, according to the app's current permission rules.
+4. Show a confirmation dialog identifying the wedding before destructive deletion.
+5. After confirmation, send the correct deletion request to the existing backend.
+6. Update the UI only after the backend confirms success.
+7. Remove the deleted wedding from the appropriate lists and views, including the Leaderboard if applicable.
+8. If deletion fails, show a useful error message and retain the wedding in the UI.
+9. Handle dependent records and media according to the existing data model and retention rules. Do not leave unintended orphaned records or delete media shared by other weddings.
+10. Prevent duplicate deletion requests while a deletion is in progress.
+
+Use a safe, transactional or otherwise reliable deletion process where the existing backend supports it. Do not bypass database security policies or use privileged credentials in client-side code.
+
+Important: Fix the real root cause. Do not merely change the button's appearance or simulate successful deletion.
+
+PHASE 3 — Build a Bride-Focused Discover Section
+
+Transform the existing Discover button/section into a dedicated destination for Indian bridal fashion, jewellery, makeup, and accessories.
+
+Discover should feel like a premium, visually appealing product-discovery experience within The Wedding Circle. It must not turn the main wedding landing page into a shopping marketplace.
+
+3.1 Discover navigation and categories
+
+Remove the unrelated existing buttons and categories inside Discover and replace them with these relevant categories:
+
+- All — every eligible product discovered by all configured bots.
+- Dresses — bridal lehengas, sarees, wedding outfits, reception dresses, and related bridal clothing.
+- Jewellery — bridal necklaces, earrings, bangles, maang tikka, nath, kaleere, and jewellery sets.
+- Makeup — bridal makeup products, palettes, lip products, foundation, and related beauty essentials.
+- Footwear — bridal heels, juttis, sandals, and wedding footwear.
+- Accessories — clutches, potli bags, veils, dupattas, hair accessories, and other relevant bridal accessories.
+
+Add further bridal-specific categories only when they are useful. Avoid unrelated shopping categories, duplicate category buttons, or unnecessary navigation.
+
+The All category should be the default view when Discover opens.
+
+3.2 Product grid
+
+Display products in a compact, responsive grid.
+
+- Each product tile must have a 1:1 square aspect ratio for its main image.
+- On mobile, use a balanced multi-column grid that keeps products visible and easy to browse.
+- Use a suitable responsive column count on larger screens.
+- Use consistent image dimensions, spacing, corner radius, and theme-aware backgrounds.
+- Preserve image quality while using appropriately sized thumbnails for fast loading.
+- Prevent stretched, distorted, or incorrectly cropped product images.
+- Where appropriate, show the product name, current price when verified, source retailer, and a small popularity/trend indicator backed by real data.
+- Clearly distinguish sponsored placements, if any, from organic results.
+- Provide loading, empty, unavailable, and error states.
+- Support pagination or incremental loading rather than loading an unlimited product catalogue at once.
+
+The All category must combine eligible results from all enabled bots without showing duplicate copies of the same product. Keep product cards consistent across every category.
+
+3.3 Product detail and original-source link
+
+When a user opens a product tile, display an in-app product detail page or overlay that includes the available verified information:
+
+- Product image or gallery.
+- Product name and description.
+- Retailer or original source name.
+- Current price and currency, if available and verified.
+- Available product attributes, such as colour, material, size, or style, when supplied by the source.
+- Product link and last-checked timestamp, when available.
+- A clearly visible View Original Product action.
+
+Opening the original-product action should open the genuine product page from the retailer or authorized source.
+
+The in-app detail view must explain where the product was found, for example, “Found on Amazon” or “Source: Flipkart,” using the actual source associated with that product.
+
+Do not imply that a retailer endorses The Wedding Circle. Do not fabricate a source, product price, availability, rating, or destination URL.
+
+If a product becomes unavailable, show its status honestly and avoid presenting stale prices as current.
+
+3.4 Create five specialized discovery bots
+
+Create a bot-management system with five independently configurable discovery agents:
+
+Bot 1 — Amazon India Bridal Trends
+
+- Discover relevant Indian bridal clothing, jewellery, makeup, and accessories from Amazon India.
+
+Bot 2 — Flipkart Bridal Trends
+
+- Discover relevant Indian bridal clothing, jewellery, makeup, and accessories from Flipkart.
+
+Bot 3 — Meesho Bridal Trends
+
+- Discover relevant Indian bridal clothing, jewellery, makeup, and accessories from Meesho.
+
+Bot 4 — Bridal Dress Research
+
+- Focus on trending Indian bridal dresses, lehengas, sarees, reception outfits, wedding suits, and related clothing across approved sources.
+
+Bot 5 — Bridal Jewellery Research
+
+- Focus on bridal jewellery sets, necklaces, earrings, bangles, maang tikka, nath, kaleere, and related accessories across approved sources.
+
+The dress and jewellery bots may use approved sources beyond the first three retailers, provided each product's actual source is recorded and displayed.
+
+Bot responsibilities
+
+Each bot should:
+
+1. Search for products relevant to Indian bridal fashion and wedding accessories.
+2. Identify products with evidence of popularity, growing interest, or emerging trends.
+3. Rank candidates using available, legitimate signals such as retailer-provided popularity, bestseller status, verified review counts, recent engagement data where accessible, and trend information from permitted sources.
+4. Prefer relevant, available, well-documented products over unrelated or low-quality matches.
+5. Deduplicate repeated products across bots and categories.
+6. Store the product metadata and original source link.
+7. Record when the product was discovered and last checked.
+8. Update or remove outdated results according to configurable freshness rules.
+9. Never invent engagement numbers, rankings, ratings, sales, or claims that a product is viral.
+
+Do not assume that every retailer provides public APIs or allows automated crawling. Inspect available authorized APIs, affiliate/product feeds, permitted search services, and their terms before choosing an integration.
+
+Use official or authorized integrations where available. If a source requires API credentials, affiliate approval, or additional configuration, show that status clearly in Developer controls. Do not bypass anti-bot protections, access controls, or retailer restrictions.
+
+If a bot cannot access a source yet, display it as Not configured or Needs connection rather than pretending that it is searching.
+
+Bot execution and reliability
+
+- Support configurable search schedules and manual runs.
+- Avoid unnecessary repeated requests and duplicate product ingestion.
+- Implement appropriate rate limits, timeouts, retries, and error handling.
+- Keep bot jobs independent so a failure in one bot does not stop the others.
+- Store search-run status, last successful run, number of valid products found, and meaningful errors.
+- Use existing backend infrastructure where practical; do not run continuous polling inside a user's browser.
+- Keep product discovery asynchronous so Discover remains responsive.
+
+PHASE 4 — Developer-Only Bot Management
+
+Place all bot controls and editable bot commands inside the existing Developer section.
+
+Do not expose developer bot configuration controls to ordinary wedding members, guests, or shoppers.
+
+Create a Discover Bot Management area inside the existing Developer section.
+
+Dashboard overview
+
+Show a separate status card for each of the five bots, including:
+
+- Bot name and source/specialization.
+- Enabled or disabled state.
+- Connection/configuration status.
+- Last run and last successful run.
+- Next scheduled run, if scheduling is enabled.
+- Number of valid products discovered.
+- Last error, if any.
+
+Editable bot controls
+
+Allow authorized developers to:
+
+- Enable or pause each bot independently.
+- Configure the approved data source and connection status.
+- Edit search keywords and bridal-specific categories.
+- Configure search schedules and refresh frequency within source limits.
+- Configure product relevance and trend-ranking rules.
+- Set product freshness and deduplication rules.
+- Set sensible maximum result limits.
+- Trigger a manual discovery run.
+- Inspect recent run logs and errors.
+- Retry failed jobs.
+- Review products before publication if moderation is enabled.
+- Exclude inappropriate, irrelevant, duplicate, or outdated products.
+- View the product's original source and recorded discovery metadata.
+
+Validate configuration before applying it. Show a clear confirmation when a change affects scheduled jobs or publication behavior.
+
+Developer controls must be protected by server-side authorization, not merely hidden from the interface.
+
+Store API secrets in trusted server-side environment variables or a secure secrets manager. Never expose retailer credentials, private API keys, or privileged service keys in browser code, local storage, public database rows, or logs.
+
+Maintain a clear separation between developer configuration and ordinary user access to published products.
+
+PHASE 5 — Data Model and Security
+
+Inspect the existing schema before creating or modifying tables.
+
+Reuse existing structures where appropriate. If new structures are necessary, create minimal, backward-compatible migrations for items such as:
+
+- Bot configuration and status.
+- Discovery job history.
+- Normalized product records.
+- Original source and source product identifier.
+- Product category and verified metadata.
+- Trend signals with their origin and timestamp.
+- Product freshness and availability status.
+- Duplicate-detection identifiers.
+
+Use stable product identifiers and source URLs to prevent duplicate records. Preserve source attribution throughout ingestion, ranking, display, and product-detail navigation.
+
+Apply appropriate database access policies so only authorized services can modify bot configurations and discovery records. Public or authenticated users should only access product data they are permitted to view.
+
+Do not migrate or delete existing wedding data. Do not change the existing authentication system, wedding membership rules, or unrelated backend services.
+
+PHASE 6 — Verification and Completion Report
+
+Test the following:
+
+1. The landing page no longer displays any leaderboard rankings or leaderboard data.
+2. The existing top-bar Leaderboard button opens the complete working Leaderboard.
+3. Existing wedding rankings and scoring are preserved.
+4. Authorized users can delete a wedding successfully.
+5. Unauthorized users cannot delete weddings.
+6. Failed deletions show an error without falsely removing a wedding.
+7. Discover contains only the bridal-focused categories specified above.
+8. All displays products from every enabled bot without duplicates.
+9. Product images use square 1:1 tiles.
+10. Opening a product shows its genuine source and verified available details.
+11. The original-product link points to the actual source page.
+12. Bot controls are accessible only to authorized developers.
+13. A missing API connection is reported honestly, and an unconfigured bot does not generate fabricated results.
+14. Bot failures, stale products, unavailable products, and empty categories are handled correctly.
+15. Existing weddings, chat, albums, invitations, themes, memberships, and other app functionality remain intact.
+
+Finish with a concise report containing:
+
+- Root cause of the wedding deletion bug.
+- Files and database migrations changed.
+- How the Leaderboard was relocated.
+- Which bots are operational and which need credentials or source approval.
+- Tests actually completed and their results.
+- Any remaining configuration steps.
+
+Do not claim that all five bots are operational until their source integrations have been configured and successfully tested.

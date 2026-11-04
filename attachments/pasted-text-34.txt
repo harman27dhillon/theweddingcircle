@@ -1,0 +1,59 @@
+Fix Mobile Chat Send Button — The Wedding Circle
+
+Work directly on the existing Wedding Circle codebase. Fix the bug where tapping the Send icon while the mobile keyboard is open does not send the typed message. The user has to close the keyboard and tap Send again.
+
+1. Reproduce and identify the root cause
+
+Inspect the chat composer, message submission handler, input state, keyboard interactions, and any surrounding overlays or touch handlers.
+
+Check for:
+
+- The Send button losing its click/touch event while the virtual keyboard is open.
+- An invisible overlay or incorrect z-index intercepting taps.
+- Event propagation or touch handling preventing submission.
+- The send handler relying on keyboard dismissal, blur, or a delayed state update.
+- Incorrect "pointer-events", disabled states, focus handlers, or mobile viewport resizing.
+- A form submission issue, including an unintended default form action or keyboard-related rerender.
+- Async submission state causing the first tap to be ignored.
+
+Fix the actual root cause rather than hiding the keyboard as a workaround.
+
+2. Required behavior
+
+On mobile, including Android Chrome and installed/PWA mode:
+
+1. The user types a message.
+2. The Send icon is visible and tappable while the keyboard remains open.
+3. One tap sends the message immediately.
+4. The message appears in the chat using the existing message flow.
+5. The input clears only when submission is accepted, preserving text if sending fails.
+6. The keyboard behavior remains natural; do not force it to close before sending.
+7. Prevent accidental duplicate messages from repeated taps while a submission is in progress.
+8. Keep the existing Enter-to-send behavior, multiline input behavior, and Shift+Enter behavior wherever currently supported.
+9. Preserve the current slim composer, message alignment, animations, and premium Wedding Circle styling.
+
+3. Technical requirements
+
+- Use the existing message submission function; do not create a separate sending pipeline.
+- Ensure the Send control has a reliable semantic button action and correct form handling.
+- Make sure keyboard focus, blur, touch, pointer, and viewport-resize events cannot block the first tap.
+- Check the composer's stacking context, overlays, safe-area positioning, and touch target.
+- Do not add arbitrary delays or require users to tap twice.
+- Preserve message persistence, offline queueing, retries, and Supabase/server synchronization.
+- Do not modify unrelated chat styling, theme settings, authentication, database migrations, or other features.
+
+4. Test the fix
+
+Test these cases:
+
+- Type a message and tap Send while the Android keyboard is open.
+- Send several consecutive messages without dismissing the keyboard.
+- Send with the keyboard closed.
+- Test an empty message and prevent it from sending.
+- Simulate a failed network request and verify the text is not silently lost.
+- Verify there are no duplicate messages.
+- Confirm desktop chat behavior remains unchanged.
+
+Run the existing typecheck, tests, and production build.
+
+Implement the fix in the existing source code, not just a proposed patch. At the end, report the root cause, changed files, tests performed, and whether the fix was verified on an actual mobile device.

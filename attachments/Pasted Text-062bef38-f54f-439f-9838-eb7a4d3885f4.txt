@@ -1,0 +1,273 @@
+TASK: APPLY THE ROYAL BURGUNDY THEME TO THE ENTIRE WEDDING CIRCLE EXPERIENCE.
+
+I have attached screenshots of four different sections of the same wedding:
+1. Wedding Home and ceremonies
+2. Live streaming
+3. More and Host Control
+4. Wedding information and family details
+
+Currently, these screens use pale pink, cream, and neutral styling. I want the ENTIRE wedding interface converted to the Royal Burgundy theme.
+
+IMPORTANT: Do not change only the page backgrounds. Inspect and update every relevant component, button, popup, window, input, card, icon, and navigation element in these screens and throughout the rest of the wedding.
+
+Use the existing Royal Burgundy theme preset if it already exists. Do not create a duplicate theme system.
+
+==================================================
+1. ROYAL BURGUNDY DESIGN SYSTEM
+==================================================
+
+Use this visual direction consistently:
+
+- Primary burgundy: #701C32
+- Deep burgundy: #4A101F
+- Rich wine red: #8C263D
+- Champagne gold: #D6B477
+- Warm ivory: #FFF8F0
+- Soft blush: #F4E4E5
+- Dark text: #351C20
+- Muted text: #80666A
+- Subtle borders: champagne gold or muted burgundy
+
+Treat these as starting design tokens and integrate them with the existing theme system.
+
+Visual style:
+- Premium, elegant, traditional wedding aesthetic.
+- Deep burgundy surfaces with champagne-gold accents.
+- Warm ivory text on dark surfaces.
+- Light ivory surfaces with dark burgundy text where appropriate.
+- Refined borders, subtle shadows, and restrained decorative details.
+- Sophisticated wedding typography that remains easy to read.
+- Consistent rounded corners and spacing across related components.
+
+Do not turn every surface completely dark red. Use a deliberate balance of burgundy, ivory, and gold so that the interface feels luxurious rather than overwhelming.
+
+==================================================
+2. WEDDING HOME AND CEREMONIES
+==================================================
+
+Apply Royal Burgundy to the entire Home screen shown in the screenshots.
+
+Update:
+- Page background
+- Wedding cover card
+- Couple names and wedding details
+- Ceremony headings
+- Ceremony cards
+- Next-ceremony indicators
+- Descriptions and directions links
+- Family information panels
+- Edit family details action
+- Wedding tools section
+- Change cover, Switch to planning, Pre-wedding, Checklist, and Vendors buttons
+- Host/status information panels
+- All other cards, dividers, and controls on the Home screen
+
+Use burgundy headings and accents, ivory or deep burgundy card surfaces as appropriate, and champagne-gold borders.
+
+Preserve the existing wedding information, layout, card hierarchy, and actions.
+
+==================================================
+3. CHAT — COMPLETE THEME APPLICATION
+==================================================
+
+Inspect the entire Chat interface, including components that are not visible in the supplied screenshots.
+
+Apply the theme to:
+- Chat page and conversation header
+- Sent and received message bubbles
+- Sender names and timestamps
+- Message composer and text input
+- Placeholder text
+- Send button
+- Plus/attachment button
+- Camera and gallery controls
+- Voice-note recording and playback controls
+- Reply and message-action menus
+- Attachment previews
+- Confirmation dialogs
+- Loading, empty, and error states
+
+Maintain clear visual distinction between sent and received messages.
+
+Ensure the chat box, buttons, and input fields look like they belong to the same Royal Burgundy wedding interface. Do not leave them using unrelated default colors.
+
+Preserve message sending, attachments, media handling, keyboard behavior, and scrolling.
+
+==================================================
+4. LIVE STREAMING
+==================================================
+
+Apply Royal Burgundy throughout the Live screen shown in the screenshots.
+
+Update:
+- Live page background
+- Wedding Circle Live heading and header
+- Camera and stream preview containers
+- Empty stream slots and their Add buttons
+- Start Live button
+- Stream management controls
+- Calendar and guest controls
+- Comment area and input field
+- Send button
+- Information popup
+- Any stream-selection menus, dialogs, or overlays
+- Live indicators and relevant status labels
+
+Use burgundy and champagne gold for interactive elements, with suitable ivory surfaces and readable text.
+
+Keep the existing stream grid dimensions, camera behavior, stream functionality, and control placement unchanged unless a specific adjustment is required for visual consistency.
+
+Do not cover camera previews with opaque decorative backgrounds.
+
+==================================================
+5. MORE AND HOST CONTROL
+==================================================
+
+Apply the theme to the entire More section and every existing screen accessible from it.
+
+Update:
+- Host Control entry card
+- More heading
+- Before
+- Ceremonies
+- Guests
+- Notices
+- Places
+- Services
+- Checklist
+- Planner
+- Highlights
+- Invite
+- Background
+- Privacy
+- All other existing tiles and sections
+
+Make all tiles, icons, labels, borders, active states, and backgrounds consistent with Royal Burgundy.
+
+The Host Control card should look premium and prominent, with a burgundy border or surface and elegant champagne-gold detailing.
+
+Inspect every Host Control subsection, not just the entry card. Apply the same theme to its settings, forms, controls, dialogs, and nested pages.
+
+Preserve host/co-host permissions and the existing behavior of all controls.
+
+==================================================
+6. ALL BUTTONS AND INTERACTIVE CONTROLS
+==================================================
+
+This is a critical requirement.
+
+Inspect every button throughout the wedding, including:
+- Primary and secondary buttons
+- Icon-only buttons
+- Circular floating controls
+- Compact action buttons
+- Navigation buttons
+- Form submission buttons
+- Disabled and loading buttons
+- Confirmation and cancellation actions
+- Dropdown and popup actions
+
+Every button must use the correct Royal Burgundy theme colors, borders, text, icons, and interaction states.
+
+Do not merely change the background behind the buttons while leaving the buttons themselves unchanged.
+
+Preserve the existing control types, dimensions, placement, and functionality wherever possible.
+
+For the wedding-card Chat/Feed and Live shortcut tiles, retain the established screenshot design:
+- Matching rounded-rectangle tiles
+- Prominent icons and readable labels
+- Delicate floral corner details
+- Elegant illuminated or double borders
+- Identical dimensions and consistent positioning inside the card
+
+Adapt their colors and accents to Royal Burgundy without replacing them with generic pills or plain toolbar buttons.
+
+==================================================
+7. EVERY WINDOW, POPUP, AND INPUT
+==================================================
+
+Inspect every existing modal, dropdown, dialog, bottom sheet, drawer, context menu, media preview, upload window, and confirmation popup across the entire wedding.
+
+Make sure each uses the active Royal Burgundy theme, including:
+- Window background
+- Headings and body text
+- Input fields and placeholders
+- Buttons and icons
+- Borders and dividers
+- Shadows and overlays
+- Success, warning, and error states
+
+Also inspect nested windows opened from within other windows.
+
+Do not leave any popup using the old pink/cream default styling simply because it is rendered through a portal or shared component.
+
+Keep text readable and destructive actions clearly identifiable.
+
+==================================================
+8. NAVIGATION AND CONSISTENCY
+==================================================
+
+Apply the theme to the bottom navigation:
+- Home
+- Chat
+- Live
+- Album
+- More
+
+Update active and inactive icons, labels, backgrounds, and indicators.
+
+Ensure that navigating between sections does not cause the interface to revert to the default theme.
+
+Inspect the Album and every existing wedding-specific subsection even though they are not fully shown in the screenshots.
+
+==================================================
+9. KEEP THE THEME SCOPED TO THIS WEDDING
+==================================================
+
+Use the existing wedding ID and saved theme-selection system.
+
+- Apply Royal Burgundy to this specific wedding.
+- Preserve the selected theme when navigating, refreshing, or reopening it.
+- Do not accidentally change the theme of other weddings.
+- Ensure other weddings continue using their own selected themes.
+- Do not create duplicate theme fields or a second styling system.
+- Only authorized host/co-host users may change the theme.
+
+If the theme is already saved as Royal Burgundy, make every screen read that existing value instead of introducing another setting.
+
+==================================================
+10. IMPLEMENTATION AND VERIFICATION
+==================================================
+
+Before editing:
+- Inspect the existing theme tokens and theme provider/context.
+- Identify components still using hard-coded pink, cream, or unrelated default styles.
+- Identify shared buttons, cards, dialogs, inputs, and navigation components.
+- Trace any components that are not receiving the active wedding's theme.
+
+Then implement the changes systematically, reusing shared components and existing architecture.
+
+After implementation, verify:
+- Home and ceremonies
+- Family information and wedding tools
+- Chat and its composer
+- Live screen and controls
+- Album and media viewer
+- More and Host Control
+- All existing nested pages, forms, buttons, and popups
+- Navigation between sections
+- Theme persistence after refresh
+- Isolation between different weddings
+
+Use the supplied screenshots to compare the updated screens with the intended design direction.
+
+Do not change wedding data, authentication, permissions, media functionality, or existing navigation.
+
+Do not rebuild working screens or replace functional elements with static mockups.
+
+If a screen or interaction cannot be tested, state that explicitly.
+
+FINAL REQUIREMENT:
+Royal Burgundy must be visible throughout the entire wedding experience, including the smallest buttons, chat input, popup windows, dialogs, and nested sections—not just the main page backgrounds.
+
+At the end, report the components updated, the actual tests performed, and any remaining areas that could not be verified.

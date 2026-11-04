@@ -1,0 +1,34 @@
+URGENT FOLLOW-UP: Desktop Layout Still Broken
+
+The previous desktop responsive-layout fix has not resolved the problem.
+
+I have opened the published website, https://theweddingcircle.in, in a browser, and it still displays a narrow, phone-style layout centered on the screen with excessive unused space on both sides. The intended desktop layout is not appearing.
+
+Diagnose the actual published result
+
+1. Inspect the current deployed version and the exact landing-page component responsible for this layout.
+2. Determine the actual rendered viewport width and the width of the main content container.
+3. Inspect whether the landing page has a mobile-only wrapper, fixed or restrictive "width"/"max-width", incorrect responsive breakpoints, or desktop CSS that is being overridden.
+4. Check whether the published build includes the previous fix. Do not assume the deployed site matches the latest source code.
+5. Determine whether the problem affects only the landing page or other pages as well.
+
+Implement the smallest necessary fix
+
+- Restore the existing intended desktop landing-page layout at desktop widths.
+- Ensure the content uses the intended desktop width and layout rather than remaining constrained to a phone-sized column.
+- Preserve the existing mobile layout and ensure the desktop fix does not break it.
+- Preserve the existing design, colors, typography, wedding card appearance, buttons, navigation, content, themes, animations, and all other working behavior.
+- Do not invent a new desktop design. Restore the intended existing desktop design.
+- Do not change unrelated components or responsive behavior.
+
+Verification
+
+Test the actual deployed website, or the built application if deployment testing is unavailable, at 390px, 768px, 1366px, and 1920px widths.
+
+Verify that the desktop layout actually expands and arranges its content as intended. Report the measured viewport and content widths, files changed, test results, and whether a new deployment is required.
+
+STRICT CHANGE RESTRICTION
+
+Do not change anything else. Make only the smallest changes required to fix this specific desktop layout problem. Do not modify backend code, database connections, Supabase or Neon configuration, secrets, authentication, wedding data, permissions, media storage, or unrelated functionality. Do not reset or delete data. If you cannot identify the root cause confidently, report your findings and ask before making broader changes.
+
+Do not claim the problem is fixed until the desktop layout has actually been verified.

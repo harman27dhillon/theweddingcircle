@@ -1,0 +1,57 @@
+Investigate and fix Cloudflare CDN connection test
+
+The CDN configuration currently shows:
+
+- CDN hostname: "https://media.theweddingcircle.in"
+- Cloudflare account ID: Present
+- Zone ID: Empty
+- Cloudflare API token: Saved on server
+- R2 bucket: "wedding-circle-media"
+- R2 connection: Verified
+- Cache policy: Private browser cache only
+- Private media access: Enabled and cannot be disabled
+- CDN status: Not configured; delivery is off
+- Test result: "The CDN test could not be finished."
+
+Your task
+
+Inspect the actual source code responsible for the CDN configuration, save operation, credential resolution, and connection test.
+
+1. Trace the complete CDN test flow from the UI through the server action to the Cloudflare API request.
+2. Identify the exact reason the test returns "The CDN test could not be finished." Do not guess.
+3. Check whether the test incorrectly requires a Zone ID when the hostname is not yet connected to a Cloudflare-managed DNS zone.
+4. Check whether the saved API token is being read correctly from the encrypted infrastructure vault or incorrectly from "process.env".
+5. Check Cloudflare API response handling, permissions, account ID validation, error handling, timeouts, and missing-field handling.
+6. Distinguish clearly between:
+   - Missing configuration
+   - Invalid credentials
+   - Insufficient permissions
+   - DNS/zone not managed by Cloudflare
+   - Network/API failure
+7. Fix the actual root cause. Improve the diagnostic message so it displays the real failure reason without exposing tokens or other secrets.
+8. Keep the existing private R2 storage architecture. Do not make the R2 bucket public, enable "r2.dev", or weaken private media access.
+9. Do not change GoDaddy DNS, nameservers, domain records, or Cloudflare DNS settings.
+10. Do not activate CDN delivery automatically. It must remain OFF until configuration and testing are successful and explicitly approved.
+11. Do not alter Cloudflare Stream or Firebase while fixing this CDN issue.
+
+Important constraints
+
+- Inspect the current source before editing.
+- Do not replace working functionality or create duplicate CDN systems.
+- Preserve existing credentials. Never ask me to regenerate or re-enter tokens without proving the existing token is invalid.
+- Do not expose secret values in logs, UI, test output, or reports.
+- If a Zone ID is genuinely required, explain exactly why and how it is used before requesting it.
+- Do not claim a live Cloudflare test passed unless an actual request using the saved credentials succeeded.
+
+Verification
+
+After implementation:
+
+- Run relevant CDN tests.
+- Run TypeScript checks.
+- Run the production build.
+- Add tests for each distinct failure category.
+- Confirm private R2 access remains enforced.
+- Report the exact root cause, files changed, tests passed, and anything still requiring a live test.
+
+Do not deploy or change production configuration. Stop after source changes and verification.

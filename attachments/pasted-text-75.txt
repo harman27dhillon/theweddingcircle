@@ -1,0 +1,29 @@
+Investigate a recurring production issue in The Wedding Circle.
+
+Problem: The website repeatedly breaks its layout in normal Android Chrome. It works correctly in Incognito. Resetting the entire Chrome app temporarily fixes it, but the problem eventually returns.
+
+Do NOT modify the UI or CSS during this investigation.
+
+Inspect the actual production code for:
+
+1. Service worker registration, lifecycle and update handling.
+2. PWA caching strategies and cache invalidation.
+3. Old HTML referencing outdated hashed JS/CSS assets.
+4. Vite build asset versioning and deployment behaviour.
+5. Cache-Control headers for HTML, JS, CSS and static assets.
+6. IndexedDB, localStorage and sessionStorage conflicts.
+7. Whether different application versions can run simultaneously.
+8. Whether an old service worker continues serving outdated files after deployment.
+
+Determine whether a mixed-version application or stale cached assets could explain the problem.
+
+Required outcome:
+
+- Identify the actual root cause using code and production evidence.
+- Propose a safe permanent fix.
+- Preserve login sessions, wedding data and user settings.
+- Do not indiscriminately clear browser storage.
+- Do not unregister the service worker without understanding its purpose.
+- Do not change any visual design or existing functionality.
+
+Report findings and proposed changes before implementing anything.

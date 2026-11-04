@@ -1,0 +1,152 @@
+TASK: ADD ELEGANT GOLDEN SPARKLES AND SPECIAL HIGHLIGHTING TO BRIDE AND GROOM CHAT MESSAGE BUBBLES.
+
+IMPORTANT:
+Modify only the existing Chat UI and its message styling. Preserve the recently repaired message alignment, message identity logic, message history, and all existing chat functionality.
+
+Do not redesign the Chat screen or modify unrelated screens.
+
+1. IDENTIFY THE BRIDE AND GROOM
+
+Inspect the existing wedding data model to determine how the bride and groom are identified.
+
+Use the wedding's actual bride and groom identities and stable user IDs wherever available.
+
+Do not identify them through hard-coded display names.
+
+Only messages belonging to the bride or groom should receive the special wedding sparkle treatment. Other participants' messages must retain their normal styling.
+
+The special treatment must follow the bride and groom's messages regardless of who is viewing the conversation or which side of the screen the messages appear on.
+
+2. CONTINUOUS GOLDEN SPARKLE ANIMATION
+
+Add small, elegant champagne-gold sparkles that continuously revolve around the OUTER BORDER of the bride's and groom's message bubbles.
+
+Animation requirements:
+- Small, refined gold sparkles rather than large stars.
+- Sparkles travel continuously around the message bubble's perimeter.
+- Use a smooth, seamless looping animation.
+- The animation must follow the actual bubble shape, including rounded corners.
+- Support bubbles of different widths and heights, including multiline messages.
+- Keep sparkles close to the outer border without covering the message text.
+- Use subtle gold glimmers and occasional tiny twinkles.
+- Keep the effect elegant and premium, not flashy or distracting.
+- The animation should continue while the chat is open, including when new messages arrive.
+- Do not restart every sparkle whenever the user types or a new message is received.
+
+Do not simply rotate a static star image or rotate the entire message bubble. The sparkles themselves should travel around the perimeter.
+
+3. SPECIAL MESSAGE BUBBLE HIGHLIGHTING
+
+Give the bride's and groom's message bubbles a slightly enhanced appearance:
+- A subtle luminous border.
+- A delicate champagne-gold edge highlight.
+- A very soft outer glow.
+- Refined depth that complements the existing rounded bubble shape.
+- A restrained highlight that makes their messages stand out without harming readability.
+
+The effect must remain subtle enough that the conversation is easy to read.
+
+Do not make the entire chat screen glow.
+
+Do not enlarge the bride's or groom's bubbles or change their alignment, padding, shape, or position just to create the effect.
+
+4. ADAPT THE EFFECT TO THE ACTIVE WEDDING THEME
+
+The sparkle and highlight must complement the wedding's currently applied theme.
+
+Examples:
+
+ROYAL BURGUNDY:
+- Champagne-gold sparkles.
+- Warm gold edge highlight.
+- Subtle glow against burgundy.
+
+PASTEL BLUSH:
+- Soft champagne-gold sparkles.
+- Blush-rose and warm-gold highlights.
+- A delicate romantic glow.
+
+SAGE GREEN:
+- Muted champagne-gold sparkles.
+- Soft botanical-green-compatible highlights.
+
+ROYAL BLUE:
+- Refined gold sparkles.
+- Subtle gold edging that complements navy.
+
+CLASSIC IVORY:
+- Soft champagne sparkles.
+- Fine warm-gold edging with restrained contrast.
+
+MIDNIGHT EMERALD:
+- Rich champagne-gold sparkles.
+- Elegant gold highlights against emerald.
+
+TERRACOTTA SUNSET:
+- Warm bronze-champagne sparkles.
+- Soft copper-gold highlights.
+
+LAVENDER DREAM:
+- Pale champagne-gold sparkles.
+- A delicate pearl-lavender-compatible glow.
+
+CLASSIC DEFAULT:
+- Preserve the original cream-and-brown interface.
+- Add only a very restrained warm-gold sparkle and edge highlight to bride/groom messages.
+- Do not transform Classic Default into a decorative theme or change its original general appearance.
+
+These are visual directions, not permission to replace the existing theme palettes.
+
+Use the active wedding's actual applied theme. Do not use a pending theme selection that has not been saved with Apply Theme.
+
+5. KEEP OTHER CHAT MESSAGES NORMAL
+
+Messages from ordinary wedding guests should retain their normal message styling.
+
+Do not add continuous sparkle animations to every message in the conversation.
+
+The bride and groom should be recognisable through their subtle premium treatment, not through larger text, larger bubbles, or different alignment.
+
+6. PERFORMANCE AND ACCESSIBILITY
+
+- Use lightweight CSS animations where practical.
+- Avoid continuous React state updates or JavaScript animation loops if CSS can achieve the effect.
+- Avoid creating excessive DOM elements for individual sparkles.
+- Keep scrolling and typing responsive.
+- Ensure the animation does not block tapping, selecting text, opening message controls, or using the composer.
+- Respect prefers-reduced-motion. When reduced motion is enabled, replace continuous movement with a subtle static gold border or gentle non-moving highlight.
+- Maintain sufficient text contrast.
+- Ensure the animation works with different message lengths and on phone-sized screens.
+
+7. PRESERVE THE CHAT LAYOUT
+
+Do not modify:
+- Current-user-right and other-user-left alignment.
+- Message sender identity logic.
+- Message bubble dimensions or padding.
+- Names and timestamps.
+- Message ordering or scrolling.
+- Message composer and Post button.
+- Plus menu, camera, photo attachments, or voice notes.
+- Authentication, wedding membership, or message privacy.
+- The existing theme system.
+
+If the bride or groom is also the current user, the sparkle effect must still appear on that person's messages on the right. Other viewers must see the same message highlighted on the left.
+
+8. TEST BEFORE FINISHING
+
+Verify:
+- The bride's messages have the sparkle treatment.
+- The groom's messages have the sparkle treatment.
+- Other participants' messages remain normal.
+- Sparkles follow short and multiline bubble borders correctly.
+- Sparkles continue moving without causing layout shifts.
+- All nine themes use appropriate highlights.
+- The currently applied theme controls the effect.
+- Chat alignment remains correct for two different users.
+- Reduced-motion settings work.
+- Existing Chat controls still function.
+
+Do not claim a test passed unless it was actually performed.
+
+IMPLEMENT THIS DIRECTLY IN THE EXISTING PROJECT. Keep the change limited to the bride/groom message styling and its necessary theme-aware animation styles.

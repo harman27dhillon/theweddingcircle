@@ -1,0 +1,152 @@
+Wedding Circle — Developer Infrastructure Fix & Update
+
+I want to fix and improve the three existing integrations inside Developer → Infrastructure:
+
+1. Cloudflare CDN
+2. Livestream Provider
+3. Firebase / Google Cloud
+
+Currently, these integrations continue showing errors even after their credentials and configuration values have been entered.
+
+I suspect issues in the existing application code, credential handling, API communication, validation or configuration persistence.
+
+Inspect the existing implementation first, identify the actual causes, and then fix the problems. Do not blindly ask me to re-enter credentials.
+
+1. Inspect existing infrastructure code
+
+Trace each integration through its complete workflow:
+
+- Frontend settings and input fields.
+- Backend API endpoints.
+- Credential-saving functions.
+- Database persistence.
+- Environment variables and secret retrieval.
+- Provider API requests and authentication.
+- Connection testing and health checks.
+- Status updates and error handling.
+
+Check for incorrect field mappings, inconsistent secret names, incorrect API endpoints, authentication errors, stale status responses and broken frontend/backend communication.
+
+Reuse existing code wherever possible. Do not create duplicate integrations.
+
+2. Cloudflare CDN — Fix and improve
+
+Verify:
+
+- Cloudflare Account ID.
+- API token and required permissions.
+- Zone ID and domain configuration, where required.
+- Backend secret retrieval.
+- Cloudflare API authentication.
+- CDN enable/disable functionality.
+- Actual configuration and connection status.
+- Error reporting and database persistence.
+
+Important:
+
+- Keep Cloudflare R2 storage separate from CDN configuration.
+- Do not make the R2 bucket public.
+- Do not modify DNS records or Worker routes.
+- Do not weaken private media access or caching security.
+- Do not report CDN operational simply because credentials are saved.
+
+3. Livestream Provider — Fix and improve
+
+Verify:
+
+- Provider selection and configuration.
+- API credentials and secret handling.
+- Correct API endpoints and authentication.
+- Stream creation and retrieval.
+- Publishing and playback configuration.
+- Backend environment-variable mapping.
+- Connection testing and error reporting.
+
+Preserve the existing livestream architecture and working functionality.
+
+Do not replace the current provider or introduce another paid provider without approval.
+
+Test credential connectivity separately from actual stream publishing and playback.
+
+4. Firebase / Google Cloud — Fix and improve
+
+Verify:
+
+- Firebase Project ID.
+- API key.
+- Authentication domain.
+- Frontend Firebase configuration.
+- Backend configuration and service-account credentials, where required.
+- Google Cloud project configuration.
+- Required API availability and permissions.
+- Secret handling and persistence.
+- Firebase Authentication functionality.
+
+Never expose service-account private keys or secrets in frontend bundles, browser responses or logs.
+
+Preserve existing users and authentication functionality. Do not create another Firebase project or change authentication providers without approval.
+
+5. Improve integration status reporting
+
+Each integration must accurately distinguish:
+
+- Not configured.
+- Credentials saved.
+- Connection test successful.
+- Configuration incomplete.
+- Connection failed.
+- Service operational.
+- Service unavailable.
+
+Do not show green success simply because credentials exist.
+
+Show meaningful error messages identifying the actual failure without exposing secrets.
+
+6. Testing
+
+For each integration, test:
+
+- Saving credentials.
+- Retrieving saved configuration.
+- Refreshing the settings page.
+- Running connection tests.
+- Valid credentials.
+- Invalid credentials.
+- Missing permissions.
+- Missing configuration.
+- Backend secret availability.
+- Status accuracy.
+- No secret leakage.
+
+Also run typecheck, relevant automated tests and production build.
+
+Do not use fake successful API responses.
+
+7. Implementation restrictions
+
+- Fix the existing integrations rather than rebuilding them.
+- Reuse existing settings, components and backend services.
+- Do not change DNS or Worker routes.
+- Do not make R2 public.
+- Do not replace existing providers.
+- Do not delete existing credentials or configuration.
+- Do not change unrelated features.
+- Do not deploy or publish without my approval.
+
+If a manual external configuration or permission is genuinely required, explain exactly what is missing.
+
+8. Final report
+
+For each integration, report:
+
+1. Original problem and root cause.
+2. Existing code reused.
+3. Code fixed or newly implemented.
+4. Configuration changes required.
+5. Connection test results.
+6. Functional test results.
+7. Remaining blockers.
+
+Clearly distinguish implemented, tested and deployed functionality.
+
+The objective is to make all three existing integrations genuinely functional and reliably report their status—not merely remove the red error indicators.

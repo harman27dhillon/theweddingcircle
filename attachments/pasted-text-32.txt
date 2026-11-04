@@ -1,0 +1,203 @@
+CRITICAL ARCHITECTURE CHANGE — MAKE MY OWN SUPABASE PROJECT THE PERMANENT DATABASE
+
+You are working on my existing production application, The Wedding Circle. I want you to IMPLEMENT this architecture change directly in the existing source code. Do not merely explain, propose a plan, or generate example code. Inspect the actual project, modify the necessary files, configure the integration, run available checks, and report the real outcome.
+
+1. NON-NEGOTIABLE ARCHITECTURE
+
+Keep the existing Grok hosting, deployment workflow, domain, UI, and application functionality.
+
+Replace the dependency on Grok's built-in Neon PostgreSQL database with my own externally managed Supabase project as the permanent database.
+
+The intended architecture is:
+
+- Hosting and application deployment: Grok, unchanged.
+- Primary PostgreSQL database: my own Supabase project.
+- Authentication: use the existing authentication mechanism initially unless a deliberate, verified change is necessary.
+- Photos, videos, albums, live streaming, and other external services: preserve their current integrations unless a specific database dependency must be changed.
+
+Do not migrate the website to Vercel, Netlify, or another hosting platform. Do not rebuild the application from scratch.
+
+2. AUDIT THE REAL SOURCE CODE FIRST
+
+Inspect the complete existing project before making changes.
+
+Identify and trace:
+
+- All Neon database connection configuration and usage.
+- All Supabase connection configuration and usage.
+- Every server-side database client, repository, query, transaction, and database-routing function.
+- The existing migration state, feature flags, and cutover controls.
+- Every table, column, index, constraint, relationship, trigger, function, and policy required by the running application.
+- Developer Center authentication, password verification, session persistence, and developer permissions.
+- Wedding creation, membership, host/co-host permissions, Chat, Live, Album, invitations, themes, media metadata, and other existing features.
+- Background jobs, scheduled tasks, API routes, and storage integrations that depend on the current database.
+
+Use the actual files, schemas, and runtime configuration. Do not invent file paths, environment variable names, tables, or providers.
+
+3. STOP DEPENDING ON GROK'S BUILT-IN NEON
+
+Refactor the application so that the intended production database is my own Supabase PostgreSQL instance.
+
+Requirements:
+
+- All application data that currently depends on Neon must be routed to Supabase where that data is required for application operation.
+- Eliminate dual-database ambiguity, accidental fallback writes, stale database-routing flags, and split-brain behavior.
+- Do not silently write to Neon if Supabase fails.
+- Use one clearly defined, server-side database configuration for production.
+- Preserve existing API contracts and application behavior.
+- Keep database credentials and privileged keys exclusively on the server.
+- Do not expose database URLs, passwords, service-role keys, or privileged credentials to browser bundles, logs, or client-visible responses.
+
+Do not simply change a connection string and declare the migration complete. Verify every active database access path.
+
+4. CLEAN START — OLD WEDDING RECORDS ARE NOT REQUIRED
+
+I do not need to preserve the existing wedding records, memberships, ceremony invitations, couple-access records, or other old wedding data in Grok's built-in Neon database.
+
+Therefore, do not waste time trying to reconcile the existing six field conflicts or three destination-only records solely to preserve those records.
+
+Instead:
+
+1. Determine which schema and data structures the current application requires to run correctly.
+2. Create or apply the correct schema to my Supabase project using version-controlled, repeatable SQL migrations.
+3. Ensure all required tables, indexes, constraints, database functions, and access policies exist.
+4. Start with an empty wedding dataset if necessary.
+5. Preserve the application code, theme registry, configuration, and required non-wedding application settings.
+6. Do not accidentally delete or overwrite unrelated data already in my Supabase project.
+7. Do not automatically drop tables, truncate tables, reset the entire project, or delete Supabase-only records.
+8. Do not remove the Neon database or its configuration until the Supabase deployment has been verified and a recovery path exists.
+
+The fact that I do not need old wedding records is NOT permission to delete unrelated data, credentials, or configuration.
+
+5. DEVELOPER CENTER LOGIN MUST REMAIN RECOVERABLE
+
+I can change my developer credentials through the source code when necessary. Preserving the old developer password is not my priority; maintaining reliable access to the Developer Center is.
+
+Inspect the actual developer authentication implementation and determine whether it depends on Neon, Supabase, local configuration, or a separate authentication service.
+
+Requirements:
+
+- Preserve the developer login mechanism and authorization checks.
+- Ensure a valid developer can still sign in after deployment.
+- Preserve or safely recreate required developer sessions and session tables.
+- If the existing password verification is source-code-based, retain its intended behavior without exposing secrets.
+- If a database-backed session or account table is required, create and configure it correctly in Supabase.
+- Do not bypass authentication or make the Developer Center publicly accessible.
+- Verify login and logout behavior after the database switch.
+
+Do not assume that the developer login is independent of the database merely because its password hash is in the source code.
+
+6. FIX SUPABASE AUTHENTICATION AND SECURITY
+
+The previous migration dashboard reported:
+
+- Supabase PostgreSQL connected.
+- Supabase Auth API health check failed.
+- Six field conflicts.
+- Three destination-only rows.
+- A public-access/security validation failure.
+
+Investigate these findings individually.
+
+Important distinctions:
+
+- PostgreSQL connectivity does not prove that Supabase Auth is healthy.
+- If the app does not require Supabase Auth, do not introduce an unnecessary authentication migration.
+- If the existing application does require Supabase Auth, identify the exact cause of the health-check failure and correct the configuration.
+- If the health endpoint fails because of a network, endpoint, or credential issue, distinguish that from a genuine authentication-service outage.
+- Inspect actual RLS policies, grants, table privileges, and exposure of sensitive wedding data.
+- Keep private wedding content, access codes, membership information, and developer credentials protected.
+- Never resolve a security warning by disabling authentication or granting unrestricted public access.
+- Do not claim the security audit passed without actual verification.
+
+Use least-privilege database access and the existing server-side architecture wherever appropriate.
+
+7. HANDLE ENVIRONMENT CONFIGURATION CORRECTLY
+
+Inspect the project's actual configuration conventions and document every required production setting.
+
+- Reuse existing environment-variable names where appropriate.
+- If new variables are necessary, identify them explicitly.
+- Configure them through the appropriate Grok deployment environment settings when available.
+- Do not hardcode credentials into source files.
+- Do not invent secret values or claim a connection is configured if you cannot verify it.
+- If I must provide a Supabase URL, database password, publishable key, or other configuration manually, tell me exactly which value is required and where it belongs.
+- Never ask me to paste secret values into public source code.
+
+If Grok's runtime cannot securely connect to my Supabase project, explain the actual blocker rather than pretending the integration works.
+
+8. PRESERVE THE EXISTING APPLICATION
+
+This is a database architecture change, not a redesign.
+
+Do not remove, simplify, or break:
+
+- Existing wedding themes and theme application.
+- Home, Chat, Live, Album, and More navigation.
+- Wedding creation and access controls.
+- Host/co-host controls.
+- Developer Center features.
+- Chat history and message sending.
+- Photo and video upload integrations.
+- Live-streaming integrations.
+- Invitation flows and theme music.
+- Mobile responsiveness, animations, and existing UI behavior.
+
+Update only the code necessary to implement the new architecture and correct genuine database dependencies.
+
+Do not introduce unnecessary dependencies, duplicate database clients, new unrelated services, or a second authentication system.
+
+9. REQUIRED TESTS BEFORE DECLARING SUCCESS
+
+Run all available type checks, builds, tests, schema checks, and relevant security checks.
+
+Verify as much as the actual environment permits:
+
+1. The application starts and builds successfully.
+2. Production database operations use my Supabase project.
+3. The application no longer requires Grok's Neon database for ordinary operation.
+4. Required tables and constraints exist.
+5. A new wedding can be created and retrieved.
+6. Membership and host/co-host permissions work.
+7. Chat can read and write messages.
+8. Album and media metadata operations work without breaking existing storage integrations.
+9. Developer Center login and authorization work.
+10. Existing navigation and themes still function.
+11. Invalid or unauthorized requests are rejected.
+12. Sensitive tables and credentials are not publicly exposed.
+13. Database connection failures produce clear errors without silently writing to another database.
+
+Clearly distinguish tests actually executed from tests that could not be run because of missing credentials or runtime access.
+
+10. FINAL CUTOVER AND ACCEPTANCE CRITERIA
+
+Implement the code changes and prepare the production cutover.
+
+Before any irreversible action:
+
+- Verify that the intended Supabase project is the target.
+- Verify that the required schema is installed.
+- Verify that the live deployment can connect to Supabase.
+- Verify developer access and critical application functionality.
+- Verify that no required application functionality still depends on Neon.
+- Confirm that the old Neon database can remain untouched during the verification period.
+
+Do not delete or disable Neon until the new deployment has been tested successfully. Do not claim Neon has been removed from production unless the actual runtime configuration confirms it.
+
+If you cannot complete the cutover automatically, implement all safe source-code changes possible and give me the exact remaining manual steps.
+
+11. REQUIRED FINAL REPORT
+
+When finished, provide a concise, evidence-based report containing:
+
+- Files changed.
+- Database architecture before and after.
+- Tables and schema created or updated.
+- Authentication and security issues found and their actual status.
+- Build and test results.
+- Which features were verified to work.
+- Any remaining Neon dependencies.
+- Any manual Grok or Supabase configuration I must complete.
+- Whether the application is genuinely using Supabase in production or is only prepared to do so.
+
+Final instruction: Make this a real, tested architecture change in my existing Wedding Circle project. Do not stop at an audit, a proposed plan, or a successful database connection. Keep Grok hosting, make my own Supabase project the permanent database, preserve developer access, protect security, and avoid unnecessary migration of old wedding records.

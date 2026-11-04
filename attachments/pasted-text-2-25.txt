@@ -1,0 +1,70 @@
+DESKTOP ONLY — REORGANIZE THE WEDDING CIRCLE CHAT TOP BAR
+
+Inspect the existing Chat header and floating controls in the current source code. Implement the following layout correction directly.
+
+1. New desktop top-bar arrangement
+
+On desktop screens only, move the controls into the Chat top bar in this order, from left to right:
+
+Right-aligned control group:
+
+1. Notification button
+2. Filter button
+3. Chat Microphone button
+4. Chat Speaker button
+5. Arrow button (profile/participant panel toggle)
+
+All five controls must sit together at the RIGHT CORNER of the Chat top bar, on the same horizontal line.
+
+2. Positioning and spacing
+
+- Notification and Filter must be moved to the far-right area of the top bar.
+- Place the Microphone immediately next to Filter.
+- Place the Speaker immediately next to Microphone.
+- Place the Arrow immediately next to Speaker.
+- Maintain consistent spacing between all five controls.
+- Ensure none of the buttons overlap, collide, or cover another control.
+- Keep their existing icons, styling, dimensions, click handlers and functionality.
+- Vertically align all controls with the top-bar content.
+- Use a responsive flex layout with appropriate gaps and prevent controls from wrapping or overlapping at normal desktop widths.
+- If space becomes constrained, adjust available header spacing rather than hiding controls.
+
+3. Desktop-only restriction — critical
+
+This change applies ONLY to the desktop Chat interface.
+
+- Do not change the mobile Chat header.
+- Do not move or resize mobile microphone, speaker, arrow, notification or filter controls.
+- Preserve the existing mobile layout and interactions exactly as they are.
+- Use the project's existing responsive breakpoints and desktop-specific styling.
+- Avoid global CSS changes that unintentionally affect mobile.
+
+4. Functional requirements
+
+- Notification must still open its existing notification interface.
+- Filter must still open its existing filter interface.
+- Microphone must still toggle the actual Chat microphone state and correctly update its icon.
+- Speaker must still toggle the actual Chat speaker state and correctly update its icon.
+- Arrow must still open and close the existing participant/profile panel.
+
+Do not replace working functionality with decorative controls.
+
+5. Verification
+
+Test:
+
+- Desktop Chat at normal laptop width.
+- Desktop Chat at narrower desktop widths.
+- All five controls remain visible, separate and clickable.
+- No overlapping with the Chat title, other header content or message area.
+- Microphone and speaker icons reflect their real states.
+- Arrow, Notification and Filter still work.
+- Mobile layout remains visually and functionally unchanged.
+
+Implementation rules
+
+Inspect the actual Chat header components and CSS before modifying them. Fix the layout at its source rather than adding arbitrary fixed positioning.
+
+Do not redesign the Chat screen or modify unrelated components.
+
+Implement the changes directly, run the available build, and report the files changed and desktop/mobile verification results. Do not claim mobile is unchanged unless you have checked it.

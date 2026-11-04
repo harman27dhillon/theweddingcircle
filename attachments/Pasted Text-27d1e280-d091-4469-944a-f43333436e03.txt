@@ -1,0 +1,106 @@
+PROJECT: THE WEDDING CIRCLE — FIX CHAT LAYOUT AND REDUCE PHOTO/VIDEO PREVIEW SIZE
+
+Inspect the existing Chat components and fix the layout problems shown in the provided screenshot. Make targeted changes to the existing implementation. Do not redesign the app or modify the theme system.
+
+1. Restore the Chat layout
+
+- Keep the Chat heading at the top.
+- Display messages in a vertically scrolling conversation area beneath the heading.
+- Ensure messages are not clipped behind the heading or hidden beneath the composer.
+- Keep the message composer anchored at the bottom of the Chat screen, immediately above the existing bottom navigation.
+- Keep the plus, message input, microphone, Post, and existing auxiliary controls functional.
+- Ensure the composer does not overlap message content while scrolling or opening the keyboard.
+- Preserve the existing message alignment: the current user's messages on the right and other participants' messages on the left.
+- Preserve message history, sender names, timestamps, attachments, and existing interactions.
+
+2. Make posted photos significantly smaller
+
+The screenshot shows a photo occupying almost the entire available Chat screen. Fix the actual media-rendering component so this cannot happen.
+
+For photos posted in Chat:
+
+- Display a compact thumbnail inside the message bubble.
+- Use a responsive maximum width of approximately 220–260 CSS pixels on a typical phone.
+- Limit the preview height to approximately 240–280 CSS pixels.
+- On narrower screens, keep the media within the available message-bubble width.
+- Preserve the original image aspect ratio using "object-fit: contain" or an equivalent appropriate approach. Do not stretch or distort images.
+- Round the preview corners to match the existing Chat design.
+- Do not allow media to expand to the full screen or full conversation width by default.
+- Keep surrounding message text and sender information properly spaced.
+
+3. Make posted videos compact too
+
+Apply comparable sizing rules to videos posted in Chat:
+
+- Use a compact video preview with a maximum width of approximately 220–260 CSS pixels on a typical phone.
+- Limit the preview height to approximately 240–280 CSS pixels.
+- Preserve the video's aspect ratio.
+- Show appropriate playback controls and a clear play affordance.
+- Do not autoplay videos simply because they appear in the conversation.
+- Prevent video dimensions from expanding the message bubble or pushing the composer off-screen.
+
+4. Allow users to view media at full size when wanted
+
+Compact previews must not reduce access to the original media.
+
+When a user taps a photo or video, open it using the existing full-screen media viewer if available. Otherwise, implement a lightweight full-screen viewer that:
+
+- Displays the media at a suitable size.
+- Preserves aspect ratio.
+- Provides a clear close/back action.
+- Returns the user to the same conversation position.
+- Does not alter or duplicate the original uploaded file.
+
+Keep full-screen viewing separate from the default inline preview.
+
+5. Correct the underlying layout issue
+
+Inspect the actual DOM/component structure, CSS positioning, media dimensions, scrolling containers, and composer layout.
+
+Check for:
+
+- Images rendered with unrestricted width or height.
+- Fixed-height containers clipping content.
+- Absolute positioning that causes overlap.
+- Incorrect "position: fixed" or "position: sticky" behaviour.
+- Missing "min-height: 0" or incorrect flex sizing in scrolling containers, where applicable.
+- Duplicate or conflicting media styles.
+- Composer and bottom-navigation overlap.
+- Incorrect sizing when the keyboard opens.
+
+Fix the root cause instead of adding arbitrary offsets or hiding overflowing content.
+
+6. Preserve existing functionality
+
+Do not change:
+
+- Wedding themes or theme definitions.
+- Apply Theme or Cancel behaviour.
+- Chat colours or decorative backgrounds.
+- Message alignment.
+- Authentication, permissions, or wedding membership.
+- Photo/video uploads or storage.
+- Voice notes, camera, attachment menu, or Post functionality.
+- Bottom navigation.
+- Existing media URLs or uploaded files.
+
+Do not replace real media with sample content or mock previews.
+
+7. Test the actual result
+
+Verify:
+
+1. Text-only messages display correctly.
+2. Portrait photos appear as compact previews.
+3. Landscape photos appear as compact previews.
+4. Portrait and landscape videos remain within the specified size limits.
+5. Long conversations scroll normally.
+6. The composer remains visible above bottom navigation.
+7. The keyboard does not cover the composer.
+8. Tapping a media preview opens full-size viewing where implemented.
+9. Returning from the viewer restores the previous conversation position.
+10. No media overlaps the Chat heading or composer.
+
+Test on a phone-sized viewport and report which checks were actually performed. Do not claim that the issue is fixed without verifying the rendered layout.
+
+Implement the changes directly in the existing project. Preserve existing functionality and avoid unrelated modifications.

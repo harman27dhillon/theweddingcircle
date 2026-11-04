@@ -1,0 +1,16 @@
+Implement a Culture-Aware Default Mehndi/Henna Ceremony Cover Across Classic Themes
+
+Use the attached Mehndi materials image as a permanent, built-in default cover asset in The Wedding Circle.
+
+1. Automatically recognize the ceremony across cultures and naming variations. Do not match only the exact word “Mehndi.” Detect common synonyms, alternative spellings, regional names, and culturally equivalent ceremony names associated with applying henna or decorating hands with henna before a wedding. Examples include Mehndi, Mehendi, Henna Ceremony, Henna Night, Hina, and other recognized regional equivalents.
+2. Use a maintainable, extensible ceremony-alias mapping system so additional languages, cultures, spellings, and transliterations can be supported without rewriting the entire feature.
+3. When a user adds or renames a ceremony to a recognized henna-related name, automatically apply the attached image to that ceremony bar whenever either Classic theme is active.
+4. For ambiguous or unfamiliar ceremony names, avoid blindly matching unrelated ceremonies. Use known aliases and a safe fallback; allow the user to choose a ceremony category if necessary.
+5. Preserve the image composition: dark navy negative space on the left for readable text, with the Mehndi materials, flowers, and lanterns on the right. Keep the image sharp and recognizable, using appropriate cover positioning and a subtle readability gradient if required.
+6. Maintain the existing Classic theme design, including typography, borders, rounded corners, spacing, and responsive mobile layout. Do not replace the entire ceremony card with a different layout.
+7. Store the image as a permanent application asset, not a temporary upload URL, and apply it consistently wherever the relevant ceremony bar appears.
+8. Keep this asset isolated from all other ceremony and theme images. Dragging, replacing, or editing one image must never change another ceremony's or theme's image.
+9. Respect user customization: if a user explicitly selects a custom cover for a ceremony, preserve that selection instead of silently overwriting it. Provide a way to restore the default cover.
+10. Apply this feature only to the relevant henna-related ceremony bars in the two Classic themes. Do not change other themes, unrelated ceremonies, the overall wedding background, or existing application functionality.
+
+Implementation and verification: Update the actual application logic, not just the visual preview. Test multiple recognized names and spellings, both Classic themes, newly created and existing weddings, mobile display, custom cover preservation, and image isolation. Ensure all ceremony text remains readable and the image does not become excessively blurred.

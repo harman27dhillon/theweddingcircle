@@ -1,0 +1,54 @@
+Fix Album Heading Contrast and Make Start Live Stream Button Prominent
+
+Inspect the actual Wedding Circle code and implement the following two UI fixes directly. Use the attached screenshots as the visual reference.
+
+1. Album page — remove the extra text
+
+In the Album section, the current page displays:
+
+- “The album”
+- “Everything shared in the circle, kept with the function it belonged to. It stays after the wedding.”
+- “The rest of the day”
+
+These headings and descriptions are almost invisible because their light-colored text clashes with the selected theme's background.
+
+Required changes:
+
+- Remove the introductory heading “The album”.
+- Remove the descriptive paragraph below it completely.
+- Remove the subheading “The rest of the day”.
+- Replace all of them with just one clean heading: “Album”.
+- Display “Album” in a dark, readable color, preferably a deep brown or near-black that contrasts clearly with the current theme background.
+- Position the heading neatly at the top of the Album content, with balanced spacing before the photo grid.
+- Keep the existing photo count, photo grid, image previews, Save buttons, album data, and all existing functionality unchanged.
+- Ensure the heading remains readable across every theme, including light, dark, and custom themes. Use theme-aware contrast or an appropriate dark heading color for light backgrounds and a suitable contrasting color for dark backgrounds.
+
+Do not leave empty space where the removed text used to be. Make the Album page compact and visually balanced.
+
+2. Live camera — make the Start Live Stream button stand out
+
+In the camera/live preview screen, the bottom controls currently show five circular buttons: video camera, microphone, camera switch, live broadcast, and close (X).
+
+The live broadcast button (the fourth button, immediately to the left of X) is not prominent enough. It looks too similar to the other secondary controls, even though it starts a live stream.
+
+Required changes:
+
+- Keep all five controls in their current order and position.
+- Make the fourth button visually prominent as the primary action.
+- Give it a larger visual presence through a clearly differentiated background, brighter broadcast icon, and stronger contrast against the camera preview.
+- Use a premium wedding-appropriate treatment: a rich burgundy or deep red background with a champagne-gold border or subtle glow, consistent with the existing Wedding Circle design.
+- Keep the X button visually distinct as the close action, not another primary action.
+- Add an accessible label or tooltip such as “Start live stream”.
+- If the live stream is already active, show a clearly different active state and label, such as “Live” or “End live”, according to the existing functionality.
+- Preserve the current camera preview, full-screen behavior, microphone, video controls, camera switching, permissions, and live-stream logic. Do not accidentally trigger the stream merely by opening the camera preview.
+
+3. Implementation and verification
+
+- Inspect the existing components and theme system before editing.
+- Make these changes in the actual components, not just in a theme preview or screenshot.
+- Avoid broad global CSS changes that could affect other pages.
+- Test the Album heading against multiple light and dark themes.
+- Test the live button on mobile and desktop, ensuring it remains visible over bright and dark camera footage and is easy to tap.
+- Run the available build and type checks and fix any regressions.
+
+Scope restriction: Only make the Album text/heading changes and improve the live-stream button's prominence. Do not redesign the entire Album page, camera interface, or other wedding sections.

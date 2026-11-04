@@ -1,0 +1,29 @@
+URGENT: React Error #31 After Cloudflare R2 Connection Test
+
+After entering Cloudflare R2 credentials in Developer Settings → Infrastructure and clicking Test Connection, the application crashes and displays:
+
+"Minified React error #31"
+"args[]= %5Bobject%20Date%5D"
+
+Investigate and fix the actual root cause.
+
+Requirements:
+
+1. Inspect the R2 connection-test API response and frontend response handling.
+2. Identify any JavaScript object, Date object, error object or nested API response being rendered directly as a React child.
+3. Convert response data into safe, readable strings or properly structured React components.
+4. Handle successful responses, failed authentication, missing credentials, network errors and unexpected response formats without crashing.
+5. Inspect the R2 test result component and shared Infrastructure status components for the same rendering bug.
+6. Add defensive response validation and error boundaries so a failed connection test cannot crash the entire application.
+7. Preserve all saved R2 credentials and existing infrastructure configurations.
+8. Do not redesign the interface or modify unrelated features.
+
+Test the complete flow on desktop and mobile:
+
+- Save R2 credentials.
+- Run Test Connection.
+- Handle success and failure responses.
+- Confirm the interface remains functional.
+- Reload the page and test again.
+
+Do not simply hide the error. Fix the underlying React rendering problem and report the exact root cause and files changed.

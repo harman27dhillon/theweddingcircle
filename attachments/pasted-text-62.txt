@@ -1,0 +1,40 @@
+Fix the desktop Leaderboard crown rendering and Profile icon layering issues in the existing Wedding Circle application.
+
+1. Fix duplicate or overlapping Leaderboard crowns
+
+On desktop, the crown icons above the Leaderboard wedding profile circles appear doubled, with one layer misaligned over the other.
+
+- Inspect the actual Leaderboard component, JSX/React rendering, CSS, pseudo-elements ("::before" / "::after"), and any shared avatar components.
+- Identify and remove the duplicate crown rendering source if two layers are present. Do not merely shift the overlapping crown to hide the issue.
+- Render exactly one crown per applicable Leaderboard avatar.
+- Center each crown precisely above its corresponding profile circle.
+- Apply consistent crown dimensions, vertical spacing, alignment, and stacking order.
+- Preserve the existing crown design and intended ranking indicators.
+
+2. Fix the Profile icon hidden behind decorative flowers
+
+On desktop, the Profile button/icon in the landing-page header is partially hidden behind the decorative floral artwork because of incorrect rendering order or stacking.
+
+- Inspect the header, Profile button, floral decorations, positioning, and "z-index" hierarchy.
+- Keep the Profile button fully visible, clickable, and accessible above decorative artwork.
+- Ensure flowers never cover, obscure, or intercept clicks on the Profile button. Decorative elements should use "pointer-events: none" where appropriate.
+- Correct the underlying stacking contexts and positioning rather than applying arbitrary high "z-index" values without checking their parent elements.
+- Preserve the existing header layout, floral design, button styling, and responsive behavior.
+
+3. Desktop-first verification
+
+- Test at common desktop widths, including 1024px, 1366px, and 1920px.
+- Verify the Leaderboard crowns remain single, centered, and correctly aligned at every width.
+- Verify the Profile button remains completely visible and clickable when floral decorations are present.
+- Recheck mobile and tablet layouts to prevent regressions.
+
+Important restrictions
+
+- Fix the root causes in the existing code.
+- Do not redesign the landing page or Leaderboard.
+- Do not change unrelated components, themes, colors, typography, database logic, or existing functionality.
+- Do not use hardcoded offsets that only work at one screen size.
+- Preserve all existing wedding data and features.
+- After implementation, report the exact cause of each issue, the files changed, and the tests performed.
+
+Implement the fixes directly in the existing project and verify the results.

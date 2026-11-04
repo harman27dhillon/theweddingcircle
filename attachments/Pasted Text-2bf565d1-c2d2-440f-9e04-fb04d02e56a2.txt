@@ -1,0 +1,54 @@
+Modify my Wedding Circle app to use a privacy-first, user-owned media architecture.
+
+Core privacy principle
+
+Photos and videos uploaded by a user should be stored in that user's own Google Photos account, not in a company-owned storage bucket.
+
+The user should clearly understand:
+
+- Their uploaded photos/videos belong to them.
+- Their media is stored in their own Google account/Google Photos.
+- The company should not maintain a permanent copy of their media in company-owned storage.
+- The app should only request the minimum Google permissions required.
+- Users can disconnect/revoke Google Photos access.
+- Do not use user media for advertising, AI training, analytics, or any unrelated purpose.
+
+User flow
+
+1. User signs up/signs in with Google.
+2. Ask the user to authorize Google Photos access with a clear privacy explanation.
+3. User can decline or revoke access.
+4. When the user posts a photo/video to a Wedding Circle, upload it to their own Google Photos account.
+5. Associate the media with the appropriate Wedding Circle.
+6. Do not permanently copy the media into company-owned storage.
+
+Circle experience
+
+Even though the original media belongs to the uploader:
+
+- Other authorized members of that Wedding Circle should be able to see the photo.
+- Other authorized members should be able to play uploaded videos.
+- Do not expose the uploader's private Google Photos library.
+- Guests should only see media that has been shared with that specific Wedding Circle.
+
+Security
+
+- Use official Google OAuth.
+- Never ask for or store Google passwords.
+- Never expose OAuth client secrets or refresh tokens in frontend code.
+- Store only the minimum metadata needed by the app.
+- Use secure server-side OAuth handling.
+- Allow users to disconnect their Google account.
+- When a user deletes a post, handle the corresponding Google Photos media according to the user's explicit choice and Google's API capabilities.
+
+Critical API requirement
+
+Before implementing this, verify the CURRENT Google Photos API capabilities and restrictions.
+
+Do not assume that media stored in one user's private Google Photos can automatically be streamed to other Circle members.
+
+If Google's current API does not support the exact cross-user playback/storage model above, tell me exactly what limitation exists and implement the closest privacy-preserving architecture instead.
+
+Keep the existing Wedding Circle UI and design unchanged.
+
+After implementation, provide exact Google Cloud Console setup instructions, OAuth configuration, APIs to enable, redirect URLs, authorized domains, required scopes, and environment variables.

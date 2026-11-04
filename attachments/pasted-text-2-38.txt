@@ -1,0 +1,61 @@
+TASK 3 — General cleanup and organisation of Developer → Infrastructure code
+
+After completing the Firebase UI cleanup and the three integration audits, perform a careful structural cleanup of the Infrastructure code section.
+
+Goal: Make this part of the codebase easier to understand, audit, debug and modify during future maintenance.
+
+1. Inspect before restructuring
+
+- Identify all files, components, hooks, API routes, backend handlers, configuration schemas and shared utilities belonging to Infrastructure.
+- Identify duplicated logic, obsolete code, unused functions, inconsistent naming and unnecessary dependencies.
+- Map the dependencies between each Infrastructure section before moving anything.
+
+2. Organise the code
+
+- Group related code logically.
+- Separate frontend UI, configuration handling, secret management, API communication, validation and connection testing.
+- Keep Firebase, Cloudflare Stream, Cloudflare CDN, R2, database and other infrastructure integrations clearly separated.
+- Extract genuinely shared utilities where appropriate.
+- Use consistent naming and predictable file organisation.
+- Keep each integration's responsibilities clear.
+
+3. Remove unnecessary complexity
+
+- Remove confirmed dead code, duplicate handlers, obsolete checker implementations and unused imports.
+- Consolidate duplicate validation and error-handling logic where safe.
+- Avoid unnecessary abstraction layers and oversized files.
+- Do not remove functionality merely because it appears unused without checking its references.
+
+4. Preserve existing behaviour and architecture
+
+- Do not change provider choices, credentials, secret names, database architecture or storage architecture.
+- Do not change API contracts unless a proven bug requires it and is documented.
+- Preserve all existing Infrastructure settings and saved values.
+- Do not reset configuration, clear user data or force logout.
+- Keep Firebase accessible under Infrastructure.
+- Preserve private R2 storage and existing media access controls.
+- Keep CDN delivery disabled until separately verified and authorised.
+
+5. Make future audits easier
+
+- Add concise comments only where they clarify non-obvious behaviour.
+- Make configuration sources explicit: saved configuration versus server environment fallback.
+- Make errors distinguishable and traceable without exposing secrets.
+- Ensure each connection test has a clear entry point and identifiable backend route.
+- Avoid multiple competing implementations of the same connection test.
+
+6. Verification
+
+After cleanup:
+
+- Run typecheck.
+- Run relevant unit and integration tests.
+- Run production build.
+- Check imports and references after file moves.
+- Verify all Infrastructure sections still render and their existing controls remain functional.
+- Report every moved, merged, removed or renamed file.
+- Identify any behaviour changes separately.
+
+Do not deploy or publish. Do not claim that live integrations work based only on a successful build or unit tests.
+
+The result should be a clean, logically organised Infrastructure codebase that another developer can inspect and maintain without having to trace confusing duplicate code paths.

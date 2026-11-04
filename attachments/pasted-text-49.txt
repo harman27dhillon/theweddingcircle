@@ -1,0 +1,149 @@
+The Wedding Circle — Safe Source Code Cleanup and Dead Code Removal
+
+Work directly on my existing Wedding Circle project. I want to reduce unnecessary source-code size, remove confirmed dead code, and improve maintainability without breaking any existing feature.
+
+1. First, audit the entire project
+
+Inspect the source code, project structure, imports, dependencies, routes, components, hooks, utilities, stylesheets, assets, API endpoints, background jobs, database access, and tests.
+
+Identify:
+
+- Unused source files and components.
+- Unused functions, variables, constants, hooks, and exports.
+- Duplicate implementations that are genuinely redundant.
+- Unused CSS selectors and animation definitions.
+- Unused image, font, and other static assets.
+- Unused dependencies and development dependencies.
+- Dead code left behind by previous updates.
+- Duplicate helper functions that can safely share an existing implementation.
+
+Produce an internal dependency map showing how application entry points, routes, components, APIs, and assets are connected before removing anything.
+
+2. Strict removal rule — only remove code proven to be unused
+
+Remove a piece of code only when you have strong evidence that no existing application feature depends on it.
+
+Before deleting anything, verify that it is not used through:
+
+- Direct or indirect imports.
+- Dynamic imports or lazy-loaded routes.
+- Runtime component registries or string-based lookups.
+- Reflection, generated imports, or build-time asset references.
+- CSS classes applied conditionally or constructed dynamically.
+- Theme registries, animation mappings, or data-driven component rendering.
+- API routes, server-side tasks, event handlers, or external integrations.
+- Database migrations, scripts, tests, or deployment configuration.
+
+If you are uncertain whether something is in use, keep it. Mark it as requiring manual review rather than deleting it.
+
+Do not classify a file as dead simply because it is not referenced directly in the main application entry file.
+
+3. Protect all existing Wedding Circle functionality
+
+Do not remove, disable, simplify away, or change the behavior of any existing feature, including:
+
+- All Preset and Classic themes.
+- Theme switching, backgrounds, floral assets, and cover-image customization.
+- Wedding Bar customization, text positioning, and aspect-ratio settings.
+- Host Control, Developer options, and Classic Theme Maker.
+- Authentication, sessions, wedding creation, joining, deletion, and access permissions.
+- Supabase database routing, migrations, persistence, and storage.
+- Chat, message sending, music, sound controls, and synchronization.
+- Live streaming, cameras, albums, and media uploads.
+- Ceremonies, invitations, guests, family management, and privacy settings.
+- Mobile and desktop navigation, scrolling, responsive layouts, and animations.
+- Mobile landing-page backgrounds, developer-uploaded assets, and image selection.
+- Any functionality that may be used by the deployed app even if it is not immediately visible in the UI.
+
+Preserve existing environment variables, configuration files, deployment settings, build scripts, and service-worker behavior.
+
+4. Avoid risky refactoring
+
+This task is primarily a conservative cleanup, not a redesign or architectural rewrite.
+
+- Do not rewrite large files merely because they are long.
+- Do not rename files, exports, routes, database tables, API endpoints, environment variables, or configuration keys unnecessarily.
+- Do not merge components or reorganize the entire directory structure unless there is a clearly safe and necessary reason.
+- Do not change UI styling, copy, layouts, or interactions.
+- Do not remove tests because they are failing.
+- Do not remove dependencies solely because they appear unused in a basic text search.
+- Do not introduce a new framework, library, or build tool.
+- Do not reset databases, delete records, change authentication, or modify production secrets.
+- Do not remove migrations simply because their changes have already been applied in one environment.
+
+Make small, reviewable changes that can be traced to confirmed dead code.
+
+5. Remove genuinely unused dependencies and assets cautiously
+
+For dependencies:
+
+- Inspect package imports, plugin configuration, build scripts, test setup, and command-line usage.
+- Remove a package only when there is strong evidence that neither runtime nor development workflows need it.
+- Preserve compatible dependency versions for packages that remain.
+- Update the lockfile through the project's existing package manager.
+- Do not upgrade unrelated dependencies as part of this task.
+
+For assets:
+
+- Verify actual references in source files, stylesheets, theme registries, manifests, and runtime configurations.
+- Preserve images that might be selected dynamically in Host Control or the Classic Theme Maker.
+- Keep uploaded artwork that is still referenced by saved theme or background settings.
+- Do not delete an asset if an existing database record or configuration could still reference it.
+
+6. Improve maintainability where it is safe
+
+After removing confirmed dead code, make only small cleanup improvements such as:
+
+- Removing unreachable branches.
+- Removing unused imports and variables.
+- Simplifying obviously redundant conditions without changing behavior.
+- Removing duplicated declarations that are demonstrably identical and safely replaceable.
+- Correcting outdated comments that contradict the current implementation.
+- Keeping error handling, authorization checks, and validation intact.
+
+Do not perform broad code formatting across the entire repository if it would create an unnecessarily large diff.
+
+7. Required validation after each cleanup batch
+
+Use a staged process:
+
+1. Create or preserve a recoverable version of the project before editing.
+2. Inventory and classify suspected dead code.
+3. Remove only high-confidence unused items in a small batch.
+4. Run type checks, lint checks, relevant tests, and the production build.
+5. Inspect build output for missing imports, unresolved assets, and unexpected bundle changes.
+6. Review the diff and revert any change that causes a regression.
+7. Repeat with another small batch only after the previous batch passes.
+
+Also verify that the production build still includes dynamically selected themes, images, fonts, routes, and other configuration-driven features.
+
+If the project already has failing tests, identify the baseline failures and distinguish them from any new failures. Do not claim the project is fully validated if important checks could not run.
+
+8. Report uncertain candidates instead of deleting them
+
+Maintain a list of files or code that appears unused but cannot be conclusively verified.
+
+For each uncertain item, state:
+
+- What it is.
+- Why it looks unused.
+- What reference or runtime behavior remains uncertain.
+- What evidence would be needed before safe removal.
+
+Leave these items untouched.
+
+9. Final report
+
+Provide:
+
+- A summary of confirmed dead code removed.
+- The exact files deleted or modified.
+- Dependencies and assets removed, if any.
+- Validation results from type checking, linting, tests, and the production build.
+- Any baseline failures or regressions encountered.
+- A list of uncertain code intentionally retained.
+- A realistic summary of source-size and build-size changes, using actual measurements where available.
+
+Do not invent byte savings or claim performance improvements without measurements.
+
+Final instruction: Prioritize application safety over maximum code reduction. An unused-looking file should remain if its removal cannot be justified confidently. Clean only what is proven unnecessary, preserve every existing feature, and leave uncertain code untouched.

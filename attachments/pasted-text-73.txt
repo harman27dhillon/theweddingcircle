@@ -1,0 +1,56 @@
+Use the attached screenshot as the authoritative visual reference for restoring the original desktop layout of The Wedding Circle.
+
+OBJECTIVE: REBUILD THE BROKEN DESKTOP LAYOUT
+
+The screenshot shows how the desktop layout looked a few days ago, before the layout became broken. Reconstruct that arrangement as closely as possible.
+
+1. Reference layout
+
+- Two-column desktop structure.
+- Large wedding invitation card on the left.
+- Right sidebar containing:
+  1. Create New Wedding
+  2. Join a Wedding
+  3. Discover
+  4. Leaderboard
+  5. Developer feedback section
+- Centered main container with appropriate maximum width.
+- Preserve the original spacing, proportions, alignment, card dimensions, typography, corner radiuses and background decorations.
+- Preserve the soft blush/ivory background and floral corner decorations.
+
+2. Important implementation requirements
+
+- Inspect the existing source code and identify exactly what broke the desktop layout.
+- Rebuild the desktop layout using proper responsive CSS/grid/flexbox architecture.
+- Do not simply enlarge the mobile layout.
+- Ensure the wedding card and sidebar remain correctly aligned.
+- Prevent overlapping, unexpected wrapping, horizontal scrolling and excessive empty space.
+- Make the layout adapt correctly to different desktop and tablet widths.
+
+3. Strict preservation rules
+
+- Do not redesign the interface.
+- Do not change the existing colour themes or theme engine.
+- Do not modify mobile layouts.
+- Do not remove, rename or replace existing features.
+- Do not modify backend, database, authentication or wedding functionality.
+- Do not replace existing wedding images or content.
+- Make the smallest necessary code changes.
+
+4. UI protection
+
+Implement this restoration without weakening the existing UI Shield requirements. Protect the restored desktop layout against future unintended CSS changes and regressions.
+
+5. Verification
+
+Before reporting completion:
+
+- Compare the rebuilt desktop layout against the supplied screenshot.
+- Test multiple desktop widths.
+- Test tablet and mobile layouts to ensure they remain unaffected.
+- Check for CSS conflicts and unintended regressions.
+- Verify the actual running application, not just the code.
+
+IMPORTANT: Do not merely describe the problem or suggest CSS changes. Inspect the actual source code, implement the fix, and verify it.
+
+Report precisely what was broken, which files were changed, and what tests passed. Do not claim completion if the layout has not actually been verified.

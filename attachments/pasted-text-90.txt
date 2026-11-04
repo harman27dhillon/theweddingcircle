@@ -1,0 +1,189 @@
+THE WEDDING CIRCLE — CLOUDFLARE WORKER PRIVATE MEDIA GATEWAY
+Production implementation brief
+
+OBJECTIVE
+Design and implement a secure Cloudflare Worker gateway for Wedding Circle media stored in the existing private Cloudflare R2 bucket. The intended media hostname is:
+
+https://media.theweddingcircle.in
+
+The Worker must be the only public entry point for media delivery. It must authorize every request before reading an object from R2. The R2 bucket itself must remain private and must never be exposed through a public r2.dev URL or direct public custom-domain connection.
+
+CRITICAL: The current R2 bucket contains private wedding photos and videos. Do not make the bucket public. Do not connect media.theweddingcircle.in directly to the bucket using R2's public custom-domain feature if that exposes bucket contents. The hostname must be routed to the Worker, and the Worker must use a private R2 bucket binding.
+
+1. INSPECT BEFORE IMPLEMENTING
+
+Inspect the existing application and infrastructure first:
+- Current Cloudflare R2 bucket name and binding requirements.
+- Existing R2 upload flow and object-key format.
+- Existing Express backend and authentication implementation.
+- Supabase Auth configuration and how the app verifies logged-in users.
+- Wedding membership, guest permissions, host/co-host permissions and privacy rules.
+- Existing private media viewing and download flow.
+- Existing signed URL or authorization mechanisms, if any.
+- Existing Cloudflare account, zone and DNS configuration.
+
+Do not assume the existing object-key format, authentication method, or database schema. Read the actual source code and configuration. Do not invent table names, columns, routes, secrets or environment variable names. Identify the exact existing implementation and document any missing information before making changes.
+
+2. REQUIRED ARCHITECTURE
+
+Implement this security flow:
+
+A. A logged-in user requests access to a particular media object through the existing application/backend.
+
+B. The backend authenticates the user and verifies that the user is currently authorized to view that exact media object in that wedding. Authorization must use the existing Supabase membership and privacy rules. Never trust a wedding ID, object key or user ID supplied by the browser without checking it server-side.
+
+C. Only after authorization, the backend creates a short-lived, cryptographically signed media access token. The token must be scoped to:
+- The exact R2 object key.
+- The relevant wedding or access scope.
+- The permitted HTTP method or methods.
+- An expiry timestamp.
+- Any additional claims required by the existing permission model.
+
+D. The browser receives a media URL on https://media.theweddingcircle.in containing the short-lived signed token, or another secure transport that works with the app's actual image/video playback components.
+
+E. The Cloudflare Worker validates the token's signature, expiry, scope and requested object key before accessing R2.
+
+F. The Worker reads the object through a private R2 bucket binding and returns it only after successful authorization.
+
+G. Invalid, expired, altered, missing or incorrectly scoped tokens must be rejected. No unauthorized request may read or reveal an R2 object.
+
+Use Web Crypto APIs supported by Cloudflare Workers for signature verification. Prefer a well-understood cryptographic signing design such as HMAC-SHA-256 with a strong random secret stored as a Worker secret, provided the existing backend can securely sign with the matching secret. Never put signing secrets in frontend JavaScript, public environment variables, source code, logs or Git.
+
+If the current architecture has a better established secure signing mechanism, explain it and use it only if it provides equivalent object-level authorization and expiry protections.
+
+3. AUTHORIZATION AND PRIVACY REQUIREMENTS
+
+- The R2 bucket must remain private.
+- Do not enable public bucket access.
+- Do not use public r2.dev URLs.
+- Do not create a shared static password for the domain.
+- Do not treat an unguessable object key as authorization.
+- Do not accept a wedding ID or user ID as proof of permission.
+- Verify wedding membership and media visibility in the backend before issuing a token.
+- Scope each token to the exact object key; do not issue a token that grants access to the entire bucket.
+- Use short token lifetimes appropriate for image and video playback. Choose and document a practical expiry that supports media viewing without making links long-lived.
+- Prevent path traversal, encoded path tricks, key substitution and token replay outside the token's permitted scope.
+- Return generic authorization errors without revealing whether a private object exists.
+- Do not expose R2 credentials or internal storage paths unnecessarily.
+- Ensure removed guests or revoked permissions cannot obtain new access tokens.
+- Explain the remaining exposure window for a token issued before a user's access is revoked.
+
+4. MEDIA DELIVERY REQUIREMENTS
+
+Support the media behaviours used by Wedding Circle:
+- GET requests for images and videos.
+- HEAD requests if required by existing components.
+- HTTP Range requests for video seeking and playback.
+- Correct Content-Type and Content-Length headers.
+- Appropriate Content-Disposition for inline viewing or downloads.
+- ETag and Last-Modified headers where available from R2.
+- Correct handling of 206 Partial Content, 416 Range Not Satisfiable and conditional requests.
+- CORS restricted to the actual Wedding Circle application origins. Do not use wildcard origins with credentials.
+- OPTIONS preflight where needed.
+- Referrer-Policy that reduces leakage of signed media URLs.
+- No permissive redirects to public R2 URLs.
+
+Do not break current image galleries, chat media grids, full-screen viewers, video playback, downloads or mobile browsers.
+
+5. CACHE AND CDN SAFETY
+
+Private wedding media must never enter a publicly shared cache.
+
+For the first secure implementation:
+- Default to Cache-Control: private, no-store unless a demonstrably safe private caching strategy is implemented and tested.
+- Do not use a broad Cache Everything rule for the media hostname.
+- Do not cache an authorized response under a cache key that omits the authorization scope.
+- Do not allow an unauthorized request to receive a previously cached authorized response.
+- Do not assume that putting a token in a query string automatically makes caching safe.
+- Do not cache authorization failures as successful media responses.
+
+If proposing Cloudflare edge caching to improve playback speed, treat it as a separate security design requiring explicit cache-key isolation, authorization checks on every request, revocation/expiry handling and tests proving that one wedding member can never receive another user's or another wedding's cached media. Do not enable private-media caching until those tests pass.
+
+Explain clearly that a Worker gateway provides secure routing and authorization; it does not automatically make uploads faster. It may improve delivery only if a safe caching strategy is separately implemented.
+
+6. CLOUDFLARE CONFIGURATION
+
+Prepare the Worker for:
+- A private R2 bucket binding to the existing bucket.
+- Required Worker secrets for token verification.
+- Required environment variables.
+- The custom hostname media.theweddingcircle.in routed to the Worker.
+
+Do not assume the hostname is ready or that DNS is already configured.
+
+Before any DNS or Cloudflare dashboard change:
+- Explain exactly what needs to be configured.
+- Confirm the Worker route/custom domain points to the Worker, not to public R2 bucket access.
+- Preserve the existing website DNS and application domain.
+- Do not change unrelated DNS records.
+- Do not expose or print secrets.
+
+If the Cloudflare account, zone, domain ownership, R2 binding or required permissions are unavailable, stop and provide precise manual setup steps. Do not claim deployment or domain activation succeeded.
+
+7. BACKWARD COMPATIBILITY AND MIGRATION
+
+- Preserve existing private uploads and stored object keys.
+- Do not migrate or rewrite existing R2 objects unless absolutely necessary and explicitly justified.
+- Keep the current media delivery method working during development.
+- Implement a controlled migration so existing media references can be served through the Worker after verification.
+- Do not break uploads while changing downloads/viewing.
+- Do not change the photo/video optimization work or chat media layout as part of this task.
+- Do not remove the existing fallback until the new delivery path is proven on real devices.
+
+8. TESTS THAT MUST PASS
+
+Create automated tests for:
+- Valid token and authorized object.
+- Missing token.
+- Invalid signature.
+- Expired token.
+- Token altered after signing.
+- Token for a different object key.
+- Token for a different wedding.
+- Unauthorized user attempting to obtain a token.
+- Revoked or removed wedding member attempting to obtain a new token.
+- Path traversal and encoded path attacks.
+- Direct public R2 access remaining unavailable.
+- Video Range requests and seeking.
+- HEAD and GET behaviour.
+- CORS from approved and unapproved origins.
+- No public-cache leakage between users or weddings.
+- No R2 credentials or signing secrets in frontend bundles or logs.
+
+Test the deployed Worker and actual custom hostname only if deployment access is available. A local unit test is not proof that DNS, TLS, R2 binding or production authorization works.
+
+9. DEPLOYMENT RULES
+
+Do not deploy, change DNS, connect the custom domain, enable public access, or alter production secrets without explicit user approval.
+
+First provide:
+- Architecture summary.
+- Exact files and components to be changed.
+- Required Cloudflare dashboard settings.
+- Required secrets and where each belongs (never reveal secret values).
+- Required backend changes.
+- Rollback plan.
+- Security risks and unresolved questions.
+
+After implementation, run tests and production build. Clearly distinguish:
+- Implemented.
+- Locally tested.
+- Deployed.
+- Verified on the actual custom domain.
+- Not yet verified.
+
+Never claim the CDN/Worker is production-ready merely because the Worker code builds.
+
+10. FINAL DELIVERABLE
+
+Provide a concise report with:
+- Worker architecture and authorization flow.
+- Exact Worker route and R2 binding configuration required.
+- Backend token-signing changes.
+- DNS/custom-domain steps.
+- Test results.
+- Remaining manual steps.
+- Confirmation that the R2 bucket remains private.
+
+PRIORITY
+Security comes before speed. Wedding photos and videos are private family memories. The custom domain must behave as an authenticated gateway, not as a public password-protected bucket. Preserve the existing Wedding Circle storage architecture and do not make irreversible production changes without approval.

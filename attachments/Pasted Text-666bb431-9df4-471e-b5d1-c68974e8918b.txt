@@ -1,0 +1,331 @@
+Wedding Circle — Fix Swipe Navigation, Home Page Animation, and App-Wide Latency
+
+Update my existing Wedding Circle app directly in the current project.
+
+Before making changes, inspect the existing code, routing, component structure, backend, database queries, and media implementation.
+
+Strict rules: Do not rebuild the app, redesign existing pages, reset data, remove features, or modify unrelated functionality. Preserve existing accounts, wedding information, posts, comments, albums, privacy permissions, and livestream sessions.
+
+Implement the following three improvements.
+
+PART 1 — Fix Swipe Navigation Across All Five Sections
+
+The app currently has five main sections:
+
+1. Home
+2. Feed
+3. Live
+4. Album
+5. More
+
+Horizontal swipe navigation currently works inconsistently. Fix the underlying cause so users can reliably navigate between these five sections.
+
+1.1 Required swipe behavior
+
+- Swipe left anywhere on ordinary, non-interactive content to move to the next section.
+- Swipe right to move to the previous section.
+- Follow this exact order: Home → Feed → Live → Album → More.
+- Do not loop from More to Home or from Home to More.
+- Support gestures starting on ordinary page backgrounds, headers, cards, and other non-interactive content.
+- Do not restrict swipe navigation to a small portion of the screen.
+- Keep the existing bottom navigation bar visible and fully functional.
+- Update the active bottom navigation icon and label immediately after a successful swipe.
+
+The swipe behavior must work consistently across all five sections.
+
+1.2 Fix the actual cause of unreliable swipes
+
+Inspect the existing gesture handlers, routing, event listeners, touch-action CSS, overlays, scroll containers, and nested components.
+
+- Implement one consistent gesture handler at the appropriate shared app-shell level.
+- Reuse the existing routing and active-section state.
+- Avoid attaching conflicting swipe handlers to individual pages.
+- Correctly distinguish horizontal swipes from vertical scrolling.
+- Use a sensible minimum swipe distance and direction threshold.
+- Prevent duplicate navigation caused by handling the same gesture more than once.
+- Handle touch cancellation and interrupted gestures safely.
+- Ensure overlays and containers do not unintentionally block gestures.
+- Do not rely solely on click handlers or page-specific touch listeners.
+- Do not disable normal vertical scrolling to force horizontal navigation to work.
+
+1.3 Protect interactive elements
+
+Global swipe navigation must not interfere with:
+
+- Text inputs, post composers, comment fields, and reply composers.
+- Dropdowns, forms, sliders, and buttons.
+- Camera and microphone controls.
+- Active livestreams and video players.
+- Maps, drawing areas, and other gesture-sensitive components.
+- Horizontal album photo galleries.
+
+If a nested component handles its own horizontal gesture, allow that component to retain priority.
+
+Do not navigate between sections while the user is typing or interacting with the keyboard.
+
+1.4 Preserve state during navigation
+
+- Do not reload the entire application when switching sections.
+- Preserve unsent drafts and form values.
+- Preserve scroll positions where practical.
+- Preserve selected wedding functions and audience settings.
+- Preserve selected album content where practical.
+- Never restart or disconnect a livestream because the user navigates to another section.
+- Do not reset user data or create duplicate page instances.
+
+PART 2 — Main Home Page: iPhone-Inspired Animation Only
+
+Do not redesign the Home page. Keep its existing appearance exactly as it is now.
+
+The goal is to make the existing main Home page feel like an iPhone screen just unlocked, changing only its entrance animation.
+
+2.1 Preserve the current Home page
+
+Do not change any of the following:
+
+- Layout or page structure.
+- Existing icons or cards.
+- Colors, backgrounds, or gradients.
+- Text, labels, or typography.
+- Spacing, sizes, or positioning.
+- Buttons or bottom navigation.
+- Existing Home page functionality.
+
+Do not add an iPhone-style icon grid, new cards, new elements, or a redesigned launcher.
+
+Only update animation behavior.
+
+2.2 Implement the entrance animation
+
+When the main Home page opens, animate the existing visible elements using a smooth, subtle iPhone-unlock-inspired effect.
+
+- Fade existing icons, cards, and visible elements in.
+- Gently scale elements from approximately 90% to their normal 100% size.
+- Introduce a subtle staggered sequence so elements appear in a smooth wave rather than simultaneously.
+- Use natural spring-like easing with minimal bounce.
+- Keep the overall entrance animation approximately 400–700 milliseconds.
+- Avoid spinning, rotating, flashing, or dramatic movement.
+- Prevent layout shifts, flickering, and visible jumps.
+- Do not delay taps or block user interaction while the animation plays.
+
+Use existing animation tools or lightweight CSS transitions wherever possible.
+
+2.3 Animation lifecycle
+
+- Run the full entrance animation when the Home page is first opened, where appropriate.
+- Do not replay the full animation on every minor state update.
+- When returning from another section, display the existing Home page immediately or use a subtle re-entry transition.
+- Avoid remounting the Home page solely to trigger an animation.
+- Respect reduced-motion accessibility preferences by reducing or disabling animations when requested.
+
+The result should feel like the existing Home page has just appeared after unlocking an iPhone, without changing its design.
+
+2.4 Keep navigation independent
+
+The animation must never interfere with:
+
+- Horizontal swipe navigation.
+- Vertical scrolling.
+- Taps and button interactions.
+- Bottom navigation.
+- Forms and text inputs.
+
+Do not add an overlay that blocks gestures or interaction during the animation.
+
+PART 3 — Fix Latency Across the Entire Wedding Circle App
+
+The entire app needs performance optimization. Inspect and fix the actual causes of lag, slow navigation, delayed interactions, repeated loading, and unnecessary rendering.
+
+Do not merely make the interface look faster with animations or fake loading indicators. Identify and fix the underlying bottlenecks.
+
+3.1 Diagnose before optimizing
+
+Inspect the existing implementation for:
+
+- Slow API requests and database queries.
+- Excessive component re-renders.
+- Duplicate network requests.
+- Unnecessary page remounts.
+- Large images and inefficient media loading.
+- Memory leaks and repeated event listeners.
+- Inefficient state updates.
+- Slow navigation and blocking operations.
+- Expensive visual effects.
+- Slow hosting, database, or network responses.
+
+Measure performance where practical before making changes so improvements can be evaluated.
+
+3.2 Improve initial loading
+
+- Minimize unnecessary JavaScript and rendering work during startup.
+- Load only the resources required for the initial view.
+- Defer nonessential operations until needed.
+- Avoid fetching all Feed posts, albums, and media at initial launch.
+- Prevent repeated initialization of services and event listeners.
+- Keep the app interactive as early as reasonably possible.
+
+Do not remove existing features or required authentication checks to improve startup speed.
+
+3.3 Optimize section navigation
+
+Apply performance improvements to Home, Feed, Live, Album, and More.
+
+- Make switching between sections feel immediate.
+- Avoid full application reloads.
+- Prevent unnecessary component remounting and repeated data fetching.
+- Preserve existing state and drafts where practical.
+- Avoid blocking the interface while background requests run.
+- Ensure the swipe handler does not trigger expensive work during every touch movement.
+- Keep the iPhone-inspired Home entrance animation lightweight.
+
+3.4 Optimize Feed and database operations
+
+- Fetch only the data required for the current screen.
+- Use pagination or incremental loading for long feeds and comment lists.
+- Add appropriate database indexes for frequently queried fields where needed.
+- Avoid repeated queries for unchanged data.
+- Reuse cached data safely when appropriate.
+- Refresh or invalidate cached data when posts, comments, or permissions change.
+- Prevent duplicate requests and overlapping submissions.
+- Cancel obsolete requests where supported.
+- Keep database access permissions and family privacy restrictions fully enforced.
+
+Do not cache private content in a way that allows it to remain accessible after access is revoked.
+
+3.5 Optimize photos and videos
+
+- Use appropriately sized image thumbnails.
+- Lazy-load media outside the visible area.
+- Avoid downloading full-resolution files when a thumbnail is sufficient.
+- Compress uploads appropriately without unnecessary quality loss.
+- Avoid loading every album image simultaneously.
+- Release unused media resources.
+- Reduce excessive memory consumption during long scrolling sessions.
+
+Ensure the Album section remains responsive even when many photos and videos are present.
+
+3.6 Protect livestream stability
+
+- Do not recreate camera streams or media connections during ordinary UI updates.
+- Do not restart a livestream when switching sections.
+- Avoid unnecessary video-player re-renders.
+- Keep camera switching, microphone controls, and live comments responsive.
+- Prevent duplicate peer connections or repeated initialization.
+- Handle network interruptions and reconnections sensibly.
+- Clean up media tracks only when appropriate.
+
+Do not sacrifice livestream stability to optimize unrelated pages.
+
+3.7 Optimize animations and rendering
+
+- Identify and reduce unnecessary component renders.
+- Avoid expensive calculations during scrolling and touch interactions.
+- Prefer lightweight transform and opacity animations.
+- Reduce unnecessary blur, shadows, and continuous animations on lower-powered devices.
+- Avoid excessive background effects that cause frame drops.
+- Ensure animation cleanup and event listeners are handled correctly.
+
+Preserve the existing visual design across the app.
+
+3.8 Improve network reliability
+
+- Use appropriate request timeouts and cancellation.
+- Add bounded retries for recoverable failures.
+- Avoid indefinite retries or repeated requests that overload the backend.
+- Show useful loading and error states.
+- Avoid freezing an entire page because one request is slow.
+- Ensure failed posts, comments, and uploads are not silently discarded.
+- Prevent duplicate submissions after retries.
+
+3.9 Optimize mobile performance
+
+Prioritize Android phones and mobile browsers.
+
+- Reduce excessive memory usage.
+- Prevent memory leaks during long sessions.
+- Keep typing, scrolling, tapping, and swiping responsive.
+- Avoid layout jumps when the keyboard opens or closes.
+- Ensure the bottom composer remains usable.
+- Preserve existing responsive layouts.
+- Avoid unnecessarily heavy dependencies.
+
+3.10 Diagnose backend and hosting bottlenecks
+
+If latency comes from the database, storage provider, API, hosting platform, or network, identify that cause explicitly.
+
+- Measure request timing where possible.
+- Distinguish frontend rendering delays from server response delays.
+- Optimize inefficient backend queries and payloads where the current architecture permits.
+- Identify hosting or infrastructure limitations that cannot be fixed with frontend changes alone.
+- Do not claim backend performance has improved without supporting measurements.
+
+Do not migrate providers, introduce paid services, or change infrastructure unnecessarily without explaining the need.
+
+PART 4 — Strict Data and Functionality Protection
+
+Throughout all three improvements:
+
+- Do not rebuild the application.
+- Do not reset or delete existing data.
+- Do not change unrelated page designs.
+- Do not remove existing features.
+- Do not weaken authentication or family privacy controls.
+- Do not expose private media or restricted content.
+- Do not change the existing database architecture unnecessarily.
+- Do not introduce duplicate routing, navigation, media, or state systems.
+- Do not replace working features with static mockups.
+- Do not use fake loading progress or fake performance metrics.
+
+Preserve existing accounts, wedding data, Feed posts, comments, albums, media, privacy settings, and livestream functionality.
+
+PART 5 — Required Testing and Reporting
+
+Swipe navigation tests
+
+1. Swipe left from Home to reach Feed.
+2. Continue swiping through Live, Album, and More.
+3. Swipe right to navigate in reverse order.
+4. Confirm navigation does not wrap around at either end.
+5. Test gestures starting on ordinary backgrounds, headers, and cards.
+6. Confirm vertical scrolling remains normal.
+7. Confirm text inputs, maps, album galleries, and livestream controls retain their own interactions.
+8. Confirm the bottom navigation stays synchronized.
+9. Confirm drafts and livestream sessions survive section changes.
+
+Home animation tests
+
+10. Confirm the Home page's existing layout and appearance are unchanged.
+11. Confirm existing visible elements animate smoothly on entry.
+12. Confirm no flickering or layout shifts occur.
+13. Confirm the animation does not block taps or swipes.
+14. Confirm reduced-motion preferences are respected.
+15. Confirm returning to Home does not unnecessarily replay the full animation.
+
+Performance tests
+
+16. Measure initial loading time before and after optimization where possible.
+17. Measure Feed content loading time.
+18. Check section navigation responsiveness.
+19. Check API and database response times where measurable.
+20. Test scrolling through a long Feed and Album.
+21. Check memory use and repeated rendering.
+22. Test livestream stability while switching sections.
+23. Check console errors and failed requests.
+24. Confirm privacy and authentication checks remain functional.
+
+Use real measurements when available. Do not invent benchmark results.
+
+Final delivery
+
+Implement all three improvements directly in the existing Wedding Circle project.
+
+At completion, report:
+
+- The root cause of the unreliable swipe navigation.
+- How the Home animation was changed without redesigning the page.
+- The main latency bottlenecks found.
+- The optimizations implemented.
+- Which tests actually passed.
+- Any remaining limitations or infrastructure bottlenecks.
+
+If something cannot be implemented or verified, state that clearly instead of simulating success.

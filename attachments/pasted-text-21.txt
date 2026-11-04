@@ -1,0 +1,287 @@
+The Wedding Circle — Add 10 Premium Wedding Themes
+
+Inspect the existing theme system and implement the following 10 additional themes in the current application. These must be real, selectable, persistent themes—not static previews or background-only colour changes.
+
+1. New themes and visual identities
+
+Add these exact themes:
+
+1. Butterfly Romance — blush pink, ivory, rose gold, drifting butterflies, delicate floral corners.
+2. Moonlight Reverie — midnight navy, pearl silver, moonlight glow, subtle twinkling stars.
+3. Monsoon Romance — deep teal, misty grey, champagne highlights, gentle rain trails and reflections.
+4. Anime Ever After — pastel pink, lavender, sky blue, anime-inspired romantic artwork and subtle cherry-blossom petals.
+5. Royal Palace — marble ivory, regal burgundy, antique gold, palace arches and luxurious ornamental borders.
+6. Heaven's Embrace — pearl white, pale blue, soft gold, luminous clouds and gentle light rays.
+7. Enchanted Garden — emerald, moss green, warm gold, elegant foliage and floating fireflies.
+8. Cosmic Destiny — deep violet, indigo, starlight gold, subtle nebula gradients and stars.
+9. Velvet Rose — burgundy, dusty rose, champagne, floating rose petals and refined gold trim.
+10. Aurora Dreams — aurora green, turquoise, violet, flowing luminous gradients and subtle shimmering particles.
+
+2. Integrate with the existing theme system
+
+- Add these themes to the existing theme registry and selection interface.
+- Preserve every currently available theme, its identifier, styling, and saved user selection.
+- Give each new theme a stable, unique ID. Do not use array positions as theme identifiers.
+- Reuse the existing theme configuration, CSS variables, theme context, and persistence mechanisms wherever possible.
+- Do not create a second theme engine or replace the current theme system.
+
+3. Apply every theme throughout the wedding
+
+Each theme must style the entire wedding experience consistently:
+
+- Wedding landing/Home page and couple header.
+- Ceremony cards and wedding information.
+- Chat background, incoming/outgoing bubbles, bubble tails, and composer.
+- Live page, camera preview, controls, comments, and supporting elements.
+- Albums, image/video previews, and media controls.
+- More section, buttons, forms, navigation surfaces, and dialogs.
+- Relevant borders, shadows, text, icons, overlays, and selected states.
+
+Do not allow components to retain unrelated hardcoded colours when a theme is selected. Preserve readable contrast and each theme's intended light/dark character.
+
+4. Theme-specific animations
+
+Implement restrained, lightweight animations appropriate to each theme:
+
+- Butterfly Romance: slow butterfly drift.
+- Moonlight Reverie: gentle star twinkle and moon glow.
+- Monsoon Romance: subtle rain trails and soft reflections.
+- Anime Ever After: occasional falling cherry-blossom petals.
+- Royal Palace: restrained gold shimmer.
+- Heaven's Embrace: slow cloud movement and soft light rays.
+- Enchanted Garden: slowly drifting fireflies.
+- Cosmic Destiny: gentle star movement and faint nebula transitions.
+- Velvet Rose: occasional falling rose petals.
+- Aurora Dreams: slowly flowing aurora gradients.
+
+Animations must be decorative only and must not block interaction, cause layout shifts, or interfere with chat scrolling, camera controls, or video playback.
+
+Use lightweight CSS or existing animation utilities. Avoid continuous expensive JavaScript animation loops, unnecessary dependencies, and excessive DOM elements. Respect reduced-motion preferences and disable or simplify decorative movement when requested by the operating system.
+
+5. Theme selection and preview UI
+
+- Add all 10 themes to the existing theme selector.
+- Create polished preview cards using each theme's actual background, text, bubble colours, decorative effects, and accents.
+- Clearly identify the currently selected theme.
+- Allow users to preview and apply themes using the existing selection flow.
+- Ensure the selected theme persists across navigation and reopening the wedding.
+- Ensure the preview and the actual applied theme use the same configuration.
+
+6. Implementation example
+
+Adapt the following configuration pattern to the existing architecture. It is illustrative: do not duplicate an existing registry or replace existing theme definitions.
+
+type WeddingTheme = {
+  id: string;
+  name: string;
+  colors: {
+    background: string;
+    surface: string;
+    text: string;
+    mutedText: string;
+    primary: string;
+    accent: string;
+    incomingBubble: string;
+    outgoingBubble: string;
+    border: string;
+  };
+  effect:
+    | "butterflies"
+    | "moonlight"
+    | "rain"
+    | "anime-petals"
+    | "palace-shimmer"
+    | "heavenly-clouds"
+    | "fireflies"
+    | "cosmic-stars"
+    | "rose-petals"
+    | "aurora";
+};
+
+export const additionalWeddingThemes: WeddingTheme[] = [
+  {
+    id: "butterfly-romance",
+    name: "Butterfly Romance",
+    colors: {
+      background: "#FFF1F5",
+      surface: "#FFFAFC",
+      text: "#593848",
+      mutedText: "#927585",
+      primary: "#B85D83",
+      accent: "#D9B16F",
+      incomingBubble: "#FFFAFC",
+      outgoingBubble: "#E8B4C8",
+      border: "#EBD0DB"
+    },
+    effect: "butterflies"
+  },
+  {
+    id: "moonlight-reverie",
+    name: "Moonlight Reverie",
+    colors: {
+      background: "#10182F",
+      surface: "#1A2542",
+      text: "#F6F2FF",
+      mutedText: "#B5BED7",
+      primary: "#8FA8E8",
+      accent: "#D9D5F4",
+      incomingBubble: "#24314F",
+      outgoingBubble: "#46588A",
+      border: "#39476B"
+    },
+    effect: "moonlight"
+  },
+  {
+    id: "monsoon-romance",
+    name: "Monsoon Romance",
+    colors: {
+      background: "#E9F1F0",
+      surface: "#F8FBFA",
+      text: "#244643",
+      mutedText: "#708A85",
+      primary: "#367A73",
+      accent: "#D2B77D",
+      incomingBubble: "#FFFFFF",
+      outgoingBubble: "#BBD9D2",
+      border: "#C7DEDA"
+    },
+    effect: "rain"
+  },
+  {
+    id: "anime-ever-after",
+    name: "Anime Ever After",
+    colors: {
+      background: "#F4F0FF",
+      surface: "#FFFCFF",
+      text: "#43365F",
+      mutedText: "#887CA4",
+      primary: "#9679D6",
+      accent: "#E9AFC8",
+      incomingBubble: "#FFFCFF",
+      outgoingBubble: "#E4D8FA",
+      border: "#DED2F4"
+    },
+    effect: "anime-petals"
+  },
+  {
+    id: "royal-palace",
+    name: "Royal Palace",
+    colors: {
+      background: "#F5EFE4",
+      surface: "#FFFBF4",
+      text: "#44252B",
+      mutedText: "#8C7470",
+      primary: "#762E3B",
+      accent: "#C8A45D",
+      incomingBubble: "#FFFBF4",
+      outgoingBubble: "#E9D7A8",
+      border: "#D9C49A"
+    },
+    effect: "palace-shimmer"
+  },
+  {
+    id: "heavens-embrace",
+    name: "Heaven's Embrace",
+    colors: {
+      background: "#F0F6FF",
+      surface: "#FFFFFF",
+      text: "#35486A",
+      mutedText: "#7F91AD",
+      primary: "#799BCB",
+      accent: "#D8BD79",
+      incomingBubble: "#FFFFFF",
+      outgoingBubble: "#DDE9FC",
+      border: "#D8E4F5"
+    },
+    effect: "heavenly-clouds"
+  },
+  {
+    id: "enchanted-garden",
+    name: "Enchanted Garden",
+    colors: {
+      background: "#EAF0E6",
+      surface: "#F8FBF4",
+      text: "#263E30",
+      mutedText: "#728675",
+      primary: "#38664A",
+      accent: "#D0B16D",
+      incomingBubble: "#F8FBF4",
+      outgoingBubble: "#C7DDC5",
+      border: "#C7D7C3"
+    },
+    effect: "fireflies"
+  },
+  {
+    id: "cosmic-destiny",
+    name: "Cosmic Destiny",
+    colors: {
+      background: "#17142F",
+      surface: "#242044",
+      text: "#F6F1FF",
+      mutedText: "#B8B0D8",
+      primary: "#9B80DE",
+      accent: "#E0C58A",
+      incomingBubble: "#29264B",
+      outgoingBubble: "#51418A",
+      border: "#454064"
+    },
+    effect: "cosmic-stars"
+  },
+  {
+    id: "velvet-rose",
+    name: "Velvet Rose",
+    colors: {
+      background: "#F5E9EC",
+      surface: "#FFF8F8",
+      text: "#542934",
+      mutedText: "#997580",
+      primary: "#7E293F",
+      accent: "#D3AE76",
+      incomingBubble: "#FFF8F8",
+      outgoingBubble: "#E7C0C7",
+      border: "#E1C3CB"
+    },
+    effect: "rose-petals"
+  },
+  {
+    id: "aurora-dreams",
+    name: "Aurora Dreams",
+    colors: {
+      background: "#EAF5F3",
+      surface: "#F8FCFB",
+      text: "#203D40",
+      mutedText: "#718D91",
+      primary: "#3C8D88",
+      accent: "#A68DD4",
+      incomingBubble: "#F8FCFB",
+      outgoingBubble: "#C4E6DF",
+      border: "#C8E1DF"
+    },
+    effect: "aurora"
+  }
+];
+
+Map these tokens to the application's existing styling system. Verify that all required fields match the current theme interface and adjust them if necessary before integration.
+
+7. Performance, accessibility, and preservation
+
+- Keep theme effects behind content and prevent them from intercepting pointer events.
+- Use CSS animations and existing assets where practical.
+- Avoid downloading large background videos or image collections automatically.
+- Ensure animations do not cause layout shifts or slow down the chat.
+- Preserve desktop and mobile layouts.
+- Preserve all existing wedding data, messages, uploaded media, accounts, permissions, theme preferences, and backend configuration.
+- Do not reset or migrate the database.
+- Do not modify the Leaderboard or unrelated features.
+
+8. Test and report
+
+- Confirm all 10 themes appear in the existing theme selector.
+- Select every new theme and test Home, Chat, Live, Albums, and More.
+- Verify persistence after navigation and reopening the wedding.
+- Check text contrast, bubble readability, button states, and light/dark appearance.
+- Check animation performance and reduced-motion behavior.
+- Run relevant tests, type checks, and build checks.
+- Report the files changed, the themes tested, results, and any remaining limitations.
+
+Do not claim that themes are fully applied unless you have tested their appearance across the actual pages.

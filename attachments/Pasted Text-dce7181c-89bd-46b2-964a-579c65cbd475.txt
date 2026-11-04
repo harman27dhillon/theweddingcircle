@@ -1,0 +1,332 @@
+Wedding Circle — Live UI Cleanup, Function Selector & Family Privacy System
+
+Update the existing Wedding Circle app directly. Inspect the current code, components, database, authentication, and livestream implementation before making changes.
+
+STRICT RULE: Modify only the features specified below. Do not rebuild the app, reset data, delete existing functionality, or rewrite unrelated components. Preserve all existing wedding accounts, members, posts, media, comments, and settings.
+
+PART 1 — Completely Remove Emoji Reaction Buttons
+
+Remove the entire reaction emoji interface from all three locations shown in the supplied screenshots.
+
+Location A: Main Wedding Circle Live page
+
+- Remove every emoji reaction button below the Start Live button.
+- Remove the entire reaction toolbar, including its extra rows and unnecessary spacing.
+
+Location B: Active live-stream screen
+
+- Remove every floating circular emoji button displayed over the camera feed.
+- Remove hearts, rings, celebration, dancing, flowers, Nazar protection, applause, and all other reaction buttons from this interface.
+
+Location C: Camera preview screen before going live
+
+- Remove every emoji reaction button below the camera preview and Function selector.
+- Remove the reaction toolbar containers and their associated spacing.
+
+Requirements
+
+- Completely remove these reaction controls from the interface rather than hiding them with transparency.
+- Remove unused reaction-specific handlers and animations if they are no longer required.
+- Do not replace them with other emojis, icons, or reaction buttons.
+- Do not remove camera controls, microphone controls, comments, Send, Go Live, End Live, camera switching, or other essential features.
+- Do not remove emojis from unrelated features elsewhere in the app.
+
+PART 2 — Move the Roka Function Selector
+
+The camera preview currently displays an oversized panel labelled Function with a large dropdown showing Roka. Remove this panel from the camera preview screen.
+
+New placement
+
+Add a compact function dropdown to the main Wedding Circle Live page, positioned directly below the heading or in another nearby position that does not overcrowd the layout.
+
+The dropdown must:
+
+- Have a small "Function" label.
+- Display the selected function, such as Roka.
+- Use a small downward-chevron icon.
+- Have a subtle background, thin border, and rounded corners.
+- Use minimal padding and height.
+- Remain easy to tap on mobile.
+- Avoid large cards, oversized full-width panels, or unnecessary vertical space.
+
+Preserve function selection
+
+- Keep the existing list of wedding functions and their underlying values.
+- Reuse existing state and stored settings wherever possible.
+- When the host changes the selected function, update the existing selection.
+- Carry the selected function into the camera preview and live session.
+- Do not require the host to select the function again before starting the stream.
+- Do not create duplicate function selectors.
+
+PART 3 — Clean Up the Main Live Page
+
+The Wedding Circle Live section should contain:
+
+1. A heading reading "Wedding Circle Live".
+2. An information icon that opens the existing description in a popover or modal.
+3. The compact Function dropdown.
+4. The live video player and accurate stream status.
+5. The Start Live button.
+6. The existing comments section and Send button.
+
+Keep the description hidden until the information icon is tapped.
+
+Remove unnecessary reaction toolbars and empty spaces left behind by their removal.
+
+Keep the existing YouTube Live section and its functionality.
+
+PART 4 — Clean Up the Camera Preview Screen
+
+After removing the oversized Function panel and emoji reactions, reorganize the preview screen so it looks intentional and professional.
+
+Keep:
+
+- Full-screen portrait camera preview.
+- Preview status indicator.
+- Camera on/off control.
+- Microphone mute/unmute control.
+- Front/rear camera switching.
+- Go Live button.
+- Close or back button.
+- Existing permission requests and error messages.
+
+Place the controls neatly along the bottom with consistent spacing. Respect mobile safe areas and ensure controls do not overlap system navigation or important status information.
+
+The selected wedding function must already be available from the main Live page.
+
+PART 5 — Family Privacy and Selective Ceremony Access
+
+Implement a proper privacy-control system allowing hosts and authorized co-hosts to control who can see posts, photos, videos, albums, ceremony details, and livestreams.
+
+Add a Privacy & Family Access section inside the existing wedding settings.
+
+5.1 Family membership
+
+Support these family affiliations:
+
+- Bride's Family
+- Groom's Family
+- Both Families / Shared Guest
+- Unassigned
+
+Allow the host or appropriately authorized co-hosts to assign or change a member's affiliation.
+
+Do not automatically grant access to private content based only on family affiliation.
+
+Unassigned members must remain unassigned until an authorized person assigns them. Their access must follow the wedding's existing default permissions.
+
+5.2 Family visibility controls
+
+Allow the host and authorized co-hosts to configure visibility for individual posts, photos, videos, albums, and ceremony updates.
+
+Provide these audience options:
+
+1. All Wedding Members
+2. Bride's Family
+3. Groom's Family
+4. Selected People
+5. Custom Guest Groups
+6. Private Ceremony
+
+Examples:
+
+- A bride-side post can be hidden from the groom's family.
+- A groom-side album can be restricted to groom-side guests.
+- A bride-side ceremony can be shared with only selected elders from the groom's family.
+- Selected members from both families can be permitted to see the same private content.
+
+Make the selected audience visible to the content creator before publishing.
+
+5.3 Private Ceremony mode
+
+Add a Private Ceremony option when creating a ceremony, post, album, or livestream.
+
+Authorized users should be able to:
+
+- Enter the ceremony name.
+- Choose eligible family groups.
+- Select individual guests from either family.
+- Exclude specific guests or groups.
+- Choose whether comments are allowed.
+- Configure access to associated photos, videos, and livestreams.
+- Save and update the privacy settings.
+
+Example: A Roka ceremony may be visible to the bride's family and selected elders from the groom's family, while remaining inaccessible to other groom-side guests.
+
+Display a Private indicator only where appropriate. Do not expose restricted ceremony names, thumbnails, descriptions, or other details to unauthorized users.
+
+5.4 Guest-level restrictions
+
+Allow the host and authorized co-hosts to configure individual guest permissions without removing the guest from the wedding.
+
+Supported controls should include:
+
+- View shared wedding content.
+- View bride-side content.
+- View groom-side content.
+- Access selected private ceremonies.
+- Access selected albums and posts.
+- Comment on selected content.
+- Restrict access to specified content.
+
+Permissions must be configurable per guest and per content item.
+
+Ordinary guests must not be able to grant themselves additional access or override host restrictions.
+
+5.5 Privacy selector when publishing
+
+When creating a post, uploading media, creating an album, or starting a livestream, show a compact audience selector.
+
+Options:
+
+- All Wedding Members
+- Bride's Family
+- Groom's Family
+- Selected People
+- Private Ceremony
+
+Show the selected audience before the user publishes or starts the stream.
+
+Available options must depend on the user's role and permissions. Ordinary guests must not be allowed to publish into audiences they are not authorized to select.
+
+5.6 Host and co-host controls
+
+Only the host and appropriately authorized co-hosts may manage family access and private ceremony settings.
+
+Allow authorized users to:
+
+- Assign family affiliations.
+- Approve selected guests for private ceremonies.
+- Restrict or restore access.
+- Update audience settings.
+- Review the approved guest list for each private ceremony.
+
+Preserve the existing host, co-host, and developer permission model. Do not give ordinary guests administrative privileges.
+
+PART 6 — Private Livestream Access
+
+Apply the family privacy system to Wedding Circle Live.
+
+Before starting a livestream, the host or authorized co-host should be able to choose:
+
+- Both families.
+- Bride's family only.
+- Groom's family only.
+- Selected guests.
+- An approved private ceremony audience.
+
+Only authorized viewers may watch a restricted stream.
+
+Requirements:
+
+- Enforce viewer permissions on the server.
+- Do not rely solely on hiding the video player or livestream card.
+- Protect livestream access URLs and credentials.
+- Prevent unauthorized viewers from joining through direct links or API requests.
+- Apply access restrictions to comments and related media as well.
+- Handle revoked access through server-side authorization and token expiry or invalidation where supported.
+
+Keep the YouTube Live section separate and preserve its existing functionality. Do not claim that YouTube access is restricted by Wedding Circle unless that restriction is genuinely enforced by the YouTube configuration or the implemented integration.
+
+If the existing streaming provider cannot support private viewer access, identify the limitation and implement the required compatible backend changes where possible.
+
+PART 7 — Backend Security and Data Protection
+
+Privacy is not complete if it is implemented only in the frontend.
+
+Enforce permissions in the existing backend and database.
+
+- Verify authorization before returning private posts, comments, albums, photos, videos, and ceremony information.
+- Apply database security policies, such as Supabase Row Level Security or equivalent rules for the existing backend.
+- Prevent unauthorized direct API access.
+- Ensure search, feeds, notifications, and previews do not leak restricted content.
+- Protect private media from publicly accessible storage URLs.
+- Ensure access revocation prevents subsequent unauthorized requests.
+- Avoid duplicating databases, user records, or permission systems.
+- Reuse the existing authentication and data architecture whenever possible.
+- Do not expose service-role credentials or privileged secrets in frontend code.
+
+Explain any additional infrastructure required if the current backend or streaming provider cannot securely support a requested privacy feature.
+
+Previously downloaded media and screenshots cannot be remotely erased from recipients' devices; do not claim otherwise.
+
+PART 8 — Premium UI Styling
+
+Preserve the existing Wedding Circle visual identity.
+
+Keep the Wedding Circle Live and YouTube Live header bars with their existing premium styling:
+
+- Soft glassmorphism.
+- Subtle backdrop blur.
+- Muted rose, champagne gold, lavender, and warm ivory gradients.
+- Rounded corners and restrained glow.
+- Readable text and good contrast.
+- Smooth, lightweight animations.
+- Fallback styling for browsers that do not support backdrop filters.
+
+Do not unnecessarily redesign other pages.
+
+Keep the new privacy settings clean, compact, and mobile-friendly, with searchable guest lists, simple controls, clear audience labels, and confirmation when permissions change.
+
+PART 9 — Preserve Live Streaming Functionality
+
+Do not break or replace the existing streaming implementation.
+
+- Reuse existing camera and media tracks.
+- Avoid starting duplicate camera streams.
+- Preserve camera permissions and stream state.
+- Ensure front/rear camera switching updates the actual outgoing camera feed.
+- Preserve the selected function through preview and broadcast.
+- Keep Go Live and End Live working.
+- Preserve existing comments and Send functionality.
+- Handle camera, microphone, network, and authorization failures gracefully.
+- Do not display fake viewer counts or inaccurate live statuses.
+
+PART 10 — Strict Change-Scope Rules
+
+- Do not rebuild the entire app.
+- Do not reset or delete wedding data.
+- Do not change unrelated pages or features.
+- Do not remove the bottom navigation.
+- Do not remove existing accounts, comments, posts, photos, videos, or albums.
+- Do not modify payments or authentication unless a change is strictly necessary for secure privacy enforcement.
+- Do not replace working features with static mockups.
+- Do not grant additional privileges to ordinary guests.
+- Do not weaken existing privacy restrictions.
+- Use the most restrictive applicable permission when multiple restrictions overlap.
+- Do not silently make previously restricted content accessible to everyone.
+
+PART 11 — Required Testing
+
+Test the following before declaring completion.
+
+UI and function selector
+
+1. No reaction emoji buttons remain in any of the three specified locations.
+2. No empty spaces remain where the removed toolbars were located.
+3. The oversized Function panel is absent from the camera preview.
+4. The compact Function dropdown appears on the main Live page.
+5. The selected function carries through to the preview and livestream.
+6. The information icon, comments, Send button, camera controls, and streaming buttons still work.
+
+Family privacy
+
+7. Bride-side guests cannot access groom-side restricted posts.
+8. Groom-side guests cannot access bride-side restricted posts.
+9. Selected guests from the opposite family can access approved private ceremonies.
+10. Unselected guests cannot access those ceremonies.
+11. Direct links and API requests cannot bypass restrictions.
+12. Unauthorized users cannot see private media thumbnails or metadata.
+13. Restricted livestreams reject unauthorized viewers.
+14. Ordinary guests cannot change their own access permissions.
+15. Hosts and authorized co-hosts can manage permissions according to their roles.
+16. Revoking access prevents subsequent access to restricted content.
+
+Regression checks
+
+17. Existing public wedding content remains accessible to its intended audience.
+18. Existing YouTube Live functionality remains intact.
+19. Existing accounts, media, comments, and wedding data remain unchanged.
+20. No unrelated pages or features are broken.
+
+Implement the changes directly in the existing project. Inspect for errors and report which features were actually tested. Clearly distinguish fully implemented backend privacy controls from any features that still require additional infrastructure. Never simulate success or claim a security feature works without verifying it.

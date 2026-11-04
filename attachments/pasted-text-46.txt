@@ -1,0 +1,77 @@
+Critical Bug Fix — Wedding Circle Mobile App Stuck on Startup Screen
+
+The Wedding Circle mobile version is stuck permanently on the startup screen displaying “Opening The Wedding Circle” over a pink gradient background. The actual landing page never opens.
+
+Work directly on the existing project. Reproduce the problem, inspect the startup process, identify the root cause, and implement a permanent fix.
+
+1. Diagnose the startup failure
+
+Inspect the complete application startup sequence, including:
+
+- React application mounting and initialization.
+- Startup and splash-screen state management.
+- Authentication and session restoration.
+- Supabase database initialization and API requests.
+- Theme, cover-image, and background loading.
+- Local storage, IndexedDB, and persisted application state.
+- Service-worker and PWA cache behavior.
+- Mobile-only components, CSS, and responsive breakpoints.
+- JavaScript exceptions, rejected promises, and failed network requests.
+
+Identify which operation prevents the startup screen from disappearing. Do not assume the problem is merely a slow network or an incorrect animation.
+
+2. Fix the startup flow
+
+- Ensure the application transitions from “Opening The Wedding Circle” to the actual landing page after required initialization completes.
+- Prevent optional resources, such as decorative images, theme assets, or nonessential API requests, from blocking the entire application.
+- Ensure every loading state has a reliable completion, error, or recovery path.
+- Prevent unresolved promises, stale state, or failed initialization steps from leaving the app stuck indefinitely.
+- Restore the previous successful navigation and landing-page rendering behavior.
+- If initialization fails, display a useful error message with a Retry action rather than a permanently frozen splash screen.
+- Do not remove authentication checks or expose private wedding data while recovering from startup failures.
+- Avoid repeatedly reloading the page or introducing an endless retry loop.
+
+3. Handle mobile and PWA behavior correctly
+
+- Verify the application on mobile Chrome and the installed/PWA version where supported.
+- Inspect cached JavaScript bundles, service-worker updates, and stale assets if they are relevant to the failure.
+- Ensure a failed or outdated cached asset cannot permanently prevent rendering.
+- Preserve offline capabilities and existing stored wedding data.
+- Do not indiscriminately clear user storage or unregister service workers as a workaround.
+
+4. Preserve existing functionality
+
+This is a startup bug fix, not a redesign.
+
+- Keep the existing landing-page design, floral decorations, wedding covers, themes, fonts, and animations.
+- Preserve the Supabase database configuration, wedding records, authentication, host controls, chat, live streaming, albums, invitations, and navigation.
+- Do not modify database schemas or delete data unless a verified root cause makes a narrowly scoped migration necessary.
+- Avoid changing the desktop startup behavior unless the same confirmed bug affects desktop.
+
+5. Test the actual fix
+
+Perform the following checks:
+
+1. Open the mobile website in a fresh browser session.
+2. Confirm that “Opening The Wedding Circle” disappears and the landing page renders.
+3. Refresh the page several times.
+4. Test while signed out and while signed in.
+5. Test normal network conditions and a temporarily interrupted connection.
+6. Verify that failed optional image or API requests do not freeze the entire interface.
+7. Confirm that the existing desktop version still works.
+8. Run the available type checks, tests, and production build.
+
+Use actual logs and error messages to establish the root cause. If the mobile browser or device is unavailable for live testing, clearly state that limitation.
+
+6. Completion report
+
+After implementing the fix, report:
+
+- The exact root cause.
+- The files changed.
+- What was changed in the startup sequence.
+- Which tests passed.
+- Whether startup was verified on an actual mobile device.
+- Any remaining issue that requires deployment, cache refresh, or environment configuration.
+
+Important: Implement the actual code changes in the existing project. Do not merely suggest possible fixes or hide the splash screen without ensuring the application initializes and renders correctly.

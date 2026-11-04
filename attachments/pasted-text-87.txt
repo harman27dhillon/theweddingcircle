@@ -1,0 +1,181 @@
+The Wedding Circle — Production-Grade Media Upload and Delivery Optimization
+
+Upgrade the existing media infrastructure to deliver a fast, reliable, WhatsApp-style photo and video experience.
+
+IMPORTANT: Inspect the existing source code and architecture before making changes. This is an optimization of the existing application, not a rewrite. Preserve the working Cloudflare R2 integration.
+
+1. Image optimization
+
+Implement efficient client-side image processing:
+
+- Resize oversized photos before uploading.
+- Use WebP where supported, with JPEG fallback.
+- Target a maximum dimension of approximately 2560px.
+- Use sensible compression quality around 80–85%.
+- Preserve EXIF orientation and correct image rotation.
+- Avoid unnecessary recompression of already optimized images.
+- Preserve sufficient quality for wedding photography.
+- Keep the original file when necessary for formats that cannot safely be converted.
+
+Measure compression duration and resulting file size.
+
+2. Direct-to-R2 uploads
+
+Optimize the existing signed-upload architecture.
+
+- Generate secure, short-lived signed upload URLs server-side.
+- Upload files directly from the user's device to private Cloudflare R2.
+- Never route large media files through the application server unnecessarily.
+- Never expose R2 access keys or secret credentials to the frontend.
+- Validate wedding membership, Premium entitlement, file type and size before issuing upload authorization.
+- Ensure signed requests use the exact expected content type and headers.
+- Save database references only after successful upload.
+- Maintain existing cross-wedding privacy protection.
+
+3. Parallel uploads
+
+Allow multiple photos to upload simultaneously.
+
+- Default concurrency: 3 uploads.
+- Make concurrency configurable.
+- Avoid overwhelming mobile devices or network connections.
+- Display the individual progress of each upload.
+- Allow users to continue navigating the app while uploads run.
+
+4. Upload progress and feedback
+
+Create a polished upload experience:
+
+- Show real upload progress percentages.
+- Show uploading, processing, completed and failed states.
+- Display thumbnails immediately.
+- Avoid duplicate uploads when users tap repeatedly.
+- Allow failed uploads to retry without selecting the files again.
+- Show meaningful error messages rather than generic "Failed to fetch" messages.
+
+Do not show 100% completion until the upload and required database confirmation have succeeded.
+
+5. Reliable retry and recovery
+
+Implement robust upload recovery:
+
+- Retry temporary network failures with exponential backoff.
+- Detect interrupted uploads.
+- Preserve upload state when the user temporarily navigates away.
+- Prevent duplicate objects and duplicate database records.
+- Use multipart/resumable uploads for large videos where appropriate.
+- Clean up abandoned incomplete uploads safely.
+
+6. Thumbnail and media delivery optimization
+
+- Generate small thumbnails for feed and chat previews.
+- Generate thumbnails asynchronously after successful uploads.
+- Load thumbnails first.
+- Load full-resolution photos only when opened.
+- Use lazy loading for albums and feeds.
+- Avoid downloading the same media repeatedly.
+- Use appropriate browser caching without compromising private wedding access.
+
+7. Video optimization
+
+Implement a separate video pipeline:
+
+- Preserve reasonable original video quality.
+- Support common Android and iPhone video formats.
+- Use background processing for video transcoding where appropriate.
+- Generate lightweight preview thumbnails.
+- Support resumable uploads for large videos.
+- Avoid blocking the user interface during video processing.
+- Do not send live-stream video through R2.
+
+Do not introduce expensive third-party video services without first assessing the existing Cloudflare infrastructure.
+
+8. Performance diagnostics
+
+Add safe timing measurements for:
+
+- Original file size.
+- Processed file size.
+- Compression duration.
+- Signed URL generation duration.
+- Actual R2 upload duration.
+- Database confirmation duration.
+- Total time until the media becomes visible.
+
+Provide developer diagnostics so slow stages can be identified independently.
+
+Never log secrets, signed URLs or private credentials.
+
+9. Preserve existing functionality
+
+This is critical.
+
+Do not break or remove:
+
+- Existing wedding posts.
+- Chat media.
+- Ceremony uploads.
+- Albums.
+- Profile pictures.
+- Wedding cover images.
+- Existing R2 media references.
+- Legacy Google Drive media references that must remain readable.
+- Premium entitlement checks.
+- Wedding membership and privacy controls.
+- Host and co-host permissions.
+
+Do not make the R2 bucket public.
+
+Do not change existing billing, voucher, payment or storage credentials.
+
+10. CDN readiness
+
+Prepare the media delivery layer to support a Cloudflare CDN/custom media domain later.
+
+- Keep media URLs abstracted behind a centralized media delivery service.
+- Support secure private-media authorization.
+- Do not assume that a public R2 bucket is acceptable.
+- Do not configure an unverified public media URL.
+- Do not make CDN configuration a dependency for current uploads.
+
+11. Testing requirements
+
+Test on both desktop and real Android devices.
+
+Test:
+
+1. Small photo upload.
+2. Large photo upload.
+3. Multiple simultaneous photo uploads.
+4. Large video upload.
+5. Interrupted upload and retry.
+6. Upload while navigating between app sections.
+7. Refresh after upload.
+8. Media retrieval after logging out and back in.
+9. Unauthorized access to another wedding's media.
+10. Premium and non-Premium entitlement enforcement.
+
+Compare upload times before and after optimization.
+
+Final implementation rules
+
+- Inspect existing code before changing anything.
+- Identify existing bottlenecks before optimizing.
+- Reuse existing R2 infrastructure.
+- Avoid unnecessary dependencies and recurring costs.
+- Do not rewrite working compression or upload code without evidence.
+- Implement changes directly in the existing source code.
+- Run typechecking, builds and relevant tests.
+- Test actual R2 uploads where production credentials and authorized wedding membership are available.
+
+At completion, provide:
+
+- Files changed.
+- Performance improvements measured.
+- Before-and-after upload timings.
+- Tests passed and failed.
+- Remaining production configuration requirements.
+
+Clearly distinguish implemented, locally tested and production-verified features.
+
+Do not claim that uploads are faster unless actual measurements demonstrate improvement.

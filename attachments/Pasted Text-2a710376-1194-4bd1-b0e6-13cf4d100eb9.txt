@@ -1,0 +1,174 @@
+Wedding Circle — Live Streaming UI & Experience Update
+
+Update the existing Wedding Circle app's Live page and live-streaming experience. Use the current implementation as the foundation. Do not rewrite the app, remove existing features, reset stored data, or modify unrelated pages or functionality. Make only the changes specified below.
+
+1. Replace the Current Emoji Reaction Design
+
+- Remove the current large, pill-shaped emoji reaction buttons shown under the live video, such as Love, Adorable, Wedding, Celebration, Dance, Party, Blessings, Nazar Protection, and Applause.
+- Replace them with a clean, premium live-reaction interface.
+- Use small, elegant icons or subtle animated reaction effects instead of displaying emojis with text inside large buttons.
+- When a viewer taps a reaction, show a brief animation over the live video, such as floating hearts, sparkling particles, or a subtle celebration effect.
+- Keep reactions lightweight, mobile-friendly, and visually consistent with the Wedding Circle theme.
+- Preserve the existing reaction functionality wherever it already works.
+
+2. Rename the Live Section
+
+- Change the heading "Wedding App Live" to "Wedding Circle Live".
+- Use the same name consistently anywhere this live-streaming feature is identified.
+- Do not rename unrelated app sections or change the app's overall identity.
+
+3. Move the Description into an Information Icon
+
+- Remove the always-visible description currently displayed below the live-stream heading.
+- Add a small circular information icon (ⓘ) beside the "Wedding Circle Live" heading.
+- When the user taps the icon, show the existing description in a small, attractive popover or modal.
+- The description should explain that this is an in-app wedding livestream and clarify whether the stream is recorded.
+- Keep the description hidden by default so the interface looks cleaner.
+
+4. Open Live Streaming in a Portrait Full-Screen Interface
+
+When a host or authorized user taps Start Live or Go Live:
+
+- Open a dedicated, immersive live-streaming screen that fills the available app viewport.
+- Use portrait orientation, optimized for mobile phones.
+- Request camera and microphone permissions when needed.
+- Show a clear preview from the selected camera before or as the stream starts.
+- Start the actual live broadcast only after the user confirms or the existing flow explicitly initiates it.
+- Display a live indicator, viewer count if available, and stream status.
+- Include a prominent End Live button with a confirmation step to prevent accidental termination.
+- Keep the interface optimized for one-handed use.
+
+Important: Prefer a portrait-locked live screen within the app. Use supported orientation-lock functionality where available, and gracefully fall back to a portrait layout if the browser or installed web app does not support locking orientation. Do not assume that CSS alone can force the device's physical orientation.
+
+5. Add Camera-Switching Controls
+
+Inside the live-streaming screen, add a clearly visible camera-switch button.
+
+- Allow the host to switch between the front-facing and rear-facing cameras.
+- Use a camera-flip icon rather than a text-heavy button.
+- Place the button where it is easy to reach without covering the main video.
+- Switching cameras must update the actual camera feed being broadcast, not just the preview.
+- Handle camera switching safely: stop or replace the existing camera track as necessary, update the outgoing stream, and preserve the ongoing broadcast when the browser and streaming implementation support it.
+- If camera switching fails, show a clear error message and retain the current working camera.
+- Add a mute/unmute microphone control and a camera on/off control as well.
+
+6. Make the Live Camera Full-Screen Across the App
+
+Once a live session begins, the host's camera interface should occupy the full available app screen rather than remaining confined to the small video box on the Live page.
+
+- Display the video edge-to-edge, with controls layered over it.
+- Keep important controls accessible without distracting from the video.
+- Hide unnecessary page content while the full-screen live interface is active.
+- Respect device safe areas and avoid overlapping the system status bar, navigation bar, or essential controls.
+- Support vertical mobile screens first, while remaining usable on larger screens.
+
+7. Add a Minimize Button and Floating Live Window
+
+Add a minimize button to the live-streaming screen.
+
+When tapped:
+
+- Minimize the live interface into a small, floating picture-in-picture-style window within the Wedding Circle app.
+- Keep the live camera and broadcast running while the host navigates to Home, Feed, Album, More, wedding details, or other app pages.
+- Allow the floating window to be dragged around the screen.
+- Keep it above page content without blocking essential navigation controls.
+- Add a restore or expand button to return to the full-screen live interface.
+- Include a clear close or return-to-live control where appropriate.
+
+Critical behavior: Minimizing must not end the stream, stop the camera, disconnect viewers, or reset the session. The same live session must continue.
+
+Implement this as an in-app floating video window, not merely a static thumbnail.
+
+If the app uses WebRTC, preserve the active media tracks and peer connections while the interface changes. If the browser does not support a particular picture-in-picture feature, use a custom draggable floating video component inside the app.
+
+Do not claim that the stream will continue after the browser or app is completely closed unless the actual streaming architecture supports background execution.
+
+8. Redesign the Wedding Circle Live and YouTube Live Bars
+
+Give both the Wedding Circle Live and YouTube Live section headers an attractive, premium visual treatment.
+
+- Use a soft glassmorphism effect with translucent backgrounds, subtle blur, and layered colors.
+- Use elegant gradients inspired by wedding celebrations, such as muted rose, champagne gold, lavender, and warm ivory.
+- Add a restrained glow or animated gradient shimmer.
+- Keep text readable with strong contrast.
+- Use rounded corners and subtle borders.
+- Make the bars feel modern and distinctive without looking flashy or cluttered.
+- Keep both bars visually related, but give each a slightly different gradient identity so users can distinguish the two streaming options.
+- Keep animations smooth and lightweight on mobile devices.
+- Provide a solid or reduced-blur fallback when backdrop filters are unsupported.
+
+Apply the styling to the section bars only. Do not unnecessarily redesign the entire app or change its existing color scheme outside these sections.
+
+9. Preserve Both Streaming Options
+
+Keep the two separate live-streaming sections:
+
+A. Wedding Circle Live
+
+- Streams directly inside the Wedding Circle app.
+- Uses the in-app camera and microphone.
+- Supports front/rear camera switching, reactions, comments, minimizing, and restoring the live window.
+- Does not automatically record the stream unless recording is already supported and explicitly enabled.
+
+B. YouTube Live
+
+- Remains a separate section for the YouTube livestream.
+- Continues to use the YouTube link attached to the wedding.
+- Opens or embeds the correct YouTube livestream using the existing implementation.
+- Does not accidentally start, stop, or interfere with Wedding Circle Live.
+- Receives the new premium section-bar styling described above.
+
+Do not merge the two video players into one or replace the YouTube stream with the in-app camera stream.
+
+10. Comments and Reactions
+
+- Preserve the existing live comments and Send button.
+- Keep comments available while the live session is active, subject to the current app's supported architecture.
+- Ensure the floating live window does not permanently cover the comment input or navigation.
+- Avoid unnecessary large emoji buttons.
+- Maintain a clean, modern interface with readable text and accessible touch targets.
+
+11. Technical Requirements
+
+Before making changes, inspect the existing components, routing, camera implementation, and streaming architecture.
+
+- Reuse existing working code wherever possible.
+- Do not create a second, disconnected livestream implementation.
+- Preserve the same live-session state when entering full-screen mode, minimizing, restoring, or navigating between pages.
+- Avoid starting duplicate camera streams.
+- Clean up media tracks only when the stream actually ends or the camera is intentionally turned off.
+- Handle permission denial, unavailable cameras, network interruptions, and stream-start failures gracefully.
+- Ensure camera switching updates the published stream.
+- Keep the interface responsive on Android mobile browsers and installed web apps.
+- Do not hardcode fake viewer counts, fake live statuses, or pretend that a stream has started when it has not.
+
+12. Strict Change-Scope Rules
+
+- Do not delete, overwrite, or reset existing wedding information, user accounts, comments, photos, videos, or other stored data.
+- Do not modify authentication, database schemas, payment systems, or unrelated functionality unless strictly necessary for these requested changes.
+- Do not replace working features with mockups or static demonstrations.
+- Do not remove the existing bottom navigation.
+- Do not modify the separate YouTube livestream functionality except for the requested styling and necessary compatibility.
+- Preserve all existing host and developer permissions.
+
+13. Validation Before Completion
+
+After implementation, verify all of the following:
+
+1. The heading reads "Wedding Circle Live".
+2. The description appears only after tapping the information icon.
+3. Large emoji reaction pills are replaced by compact reaction controls.
+4. Start Live opens the dedicated portrait live screen.
+5. Camera and microphone permissions are handled correctly.
+6. The front/rear camera switch changes the actual outgoing camera feed.
+7. The microphone and camera controls work.
+8. The live interface fills the available app viewport.
+9. Minimizing creates a draggable floating video window.
+10. The broadcast continues while the host navigates through the app.
+11. Restoring returns to the same live session without restarting it.
+12. Ending the broadcast stops the session correctly.
+13. The Wedding Circle Live and YouTube Live bars both display the new visual effects.
+14. The YouTube livestream remains separate and functional.
+15. Existing wedding data and unrelated features remain unchanged.
+
+Implement the changes in the existing project, inspect for errors, and report which features were actually tested. If any requested behavior is blocked by the current streaming provider or browser limitations, explain the specific limitation instead of simulating success.

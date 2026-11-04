@@ -1,0 +1,481 @@
+The Wedding Circle — Complete Firebase, Private Media Gateway & CDN Repair
+
+Perform a complete technical investigation and implementation of the three unresolved infrastructure systems:
+
+1. Firebase / Google Cloud connection
+2. Cloudflare Private Media Gateway
+3. Cloudflare CDN delivery and secure edge caching
+
+Do not give me another summary of the existing architecture. Inspect the actual source code, identify the underlying failures, implement the necessary corrections, and verify them.
+
+Do not make unrelated UI changes or modify other working infrastructure.
+
+CRITICAL RULES
+
+- Preserve the existing Supabase database and wedding membership system.
+- Preserve the private Cloudflare R2 bucket.
+- Never make the R2 bucket public.
+- Never expose service-account credentials, signing secrets, API tokens, or complete API keys in browser responses, logs, screenshots, or diagnostic output.
+- Do not generate replacement credentials or overwrite existing credentials automatically.
+- Do not delete, reset, or recreate existing vault entries.
+- Do not change DNS records or nameservers.
+- Do not enable the gateway or CDN automatically.
+- Do not change authentication or wedding membership logic.
+- Do not claim a live test passed when only simulated tests were performed.
+- Do not deploy anything. Prepare the changes for review and report the deployment requirements.
+
+---
+
+PART 1 — FIX FIREBASE COMPLETELY
+
+A. Investigate the actual API key being sent to Google
+
+The live Firebase test continues returning:
+
+"HTTP 400 — API_KEY_INVALID"
+
+Previous code changes improved diagnostic handling, but the live error remains unchanged.
+
+I want you to investigate the actual key used in the outbound Google Identity Toolkit request.
+
+The Firebase Web API key is already available in the existing Firebase configuration.
+
+I will provide its last four characters separately:
+
+"[INSERT LAST FOUR CHARACTERS OF ACTUAL FIREBASE WEB API KEY HERE]"
+
+Use these four characters only as a diagnostic fingerprint.
+
+1. Identify the exact API key source used by the Firebase connection test.
+2. Trace its complete resolution path:
+   - Environment variables
+   - Encrypted server-side vault
+   - Typed configuration
+   - Browser form state
+   - Any cached configuration
+3. Determine which source wins when multiple values exist.
+4. Compare the last four characters of the actual configured key with the key resolved immediately before the Google request.
+5. Report whether they match.
+6. Confirm that the same resolved key is actually used in the outbound HTTP request.
+7. Check whether an older vault value or environment variable overrides the newer configuration.
+8. Inspect the exact Google endpoint and request construction.
+9. Capture Google's actual HTTP status and allowlisted error code without exposing credentials.
+
+Do not print the complete key anywhere.
+
+If the fingerprint does not match, identify the incorrect source and fix the configuration resolution rather than asking me to regenerate the key.
+
+B. Investigate API_KEY_INVALID
+
+Determine the actual cause of Google's rejection.
+
+Check:
+
+- API key validity and project association.
+- Identity Toolkit API availability.
+- API key API restrictions.
+- Application restrictions.
+- Whether the required Firebase authentication endpoint is allowed.
+- Whether the request uses the correct Firebase Web API key.
+- Whether the project ID, project number, sender ID, and Web App configuration are consistent.
+
+Do not assume the API key is invalid simply because Google returns HTTP 400.
+
+Distinguish API_KEY_INVALID, API_KEY_SERVICE_BLOCKED, PERMISSION_DENIED, and other Google errors accurately.
+
+If the available evidence cannot establish the cause, report exactly what remains unknown.
+
+C. Fix Firebase credential storage and UI
+
+I have another concern.
+
+The Firebase API key remains visibly displayed inside its text field, unlike other credential fields.
+
+Investigate:
+
+- Whether the key is actually saved in the server-side encrypted vault.
+- Whether the browser merely retains the typed value.
+- Whether the field displays a value fetched from the server or only its local input state.
+- Whether saving persists the value after a page refresh.
+- Whether a blank field correctly preserves the saved server value.
+- Whether environment variables and vault values resolve consistently.
+
+Correct the UI:
+
+- Mask saved credential values.
+- Show a clear "Saved on server" indicator.
+- Use blank inputs with placeholders for already-saved values.
+- Do not send saved credentials back to the browser just to populate text fields.
+- Allow intentional replacement without exposing the previous value.
+- Preserve existing values when the user leaves the replacement field blank.
+
+Remember that Firebase Web API keys are designed to be used in client applications, unlike service-account private keys. Do not confuse their security requirements.
+
+D. Verify Firebase functionality
+
+After implementation:
+
+- Run the real Firebase connection check if existing credentials and network access permit.
+- Verify the API key check.
+- Verify the Email/Password provider check.
+- Verify the service-account check separately.
+- Confirm that a failed API key check does not falsely report Email/Password as disabled.
+- Do not change the existing Better Auth sign-in or Supabase wedding membership system.
+
+---
+
+PART 2 — FIX THE PRIVATE MEDIA GATEWAY
+
+Existing Cloudflare configuration
+
+The Worker is already deployed:
+
+"wedding-circle-media-gateway"
+
+Custom domain:
+
+"https://media.theweddingcircle.in"
+
+Previous Worker URL:
+
+"https://wedding-circle-media-gateway.labs-circle26.workers.dev"
+
+Existing R2 bucket:
+
+"wedding-circle-media"
+
+Existing Worker R2 binding:
+
+"MEDIA"
+
+Existing Worker secret:
+
+"MEDIA_GATEWAY_SECRET"
+
+Existing Worker variable:
+
+"ALLOWED_ORIGINS"
+
+The custom domain has been added in Cloudflare and responds over HTTPS.
+
+The app's Worker origin is already saved as:
+
+"https://media.theweddingcircle.in"
+
+The gateway remains OFF.
+
+A. Investigate the Test Gateway button
+
+The most recent problem is that clicking Test Gateway produces no visible result and the diagnostic panel remains unchanged.
+
+Inspect the entire flow:
+
+- Frontend button click handler.
+- Loading and error states.
+- Server action or API endpoint.
+- Authentication and authorization.
+- Request payload.
+- Response parsing.
+- Exception handling.
+- Diagnostic state persistence.
+- UI refresh after completion.
+
+Identify exactly why the button does nothing.
+
+Fix it so that:
+
+1. Clicking the button always triggers the diagnostic.
+2. A loading indicator appears.
+3. The server executes the actual checks.
+4. The response is displayed.
+5. Failures show their real reason.
+6. The latest test timestamp updates.
+7. The UI does not silently swallow errors.
+8. No secret values are displayed.
+
+B. Verify the signing contract
+
+The existing app and Worker are supposed to share:
+
+- HMAC-SHA256.
+- "v1" token.
+- GET or HEAD.
+- "/v1/{object}?t="
+
+Inspect both implementations and verify that the signing algorithm, canonical path, encoding, token format, timestamp, expiry, and signature comparison are identical.
+
+Do not assume they match merely because previous tests passed.
+
+The app server and Worker must use exactly the same "MEDIA_GATEWAY_SECRET".
+
+Do not invent, regenerate, overwrite, or silently copy a secret.
+
+C. Complete the missing security tests
+
+The previous live tests established:
+
+- Worker responds.
+- Anonymous GET returns HTTP 403.
+- Invalid token returns HTTP 403.
+- Anonymous HEAD returns HTTP 403.
+- POST returns HTTP 405.
+- Allowed website origins return HTTP 204.
+- Unapproved origin returns HTTP 403.
+- R2 binding exists.
+
+But these checks remain unverified:
+
+1. Valid signed GET.
+2. Valid signed HEAD.
+3. Expired token rejection.
+4. Wrong signature rejection.
+5. Modified object-path rejection.
+6. Private object delivery.
+7. Missing object handling.
+8. R2 error handling.
+
+Implement and execute these tests where possible.
+
+A valid signed request must use the real existing server-side secret.
+
+If the real secret cannot be accessed, explicitly report the blocker. Do not substitute a dummy secret and claim the real gateway works.
+
+D. Preserve security
+
+The Worker must:
+
+- Validate signatures before accessing private objects.
+- Validate expiry.
+- Bind authorization to the requested object path.
+- Reject malformed tokens.
+- Reject unauthorized requests.
+- Never redirect to a public R2 URL.
+- Never expose R2 credentials or signing secrets.
+- Preserve private object access.
+- Handle GET and HEAD correctly.
+
+Keep the gateway OFF until all required security tests pass.
+
+---
+
+PART 3 — COMPLETE CLOUDFLARE CDN
+
+Existing Cloudflare configuration
+
+Cloudflare DNS migration is complete.
+
+The zone "theweddingcircle.in" is active.
+
+The following hostname is connected to the Worker:
+
+"media.theweddingcircle.in"
+
+The Cloudflare API token is saved and was accepted by the app's connection test.
+
+The Cloudflare account ID is saved.
+
+The R2 bucket connection is verified.
+
+CDN delivery is currently OFF.
+
+The current app cache-policy dropdown offers only:
+
+- Private browser cache only.
+- Do not store.
+
+Cloudflare Worker Runtime currently shows Cache Disabled.
+
+Do not confuse Worker runtime cache configuration with CDN delivery.
+
+A. Audit the complete CDN implementation
+
+Inspect:
+
+- CDN configuration schema.
+- Cloudflare API calls.
+- Zone discovery.
+- Zone ID resolution.
+- API token permissions.
+- Media hostname validation.
+- R2 object delivery.
+- Cache policy implementation.
+- Cache headers.
+- Worker routing.
+- CDN status and test endpoint.
+- Actual frontend media URL generation.
+
+Determine what is already implemented and what is missing.
+
+Do not assume that an accepted Cloudflare API token means CDN delivery is operational.
+
+B. Implement secure private-media edge caching
+
+Our requirement is:
+
+Private wedding media must remain private while benefiting from Cloudflare edge caching.
+
+The solution must support authorization before cached content is served.
+
+For every request:
+
+1. Validate the signed token.
+2. Verify its expiry.
+3. Verify the signature against the requested object path.
+4. Verify that the request is authorized.
+5. Only after successful authorization may the Worker retrieve an eligible cached object.
+6. Unauthorized requests must never receive cached media.
+7. Cache keys must be designed so that tokens cannot accidentally bypass authorization.
+8. Cache lifetime must never exceed the relevant authorization and security requirements.
+
+Investigate whether caching by object identity after authorization is safe for this architecture.
+
+Never configure a cache rule that bypasses Worker authorization.
+
+Do not make the R2 bucket public.
+
+Do not use a public R2 custom domain.
+
+Do not cache private media before validating authorization.
+
+C. Improve the CDN configuration interface
+
+If the existing two cache options are insufficient, implement a proper and understandable cache-policy system.
+
+Clearly distinguish:
+
+- Browser caching.
+- Cloudflare edge caching.
+- Private no-store delivery.
+- Authorized media caching.
+
+Provide sensible defaults.
+
+Do not silently enable shared caching for existing media.
+
+Add diagnostics that show:
+
+- Cloudflare API connection.
+- Zone identification.
+- Media hostname resolution.
+- Worker availability.
+- R2 connection.
+- Cache configuration.
+- Cache status.
+- Cache HIT/MISS where applicable.
+- Authorization result.
+- Actual delivery result.
+
+The test must verify actual media delivery and cache behavior, not just Cloudflare API authentication.
+
+D. Test CDN behavior
+
+Where credentials and existing test media permit, verify:
+
+- Authorized first request.
+- Authorized repeat request.
+- Cache MISS followed by HIT, if supported.
+- Unauthorized request.
+- Expired signed request.
+- Different object path.
+- Missing object.
+- HEAD request.
+- Browser cache behavior.
+- Cache-control headers.
+- CDN response headers.
+
+Do not claim CDN delivery is complete based only on simulated tests or a successful API token check.
+
+Keep CDN delivery OFF until security and live delivery tests pass.
+
+---
+
+PART 4 — INTEGRATION AND REGRESSION AUDIT
+
+After all three systems are investigated and corrected, verify that they work together without breaking existing features.
+
+Check:
+
+- Existing private R2 uploads.
+- Photo and video viewing.
+- Signed media URLs.
+- Chat media.
+- Feed media.
+- Ceremony media.
+- Album media.
+- Profile pictures.
+- Custom covers.
+- Downloads.
+- Existing Supabase records.
+- Wedding membership authorization.
+- Existing authentication.
+- Cloudflare Stream livestreaming.
+
+Do not change the livestream provider or send live video to R2.
+
+Do not migrate the database or replace existing storage.
+
+Run:
+
+- TypeScript checks.
+- Unit tests.
+- Integration tests.
+- Security tests.
+- Production build.
+- Relevant existing regression tests.
+
+Fix regressions caused by your changes.
+
+---
+
+PART 5 — FINAL REPORT
+
+Give me a factual report with these sections:
+
+1. Firebase
+
+- Actual API key source.
+- Last-four fingerprint match or mismatch.
+- Actual Google rejection reason.
+- Storage/persistence issue found or not found.
+- Fixes implemented.
+- Real live test result.
+
+2. Private Media Gateway
+
+- Test button issue and fix.
+- Signing compatibility.
+- Secret matching status without exposing the secret.
+- Each security test result.
+- Whether valid private media delivery works.
+
+3. CDN
+
+- Cloudflare configuration completed.
+- Edge caching implementation.
+- Authorization-before-cache verification.
+- Actual HIT/MISS results.
+- Whether private media remains protected.
+- Whether CDN delivery is safe to enable.
+
+4. Verification
+
+- Tests passed.
+- Tests failed.
+- Tests not run.
+- Production build result.
+
+5. Remaining manual actions
+
+List only actions that genuinely require me to use Cloudflare, Firebase, or the live application.
+
+FINAL REQUIREMENT
+
+Do not just improve error messages again.
+
+Find the actual causes, implement real fixes, and verify them.
+
+If something cannot be completed because a credential, permission, or external service is unavailable, identify the exact blocker instead of pretending the task is complete.
+
+Do not deploy, enable the gateway, enable CDN delivery, alter DNS, or change existing credentials without my explicit approval.
+
+I want working, secure infrastructure — not another report saying that the code looks correct while the live system still fails.

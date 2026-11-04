@@ -1,0 +1,52 @@
+Fix Developer Settings – Infrastructure Credentials Not Updating
+
+There is a critical bug in the Developer Settings → Infrastructure section.
+
+Credentials saved the first time are not being properly replaced when new credentials are entered and saved. The application appears to retain or continue using the original credentials.
+
+Please investigate and fix the complete save, update, retrieval and connection-testing flow.
+
+Requirements:
+
+1. Correct update behaviour
+   
+   - Saving new credentials must replace the previously saved values for the same configuration.
+   - Do not create duplicate configuration records.
+   - Use a reliable update/upsert mechanism with a unique configuration identifier.
+
+2. Database persistence
+   
+   - Verify that new values are actually written to the database.
+   - Ensure the backend retrieves the latest saved values, not the original values.
+   - Check for database caching, stale state, old environment-variable fallbacks and hardcoded credentials.
+
+3. Connection testing
+   
+   - Every Test Connection action must use the latest saved credentials.
+   - Never test using stale or cached credentials.
+   - Show clear success or failure messages based on the actual connection result.
+
+4. Form behaviour
+   
+   - After saving, refresh the form from the backend's confirmed saved configuration.
+   - Mask secret values in the interface.
+   - Allow users to replace existing secrets even when their current values are masked.
+   - Do not accidentally overwrite existing secrets with empty fields when a field is left unchanged.
+
+5. Security
+   
+   - Keep all private credentials server-side.
+   - Never expose secret values through frontend responses, browser storage, logs or console output.
+   - Preserve existing authentication and authorization checks.
+
+6. Apply this fix to every Infrastructure configuration, including Firebase, Cloudflare R2, Livestream, Google Play Billing and Push Notifications.
+
+Important safeguards:
+
+- Do not redesign the Developer Settings interface.
+- Do not delete existing infrastructure configurations or database records.
+- Do not reset working integrations.
+- Preserve the existing database schema unless a necessary migration is justified.
+- Do not claim the issue is fixed until you verify that changing a credential, saving it, reloading the page and testing the connection all use the new value.
+
+First identify the root cause, then implement the fix and report exactly what was changed and tested.

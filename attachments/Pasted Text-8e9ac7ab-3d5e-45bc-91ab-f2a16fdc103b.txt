@@ -1,0 +1,740 @@
+Upgrade my existing application's private Developer Login into a full-fledged Developer Command Center / AI Engineering Console.
+
+This is for the application's owner/developer only. It must work with the EXISTING application, existing source code, database, authentication, GitHub repository, and deployment setup. Do not create a fake/simulated developer environment.
+
+CORE PURPOSE
+
+I want to be able to maintain and improve my entire application from this Developer Command Center without manually opening the source code whenever possible.
+
+For example, if a feature stops working, I should be able to type:
+
+«"The wedding invitation isn't opening when users click the notification. Find the problem and fix it."»
+
+The system should inspect the actual application code, identify the problem, modify the relevant code, test the fix, show me the changes, and let me deploy it.
+
+It should function like a private AI software engineer + admin console for this application.
+
+---
+
+1. DEVELOPER AUTHENTICATION
+
+Keep the Developer section completely separate from normal user functionality.
+
+Requirements:
+
+- Only the authorized developer account can access it.
+- Protect it with server-side authorization.
+- Do not rely only on hiding the Developer UI.
+- Automatically redirect unauthorized users away.
+- Add optional second-factor/passkey support if the existing authentication architecture supports it.
+- Never expose developer credentials, API keys, database passwords, OAuth secrets, GitHub tokens, or deployment tokens to the frontend.
+
+---
+
+2. DEVELOPER DASHBOARD
+
+Create a professional developer dashboard.
+
+Show:
+
+Application
+
+- Current version
+- Environment: Development / Production
+- Application status
+- Last deployment
+- Last successful deployment
+- Current Git commit
+- Build status
+
+Usage
+
+- Total users
+- Active users
+- Total weddings
+- Active weddings
+- New users
+- Storage usage
+- Database usage
+
+System
+
+- API health
+- Database health
+- Authentication status
+- Storage status
+- Third-party integration status
+
+Recent Activity
+
+- Recent developer commands
+- Recent deployments
+- Recent errors
+- Recent database changes
+
+Use cards and clear status indicators.
+
+---
+
+3. MAIN AI COMMAND CENTER
+
+Make the main screen a large command interface.
+
+Placeholder:
+
+«"What do you want to change, build, or fix?"»
+
+I should be able to type normal language.
+
+Examples:
+
+«Fix the wedding invitation notification.»
+
+«Add a countdown to every wedding page.»
+
+«Change the wedding creation fee to ₹499.»
+
+«Add a polls feature.»
+
+«Make the wedding page look better on mobile.»
+
+«Remove this button.»
+
+«Add Google login.»
+
+«Photo uploads are getting stuck at 90%. Find the cause and fix it.»
+
+«The app is showing an error when creating a wedding. Diagnose it.»
+
+«Roll back the last deployment.»
+
+«Deploy the latest approved changes.»
+
+The AI must understand the application's existing architecture before making changes.
+
+---
+
+4. REAL CODE ACCESS
+
+This is critical.
+
+The command system must work with the actual source code of this application.
+
+It must NOT simply pretend that a feature was changed.
+
+Where the required integrations are available, the AI should be able to:
+
+- Read repository files
+- Understand the project structure
+- Search the codebase
+- Identify relevant components
+- Modify source files
+- Create new files
+- Remove obsolete files
+- Modify configuration
+- Modify database schema where appropriate
+- Modify API routes
+- Modify frontend components
+- Modify backend logic
+- Modify authentication logic
+- Run tests
+- Run linting
+- Run builds
+- Review generated changes
+
+Preserve existing functionality unless my command specifically asks to change it.
+
+---
+
+5. AI BUG-FIX WORKFLOW
+
+When I report a broken feature, use this workflow:
+
+Developer request
+       ↓
+Understand problem
+       ↓
+Inspect application
+       ↓
+Inspect relevant source code
+       ↓
+Inspect logs/errors if available
+       ↓
+Identify likely cause
+       ↓
+Create proposed fix
+       ↓
+Modify code
+       ↓
+Run tests
+       ↓
+Run build
+       ↓
+Show changes
+       ↓
+Developer approval
+       ↓
+Commit
+       ↓
+Deploy
+       ↓
+Verify deployment
+
+Example:
+
+I enter:
+
+«"Users can't open a wedding invitation from notifications."»
+
+Show:
+
+PROBLEM FOUND
+
+NotificationHandler is passing an incorrect wedding ID.
+
+FILES AFFECTED
+- NotificationHandler.ts
+- WeddingRouter.ts
+
+PROPOSED FIX
+Correct the wedding ID routing and preserve the existing
+notification behavior.
+
+VALIDATION
+Build: PASS
+Tests: PASS
+Lint: PASS
+
+Then show:
+
+Review Changes
+
+Approve & Deploy
+
+Cancel
+
+---
+
+6. AI CODE EDITOR / DIFF VIEW
+
+Whenever code is changed, show me:
+
+- File name
+- Lines changed
+- Before/after diff
+- Reason for change
+- Potential side effects
+- Test result
+
+Example:
+
+WeddingHome.tsx
+
++ Added WeddingCountdown component
++ Added wedding date handling
++ Added mobile responsive layout
+
+Allow me to give follow-up instructions:
+
+«"Don't change the existing design."»
+
+«"Undo that change."»
+
+«"Try another approach."»
+
+«"Only fix the bug, don't modify anything else."»
+
+The AI should revise the changes rather than starting an unrelated implementation.
+
+---
+
+7. GIT / VERSION CONTROL
+
+Connect the Developer Center to the actual project repository.
+
+Where supported, allow:
+
+- Create development branch
+- Modify files
+- Commit changes
+- View commits
+- View branches
+- Create pull requests
+- Review diffs
+- Merge approved changes
+- Revert changes
+- Roll back to previous versions
+
+Every AI-generated code change must have a traceable commit.
+
+Never silently overwrite production code.
+
+---
+
+8. DEPLOYMENT CENTER
+
+Create a dedicated Deployments section.
+
+Show:
+
+- Deployment history
+- Version
+- Git commit
+- Build status
+- Deployment status
+- Deployment time
+- Environment
+- Deployment URL
+- Error logs
+
+Allow:
+
+Deploy
+
+Rollback
+
+Redeploy
+
+View Logs
+
+Production deployment of code changes should normally require my approval.
+
+---
+
+9. AUTOMATIC TESTING
+
+Before allowing production deployment of code changes:
+
+Run whatever tests are available in the existing project.
+
+At minimum attempt:
+
+- Type checking
+- Linting
+- Build
+- Existing automated tests
+
+Show:
+
+Type Check     ✅
+Lint           ✅
+Build          ✅
+Tests          ✅
+
+If something fails, do NOT pretend it passed.
+
+Show the actual error and allow the AI to attempt a fix.
+
+---
+
+10. ERROR CENTER
+
+Create an Errors section.
+
+Collect available:
+
+- Frontend errors
+- Backend errors
+- API errors
+- Authentication errors
+- Database errors
+- Upload errors
+- Deployment errors
+- Build errors
+
+For each error provide:
+
+Analyze
+
+The AI should inspect the available error information and relevant code.
+
+Then show:
+
+CAUSE
+...
+
+AFFECTED FILES
+...
+
+PROPOSED FIX
+...
+
+RISK
+Low / Medium / High
+
+Then:
+
+Apply Fix
+
+---
+
+11. FEATURE MANAGEMENT
+
+Create a Feature Flags section.
+
+Example:
+
+Wedding Polls             ON
+Wedding Countdown         ON
+Premium Themes            OFF
+Photo Uploads             ON
+Google Photos Integration ON
+
+Allow features to be enabled/disabled without requiring a full deployment where technically possible.
+
+---
+
+12. APPLICATION CONTENT CONTROL
+
+Allow the Developer Center to manage application-level content such as:
+
+- Themes
+- Backgrounds
+- Wedding templates
+- Announcements
+- Default text
+- Feature descriptions
+- Pricing
+- Limits
+- App configuration
+
+Separate content/configuration changes from source-code changes.
+
+---
+
+13. USER MANAGEMENT
+
+Create a private user-management section.
+
+Allow authorized developer actions such as:
+
+- Search users
+- View account information
+- View account status
+- Suspend account
+- Restore account
+- Delete account
+- View user's weddings
+- View relevant account activity
+
+Do not expose private user data unnecessarily.
+
+Every sensitive action must be logged.
+
+---
+
+14. WEDDING MANAGEMENT
+
+Create a Wedding Management section.
+
+Allow me to:
+
+- Search weddings
+- View wedding status
+- View hosts/co-hosts
+- View member count
+- View creation date
+- View relevant activity
+- Suspend/remove a wedding where appropriate
+- Diagnose wedding-specific problems
+
+Do not expose private wedding content unnecessarily.
+
+---
+
+15. DATABASE MANAGEMENT
+
+Provide database diagnostics and controlled management.
+
+Allow the AI to:
+
+- Inspect schema
+- Understand relationships
+- Diagnose database errors
+- Propose migrations
+- Create migrations
+- Validate migrations
+
+Destructive database operations must require explicit confirmation.
+
+Never execute:
+
+DROP DATABASE
+DELETE ALL USERS
+DELETE ALL WEDDINGS
+
+or equivalent destructive operations without an explicit confirmation step.
+
+Where possible, create a backup before destructive migrations.
+
+---
+
+16. COMMAND SAFETY LEVELS
+
+Classify commands automatically.
+
+GREEN — SAFE
+
+Examples:
+
+- Change text
+- Change theme
+- Enable feature flag
+- Disable feature flag
+- View logs
+- Analyze error
+- View analytics
+
+Can execute automatically.
+
+YELLOW — REVIEW
+
+Examples:
+
+- Modify source code
+- Add features
+- Fix bugs
+- Modify APIs
+- Modify database schema
+- Change authentication
+- Create deployment
+
+Must show proposed changes and require my approval.
+
+RED — DANGEROUS
+
+Examples:
+
+- Delete users
+- Delete weddings
+- Delete database records
+- Mass modifications
+- Disable authentication
+- Change security credentials
+- Destructive migrations
+
+Require explicit confirmation immediately before execution.
+
+---
+
+17. COMMAND HISTORY / AUDIT LOG
+
+Record every developer action.
+
+Store:
+
+- Developer
+- Command
+- Date/time
+- AI interpretation
+- Action performed
+- Files changed
+- Database changes
+- Git commit
+- Deployment ID
+- Result
+- Error
+- Rollback information
+
+Example:
+
+04 Oct 2026 22:10
+
+COMMAND
+"Fix broken wedding invitation notification"
+
+RESULT
+Successful
+
+FILES
+NotificationHandler.ts
+WeddingRouter.ts
+
+COMMIT
+abc123
+
+DEPLOYMENT
+Production #42
+
+Make the audit log immutable from the normal developer UI where practical.
+
+---
+
+18. ROLLBACK
+
+Maintain previous working versions.
+
+Allow commands such as:
+
+«"Rollback the last deployment."»
+
+«"Restore yesterday's version."»
+
+«"Revert the changes from the previous command."»
+
+Before rollback, show exactly what version will be restored.
+
+---
+
+19. AI DIAGNOSTIC MODE
+
+Add a button:
+
+Diagnose Application
+
+The AI should inspect available:
+
+- Recent errors
+- Failed API calls
+- Build failures
+- Deployment failures
+- Performance issues
+- Authentication failures
+
+Then produce:
+
+CRITICAL ISSUES
+...
+
+WARNINGS
+...
+
+RECOMMENDED FIXES
+...
+
+SAFE AUTOMATIC FIXES
+...
+
+Do not automatically apply potentially risky fixes.
+
+---
+
+20. NATURAL LANGUAGE DEVELOPMENT
+
+The command system should understand requests like:
+
+«"Make this page look more professional."»
+
+«"Make the wedding creation process simpler."»
+
+«"Add a share button."»
+
+«"The app feels slow. Find out why."»
+
+«"Make this work better on Samsung phones."»
+
+«"Don't change the current design, just fix the bug."»
+
+The AI should inspect the actual application before making assumptions.
+
+---
+
+21. SECURITY
+
+Never put sensitive credentials in frontend JavaScript.
+
+Use secure server-side environment variables/secrets for:
+
+- GitHub
+- Database
+- Deployment provider
+- Google APIs
+- Authentication
+- Storage
+- Other third-party services
+
+Use least-privilege permissions wherever possible.
+
+Do not give the browser direct unrestricted shell/database access.
+
+The AI command executor should run through a secure backend.
+
+---
+
+22. UI STRUCTURE
+
+Create the Developer Center with this sidebar:
+
+DEVELOPER CENTER
+
+Overview
+Command Center
+AI Code Fixer
+Users
+Weddings
+Features
+Database
+Errors
+Logs
+GitHub
+Deployments
+Settings
+
+The Command Center should be the main landing page.
+
+Use a modern professional developer-console design with:
+
+- Dark mode
+- Command terminal style
+- Status cards
+- Code diff viewer
+- Log viewer
+- Deployment cards
+- Confirmation dialogs
+- Clear success/error states
+- Responsive layout
+
+---
+
+23. IMPORTANT IMPLEMENTATION RULE
+
+Do not claim that an integration exists if it has not actually been configured.
+
+If GitHub, deployment, database, AI coding, or another service requires credentials/configuration, show me exactly what needs to be connected.
+
+Example:
+
+GitHub connection required.
+
+Required:
+- Repository
+- GitHub authorization
+- Repository write permission
+
+Do not create fake deployment results, fake Git commits, fake test results, or fake code changes.
+
+---
+
+24. FINAL GOAL
+
+The finished Developer Center should let me manage the application from one place.
+
+My intended workflow is:
+
+Something breaks
+       ↓
+Open Developer Center
+       ↓
+Describe the problem
+       ↓
+AI investigates actual application
+       ↓
+AI finds the cause
+       ↓
+AI modifies actual code
+       ↓
+Tests/build
+       ↓
+I review changes
+       ↓
+Approve
+       ↓
+Git commit
+       ↓
+Production deployment
+       ↓
+Verify
+
+I should be able to maintain, debug, improve, and deploy the application primarily from this private Developer Center without manually editing the project files for every change.
+
+Do not replace existing functionality while implementing this. Integrate with the existing architecture and preserve all currently working features.

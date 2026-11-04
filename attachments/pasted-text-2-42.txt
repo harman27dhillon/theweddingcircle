@@ -1,0 +1,132 @@
+The Wedding Circle — Google Play Billing Reliability Audit
+
+Objective
+
+Prepare Google Play Billing for reliable production integration. We have previously encountered code-level issues with infrastructure connection tests, configuration validation, and misleading success/failure reporting.
+
+I want Google Play Billing implemented correctly from the beginning, avoiding those same problems.
+
+1. Inspect the existing architecture
+
+Inspect the actual source code and identify:
+
+- Android application package ID.
+- Android wrapper and native billing capabilities.
+- Existing backend architecture and API routes.
+- Existing Supabase database schema and user/wedding membership relationships.
+- Current premium feature and entitlement logic.
+- Existing infrastructure configuration and secret-management patterns.
+
+Do not assume a capability exists just because a configuration field is present.
+
+2. Audit Google Play Billing requirements
+
+Verify the implementation requirements for:
+
+- Google Play Billing Library compatibility.
+- Product and subscription IDs.
+- One-time purchases and subscriptions, if supported by the planned business model.
+- Purchase initiation and purchase updates.
+- Purchase-token handling.
+- Server-side purchase verification through Google Play Developer API.
+- Purchase acknowledgement and consumption where applicable.
+- Subscription renewals, cancellations, expiration, refunds, and revocations.
+- Real-time Developer Notifications.
+- Duplicate purchase and replay protection.
+- Secure entitlement granting and revocation.
+- Test purchases and license testers.
+
+Use current official Google documentation for API and billing requirements.
+
+3. Build reliable connection diagnostics
+
+Design accurate tests for:
+
+- Google Play Developer API authentication.
+- Service account permissions.
+- Package ID validity.
+- Product and subscription availability.
+- Backend connectivity.
+- Purchase-token verification.
+- Notification configuration.
+
+Each test must read the complete response and distinguish authentication failures, permission errors, missing products, invalid tokens, network errors, and application-code errors.
+
+Never report a successful billing connection merely because credentials are saved.
+
+Never expose service-account credentials, private keys, API tokens, or purchase tokens in logs or frontend responses.
+
+4. Inspect and fix code-level problems
+
+Identify and fix confirmed defects involving:
+
+- Incorrect API endpoints or request formats.
+- Incorrect secret names or configuration sources.
+- Frontend/backend configuration mismatches.
+- Incomplete response parsing.
+- Incorrect HTTP status classification.
+- Stale connection-test results.
+- Missing error handling and timeout handling.
+- Duplicate purchase processing.
+- Incorrect entitlement updates.
+- Security vulnerabilities in purchase verification.
+
+Implement fixes directly where safe. Do not perform unrelated refactoring.
+
+5. Preserve existing systems
+
+Mandatory:
+
+- Keep Supabase as the current database.
+- Preserve Better Auth and existing sign-in.
+- Preserve existing wedding membership and access rules.
+- Do not change Firebase, Cloudflare, R2, CDN, or livestream functionality.
+- Do not delete or migrate existing data.
+- Do not grant premium access based on an unverified client-side purchase.
+- Do not expose or request existing secrets unnecessarily.
+
+6. Testing
+
+Run relevant:
+
+- Unit and integration tests.
+- Purchase verification tests.
+- Subscription lifecycle tests.
+- Duplicate/replay protection tests.
+- Authorization tests.
+- Secret-redaction tests.
+- TypeScript checks.
+- Production build.
+
+Use test fixtures or sandbox testing where real Google Play credentials and products are not yet configured.
+
+Clearly distinguish simulated tests from actual Google Play API verification.
+
+7. Do not activate billing yet
+
+For this task:
+
+- Do not enable production billing.
+- Do not create real purchases.
+- Do not change product pricing.
+- Do not grant premium entitlements.
+- Do not modify Google Play Console settings.
+- Do not invent credentials or product IDs.
+
+First inspect, implement safe code-level improvements, and prepare the integration.
+
+8. Final report
+
+Report:
+
+1. Current Google Play Billing implementation status.
+2. Confirmed code defects.
+3. Exact files changed.
+4. Fixes implemented.
+5. Tests actually executed and results.
+6. Google Play Console configuration still required.
+7. Credentials and permissions still required.
+8. Remaining blockers before sandbox testing.
+9. Remaining blockers before production launch.
+
+Do not claim billing is ready until a real sandbox purchase has been verified end-to-end, including server-side verification and entitlement handling.

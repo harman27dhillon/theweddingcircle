@@ -1,0 +1,167 @@
+TASK: FIX THE INCOMPLETE WEDDING CIRCLE THEMES — START WITH PASTEL BLUSH.
+
+The previous theme update was reported as complete, but the actual UI proves otherwise. The five light themes still apply only partial styling. For example, the Live screen changes to a cream background with brown buttons, but the camera tiles remain plain dark rectangles, decorative details are missing, and the screen does not match the intended complete theme design.
+
+Do not repeat the previous approach of changing a few color tokens. Investigate the actual implementation and fix the underlying cause.
+
+IMPORTANT: Make changes directly to the existing project. Do not merely provide recommendations, pseudocode, or a proposed implementation.
+
+PHASE 1 — AUDIT BEFORE MODIFYING
+
+1. Inspect the complete existing theme system:
+   - Theme definitions and theme identifiers.
+   - Theme selection and persistence.
+   - Theme provider, context, CSS variables, design tokens, and component styles.
+   - Home, Chat, Live, Album, More, and Host Control components.
+   - Nested pages, modals, dialogs, menus, inputs, buttons, and camera tiles.
+   - Any hard-coded colors, backgrounds, borders, and decorative assets that override the selected theme.
+
+2. Determine exactly why Royal Burgundy, Royal Blue, and Midnight Emerald receive complete styling while Pastel Blush, Sage Green, Classic Ivory, Terracotta Sunset, and Lavender Dream receive only partial styling.
+
+3. Trace the styling from theme selection to the actual rendered components. Check for:
+   - Missing theme definitions or incomplete theme objects.
+   - Components that ignore the active theme.
+   - Hard-coded colors overriding theme styles.
+   - CSS specificity conflicts.
+   - Incorrect theme identifiers or fallback behavior.
+   - Missing decorative assets or styles.
+   - Components using a different theme context.
+   - Styles that work on one screen but not on nested screens.
+
+4. Establish the root cause before implementing the fix. Do not assume that adding more CSS variables alone will solve it.
+
+PHASE 2 — FIX PASTEL BLUSH FIRST
+
+Use Pastel Blush as the first end-to-end test theme.
+
+Its intended design:
+- Blush pink, warm cream, rose gold, and restrained champagne accents.
+- Elegant wedding typography.
+- Appropriate floral details and decorative borders.
+- Soft, refined surfaces rather than generic flat styling.
+- Clear text contrast and consistent button styling.
+- Existing glassmorphism and smooth animations preserved where already used.
+
+Apply the theme consistently across the entire wedding interface.
+
+LIVE SCREEN:
+- The page background, header, camera tiles, borders, decorative corners, buttons, comment field, send button, and bottom navigation must all follow Pastel Blush.
+- Do not leave the camera tiles with unrelated default styling merely because their background is dark.
+- Preserve the existing camera tile dimensions, aspect ratios, positions, grid, and spacing.
+- Keep all camera, live-stream, comment, and navigation functionality working.
+- Use existing floral assets where available. Do not invent a new asset system if the project already has one.
+
+HOME SCREEN:
+- Theme the wedding header, couple names, date, location, wedding cards, ceremony text, buttons, and decorative elements.
+- Preserve the existing wedding-card layout and the proportions of the Chat/Feed and Live shortcut tiles.
+
+CHAT SCREEN:
+- Preserve the existing chat layout and behavior.
+- Keep sent and received message alignment, bubble shapes, names, timestamps, scrolling, keyboard behavior, composer, attachment menu, camera, voice notes, and Post/send controls.
+- Change only the visual styling required by Pastel Blush.
+- Do not redesign or replace the Chat component.
+
+ALBUM, MORE, AND HOST CONTROL:
+- Apply Pastel Blush consistently to album cards, image viewer surfaces, navigation, menus, dialogs, forms, controls, and nested screens.
+- Preserve existing functionality and component layouts.
+- Ensure no screen silently falls back to the old brown/pink styling unless that styling is explicitly part of the selected theme.
+
+PHASE 3 — PRESERVE THE EXISTING THEMES
+
+There are nine themes:
+
+1. Royal Burgundy
+2. Pastel Blush
+3. Sage Green
+4. Royal Blue
+5. Classic Ivory
+6. Midnight Emerald
+7. Terracotta Sunset
+8. Lavender Dream
+9. Classic Default
+
+Royal Burgundy, Royal Blue, and Midnight Emerald already work correctly. Do not redesign them, change their palettes, or replace their styling architecture unnecessarily.
+
+Classic Default must preserve the original cream-and-brown interface:
+- Cream page surfaces.
+- Brown text.
+- Original soft Live header.
+- Dark camera slots.
+- Cream More tiles.
+- Solid brown chat bubbles.
+
+Classic Default is different from Classic Ivory. Do not merge them.
+
+Do not apply Pastel Blush's decorative styling globally. Each theme must use its own design definition.
+
+PHASE 4 — FIX THE UNDERLYING ARCHITECTURE
+
+After Pastel Blush works across all screens:
+
+1. Correct the shared theme mechanism so all theme-aware components consistently consume the active wedding's theme.
+2. Reuse shared theme tokens and component styling where appropriate, but allow each theme to retain its unique visual identity.
+3. Complete the theme definitions for:
+   - Sage Green: sage, ivory, botanical styling.
+   - Classic Ivory: ivory, cream, charcoal/soft brown, subtle gold.
+   - Terracotta Sunset: terracotta, peach, sand, bronze.
+   - Lavender Dream: lavender, lilac, pearl, silver, floral styling.
+4. Ensure component styles do not accidentally override these themes with hard-coded colors.
+5. Preserve the complete designs of Royal Burgundy, Royal Blue, and Midnight Emerald.
+6. Keep all nine themes isolated to the correct wedding.
+
+Do not solve this by blindly copying the Royal Burgundy palette or by applying the same floral overlay to every theme.
+
+PHASE 5 — THEME SELECTION AND PERSISTENCE
+
+Preserve the existing intended behavior:
+- Selecting a theme preview only marks it Selected.
+- Apply Theme is the only action that saves the selection.
+- Cancel discards the pending selection.
+- The applied theme remains active after navigation, refresh, and reopening the wedding.
+- Each wedding retains its own saved theme.
+- A wedding without a saved theme opens in Classic Default.
+- Guests cannot change themes.
+- Only authorized hosts/co-hosts can change the theme.
+- If saving fails, retain the previously saved theme and show an accurate error.
+- Show success only after the save actually succeeds.
+
+Do not change authentication, roles, membership, wedding codes, or access permissions.
+
+PHASE 6 — TEST AND VERIFY
+
+First, test Pastel Blush end-to-end before proceeding to the other four incomplete themes.
+
+For Pastel Blush, inspect:
+- Home.
+- Chat.
+- Live.
+- Album.
+- More.
+- Host Control.
+- At least one nested screen, dialog, or modal where available.
+
+Then verify the remaining four incomplete themes across the same shared components.
+
+Regression-test the three working dark themes and Classic Default.
+
+Check:
+- No unexpected horizontal overflow on a phone-sized viewport.
+- No missing text, clipped buttons, broken borders, or unreadable contrast.
+- No missing floral assets or incorrect default colors.
+- No theme leaking from one wedding into another.
+- No broken camera, live stream, chat, album, or navigation functionality.
+- No regression in glassmorphism or existing animations.
+- Apply Theme, Cancel, and persistence work as intended.
+
+Use the actual components and code paths. Do not claim a screen has been tested if it was not actually rendered or exercised. Distinguish code inspection from browser testing and physical-device testing.
+
+FINAL REPORT:
+Tell me:
+1. The exact root cause found.
+2. The files/components changed.
+3. What was fixed in Pastel Blush.
+4. Which other themes were completed.
+5. Whether each screen was actually tested.
+6. Any remaining unverified areas or known limitations.
+
+Begin by auditing the existing implementation, then fix Pastel Blush end-to-end. Do not start by rewriting all nine themes.

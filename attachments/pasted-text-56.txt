@@ -1,0 +1,45 @@
+The Wedding Circle — Replace Four Ceremony Cover Images
+
+Update the existing ceremony cover images using the four newly supplied images. This is strictly an asset-replacement task. Do not redesign the ceremony section or modify unrelated functionality.
+
+Exact Image Mapping
+
+1. Mehndi → Image 1: the golden ceremonial tray with henna bowls, flowers, decorative lanterns, and pink-and-green fabrics.
+2. Nikah → Image 2: the elegant dark-green and gold Islamic ceremonial arrangement featuring a Quran on a decorative stand, white roses, pearls, and illuminated lanterns.
+3. Anand Karaj → Image 3: the traditional Sikh ceremonial arrangement featuring the scripture beneath a rich red embroidered rumala, Khanda symbol, white ceremonial whisk, and marigold flowers.
+4. Vidaai / Doli → Image 4: the luxurious red-and-gold bridal doli/palanquin decorated with flowers, hanging garlands, and golden lanterns.
+
+Use the images in the exact order above. Do not interchange them.
+
+Display Requirements
+
+- Replace the existing images for these four ceremonies; do not add duplicate ceremony entries.
+- Preserve the existing ceremony names, dates, ordering, navigation, and functionality.
+- Retain each image's original wide landscape composition.
+- Use the image as a cinematic background cover with appropriate "background-size: cover" and carefully chosen positioning.
+- Keep the left side of each image visually quiet so ceremony titles and dates remain readable.
+- Keep the principal ceremonial objects clearly visible on the right.
+- Apply only a subtle readability gradient if required. Do not blur, regenerate, recolor, or unnecessarily crop the images.
+- Ensure the covers work across all existing wedding themes, including custom themes and dark mode.
+- Adjust positioning responsively for mobile and desktop without losing the key ceremonial objects.
+
+Asset Isolation and Safety
+
+- Each image must be assigned only to its designated ceremony.
+- Replacing or editing one ceremony image must not change another ceremony's image.
+- Do not modify Shagun, Paath, any other ceremony, the global wedding background, or landing-page imagery.
+- Preserve existing custom image-upload functionality and theme-specific settings.
+- Inspect the current ceremony-to-image mapping before editing so the replacement updates the actual source of each cover rather than just changing a temporary preview.
+
+Verification
+
+After the changes, verify that:
+
+- Mehndi displays Image 1.
+- Nikah displays Image 2.
+- Anand Karaj displays Image 3.
+- Vidaai / Doli displays Image 4.
+- The four assignments remain correct after refreshing the page and switching themes.
+- No unrelated ceremony images or features have changed.
+
+Strict scope: Replace only these four ceremony cover images. Preserve all other source code, data, designs, and behavior. Report the exact files changed and confirm that each image is correctly mapped.

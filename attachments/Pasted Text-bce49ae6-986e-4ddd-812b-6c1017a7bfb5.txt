@@ -1,0 +1,100 @@
+WEDDING CIRCLE — CRITICAL BUG FIX: ALBUM SWIPES, FEED MESSAGES, LIVE STREAM VISIBILITY, AND CHAT UX
+
+These features are still broken in my existing application. Previous attempts have not resolved all the issues. Do not repeat superficial fixes, build mockups, create unused components, or claim success without testing. Inspect the actual running components, data flow, backend subscriptions, database rules, and media transport. Fix the root causes in the real application.
+
+PRIORITY 1 — ALBUM SWIPE NAVIGATION: FIX THE ACTUAL GESTURE BUG
+Horizontal screen swiping still does not work inside Album. Treat this as a persistent functional defect.
+
+1. Trace the complete gesture path from touch start through direction recognition to navigation and rendering. Inspect Album-specific event handlers, parent containers, touch-action, pointer events, event propagation, overlays, nested scrollers, image viewers, carousels, and component lifecycle.
+2. Determine exactly where the gesture is being intercepted, ignored, cancelled, or disabled. Do not merely reduce the swipe threshold or add another competing handler.
+3. Implement one reliable, coordinated horizontal gesture handler for section navigation. If the user performs a deliberate left swipe on a non-interactive Album area, navigate to the next section. A deliberate right swipe navigates to the previous section, following the existing section order.
+4. Preserve vertical scrolling, image zoom, video playback, media controls, and carousel gestures. Ignore navigation gestures that originate on interactive controls or media surfaces that need their own gestures.
+5. Ensure navigation is immediate, the destination section renders correctly, and the bottom navigation highlight stays synchronized. Prevent duplicate navigation and stale touch state.
+6. Test both directions repeatedly inside Album itself, including between media cards, after opening and closing a viewer, and after switching away from and back to Album.
+
+Do not report this issue fixed unless actual horizontal swipes work in both directions in the rendered application. If the environment cannot simulate touch gestures, state that limitation and provide a concrete manual test requirement.
+
+PRIORITY 2 — FEED: OTHER ATTENDEES' MESSAGES ARE NOT VISIBLE
+Users cannot see new text messages posted by other attendees, even after refreshing. Fix the message delivery and retrieval pipeline, not just the Feed UI.
+
+Investigate the actual sender-to-recipient flow:
+- Confirm that a message submitted by one attendee is successfully persisted in the correct wedding's data store.
+- Verify the feed query retrieves messages for the currently selected wedding and correct audience or family privacy group.
+- Inspect database queries, subscriptions, real-time channels, authentication, access rules, filters, pagination, sorting, and error handling.
+- Verify subscriptions are established for the correct wedding ID, remain active, and are cleaned up when leaving the wedding.
+- Check whether messages are saved but omitted from the query, delivered but not rendered, blocked by access rules, or never persisted at all.
+- Ensure a successful new message appears for other authorized attendees without requiring a page refresh. Use the existing real-time infrastructure if available; repair it instead of adding an unrelated messaging system.
+- If real-time delivery is unavailable, implement reliable refresh/revalidation as a fallback without aggressive polling or duplicate requests.
+- Ensure reconnecting or refreshing retrieves persisted messages, with stable message IDs and no duplicates.
+- Preserve chronological ordering, correct parent/reply relationships, and existing privacy rules.
+- Never expose messages from another wedding or unauthorized family group. Do not weaken backend security to make messages appear.
+- Show a clear sending, sent, or failed state. Do not silently discard messages or display a false success state.
+
+Verify with at least two separate authenticated attendee sessions in the same test wedding: user A sends a message; user B sees it; user B replies; user A sees the reply. Refresh both sessions and confirm the messages persist. Repeat with a different wedding to confirm isolation.
+
+PRIORITY 3 — LIVE: HOST STREAM IS NOT VISIBLE TO ATTENDEES
+When a host starts a live session, other attendees see nothing in the Live section. Diagnose and repair the complete live-stream lifecycle.
+
+Trace these stages:
+1. Host creates and starts a live session.
+2. Session metadata and active status are persisted and associated with the correct wedding.
+3. The session becomes discoverable to authorized attendees in that wedding's Live section.
+4. Attendees receive the session through the existing real-time subscription or reliable refresh mechanism.
+5. An attendee selects the session and successfully joins playback.
+6. The session is removed or marked ended when the host stops broadcasting, and viewers see the correct ended state.
+
+Inspect the actual streaming provider and transport used by the app, stream creation and publishing, playback URLs or session IDs, database records, live-status updates, subscriptions, authentication, audience permissions, and media errors. Determine whether the failure is session discovery, publishing, signaling, playback, or access control.
+
+Requirements:
+- Show an active live-session card in the correct wedding's Live section when an authorized host starts broadcasting.
+- Display useful session information, such as host identity, live status, and an appropriate Join/Watch action.
+- Allow authorized attendees to join the actual stream using the existing supported streaming transport. Do not display a fake live preview or placeholder that pretends to be a working stream.
+- Handle loading, connection failures, ended streams, and reconnecting with useful UI feedback.
+- Keep stream state synchronized when the host starts or ends a session.
+- Enforce the existing wedding membership and audience privacy rules. Do not expose private streams to unrelated weddings or unauthorized attendees.
+- Do not replace the streaming architecture unless the current one is genuinely incapable of supporting the required behavior. If a provider, configuration, or credential is missing, identify the exact dependency instead of fabricating functionality.
+
+Verify with two separate authenticated sessions: the host starts broadcasting, the attendee sees the active session, joins it, and receives actual video/audio if supported by the configured platform. Then end the stream and verify the attendee sees the correct ended state. Report any environment limitations honestly.
+
+PRIORITY 4 — FEED CHAT: THREE-DOT TYPING INDICATOR AND LONG-PRESS ACTIONS
+Improve the Feed chat interface while preserving existing messaging functionality.
+
+A. Three-dot typing animation
+- When another participant is actively typing in the same chat or conversation, display three small circular dots in a horizontal row.
+- Animate the dots with a subtle sequential rise/fade or opacity pulse, creating a familiar messaging-app typing indicator.
+- Use a short, smooth repeating animation with staggered timing and no distracting movement.
+- Show the indicator only while a participant is genuinely typing, not permanently or merely because someone is online.
+- Use the existing real-time messaging infrastructure for typing events if available. Add appropriate debouncing, expiration, and cleanup so a stale indicator disappears when typing stops, the user disconnects, or the conversation changes.
+- Do not persist every keystroke as a chat message or expose typed message contents to other users.
+- Respect wedding and conversation privacy.
+
+B. Hide Report and Delete actions by default
+- Remove permanently visible Report and Delete buttons from each chat message or chat window.
+- Keep the message layout clean, compact, and uncluttered.
+- When a user deliberately long-presses a message for approximately one second, reveal a small, neatly styled contextual action menu containing the applicable actions.
+- Only show Delete where the current user's role and message ownership permit deletion. Preserve existing permissions; do not allow users to delete other people's messages unless the existing policy explicitly permits it.
+- Report should remain available where supported, but it must not be triggered accidentally by a tap or long-press intended to open the menu.
+- Dismiss the menu when the user taps elsewhere, selects an action, scrolls away, or navigates to another section.
+- Support touch devices and mouse/keyboard accessibility where practical. Prevent long-press handling from interfering with ordinary scrolling, text selection, links, and media controls.
+- If a native context menu or browser long-press behavior conflicts, handle it carefully only on the message surface rather than disabling useful behavior globally.
+- Include appropriate visual feedback and accessible labels. Confirm actions through the existing reporting/deletion flows and show errors if an action fails.
+
+VERIFICATION AND IMPLEMENTATION RULES
+
+1. Inspect the real components, routes, database schema, security policies, subscriptions, and streaming provider before changing code.
+2. Reproduce each failure and identify the specific root cause. Check whether previous fixes modified code that is actually used by the running app.
+3. Implement fixes in the real code paths. Do not create demo-only data, hardcoded fake attendees, fake incoming messages, fabricated live sessions, or cosmetic substitutes for backend functionality.
+4. Preserve the existing design, wedding-specific data, family privacy settings, host/co-host permissions, and navigation.
+5. Do not disable security rules or expose credentials to make a feature work.
+6. Clean up listeners and timers correctly; avoid duplicate subscriptions, memory leaks, infinite retries, and excessive polling.
+7. Test with separate authenticated users and actual persisted data, not just one browser session or a mocked local preview.
+8. Fix any regressions introduced by the changes.
+
+MANDATORY FINAL REPORT
+For each of the four issues, state:
+- The exact root cause found.
+- The actual files or backend configuration changed.
+- The test performed and its result.
+- Any remaining blocker, missing configuration, or test that could not be performed.
+
+Do not respond with generic recommendations or claim completion because the page compiles. Implement the fixes, verify the actual behaviors, and be explicit about anything that remains unresolved.

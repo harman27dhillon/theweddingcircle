@@ -1,0 +1,38 @@
+Fix Desktop Top-Right Flowers and Profile Button Position
+
+Correct the existing Wedding Circle landing page using the latest screenshot as reference.
+
+1. Restore the top-right flowers to the proper size
+
+The previous change made the top-right floral corner even smaller. This is incorrect.
+
+- Increase the top-right floral decoration to approximately the same rendered size and visual scale as the top-left floral corner.
+- Anchor it to the actual top-right outer corner of the page background.
+- Match the left corner's visual prominence, density, and decorative coverage while preserving the right image's original proportions.
+- Inspect transparent padding inside the right image. Correct the visible artwork bounds instead of shrinking the image to avoid overlap.
+- Do not use a smaller width, scale-down transform, or excessive negative offset to solve the layout problem.
+- Keep the flowers decorative and outside important text and controls.
+
+2. Move the profile button
+
+The circular profile button currently sits by itself near the top-right of the page, above the floral decoration.
+
+- Move the existing profile button to the top-right of the “Create New Wedding” card, aligned with that card's right edge and positioned just above it.
+- Give it a small, consistent gap above the card.
+- Keep the button fully visible, clickable, and accessible.
+- Do not duplicate the profile button or change its functionality.
+- Do not leave it floating at the page's far upper-right.
+
+3. Make the layout work together
+
+- Position the enlarged top-right floral corner behind the decorative page background, with a suitable stacking order.
+- Keep the profile button above the Create New Wedding card, not overlapping its text or covering important flowers.
+- Do not move or resize the wedding cover card, Create New Wedding card, or other page content to compensate.
+- Do not alter the top-left floral corner.
+- Apply these layout changes to desktop only; preserve the existing mobile layout and mobile flower-hiding behavior.
+
+Acceptance criteria
+
+At desktop widths, the top-right flowers are as visually large and prominent as the top-left flowers, anchored to the outer corner. The profile button sits directly above the right edge of the Create New Wedding card. Nothing is clipped, and the flowers do not obstruct the button or card content.
+
+Inspect the existing components and CSS, fix the actual positioning and sizing rules, remove conflicting overrides, and verify the result at multiple desktop widths.

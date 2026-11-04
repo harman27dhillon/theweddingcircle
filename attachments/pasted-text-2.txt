@@ -1,0 +1,164 @@
+The Wedding Circle — Complete Supabase Database Integration and Safe Migration
+
+Work directly on the existing The Wedding Circle project at "theweddingcircle.grok.me".
+
+Primary objective
+
+Integrate my existing Supabase project as the database for wedding records, memberships, chat, and related application data, replacing Neon Postgres as the active database only after a successful, verified migration.
+
+Keep all existing photos and videos in their current media library/storage. Do not migrate media files or change their URLs.
+
+I have already configured environment variables in Grok's published-app Secrets interface. Inspect and use the existing configuration rather than asking me to repeatedly copy values into forms.
+
+1. Inspect the existing implementation first
+
+Before changing anything:
+
+- Inspect the existing application architecture, backend/runtime, database client, authentication system, schema, migration code, and deployment capabilities.
+- Identify the exact source Neon database connection variable and the existing Supabase environment variable names.
+- Check whether the deployed backend can securely access the required secrets and establish direct PostgreSQL connections.
+- Preserve the existing Developer Center and its Cloud Connections interface.
+- Do not assume a connection works merely because a secret exists.
+
+Existing Supabase secrets/configuration may include:
+
+- "SUPABASE_URL"
+- "SUPABASE_PUBLISHABLE_KEY"
+- "SUPABASE_DB_URL"
+- "SUPABASE_SERVICE_ROLE_KEY"
+
+The current source database is Neon Postgres. Identify its existing connection variable from the project configuration; do not guess its name.
+
+Never print, expose, return, or log secret values. Never put privileged credentials in frontend code, browser storage, public configuration, client-readable database rows, or ordinary logs.
+
+2. Fix the actual connection problem
+
+The current migration panel has reported these errors:
+
+- "getaddrinfo ENOTFOUND" for the Supabase database hostname.
+- "password authentication failed for user "postgres"".
+- All five required Supabase tables reported as missing.
+
+Diagnose the underlying cause instead of repeatedly retrying the same connection.
+
+- Validate the exact Supabase project URL and PostgreSQL connection string.
+- Support the Supabase connection method available to the deployed runtime. Prefer the Session Pooler when required by IPv4 networking; use the correct username, host, port, database, and password for the selected connection method.
+- Correctly parse connection strings and handle URL-encoded passwords.
+- Verify that the secret values are available to the actual server runtime after deployment.
+- Perform a safe, read-only connection test and report the real result.
+- If the runtime cannot make PostgreSQL connections, explain the limitation and implement a secure supported backend solution if the platform allows it. Do not simulate success.
+
+Do not ask me to reveal passwords or private keys in chat.
+
+3. Create a faithful Supabase schema
+
+Inspect the real Neon schema and the application queries before creating or changing tables.
+
+Prepare version-controlled, repeatable Supabase SQL migrations that reproduce the required schema, including:
+
+- "circles"
+- "circle_members"
+- "circle_auth"
+- "ceremony_invites"
+- "couple_access"
+
+Also identify any additional tables, chat records, relationships, indexes, sequences, constraints, triggers, or metadata required by the actual application. Do not assume these five tables represent the entire database.
+
+Preserve primary keys, IDs, foreign-key relationships, timestamps, roles, memberships, permissions, and data formats.
+
+Implement appropriate Row Level Security policies and least-privilege access. Do not disable RLS or weaken permissions to make a test pass. Keep privileged database operations on the trusted server.
+
+Do not create a guessed schema if the source schema cannot be inspected. Report the exact blocker instead.
+
+4. Migrate existing wedding data safely
+
+The current Neon database contains these records in the tables previously inspected:
+
+- "circles": 3
+- "circle_members": 6
+- "circle_auth": 3
+- "ceremony_invites": 1
+- "couple_access": 1
+
+These are the previously observed counts; query the current source database again to confirm the actual latest counts before migrating.
+
+Migration requirements:
+
+1. Create and validate the destination schema.
+2. Perform a dry run without modifying either database.
+3. Create a backup or a recoverable export of the source data where supported.
+4. Copy records in dependency order while preserving their original IDs and relationships.
+5. Make operations resumable and idempotent so retries do not create duplicates.
+6. Compare source and destination counts and verify records, relationships, and important fields.
+7. Report every failure honestly.
+
+Never delete, reset, truncate, overwrite, or disable the current Neon database. Do not modify source records as part of the migration.
+
+Do not migrate media bytes. Existing photos and videos must remain in their current storage, with their existing URLs and metadata preserved.
+
+5. Handle authentication separately
+
+The existing app uses Neon-related authentication. Moving database tables does not automatically move password hashes, sessions, or authenticated users.
+
+Inspect the real authentication architecture and implement a compatible migration strategy before switching the live app.
+
+- Preserve account identity and existing sign-in behavior.
+- Do not copy password hashes into arbitrary tables or claim that users have migrated if they have not.
+- If authentication cannot be safely migrated, keep the existing authentication system operational and document the required transition before cutover.
+- Do not invalidate all existing sessions or force a surprise account reset.
+
+6. Switch the live app only after all checks pass
+
+Neon must remain the active source of truth until all migration and authentication checks succeed.
+
+Only switch the application to Supabase after:
+
+- The destination schema matches the source requirements.
+- All required records have been copied and validated.
+- Relationships, memberships, permissions, and authentication have been tested.
+- Core workflows pass in a safe test environment.
+- A rollback procedure has been prepared.
+
+Do not switch the live application merely because a connection test succeeds.
+
+If any prerequisite is missing, leave Neon active and report what is needed. Never claim that cutover succeeded unless it actually did.
+
+7. Fix the Developer Center migration controls
+
+Keep the existing controls, but make their behavior truthful and reliable:
+
+- Inspect schema and prerequisites: report actual connectivity, table existence, schema compatibility, and current record counts.
+- Run dry run: make no data changes; report the real migration plan and blockers.
+- Prepare migrations: create the destination schema only, without copying wedding records.
+- Run validated data migration: copy data only after explicit confirmation and successful prerequisites.
+- Validate migrated records: compare actual source and destination records.
+- Confirm cutover: switch routing only after all required checks pass.
+- Rollback routing: restore Neon as the active source without deleting Supabase data.
+
+Display clear errors for DNS failures, invalid passwords, missing tables, incompatible schemas, insufficient permissions, and unavailable backend capabilities.
+
+Never display “success” when the database was not actually queried or a migration was not actually completed.
+
+8. Preserve the rest of The Wedding Circle
+
+Make the smallest targeted changes necessary. Do not redesign the UI, remove features, alter themes, change wedding access rules, or modify unrelated workflows.
+
+Preserve all existing weddings, memberships, invitations, chat history, account behavior, developer permissions, media, and persistent application state.
+
+Do not add duplicate database clients, duplicate migration systems, or a second source of truth.
+
+9. Test and report the result
+
+Run the relevant tests and checks available in the project.
+
+At completion, provide a concise report containing:
+
+- Files and backend components changed.
+- Whether the Supabase connection was actually verified.
+- Tables and schema prepared.
+- Source and destination record counts.
+- Migration and authentication test results.
+- Whether Neon is still active or cutover was completed.
+- Remaining blockers and the exact action required from me.
+
+Start by inspecting the existing project and fixing the connection and schema-preparation issues. Proceed in small, reversible steps. Do not perform an unsafe migration or cutover just to report completion.

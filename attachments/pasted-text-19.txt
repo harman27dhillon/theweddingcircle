@@ -1,0 +1,172 @@
+The Wedding Circle — Targeted UI, Chat, Live, and Performance Fixes
+
+Grok, carefully inspect the existing code, components, CSS, routing, state management, and current implementation before making changes. The previous attempt spent approximately 45 minutes summarizing the conversation and still failed to implement several fixes correctly. Do not summarize or repeatedly restate the task. Investigate the actual code, make the smallest targeted changes, test them, and report the results.
+
+Critical rules
+
+- Preserve all existing wedding data, accounts, memberships, permissions, messages, media, themes, settings, database records, and backend integrations.
+- Do not reset, wipe, migrate, replace, or seed production data.
+- Do not rebuild working components or introduce duplicate implementations.
+- Preserve the existing mobile and desktop layouts except where a specific change below requires modification.
+- Do not report a fix as complete unless you have verified it in the code and through the most relevant available tests.
+- Do not modify the Leaderboard or its animation.
+- Treat these eight items as the complete scope of this task.
+
+1. Fix the Start Live button placement
+
+The Start Live button is still appearing outside the camera preview or in the wrong position.
+
+- The Start Live control must appear inside the existing Live camera-preview area, centered both horizontally and vertically while the preview is in its inactive state.
+- Use the existing preview container as the positioning reference. Do not position the button relative to the entire Live page, the comments section, or the outer Live card.
+- When the camera opens, display the appropriate camera preview and controls within that same preview area.
+- When a stream successfully starts, transition the button to the correct live-state controls within the preview.
+- The Stop Live button must have a solid red appearance.
+- Do not show a false success notification. Display a brief “Live started” notification only after the stream actually starts successfully.
+- Preserve existing stream permissions, real streaming behavior, spectator playback, and comments functionality.
+- Keep the existing mobile appearance and make the equivalent placement correct on desktop.
+
+Acceptance test: Before going live, Start Live is visibly centered inside the preview. After starting a stream, the live state and controls remain correctly positioned inside that preview.
+
+2. Restore consistent theme application across every page
+
+Themes previously applied more consistently than they do now. Some pages or components retain their original colors after a theme is selected.
+
+- Inspect the current theme-selection mechanism and identify why theme tokens or styles are not reaching every component.
+- Restore consistent application of the selected theme across Home, Chat, Live, Albums, More, wedding information, ceremony cards, chat bubbles, buttons, headers, inputs, notifications, and relevant overlays.
+- Ensure the selected theme controls the appropriate backgrounds, text colors, borders, accents, cards, and interactive states.
+- Preserve each theme's unique visual identity. Do not make every theme look identical or replace the existing theme collection.
+- Retain the premium wedding aesthetic, including coordinated colors and subtle decorative details.
+- Ensure theme changes update the relevant UI consistently without requiring a full page reload.
+- Preserve the selected theme across navigation and app reopening using the existing persistence mechanism.
+- Do not overwrite user settings or introduce a second theme-management system.
+
+Acceptance test: Select multiple existing themes and navigate through every major page. No component should unexpectedly retain an unrelated theme's colors.
+
+3. Eliminate the bottom navigation flicker on mobile
+
+When opening a wedding on a phone, the bottom navigation bar initially appears partially hidden or underneath the screen, then slowly moves into its final position.
+
+- Fix the initial rendering, layout calculation, and positioning responsible for this behavior.
+- The bottom navigation must appear fully visible in its correct position from the first stable frame when a wedding opens.
+- Prevent the bar from briefly rendering behind the content, below the viewport, or beneath the device's navigation area before moving upward.
+- Inspect CSS transitions, entrance animations, conditional rendering, loading states, viewport-height calculations, and safe-area insets.
+- If an entrance animation causes the flicker, remove or adjust only the problematic animation.
+- Preserve the existing navigation design, active-tab styling, tap targets, and navigation behavior.
+- Account for mobile browser viewport changes and Android safe-area/system navigation behavior where applicable.
+- Do not hide the navigation until the page finishes loading, and do not introduce a blank navigation area.
+
+Acceptance test: Open and reopen a wedding several times on mobile. The complete bottom navigation should be visible immediately, without a noticeable upward pop or flicker.
+
+4. Group consecutive messages from the same sender into a visual thread
+
+When one user sends several consecutive text messages, they should appear visually connected rather than as completely separate, unrelated bubbles.
+
+- Detect consecutive messages from the same sender in chronological order.
+- Visually group consecutive text messages into a compact thread using coordinated spacing, consistent alignment, and complementary bubble corners.
+- Keep the first, middle, and final bubbles visually connected while retaining comfortable readability.
+- Start a new group when the sender changes or when a meaningful time gap or existing grouping rule requires it.
+- Apply compatible grouping to consecutive messages where appropriate, without breaking the existing photo, video, or voice-message layouts.
+- Preserve individual message IDs, timestamps in stored data, delivery states, reactions or other existing functionality not explicitly removed elsewhere, and message history.
+- Do not merge messages into a single database record or change the actual message content.
+- Ensure grouping works consistently on mobile and desktop and for both incoming and outgoing messages.
+
+Acceptance test: Send several messages in a row from one user, followed by a message from another user. The first sequence should appear connected, and the sender change should create a clear new group.
+
+5. Make Chat load smoothly and show the newest messages
+
+Opening a wedding currently causes Chat to appear abruptly. The chat sometimes becomes visible late, and the displayed conversation can start somewhere in the middle instead of at the latest messages.
+
+Chat initialization and rendering
+
+- Inspect the existing app initialization, route loading, chat subscriptions, message retrieval, and scroll-position restoration.
+- Prepare or retain the existing chat state in the background where feasible, so opening the app or switching to Chat does not cause a noticeable blank state or abrupt content appearance.
+- Avoid fetching the entire conversation again if a valid local cache already exists.
+- Show a lightweight loading state only when necessary, styled to match the current theme.
+- Preserve authentication and wedding membership checks; do not expose messages before authorization succeeds.
+- When opening Chat normally, position the conversation at the latest messages.
+- Do not unexpectedly restore an old middle-of-history position when the user has not explicitly chosen to view older messages.
+- If a user is deliberately reading older messages, do not force-scroll them to the bottom every time a new message arrives.
+- Preserve existing pagination and the ability to browse message history.
+
+Faster photo and video thumbnail refresh
+
+- Inspect the current media-thumbnail loading and caching behavior.
+- Display cached thumbnails immediately when available, then refresh them in the background when necessary.
+- Use appropriately sized thumbnail variants and lazy loading for off-screen media where supported.
+- Reuse existing browser caching, object URLs, media metadata, or image transformation infrastructure where appropriate. Revoke temporary object URLs when no longer needed.
+- Avoid downloading full-resolution media merely to render a chat thumbnail.
+- Refresh expired or unavailable thumbnails gracefully, with a matching placeholder while a replacement loads.
+- Preserve full-resolution originals, media permissions, downloads, and full-screen previews.
+- Do not regenerate every thumbnail or download every media file on each page opening.
+
+Acceptance test: Open a wedding and then Chat repeatedly. The conversation should become visible smoothly and show the latest messages by default. Previously viewed media thumbnails should reappear quickly without unnecessary full-file downloads.
+
+6. Improve outgoing-message alignment on the sender's own screen
+
+In the supplied mobile screenshot, the current user's outgoing text messages, pictures, and voice notes appear too far toward the center because the sender's profile picture and name occupy additional space.
+
+- On a user's own Chat screen, hide the sender avatar and sender-name label for messages sent by that same user.
+- Move the user's outgoing bubbles and media closer to the right edge of the available chat content area.
+- Apply this consistently to text messages, photos, videos, and voice notes.
+- Preserve appropriate right-side padding so messages never touch or overflow the screen edge.
+- Keep incoming messages, including other users' avatars and names, unchanged.
+- Keep sender identity and avatars visible to other participants where the existing design requires them.
+- Do not remove profile information from stored messages or affect sender identification, authorization, message ownership, or host controls.
+- Preserve the existing premium bubble styling and responsive behavior.
+
+Acceptance test: On the sender's own device, outgoing messages align cleanly toward the right without an unnecessary avatar/name column. On another participant's device, the sender's identity remains available as before.
+
+7. Fix the desktop Home ceremony layout and priority
+
+In the supplied desktop screenshot, the small Roka ceremony card is too short compared with the couple-name and countdown header. The ceremony area should align more cleanly with the header.
+
+Ceremony priority
+
+- Inspect the existing ceremony data and rendering logic.
+- Replace the small Roka preview in the relevant desktop Home layout with the highest-priority upcoming wedding-day or special ceremony, such as Anand Karaj, when that ceremony is present and is the appropriate priority.
+- Give priority to the main wedding ceremony or an explicitly designated wedding-day special ceremony over routine preliminary ceremonies such as Roka.
+- Use a deterministic priority rule. Do not hardcode a ceremony name, wedding date, or specific wedding's data into the UI.
+- If no qualifying special ceremony exists, use the most appropriate existing upcoming ceremony as a fallback.
+- Preserve all ceremony records and their dates, descriptions, times, locations, and directions. This is a display-priority change, not a data change.
+
+Desktop layout and styling
+
+- Extend the featured ceremony bar/card to match the full rendered height of the couple-name and countdown header beside it.
+- Align their top and bottom edges cleanly, accounting for the actual responsive layout.
+- Style the featured ceremony using coordinated theme colors, borders, typography, decorative effects, and visual treatment consistent with the couple-name/countdown header.
+- Avoid stretching text, distorting content, or making the ceremony card unreadable.
+- Ensure remaining ceremonies begin directly beneath the relevant header area in a clean horizontal row, as requested, while preserving the intended top-level parallel layout.
+- Keep this adjustment desktop-specific where appropriate. Do not disrupt the mobile ceremony layout.
+
+Acceptance test: At desktop width, the featured main ceremony has the correct priority and matches the couple-header card's height and visual style. Remaining ceremony cards begin directly beneath the relevant header area in a coherent horizontal layout.
+
+8. Hide the desktop couple/profile/host utility bar behind the app icon
+
+On desktop, the long top utility bar containing the couple's name, profile-related information, and Host controls takes up space unnecessarily.
+
+- On desktop only, make this existing utility bar hidden by default.
+- Use the existing app icon/profile entry point as the toggle: clicking it should reveal or hide the existing utility bar.
+- Clicking elsewhere or navigating between Home, Chat, Live, Albums, and More should not unexpectedly leave the bar open unless that behavior is explicitly part of the current design.
+- The hidden bar must not occupy blank layout space or overlap the main content.
+- Preserve the existing profile, notifications, Host controls, couple information, and all associated permissions and actions.
+- Do not delete or recreate these controls. Reuse their existing components and handlers.
+- Provide an appropriate accessible label and keyboard operation for the toggle.
+- On mobile, preserve the existing top bar and controls exactly as they currently work.
+- Ensure this change does not interfere with the desktop horizontal navigation, independent panel selections, scrolling, or the Live preview.
+
+Acceptance test: On desktop, the utility bar starts hidden. Clicking the app icon reveals it, and clicking again hides it. All existing controls remain functional. Mobile remains unchanged.
+
+Final verification and report
+
+After implementation:
+
+1. Run the available relevant tests, type checks, lint checks, and build.
+2. Test the eight changes independently so one fix does not conceal a regression in another.
+3. Check mobile and desktop breakpoints, existing themes, navigation, and the relevant Chat and Live flows.
+4. Verify that existing records, messages, media, wedding memberships, and permissions remain intact.
+5. Do not claim to have tested a real live stream, production database, or deployed website unless you actually did so.
+6. Report each of the eight items as Fixed and verified, Partially fixed, or Not fixed, with a brief explanation and any remaining blocker.
+7. List the files changed and the tests actually run.
+8. If an item cannot be verified, say so clearly instead of summarizing the intended code change as a successful fix.
+
+Make only the changes necessary to complete these eight items. Do not introduce unrelated UI redesigns or modify the Leaderboard.

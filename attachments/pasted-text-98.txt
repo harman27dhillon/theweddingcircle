@@ -1,0 +1,194 @@
+TASK 1 — Remove duplicate Firebase setup from Cloud Connection
+
+Inside Developer → Cloud Connection:
+
+- Remove the Firebase setup section and its associated configuration UI from this section.
+- Do not delete Firebase functionality, credentials, backend services, authentication logic, or database integrations.
+- Keep Developer → Infrastructure → Firebase fully accessible and functional.
+- All existing Firebase configuration and connection testing must remain available through Infrastructure → Firebase.
+- Check navigation, references, shared components, and dependencies before removing anything.
+- Do not accidentally remove or break the Infrastructure Firebase section.
+- Do not delete or reset any saved secrets or configuration values.
+
+TASK 2 — Deep end-to-end audit of three integration failures
+
+Perform a thorough investigation of these three unresolved issues:
+
+1. Firebase / Google Cloud connection test.
+2. Cloudflare Stream connection test.
+3. Cloudflare CDN connection test.
+
+Important: Previous updates were reported as implemented and tested, but the live application still displays exactly the same errors. Do not assume previous fixes are working. Do not simply repeat previous explanations or make another superficial checker change.
+
+A. Trace the complete credential journey
+
+For EACH integration, trace the entire process from beginning to end:
+
+1. User opens the relevant Infrastructure section.
+2. User types or pastes credentials into the text fields.
+3. Frontend validates and handles the entered values.
+4. Save button triggers the correct handler.
+5. Request reaches the correct backend endpoint.
+6. Backend receives the correct values.
+7. Values are saved in the intended secret/configuration storage.
+8. Backend retrieves the saved values later.
+9. Correct credentials are selected instead of stale environment variables or previous saved values.
+10. Authentication headers, account IDs, project IDs, scopes, permissions and API endpoints are constructed correctly.
+11. Request reaches the intended external service.
+12. External service response is parsed correctly.
+13. Backend returns the correct result to the frontend.
+14. Frontend displays the actual latest result, not a cached or outdated test result.
+
+Do not skip any stage.
+
+B. Firebase audit
+
+Investigate:
+
+- FIREBASE_API_KEY
+- FIREBASE_AUTH_DOMAIN
+- FIREBASE_PROJECT_ID
+- FIREBASE_APP_ID
+- FIREBASE_MESSAGING_SENDER_ID, if used
+- FIREBASE_SERVICE_ACCOUNT_JSON
+
+Verify:
+
+- Text-field names and frontend-to-backend mapping.
+- Secret saving and retrieval.
+- Service account JSON parsing and project_id matching.
+- Actual project ID comparisons.
+- Google API endpoint and request construction.
+- API key restrictions and Google API responses.
+- Web app verification.
+- Email/Password provider check and its fallback logic.
+- Identity Toolkit and service-account authentication.
+- Permission failures and incomplete responses.
+- Whether the live test is executing the latest checker code.
+
+Expected Firebase project: "the-wedding-circle-b31b6".
+
+Do not invent a mismatch when Google's response is incomplete. Clearly distinguish actual mismatch, permission denied, missing configuration and network failure.
+
+C. Cloudflare Stream audit
+
+Trace:
+
+- Saved Cloudflare account ID.
+- Saved Stream API token.
+- Secret field and backend mapping.
+- Correct token source: saved configuration versus environment fallback.
+- Authorization header construction.
+- Account ID selection.
+- Stream API endpoint and required permissions.
+- Response parsing and error classification.
+- Whether the test actually reaches the Stream API.
+
+The test must not stop at "/user/tokens/verify" and incorrectly reject a valid account-scoped Stream token.
+
+Verify Stream access using the correct account-scoped Stream API endpoint.
+
+Do not create a Live Input during connection testing.
+
+Do not regenerate or replace credentials.
+
+D. Cloudflare CDN audit
+
+Trace:
+
+- CDN status.
+- Media domain.
+- CDN base URL.
+- Cloudflare account ID.
+- Optional Zone ID.
+- Cloudflare Zone Read API token.
+- Frontend field mapping.
+- Saved secret retrieval.
+- Actual backend API request.
+- Correct Cloudflare Zone API endpoint.
+- Required Zone Read permission and account scope.
+- Whether missing Zone ID is handled correctly.
+- Response parsing and frontend status display.
+
+Investigate why the screen still shows:
+
+"Status: Not configured. CDN delivery is off."
+
+The token has already been created with Zone → Zone → Read permission, restricted to the user's Cloudflare account.
+
+Do not assume the token is invalid just because the status remains unchanged.
+
+Do not enable CDN delivery during this audit.
+
+E. Shared infrastructure investigation
+
+Inspect all three integrations for common problems:
+
+- Wrong secret names.
+- Frontend/backend naming mismatches.
+- Incorrect API routes.
+- Stale environment variables overriding saved configuration.
+- Secrets saved in one location but read from another.
+- Incorrect request payloads.
+- Missing authentication or permissions.
+- Old backend processes or stale deployments.
+- Cached configuration or stale test results.
+- Incorrect success/failure conditions.
+- Error handling that hides the actual underlying response.
+- UI displaying old results after a new test.
+- Different code paths between development preview and deployed application.
+- Build/version mismatch between frontend and backend.
+- Any shared infrastructure helper causing multiple integrations to fail.
+
+Inspect the actual source code and follow the execution path. Do not rely only on comments, previous reports, or test names.
+
+F. Safe diagnostics
+
+You may inspect actual configuration availability and runtime behaviour, but:
+
+- Never print API keys, tokens, private keys or service-account JSON.
+- Never expose full secret values in logs or reports.
+- Never send credentials to unrelated endpoints.
+- Do not regenerate, replace or delete credentials.
+- Do not modify Cloudflare DNS, Workers, R2 bucket privacy, Firebase project settings or Google Cloud permissions.
+- Do not create Live Inputs or change production media delivery.
+- Do not clear user data, reset configuration or force logout.
+
+G. Required final report
+
+After completing the investigation, provide a detailed report with these sections:
+
+1. Cloud Connection cleanup: What was removed and what was preserved.
+2. Firebase: Every stage traced, actual findings and suspicious behaviour.
+3. Cloudflare Stream: Every stage traced, actual findings and suspicious behaviour.
+4. Cloudflare CDN: Every stage traced, actual findings and suspicious behaviour.
+5. Shared root causes: Any common failures affecting multiple integrations.
+6. Frontend-to-backend flow: Actual files, functions, routes and secret names involved.
+7. Evidence: Exact errors, HTTP status codes, response classifications and relevant code locations, with all credentials redacted.
+8. What was verified: Distinguish source-code inspection, automated tests and actual live API calls.
+9. Unresolved questions: Anything that could not be verified and precisely why.
+10. Recommended fixes: Prioritized by root cause, not guesses.
+
+For each integration, explicitly state whether the failure occurs during:
+
+- Credential entry.
+- Saving.
+- Secret retrieval.
+- Request construction.
+- Authentication.
+- External API response.
+- Backend response.
+- Frontend display.
+
+IMPORTANT EXECUTION RULES
+
+- Begin with the Cloud Connection Firebase UI cleanup.
+- Then perform the complete read-only investigation of all three integrations.
+- Do not make speculative fixes during the audit.
+- Do not replace working architecture or rewrite entire integrations.
+- Preserve Supabase as the primary database, Firebase as authentication only, Cloudflare R2 as private media storage and Cloudflare Stream as the livestream provider.
+- Do not deploy or publish anything.
+- Do not claim a live connection works unless an actual live API request proves it.
+- If a test cannot run because credentials are inaccessible, identify exactly where access fails rather than claiming the credentials are missing.
+
+I want an evidence-based diagnosis of what is actually happening, not another report saying the code was fixed while the live application remains unchanged.

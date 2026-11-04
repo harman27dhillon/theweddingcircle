@@ -1,0 +1,290 @@
+Audit and FIX the entire Wedding Circle website/app, not just the visual design.
+
+Website: https://theweddingcircle.grok.me/
+
+I want you to act as a senior product engineer + UX designer. Preserve the existing visual identity, but fix every broken, confusing, incomplete, or dead-end user flow.
+
+1. FIX THE GUEST INVITATION FLOW — HIGHEST PRIORITY
+
+Current problem:
+A guest opening an invitation can get:
+“This invitation is not on this device.”
+
+This is wrong for a wedding invitation.
+
+A wedding invitation link must work when:
+
+- forwarded on WhatsApp
+- opened on another phone
+- opened in Chrome/Safari
+- opened from Instagram/SMS/email
+- opened from a QR code
+- opened by someone who has never visited the site before
+
+Remove any device-specific/local-storage requirement for validating a legitimate invitation.
+
+Use the invitation ID/slug from the URL as the source of truth.
+
+Flow should be:
+
+Shared invitation link
+→ Wedding invitation landing page
+→ Guest enters name (optional if already known)
+→ Enter wedding
+→ Wedding experience
+
+Do NOT force guest signup/login.
+
+If an invitation is genuinely invalid or expired, show a proper recovery screen with:
+
+- “This invitation link is invalid or expired.”
+- “Ask the couple for a new invitation link.”
+- “View sample wedding”
+
+2. FIX “WATCH AS A GUEST”
+
+The “Watch as a guest” / sample experience must NEVER dead-end.
+
+It should immediately open a fully functional sample wedding.
+
+Create a realistic sample wedding using the existing design system.
+
+Guest should be able to explore:
+
+Home
+→ Wedding details
+→ Live ceremony
+→ Family/community area
+→ Photos/memories
+→ Schedule/events
+→ Back to wedding home
+
+Every button must actually work.
+
+No placeholder buttons that do nothing.
+
+3. FIX THE CREATION FUNNEL
+
+The current creation flow should not immediately throw the user into a confusing signup/payment state.
+
+Make the funnel:
+
+CREATE WEDDING
+↓
+Create account / sign in
+↓
+Wedding basics
+
+- Couple names
+- Wedding date
+- Location
+- Optional wedding photo
+  ↓
+  Customize wedding
+  ↓
+  Preview wedding
+  ↓
+  Confirm
+  ↓
+  ₹499 payment
+  ↓
+  Payment success
+  ↓
+  Wedding Circle created
+  ↓
+  Share invitation
+
+The user must be able to see and preview what they are paying for BEFORE payment.
+
+4. MAKE ₹499 COMPLETELY CLEAR
+
+Clearly explain:
+
+“₹499 one-time fee”
+
+Do not make users guess:
+
+- when payment occurs
+- what they are paying for
+- whether the fee is recurring
+- what happens after payment
+
+Before payment show a concise order summary:
+
+Wedding Circle
+One-time setup
+₹499
+
+Then:
+“Pay ₹499 & Create Wedding Circle”
+
+After successful payment:
+“Your Wedding Circle is ready.”
+
+If payment fails:
+“Payment failed — your wedding has not been charged/created.”
+Give:
+
+- Try again
+- Back to preview
+
+If payment is cancelled:
+Return to preview without losing the user's entered information.
+
+5. FIX SHARING
+
+After creation, provide:
+
+Share Wedding
+
+- WhatsApp
+- Copy invitation link
+- QR code
+- Other sharing options
+
+Generate a stable public URL such as:
+
+/w/[unique-wedding-id]
+
+Anyone with that URL should be able to access the guest experience.
+
+Do NOT depend on the creator's browser, device, localStorage, cookies, or session to make the invitation work.
+
+6. FIX ALL NAVIGATION
+
+Audit EVERY:
+
+- button
+- CTA
+- card
+- navigation item
+- back button
+- link
+- menu item
+
+Make sure every interactive element has a logical destination.
+
+No dead buttons.
+No fake CTAs.
+No circular navigation loops.
+No unexpected login screens.
+No unexplained “not on this device” states.
+
+Browser back navigation should also behave naturally.
+
+7. HANDLE REFRESHES AND DIRECT LINKS
+
+Test every important page by directly opening its URL in a fresh browser session.
+
+Refreshing must not destroy the wedding state.
+
+Opening an invitation URL directly must work.
+
+Opening an invitation URL in incognito/private browsing must work.
+
+Opening the same invitation on a second device must work.
+
+8. MOBILE-FIRST
+
+This product is primarily going to be used through phones and WhatsApp.
+
+Optimize every flow for mobile.
+
+Test:
+
+- Android Chrome
+- iPhone Safari
+- small phone screens
+- large phone screens
+
+Make buttons large enough to tap comfortably.
+
+Avoid horizontal scrolling.
+
+9. ERROR STATES
+
+Create useful error states for:
+
+- invalid invitation
+- expired invitation
+- missing wedding
+- network failure
+- payment failure
+- payment cancellation
+- authentication failure
+- unexpected server error
+
+Never expose raw technical errors to users.
+
+10. PRESERVE THE BRAND
+
+Do NOT redesign the entire website unnecessarily.
+
+Keep the existing:
+
+- typography
+- colors
+- visual language
+- wedding aesthetic
+- animations where they work
+
+Focus on fixing the actual product experience.
+
+11. FINAL QA
+
+After implementing everything, test the complete journeys:
+
+TEST A — Guest
+
+Homepage
+→ Watch as guest
+→ Sample wedding
+→ Explore sections
+→ Return home
+
+TEST B — Real invitation
+
+Invitation URL
+→ Guest opens on fresh device
+→ Guest enters name
+→ Wedding opens
+→ Navigate sections
+→ Refresh
+→ Continue using wedding
+
+TEST C — Creator
+
+Homepage
+→ Create Wedding
+→ Sign up
+→ Enter details
+→ Customize
+→ Preview
+→ Payment
+→ Success
+→ Share invitation
+
+TEST D — Payment failure
+
+Create
+→ Preview
+→ Payment
+→ Cancel/fail
+→ Return to preview
+→ Data preserved
+
+TEST E — Cross-device
+
+Create wedding
+→ Generate invitation URL
+→ Open URL in incognito/another device
+→ Guest experience works without creator login.
+
+Do not just describe these fixes. IMPLEMENT them.
+
+After implementation, give me a short list of:
+
+1. What you changed
+2. What flows were fixed
+3. Any remaining limitations
+4. URLs/routes I should test

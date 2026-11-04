@@ -1,0 +1,230 @@
+The Wedding Circle — 30-Day Wedding Lifecycle, Restore iPhone-Like Animations & Implement Theme Music
+
+Inspect the current codebase and implement all three updates directly. Do not merely provide a plan or report what should be done. First inspect the existing database schema, wedding creation flow, notification system, media storage, theme registry, chat component, and animation implementation. Reuse the existing architecture wherever possible.
+
+1. Automatic 30-Day Wedding Expiry and Paid Media Retention
+
+A. Establish the expiry date
+
+When a wedding is successfully created, record its authoritative creation timestamp using the server/database time.
+
+- Set "expires_at" to exactly 30 days after the creation timestamp.
+- Use a consistent UTC timestamp for storage and calculations.
+- Calculate the deadline as 30 × 24 hours after creation, not merely the end of the 30th calendar date.
+- Store the expiry timestamp persistently in the existing authoritative database.
+- Do not reset the expiry date when someone edits the wedding, uploads media, sends a message, changes a theme, or reopens the app.
+- Ensure all existing weddings are handled safely. Backfill missing expiry dates using reliable existing creation timestamps; do not invent dates or immediately expire existing weddings because a field is missing.
+
+B. Send reminders during the final seven days
+
+Starting exactly seven days before "expires_at", send two reminders per day to the wedding's authorized host and co-hosts.
+
+Requirements:
+
+- Send two reminders daily, approximately 12 hours apart, until the wedding expires or retention is extended.
+- Use the existing notification infrastructure if it supports reliable scheduled delivery. Otherwise, implement a suitable server-side scheduled job or equivalent mechanism.
+- Do not rely on the user's browser being open or their phone staying online.
+- Prevent duplicate reminders through persistent scheduling records or idempotency keys.
+- Respect notification preferences where applicable, but ensure the expiry deadline and in-app notice remain visible.
+- Notify only authorized hosts and co-hosts, never all wedding guests.
+- Include the wedding name and exact expiry date/time in each reminder.
+
+Suggested notification:
+
+“Your wedding circle expires soon. Save your photos and videos to your phone before the expiry date, or extend cloud media retention for another 30 days for ₹150.”
+
+Include two clear actions:
+
+1. Save my media — guide the host/co-host through the existing media download or export capability.
+2. Extend for ₹150 — open the extension/payment flow.
+
+If the app cannot reliably download an entire album directly to a phone, explain the available download options rather than falsely claiming everything has been saved.
+
+C. Offer a ₹150 extension for another 30 days
+
+Implement the paid extension using the project's existing payment integration if one exists. Inspect it before choosing an implementation.
+
+- Charge ₹150 for an additional 30 days of cloud media retention.
+- Extend the retention deadline only after the payment provider confirms successful payment server-side.
+- Use verified payment webhooks or the provider's equivalent server-side confirmation. Never trust a client-side success message.
+- Prevent duplicate charges and duplicate extensions when payment callbacks are retried.
+- Display the price, retention period, and what is included before payment.
+- Show clear payment-pending, payment-success, and payment-failure states.
+- Keep a persistent record of each extension and its transaction reference.
+
+Important distinction: The user is purchasing an additional 30 days of cloud media retention. Do not silently extend the wedding's entire active period unless the existing product architecture explicitly defines retention that way. The wedding's 30-day lifecycle and its media-retention deadline must be modeled separately if necessary.
+
+If no payment integration exists, implement the safe UI and server-side extension workflow without pretending a payment has been collected. Clearly identify the payment integration still required.
+
+D. Expire and delete the wedding safely
+
+At the exact expiry deadline, automatically remove the expired wedding and its associated data according to the app's retention rules.
+
+This includes:
+
+- Wedding record and associated private content.
+- Photos and videos stored in cloud storage.
+- Chat messages and associated attachments.
+- Other wedding-specific content that should expire with the wedding.
+
+However, delete nothing until you have verified that the wedding has not been extended and is genuinely eligible for expiry.
+
+Implementation safeguards:
+
+- Use an authoritative server-side scheduled cleanup process, not a client-side timer.
+- Recheck "expires_at", the media-retention deadline, and any valid paid extension immediately before deletion.
+- Handle retries and partial failures safely.
+- Delete only resources belonging to the expired wedding. Never wipe shared storage, unrelated weddings, other users' data, or application-wide tables.
+- Handle storage deletion and database cleanup consistently so a failed storage deletion is retried instead of leaving orphaned files.
+- Prevent stale browser caches, offline queues, background sync, subscriptions, or pending requests from resurrecting a deleted wedding.
+- Make expired weddings unavailable to guests as appropriate and display an expiry notice.
+- Maintain only the minimal operational deletion/payment audit records required by the application's policy and applicable law; do not retain deleted media or chat content in the audit log.
+- Ensure unpaid expired media is deleted according to the confirmed retention policy, while paid extensions are honored.
+
+If wedding records, media, or chats are stored across multiple providers, identify the actual storage locations first and implement cleanup for each relevant system.
+
+E. Test expiry without risking real weddings
+
+Create an isolated test wedding and test the lifecycle using controlled test timestamps or a test-only clock mechanism.
+
+Verify:
+
+- The expiry timestamp is correct.
+- Reminders start seven days before expiry and occur twice daily.
+- Paid extension confirmation moves the media-retention deadline by exactly 30 days.
+- Failed or pending payments do not extend retention.
+- An extended wedding is not deleted by a stale scheduled job.
+- Expired media, chats, and wedding data are cleaned up correctly.
+- Unrelated weddings and their media remain untouched.
+- Repeated cleanup jobs do not cause duplicate or inconsistent operations.
+
+Never shorten the retention period of real users' weddings to test the feature.
+
+2. Restore the Missing iPhone-Like Animations
+
+After recent updates, the iPhone-like transitions and animations have disappeared again. Inspect the previous implementation, Git history if available, existing animation components, CSS, and routing/navigation code to find what regressed.
+
+Restore the existing animation style rather than inventing an unrelated animation system.
+
+Check and restore, where previously implemented:
+
+- Smooth landing-page transitions.
+- Wedding home-page entrance and navigation transitions.
+- iPhone-like sliding and easing between the five main sections: Home, Chat, Live, Album, and More.
+- Smooth page and panel transitions without white flashes, flickering, or abrupt remounts.
+- Existing subtle wedding-specific animation details.
+
+Requirements:
+
+- Preserve swipe navigation, button navigation, back navigation, and all existing section functionality.
+- Avoid unnecessary full-page rerenders and component remounts that interrupt animations.
+- Use the project's existing animation library and animation components where possible.
+- Avoid adding multiple competing animation libraries or duplicating animation systems.
+- Respect reduced-motion accessibility settings.
+- Keep transitions responsive on lower-powered Android phones and desktop browsers.
+- Do not add delays that make navigation feel slow.
+
+Test all five sections on mobile and desktop after the changes, including switching themes and reopening the wedding.
+
+3. Implement and Verify Background Music for Every Non-Default Theme
+
+The theme music update is not visible in the current app. Inspect the existing theme registry and previous implementation to determine whether music assets, theme-to-track mappings, playback logic, or the speaker control were never implemented, were disconnected, or were lost during later updates.
+
+Do not merely add a speaker icon without working playback.
+
+A. Theme-to-music mapping
+
+Implement the intended background music for every existing non-default theme, including all previously updated themes.
+
+The app has previously discussed these original themes:
+
+- Royal Burgundy
+- Pastel Blush
+- Sage Green
+- Royal Blue
+- Classic Ivory
+- Midnight Emerald
+- Terracotta Sunset
+- Lavender Dream
+- Blossom Pink
+- Sky Blue
+- Rose Romance
+- Peach Garden
+
+And these ten newer themes:
+
+- Butterfly Romance
+- Moonlight Reverie
+- Monsoon Romance
+- Anime Ever After
+- Royal Palace
+- Heaven's Embrace
+- Enchanted Garden
+- Cosmic Destiny
+- Velvet Rose
+- Aurora Dreams
+
+Inspect the actual registry to identify all themes that currently exist. This list is a verification checklist, not permission to create duplicates, rename existing themes, or delete other themes. If the current registry contains additional non-default themes, include them too.
+
+For each non-default theme:
+
+- Assign an appropriate, distinct instrumental background track that suits its mood.
+- Use properly licensed, original, public-domain, or otherwise authorized audio assets.
+- Do not use copyrighted commercial songs without permission.
+- Make sure the track is actually available and loads successfully. Do not use fabricated audio URLs or placeholder assets.
+- Keep the music subtle and suitable for a wedding app, with a low default volume of approximately 8–12%.
+- Avoid abrupt starts and stops; use gentle fades where appropriate.
+- Load audio lazily and avoid downloading all tracks at once.
+
+Classic Default must remain unchanged and must not automatically play theme music.
+
+B. Add the floating speaker control to Chat
+
+Add a small floating speaker button to the upper-right corner of the Chat panel, immediately below the top bar, as previously specified.
+
+- Keep it approximately 30–36 px in size.
+- Make it visible but unobtrusive and consistent with the selected theme.
+- Display a speaker-on icon while music is playing and a muted-speaker icon while muted.
+- Tapping the button must actually mute or unmute the background music.
+- Keep the button in the correct position on mobile and desktop, without covering the chat composer, messages, or other controls.
+- Give it an accessible label: “Mute background music” or “Unmute background music”.
+- Preserve the user's mute preference across navigation and reloads using the existing persistence approach.
+- Do not create multiple audio players when switching sections or reopening Chat.
+
+C. Correct playback behavior
+
+- Respect browser autoplay restrictions. Start playback after an appropriate user interaction if required.
+- Switching themes must switch to the correct track without overlapping audio.
+- Moving between Home, Chat, Live, Album, and More must not create duplicate playback or unexpectedly restart the track.
+- When the user mutes music, keep it muted until they unmute it.
+- Handle missing audio assets and playback errors gracefully.
+- If a track cannot load, do not pretend it is playing; log the issue and provide a sensible fallback.
+
+D. Verify every theme
+
+Test every non-default theme in the actual app:
+
+1. Select and apply the theme.
+2. Verify the correct track loads and plays after permitted user interaction.
+3. Verify the speaker control appears in the Chat panel.
+4. Mute and unmute the music.
+5. Navigate between all five sections and confirm there is no duplicate playback.
+6. Switch to another theme and verify the track changes.
+7. Reload the wedding and confirm the user's mute preference persists.
+8. Select Classic Default and confirm automatic theme music is disabled.
+
+4. Final verification and report
+
+Implement all three updates in the actual codebase. Run available build, type checks, and relevant tests. Fix regressions caused by the changes.
+
+Preserve existing wedding data, theme IDs, permissions, chat functionality, media, live streaming, and payment records. Do not reset the database or replace the existing architecture unnecessarily.
+
+When finished, report:
+
+1. What was implemented.
+2. The root cause of the missing animations and music control.
+3. How the expiry, reminder, payment, and deletion jobs are scheduled.
+4. Which theme tracks are working and which, if any, still require assets or setup.
+5. Which tests and build checks passed or failed.
+
+Do not report a feature as complete unless it is implemented and verified. Clearly distinguish working functionality from any remaining external configuration.
