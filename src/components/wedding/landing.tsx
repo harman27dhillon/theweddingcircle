@@ -682,7 +682,7 @@ export function Landing() {
       </div>
       <div className="landing-gloss" aria-hidden="true" />
       <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-4 md:px-8 md:py-5">
-        <LandingMark className="landing-brand flex min-w-0 items-center gap-2" />
+        <LandingMark className="landing-brand flex min-w-0 items-center gap-2 lg:justify-self-center" />
         <div className="landing-tools flex shrink-0 items-center gap-1">
           <button
             type="button"
