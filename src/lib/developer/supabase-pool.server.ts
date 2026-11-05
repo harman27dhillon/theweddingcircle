@@ -3,7 +3,7 @@ import { parse } from "pg-connection-string";
 import type { Sql } from "@/lib/db";
 import { redactCloud } from "@/lib/developer/cloud";
 import { classifyDatabaseError, safeSupabaseUri, trustedSupabaseSsl, type SafeDbUri } from "@/lib/developer/supabase-connect";
-import { env, hyperdriveConnectionString, serverEnvironment } from "@/lib/env.server";
+import { env, hyperdriveConnectionString } from "@/lib/env.server";
 
 export type Query = (text: string, params?: unknown[]) => Promise<Record<string, unknown>[]>;
 
