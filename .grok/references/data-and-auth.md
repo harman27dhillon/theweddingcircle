@@ -4,24 +4,24 @@ Read this **after** `AGENTS.md` §0.5 has already said the app needs a database
 and/or sign-in. The decision (auth OFF by default, the closed trigger list, "no
 migrations / no `@/lib/db` unless triggered") lives in `AGENTS.md`, not here.
 
-Full guides + snippets: the **`neon` skill** (database) and the **`auth` skill**
+Full guides + snippets: the Supabase database configuration and the **`auth` skill**
 (sign-in), under `.grok/skills/`.
 
 ## Database (`@/lib/db`, server-only)
 
 - `const sql = await getSql()` from `@/lib/db`. Use it **only** inside
   `createServerFn` handlers / server loaders.
-- Dual-mode: a regular Postgres driver (node-postgres, `pg`) when `DATABASE_URL`
+- Dual-mode: a regular Postgres driver (node-postgres, `pg`) when `SUPABASE_DB_URL`
   is set, else a local **PGLite** fallback — so the preview always renders.
 - In preview, PGLite **bootstraps at server start** (`ensureDbReady`) once the
   app has migrations. Do not remove that.
 - A deployed app is provisioned a real database when it ships `migrations/*.sql`
   or sign-in. An app that needs one without either says so with
-  `"deploy": {"database": true}` in `.grok/app-env.json` — see the `neon` skill.
+  `"deploy": {"database": true}` in `.grok/app-env.json` — see the Supabase database setup.
 
 ## Migrations
 
-- `migrations/*.sql` is the single schema source: applied to **Neon on deploy**
+- `migrations/*.sql` is the single schema source: applied to **Supabase on deploy**
   (`npm run build` runs `npm run db:migrate`, so Vercel ships with the schema
   ready) and to the **PGLite** preview automatically on startup.
 - Add the app's tables as ordered files (`migrations/0002_*.sql`), not inline.
@@ -75,7 +75,7 @@ flag (exit 0 agree, 1 diverged, 2 could not observe).
 
 ## Env
 
-On deploy the platform injects `DATABASE_URL` + per-app auth creds; live preview
+On deploy the platform injects `SUPABASE_DB_URL` + per-app auth creds; live preview
 needs neither (baked preview client, PGLite fallback). Deployed behind the gate,
 signed-in Grok viewers get the app session automatically from `x-grok-identity`
 (see the `auth` skill — `references/grok-identity.md`); the broker federation
