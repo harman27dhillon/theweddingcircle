@@ -182,7 +182,7 @@ function Dashboard({ email, configuration, message, onLogout }: {
               <StatusCard title="Supabase API">{apiResult ? apiResult.message : configuration.configured.SUPABASE_URL && configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured, awaiting a live API test" : "API credentials missing"}</StatusCard>
               <StatusCard title="Postgres">{state === "verified" ? "Schema and read/write checks verified" : latestDb?.message || "Awaiting verification"}</StatusCard>
               <StatusCard title="Last successful Postgres check">{lastConnected ? new Date(lastConnected).toLocaleString() : "None in this session"}</StatusCard>
-              <StatusCard title="HYPERDRIVE">{configuration.hyperdrive ? "Runtime binding present. Direct Supabase Postgres is used for these checks." : "Optional runtime binding not present"}</StatusCard>
+              <StatusCard title="HYPERDRIVE">{configuration.hyperdrive ? "Runtime binding present. Database diagnostics use Hyperdrive." : "Optional runtime binding not present"}</StatusCard>
             </div>
           </>
         ) : null}
