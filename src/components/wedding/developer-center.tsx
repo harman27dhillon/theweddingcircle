@@ -162,6 +162,8 @@ function Dashboard({ email, configuration, message, onLogout }: {
     try {
       const result = await developerInfrastructureCheck({ data: { id } });
       setInfraResults((current) => ({ ...current, [id]: result }));
+      const status = await developerInfrastructureStatus();
+      setInfraStatus(status);
     } catch {
       setInfraResults((current) => ({ ...current, [id]: { ok: false, message: "Diagnostic request failed. Reopen Developer Center if the session expired." } }));
     } finally { setInfraRunning(null); }
