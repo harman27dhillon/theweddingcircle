@@ -396,10 +396,8 @@ export function reviewGrants(rows: { table: string; grantee: string; privilege: 
 }
 
 /** Rolled-back and in-progress reverse sync stay put. Everything else may reconcile. */
-export function shouldAutoActivate(cutover: string, phase: string) {
-  if (cutover === "supabase") return false;
-  if (phase === "rolled_back" || phase === "frozen" || phase === "reverse_verified") return false;
-  return true;
+export function shouldAutoActivate(phase: string) {
+  return phase !== "rolled_back" && phase !== "frozen" && phase !== "reverse_verified";
 }
 
 export function chooseWeddingRoute(input: { production: boolean; supabaseConfigured: boolean; supabaseOpen: boolean }) {
