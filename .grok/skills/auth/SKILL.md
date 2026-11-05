@@ -32,7 +32,7 @@ them (AGENTS.md §0.5). Switching it on is "Turning sign-in on" below.
 
 **Once on, sign-in is REAL — including in the sandbox live preview.** Do **NOT**
 scaffold demo/mock/hardcoded users. Preview: popup + baked preview client;
-deployed: per-app client + `DATABASE_URL` + zero-click gate sign-in
+deployed: per-app client + `SUPABASE_DB_URL` + zero-click gate sign-in
 (`references/prewired-and-env.md`).
 
 **While OFF** (`VITE_AUTH_ENABLED=false`) a **dev user** is returned so a
@@ -79,7 +79,7 @@ Do all of this — the routes alone render the disabled branch:
 4. **Sign out:** a login with no way out is not done — render `<UserButton />`
    from `@/lib/auth/gates` (wires `signOut()`; hides sign-out for gate sessions).
 5. **Existing data:** wrap the app's server functions in `authMiddleware` (an
-   auth-off app must not have been using it — see the `neon` skill). Rows from
+   auth-off app must not have been using it — see the Supabase database setup). Rows from
    before sign-in existed are **development data**: drop and recreate them
    unless the user says otherwise — don't hand them to whoever signs in first.
 
