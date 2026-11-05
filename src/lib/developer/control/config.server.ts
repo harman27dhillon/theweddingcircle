@@ -121,8 +121,10 @@ export async function testSupabaseApi(environment?: Record<string, string | unde
   const resolvedEnvironment = environment ?? (await resolvedInfraEnv()).env;
   const config = readControlConfig(resolvedEnvironment);
   const url = projectUrl(config.SUPABASE_URL);
-  const key = config.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable key in Infrastructure settings first." };
+  // Supabase still supports legacy anon keys. The status panel accepts either
+  // name, so the actual API diagnostic must resolve the same supported inputs.
+  const key = config.SUPABASE_PUBLISHABLE_KEY || resolvedEnvironment.SUPABASE_ANON_KEY?.trim() || resolvedEnvironment[`${prefix}SUPABASE_ANON_KEY`]?.trim() || "";
+  if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable (or legacy anon) key in Infrastructure settings first." };
   if (validate("SUPABASE_PUBLISHABLE_KEY", key, url)) return { ok: false, message: "The configured key is not a Supabase publishable key." };
 
   try {
