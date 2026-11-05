@@ -1,5 +1,4 @@
 import { pendingMigrations } from "../../scripts/migration-plan.mjs";
-import { serverEnvironment } from "@/lib/env.server";
 
 /** Which database backend is active. Supabase wins when its server URL is set. */
 export type DbSource = "supabase" | "neon" | "pglite";
@@ -195,6 +194,7 @@ async function createSql(): Promise<Sql> {
         "or a server route loader, never from client code.",
     );
   }
+  const { serverEnvironment } = await import("@/lib/env.server");
   const settings = databaseSettings(await serverEnvironment());
   dbSource = settings.source;
   if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl);
