@@ -429,7 +429,7 @@ var DEVELOPER = {
 	developer: true,
 	country: "India"
 };
-var DEVELOPER_EMAILS = ["developer@weddingcircle.app", "singhsaab6812@gmail.com"];
+var DEVELOPER_EMAILS = ["circle.admin@weddingcircle.app", "developer@weddingcircle.app", "singhsaab6812@gmail.com"];
 export function isDeveloperEmail(email) {
 	return DEVELOPER_EMAILS.includes(email.trim().toLowerCase());
 }

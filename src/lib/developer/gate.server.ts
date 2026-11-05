@@ -5,11 +5,12 @@ import { getSql } from "@/lib/db";
 const COOKIE = "wc_dev";
 const SESSION_HOURS = 12;
 
-const DEVELOPER_EMAILS = ["developer@weddingcircle.app", "singhsaab6812@gmail.com"];
-const DEVELOPER_PASSWORD_HASH = "3aa2ee3c2f232c1dd47a2246402f34c2190663dcf5f57572f034abd66c796717";
+const DEVELOPER_LOGIN_EMAIL = "circle.admin@weddingcircle.app";
+const RESERVED_DEVELOPER_EMAILS = [DEVELOPER_LOGIN_EMAIL, "developer@weddingcircle.app", "singhsaab6812@gmail.com"];
+const DEVELOPER_PASSWORD_HASH = "bb0cbeb99028b9679835f8c3d8456df8e4c9e14d63bfa87736a80f55bf37bc1a";
 
 export function developerEmails() {
-  return [...DEVELOPER_EMAILS];
+  return [...RESERVED_DEVELOPER_EMAILS];
 }
 
 function sha256(value: string) {
@@ -29,7 +30,7 @@ function id() {
 
 export async function unlockDeveloper(email: string, password: string) {
   const clean = email.trim().toLowerCase();
-  if (!DEVELOPER_EMAILS.includes(clean) || !sameHex(sha256(password), DEVELOPER_PASSWORD_HASH)) {
+  if (clean !== DEVELOPER_LOGIN_EMAIL || !sameHex(sha256(password), DEVELOPER_PASSWORD_HASH)) {
     return { ok: false as const, error: "That developer sign-in was not accepted." };
   }
   const sql = await getSql();
@@ -64,7 +65,7 @@ export async function developerSession(token = "") {
     select email, expires_at from developer_sessions where token_hash = ${sha256(current)} and expires_at > now() limit 1
   `;
   const row = rows[0];
-  if (!row || !DEVELOPER_EMAILS.includes(row.email)) return null;
+  if (!row || row.email !== DEVELOPER_LOGIN_EMAIL) return null;
   return { email: row.email };
 }
 
