@@ -169,13 +169,15 @@ async function createSql(): Promise<Sql> {
         "or a server route loader, never from client code.",
     );
   }
-  const { hyperdriveConnectionString, serverEnvironment } = await import("@/lib/env.server");
+  const { hyperdriveConnectionString, serverEnvironment, isWorkspacePreview, env } = await import("@/lib/env.server");
   const [environment, hyperdrive] = await Promise.all([serverEnvironment(), hyperdriveConnectionString()]);
   const settings = databaseSettings(environment, Boolean(hyperdrive));
   dbSource = settings.source;
   if (hyperdrive) return createSupabaseSql(hyperdrive, "hyperdrive");
   if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl, "direct");
-  if (settings.source === "supabase") throw new Error("Supabase is configured but its database connection could not be opened.");
+  if (!isWorkspacePreview() || env("VERCEL")) {
+    throw new Error("Supabase is not configured in this deployed environment. Persistent database access is disabled.");
+  }
   return createPgliteSql();
 }
 
