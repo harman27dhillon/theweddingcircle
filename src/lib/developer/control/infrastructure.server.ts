@@ -11,7 +11,7 @@ const checked = (ok: boolean, message: string, details?: string[]): Infrastructu
   ({ ok, message, ...(details?.length ? { details } : {}), checkedAt: new Date().toISOString() });
 
 export async function infrastructureStatus() {
-  const env = await serverEnvironment();
+  const { env } = await (await import("@/lib/infra/resolved-env.server")).resolvedInfraEnv();
   let hyperdrive = false;
   try {
     const runtime = await import("cloudflare:workers");
@@ -30,7 +30,7 @@ export async function infrastructureStatus() {
 }
 
 export async function runInfrastructureDiagnostic(id: InfrastructureId): Promise<InfrastructureDiagnostic> {
-  const env = await serverEnvironment();
+  const { env } = await (await import("@/lib/infra/resolved-env.server")).resolvedInfraEnv();
   try {
     if (id === "supabase") return testSupabaseApi();
     if (id === "hyperdrive") {
@@ -65,8 +65,8 @@ export async function runInfrastructureDiagnostic(id: InfrastructureId): Promise
       } catch { return checked(false, "Firebase service-account verification could not complete. Check the private key and Worker network access."); }
     }
     if (id === "gateway") {
-      const origin = (env.MEDIA_GATEWAY_URL || env.MEDIA_GATEWAY_ORIGIN || "").trim().replace(/\/$/, "");
-      if (!origin || !env.MEDIA_GATEWAY_SECRET) return checked(false, "Media Gateway origin or MEDIA_GATEWAY_SECRET is missing. Existing private media delivery was not changed.");
+      const origin = (env.MEDIA_GATEWAY_ORIGIN || "").trim().replace(/\/$/, "");
+      if (String(env.MEDIA_GATEWAY_ENABLED || "").trim() !== "yes" || !origin || !env.MEDIA_GATEWAY_SECRET) return checked(false, "Media Gateway is not fully configured/enabled in the existing Infrastructure settings. Existing private media delivery was not changed.");
       let url: URL;
       try { url = new URL(origin); } catch { return checked(false, "Media Gateway origin is not a valid URL."); }
       if (url.protocol !== "https:") return checked(false, "Media Gateway must use HTTPS.");
