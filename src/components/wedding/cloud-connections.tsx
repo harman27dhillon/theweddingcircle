@@ -32,7 +32,13 @@ export function CloudConnections({ token }: { token: string }) {
   }, [token]);
 
   if (!board) return <p className="text-sm text-on-photo/70">Loading cloud connections…</p>;
-  if (!board.ok) return <p className="text-sm">{board.error}</p>;
+  if (!board.ok) return (
+    <section className="max-w-6xl">
+      <h1 className="font-serif text-4xl">Cloud connections</h1>
+      <p role="status" className="mt-2 text-sm text-on-photo/70">{board.error}</p>
+      <CoreMigration token={token} />
+    </section>
+  );
 
   return (
     <section className="max-w-6xl">

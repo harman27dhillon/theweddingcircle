@@ -230,9 +230,7 @@ export async function cloudBoard(token: string) {
     return { ...(await persistedCloudBoard()), persisted: true as const };
   } catch {
     const publicSupabase = cleanSupabaseInput(supabaseRaw());
-    const publicFirebase = cleanFirebaseInput(firebaseRawFromEnv());
     const supabase: Record<string, string> = publicSupabase.ok ? publicSupabase.fields : {};
-    const firebase: Record<string, string> = publicFirebase.ok ? publicFirebase.fields : {};
     const board = buildCloudBoard({
       databaseLabel: `${databaseLabel()} (unavailable)`,
       supabase: {
@@ -241,10 +239,9 @@ export async function cloudBoard(token: string) {
         savedAt: "",
       },
       firebase: {
-        fields: FIREBASE_FIELDS.map((field) => fieldView(field.id, field.label, field.env, field.secret, "optional" in field && field.optional === true, firebase[field.id] || "", "environment")),
+        fields: FIREBASE_FIELDS.map((field) => fieldView(field.id, field.label, field.env, field.secret, "optional" in field && field.optional === true, "", "none")),
         capabilities: [],
-        vapid: Boolean(env("FIREBASE_VAPID_KEY")),
-        serviceAccount: serviceAccountConfigured(),
+        vapid: false,
       },
       requests: [],
       actives: { media: "", push: "", analytics: "" },
