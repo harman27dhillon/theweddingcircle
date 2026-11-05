@@ -213,6 +213,12 @@ export default defineConfig(({ command, isPreview }) => ({
             cloudflare: {
               wrangler: {
                 name: "theweddingcircle",
+                hyperdrive: [
+                  {
+                    binding: "HYPERDRIVE",
+                    id: "7cc99881548c416db610ead45c7b0f51",
+                  },
+                ],
                 vars: {
                   MEDIA_GATEWAY_ENABLED: "yes",
                   MEDIA_GATEWAY_ORIGIN: "https://media.theweddingcircle.in",
