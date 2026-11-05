@@ -1,29 +1,26 @@
 import { pendingMigrations } from "../../scripts/migration-plan.mjs";
 
 /** Which database backend is active. Supabase wins when its server URL is set. */
-export type DbSource = "supabase" | "neon" | "pglite";
+export type DbSource = "supabase" | "pglite";
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
 // "unset" — otherwise production would silently run on the PGLite fallback.
 function databaseSettings(environment: Record<string, string | undefined>, hasHyperdrive = false) {
-  const rawDatabaseUrl = environment.DATABASE_URL;
-  const databaseUrl = rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl.trim() : undefined;
   const rawSupabaseUrl = environment.SUPABASE_DB_URL;
   const supabaseUrl = rawSupabaseUrl && rawSupabaseUrl.trim().startsWith("postgres")
     ? rawSupabaseUrl.trim()
     : undefined;
-  return { databaseUrl, supabaseUrl, source: hasHyperdrive || supabaseUrl ? "supabase" as const : databaseUrl ? "neon" as const : "pglite" as const };
+  return { supabaseUrl, source: hasHyperdrive || supabaseUrl ? "supabase" as const : "pglite" as const };
 }
 
 /**
- * Active backend. `SUPABASE_DB_URL` is the permanent database when it is set.
- * Otherwise Neon when `DATABASE_URL` is set, otherwise embedded PGLite for preview.
- * A failed Supabase connection is not replaced with Neon or PGLite.
+ * Supabase is the only persistent database. PGLite is a disposable local preview fallback.
+ * A failed Supabase connection is never replaced with a different database.
  */
 export let dbSource: DbSource = databaseSettings(process.env).source;
 
 /**
- * Minimal shared SQL surface, satisfied by both Neon and PGLite. Both the
+ * Minimal shared SQL surface, satisfied by Supabase Postgres and PGLite. Both the
  * tagged-template and `.query()` forms resolve to an array of row objects:
  *
  *   const sql = await getSql();
@@ -89,28 +86,8 @@ function toSql(run: Run): Sql {
   return sql;
 }
 
-function createNeonSql(connectionString: string): Promise<Sql> {
-  globalRef.__pgSqlPromise__ ??= (async () => {
-    // Regular Postgres driver: node-postgres (`pg`) — works directly with Neon's
-    // pooled endpoint. One pool per process; warm serverless instances reuse it.
-    const { Pool, types } = await import("pg");
-    types.setTypeParser(OID_INT8, Number);
-    types.setTypeParser(OID_DATE, identity);
-    types.setTypeParser(OID_INTERVAL, identity);
-    const pool = new Pool({ connectionString });
-    return toSql(async <T>(text: string, params: unknown[]) => {
-      const res = await pool.query(text, params);
-      return res.rows as T[];
-    });
-  })().catch((err) => {
-    globalRef.__pgSqlPromise__ = undefined;
-    throw err;
-  });
-  return globalRef.__pgSqlPromise__;
-}
-
 async function createPgliteSql(): Promise<Sql> {
-  // Embedded Postgres, imported on demand so it never loads on the Neon path.
+  // Embedded Postgres, imported on demand for local preview only.
   // One in-memory instance per process, shared across HMR module instances, so
   // data survives source edits (it resets on dev-server restart).
   globalRef.__pgliteInstance__ ??= (async () => {
@@ -200,12 +177,13 @@ async function createSql(): Promise<Sql> {
   dbSource = settings.source;
   if (hyperdrive) return createSupabaseSql(hyperdrive, "hyperdrive");
   if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl, "direct");
-  return settings.databaseUrl ? createNeonSql(settings.databaseUrl) : createPgliteSql();
+  if (settings.source === "supabase") throw new Error("Supabase is configured but its database connection could not be opened.");
+  return createPgliteSql();
 }
 
 /**
- * Get the shared, **server-only** SQL client. Neon when `DATABASE_URL` is set,
- * otherwise the local PGLite fallback. Memoized — safe to call per request.
+ * Get the shared, **server-only** SQL client. Supabase in deployed environments;
+ * local PGLite only when no Supabase connection is configured. Memoized per request.
  *
  * Schema comes from `migrations/*.sql`, auto-applied before the first query on
  * both backends — define tables there, never inline in server functions.
@@ -226,7 +204,7 @@ export function getSql(): Promise<Sql> {
 export async function getPglite(): Promise<import("@electric-sql/pglite").PGlite> {
   await getSql();
   if (dbSource !== "pglite") {
-    throw new Error("getPglite() is only available when neither Hyperdrive, SUPABASE_DB_URL nor DATABASE_URL is set.");
+    throw new Error("getPglite() is only available for local preview when Supabase is not configured.");
   }
   const pg = await globalRef.__pgliteInstance__;
   if (!pg) throw new Error("PGLite instance failed to initialize");
@@ -236,15 +214,14 @@ export async function getPglite(): Promise<import("@electric-sql/pglite").PGlite
 /**
  * Finish DB bootstrap before the server handles traffic.
  *
- * - **PGLite** (preview / no `DATABASE_URL`): open the in-memory DB and apply
+ * - **PGLite** (local preview only): open the in-memory DB and apply
  *   `migrations/*.sql`. Idempotent — concurrent callers share one promise.
- * - **Neon**: no-op (pool is created lazily on first query).
+ * - **Supabase**: open the persistent Postgres connection and apply pending schema migrations.
  *
  * Vite `configureServer` awaits this at dev startup; production imports of this
  * module kick it off immediately (see bottom of file).
  */
 export function ensureDbReady(): Promise<void> {
-  if (dbSource === "neon") return Promise.resolve();
   return getSql().then(() => undefined);
 }
 
@@ -253,7 +230,7 @@ export function ensureDbReady(): Promise<void> {
 const globalBoot = globalThis as typeof globalThis & {
   __pgBootstrapPromise__?: Promise<void>;
 };
-if (typeof window === "undefined" && dbSource !== "neon") {
+if (typeof window === "undefined") {
   globalBoot.__pgBootstrapPromise__ ??= ensureDbReady().catch((err) => {
     globalBoot.__pgBootstrapPromise__ = undefined;
     console.error("[db] PGLite bootstrap failed:", err);
