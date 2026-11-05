@@ -5,14 +5,14 @@ export type DbSource = "supabase" | "neon" | "pglite";
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
 // "unset" — otherwise production would silently run on the PGLite fallback.
-function databaseSettings(environment: Record<string, string | undefined>) {
+function databaseSettings(environment: Record<string, string | undefined>, hasHyperdrive = false) {
   const rawDatabaseUrl = environment.DATABASE_URL;
   const databaseUrl = rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl.trim() : undefined;
   const rawSupabaseUrl = environment.SUPABASE_DB_URL;
   const supabaseUrl = rawSupabaseUrl && rawSupabaseUrl.trim().startsWith("postgres")
     ? rawSupabaseUrl.trim()
     : undefined;
-  return { databaseUrl, supabaseUrl, source: supabaseUrl ? "supabase" as const : databaseUrl ? "neon" as const : "pglite" as const };
+  return { databaseUrl, supabaseUrl, source: hasHyperdrive || supabaseUrl ? "supabase" as const : databaseUrl ? "neon" as const : "pglite" as const };
 }
 
 /**
@@ -173,7 +173,7 @@ async function createPgliteSql(): Promise<Sql> {
 
 let sqlPromise: Promise<Sql> | null = null;
 
-async function createSupabaseSql(connectionString: string): Promise<Sql> {
+async function createSupabaseSql(connectionString: string, mode: "direct" | "hyperdrive" = "direct"): Promise<Sql> {
   const { openSupabaseSql, runSupabaseSchema } = await import("@/lib/developer/supabase-pool.server");
   const migrations = import.meta.glob("/migrations/*.sql", {
     query: "?raw",
@@ -194,10 +194,12 @@ async function createSql(): Promise<Sql> {
         "or a server route loader, never from client code.",
     );
   }
-  const { serverEnvironment } = await import("@/lib/env.server");
-  const settings = databaseSettings(await serverEnvironment());
+  const { hyperdriveConnectionString, serverEnvironment } = await import("@/lib/env.server");
+  const [environment, hyperdrive] = await Promise.all([serverEnvironment(), hyperdriveConnectionString()]);
+  const settings = databaseSettings(environment, Boolean(hyperdrive));
   dbSource = settings.source;
-  if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl);
+  if (hyperdrive) return createSupabaseSql(hyperdrive, "hyperdrive");
+  if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl, "direct");
   return settings.databaseUrl ? createNeonSql(settings.databaseUrl) : createPgliteSql();
 }
 
@@ -224,7 +226,7 @@ export function getSql(): Promise<Sql> {
 export async function getPglite(): Promise<import("@electric-sql/pglite").PGlite> {
   await getSql();
   if (dbSource !== "pglite") {
-    throw new Error("getPglite() is only available when neither SUPABASE_DB_URL nor DATABASE_URL is set.");
+    throw new Error("getPglite() is only available when neither Hyperdrive, SUPABASE_DB_URL nor DATABASE_URL is set.");
   }
   const pg = await globalRef.__pgliteInstance__;
   if (!pg) throw new Error("PGLite instance failed to initialize");
