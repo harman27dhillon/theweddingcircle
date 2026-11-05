@@ -223,6 +223,8 @@ export default defineConfig(({ command, isPreview }) => ({
                   FIREBASE_APP_ID: "1:637941576967:web:485b3de1463dcd8895c1a2",
                   FIREBASE_AUTH_DOMAIN: "the-wedding-circle-b316b.firebaseapp.com",
                   FIREBASE_MESSAGING_SENDER_ID: "637941576967",
+                  MEDIA_GATEWAY_ENABLED: "yes",
+                  MEDIA_GATEWAY_ORIGIN: "https://media.theweddingcircle.in",
                   R2_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
                   R2_BUCKET: "wedding-circle-media",
                   SUPABASE_URL: "https://vyto1hwepbtzinvceucf.supabase.co",
