@@ -1,7 +1,7 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getCookie, setCookie } from "@tanstack/react-start/server";
 import { getSql } from "@/lib/db";
-import { env } from "@/lib/env.server";
+import { env, serverEnvironment } from "@/lib/env.server";
 
 const COOKIE = "wc_dev";
 const SESSION_HOURS = 12;
@@ -62,7 +62,11 @@ function openRecoverySession(email: string) {
 
 export async function unlockDeveloper(email: string, password: string) {
   const clean = email.trim().toLowerCase();
-  if (clean !== DEVELOPER_LOGIN_EMAIL || !sameHex(sha256(password), DEVELOPER_PASSWORD_HASH)) {
+  const runtime = await serverEnvironment();
+  const expectedEmail = runtime.DEVELOPER_ADMIN_EMAIL?.trim().toLowerCase() || DEVELOPER_LOGIN_EMAIL;
+  const expectedPassword = runtime.DEVELOPER_ADMIN_PASSWORD;
+  const expectedPasswordHash = expectedPassword ? sha256(expectedPassword) : DEVELOPER_PASSWORD_HASH;
+  if (clean !== expectedEmail || !sameHex(sha256(password), expectedPasswordHash)) {
     return { ok: false as const, error: "That developer sign-in was not accepted." };
   }
   const token = randomBytes(32).toString("hex");
@@ -107,7 +111,9 @@ export async function developerSession(token = "") {
     select email, expires_at from developer_sessions where token_hash = ${sha256(current)} and expires_at > now() limit 1
   `;
   const row = rows[0];
-  if (!row || row.email !== DEVELOPER_LOGIN_EMAIL) return null;
+  const runtime = await serverEnvironment();
+  const expectedEmail = runtime.DEVELOPER_ADMIN_EMAIL?.trim().toLowerCase() || DEVELOPER_LOGIN_EMAIL;
+  if (!row || row.email !== expectedEmail) return null;
   return { email: row.email };
 }
 
