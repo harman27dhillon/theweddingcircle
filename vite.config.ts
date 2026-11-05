@@ -215,6 +215,7 @@ export default defineConfig(({ command, isPreview }) => ({
                 name: "theweddingcircle",
                 vars: {
                   CLOUDFLARE_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
+                  CLOUDFLARE_REALTIME_APP_ID: "d59fd1e8-4e0b-48b6-b11c-510594e0327c",
                 },
                 hyperdrive: [
                   {
