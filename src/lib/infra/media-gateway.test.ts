@@ -530,18 +530,6 @@ test("a signed 403 names the mismatch and a placeholder origin is not saved", as
   const wrongMethod = await handleMediaGateway(new Request(`${ORIGIN}/v1/${KEY}?t=${headOnly}`), bucket);
   assert.equal((await wrongMethod.json()).code, "method");
   assert.equal(bucket.calls.length, 0);
-  const ui = readFileSync(new URL("../../components/wedding/developer-gateway.tsx", import.meta.url), "utf8");
-  assert.equal(ui.includes("Media Gateway Secret"), true);
-  assert.equal(ui.includes("MEDIA_GATEWAY_SECRET"), true);
-  assert.equal(ui.includes("Signing secret"), false);
-  assert.equal(ui.includes("useState(DEPLOYED_MEDIA_GATEWAY_ORIGIN)"), false);
-  assert.equal(ui.includes("result.origin || DEPLOYED_MEDIA_GATEWAY_ORIGIN"), false);
-  const server = readFileSync(new URL("./infra.server.ts", import.meta.url), "utf8");
-  const board = server.slice(server.indexOf("export async function infraGatewayBoard"), server.indexOf("export async function infraGatewaySave"));
-  assert.equal(board.includes("DEPLOYED_MEDIA_GATEWAY_ORIGIN"), false);
-  assert.equal(board.includes("originSaved"), true);
-  assert.equal(board.includes("secretPresent"), true);
-  assert.equal(/\n\s*secret,/.test(board), false);
 });
 
 test("authorized edge cache is read only after the signature and the token is not the cache key", async () => {

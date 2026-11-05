@@ -9,57 +9,6 @@ function text(value: unknown, max = 200) {
 const PURPOSES = new Set<MediaPurpose>(["album", "chat", "profile", "cover"]);
 const ACTIONS = new Set<LiveAction>(["create", "start", "stop", "watch", "status"]);
 
-export const developerInfraBoard = createServerFn({ method: "POST" })
-  .validator((input: unknown) => ({ token: text((input as { token?: unknown })?.token, 200) }))
-  .handler(async ({ data }) => {
-    const { infraBoard } = await import("@/lib/infra/infra.server");
-    return infraBoard(data.token);
-  });
-
-export const developerInfraTest = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    const body = input as { token?: unknown; provider?: unknown };
-    return { token: text(body?.token, 200), provider: text(body?.provider, 40) };
-  })
-  .handler(async ({ data }) => {
-    const { infraTest } = await import("@/lib/infra/infra.server");
-    return infraTest(data.token, data.provider);
-  });
-
-export const developerInfraSave = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    const body = input as { token?: unknown; provider?: unknown; values?: unknown };
-    const values: Record<string, string> = {};
-    const raw = body?.values;
-    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-      for (const [key, value] of Object.entries(raw)) {
-        if (!/^[A-Z0-9_]{3,80}$/.test(key) || typeof value !== "string") continue;
-        values[key] = value.slice(0, key.includes("JSON") ? 20000 : 500);
-      }
-    }
-    return { token: text(body?.token, 200), provider: text(body?.provider, 40), values };
-  })
-  .handler(async ({ data }) => {
-    const { infraSaveConfig } = await import("@/lib/infra/infra.server");
-    return infraSaveConfig(data.token, data.provider, data.values);
-  });
-
-export const developerInfraFlag = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    const body = input as { token?: unknown; id?: unknown; enable?: unknown; confirm?: unknown; phrase?: unknown };
-    return {
-      token: text(body?.token, 200),
-      id: text(body?.id, 40),
-      enable: body?.enable === true,
-      confirm: body?.confirm === true,
-      phrase: text(body?.phrase, 80),
-    };
-  })
-  .handler(async ({ data }) => {
-    const { infraSetFlag } = await import("@/lib/infra/infra.server");
-    return infraSetFlag(data.token, data.id, data.enable, data.confirm, data.phrase);
-  });
-
 export const infraPrepareUpload = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
     const body = input as { slug?: unknown; memberKey?: unknown; purpose?: unknown; mime?: unknown; bytes?: unknown; fileName?: unknown };
@@ -244,66 +193,5 @@ export const infraVerifyPurchase = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { infraVerifyPurchase: verify } = await import("@/lib/infra/infra.server");
     return verify(data);
-  });
-
-export const developerCdnBoard = createServerFn({ method: "POST" })
-  .validator((input: unknown) => ({ token: text((input as { token?: unknown })?.token, 200) }))
-  .handler(async ({ data }) => {
-    const { infraCdnBoard } = await import("@/lib/infra/infra.server");
-    return infraCdnBoard(data.token);
-  });
-
-export const developerCdnSave = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    const body = input as { token?: unknown; enabled?: unknown; domain?: unknown; base?: unknown; cache?: unknown; zoneId?: unknown; apiToken?: unknown };
-    return {
-      token: text(body?.token, 200),
-      enabled: body?.enabled === true,
-      domain: text(body?.domain, 253),
-      base: text(body?.base, 300),
-      cache: text(body?.cache, 20),
-      zoneId: text(body?.zoneId, 40),
-      apiToken: text(body?.apiToken, 400),
-    };
-  })
-  .handler(async ({ data }) => {
-    const { infraCdnSave } = await import("@/lib/infra/infra.server");
-    return infraCdnSave(data.token, data);
-  });
-
-export const developerCdnTest = createServerFn({ method: "POST" })
-  .validator((input: unknown) => ({ token: text((input as { token?: unknown })?.token, 200) }))
-  .handler(async ({ data }) => {
-    const { infraCdnTest } = await import("@/lib/infra/infra.server");
-    return infraCdnTest(data.token);
-  });
-
-export const developerGatewayBoard = createServerFn({ method: "POST" })
-  .validator((input: unknown) => ({ token: text((input as { token?: unknown })?.token, 200) }))
-  .handler(async ({ data }) => {
-    const { infraGatewayBoard } = await import("@/lib/infra/infra.server");
-    return infraGatewayBoard(data.token);
-  });
-
-export const developerGatewaySave = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    const body = input as { token?: unknown; enabled?: unknown; origin?: unknown; secret?: unknown };
-    return {
-      token: text(body?.token, 200),
-      enabled: body?.enabled === true,
-      origin: text(body?.origin, 300),
-      secret: text(body?.secret, 200),
-    };
-  })
-  .handler(async ({ data }) => {
-    const { infraGatewaySave } = await import("@/lib/infra/infra.server");
-    return infraGatewaySave(data.token, data);
-  });
-
-export const developerGatewayTest = createServerFn({ method: "POST" })
-  .validator((input: unknown) => ({ token: text((input as { token?: unknown })?.token, 200) }))
-  .handler(async ({ data }) => {
-    const { infraGatewayTest } = await import("@/lib/infra/infra.server");
-    return infraGatewayTest(data.token);
   });
 

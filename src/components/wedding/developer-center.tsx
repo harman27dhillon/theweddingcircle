@@ -191,14 +191,14 @@ function Dashboard({ email, configuration, message, onLogout }: {
                 <article key={id} className="rounded-card border border-on-photo/15 p-4">
                   <h2 className="font-serif text-xl">{title}</h2>
                   {id === "initialize" ? <label className="mt-2 flex items-start gap-2 text-sm text-on-photo/75"><input className="mt-1" type="checkbox" checked={initialize} onChange={(event) => setInitialize(event.target.checked)} />Create missing tables after inspection</label> : null}
-                  <button type="button" className={`mt-3 ${id === "verify" ? primary : button}`} disabled={Boolean(running) || !configuration.configured.SUPABASE_DB_URL || (id === "initialize" && !initialize)} onClick={() => void run(id)}>
+                  <button type="button" className={`mt-3 ${id === "verify" ? primary : button}`} disabled={Boolean(running) || !configuration.databaseConfigured || (id === "initialize" && !initialize)} onClick={() => void run(id)}>
                     {running === id ? "Running…" : title}
                   </button>
                   <Result value={results[id]} />
                 </article>
               ))}
             </div>
-            {!configuration.configured.SUPABASE_DB_URL ? <p className="mt-4 text-sm text-gold">Add the Postgres connection in Supabase configuration to enable database actions.</p> : null}
+            {!configuration.databaseConfigured ? <p className="mt-4 text-sm text-gold">Add the Postgres connection in Supabase configuration to enable database actions.</p> : null}
           </>
         ) : null}
       </main>
