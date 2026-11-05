@@ -155,7 +155,19 @@ function Dashboard({ email, configuration, message, onLogout }: {
     return () => { active = false; clearInterval(timer); };
   }, [state, running]);
 
-  useEffect(() => { void developerInfrastructureStatus().then(setInfraStatus).catch(() => setInfraStatus(null)); }, []);\n\n  async function runInfrastructure(id: InfrastructureCheck) {\n    setInfraRunning(id);\n    try {\n      const result = await developerInfrastructureCheck({ data: { id } });\n      setInfraResults((current) => ({ ...current, [id]: result }));\n    } catch {\n      setInfraResults((current) => ({ ...current, [id]: { ok: false, message: "Diagnostic request failed. Reopen Developer Center if the session expired." } }));\n    } finally { setInfraRunning(null); }\n  }\n\n  const apiResult = results.api;
+  useEffect(() => { void developerInfrastructureStatus().then(setInfraStatus).catch(() => setInfraStatus(null)); }, []);
+
+  async function runInfrastructure(id: InfrastructureCheck) {
+    setInfraRunning(id);
+    try {
+      const result = await developerInfrastructureCheck({ data: { id } });
+      setInfraResults((current) => ({ ...current, [id]: result }));
+    } catch {
+      setInfraResults((current) => ({ ...current, [id]: { ok: false, message: "Diagnostic request failed. Reopen Developer Center if the session expired." } }));
+    } finally { setInfraRunning(null); }
+  }
+
+  const apiResult = results.api;
   const latestDb = results.connect;
   return (
     <div className="min-h-dvh bg-ink text-on-photo md:grid md:grid-cols-[15rem_minmax(0,1fr)]">
@@ -187,7 +199,23 @@ function Dashboard({ email, configuration, message, onLogout }: {
           </>
         ) : null}
 
-        {section === "infrastructure" ? (\n          <>\n            <h1 className="mt-2 font-serif text-4xl">Infrastructure</h1>\n            <p className="mt-2 max-w-3xl text-sm text-on-photo/70">Read-only diagnostics use the Worker’s existing secrets, variables and bindings. No credential entry fields are used here. A failed check is shown below its service.</p>\n            <div className="mt-6 grid gap-3 sm:grid-cols-2">\n              {INFRASTRUCTURE_CHECKS.map(([id, title]) => (\n                <article key={id} className="rounded-card border border-on-photo/15 p-4">\n                  <div className="flex items-start justify-between gap-3"><h2 className="font-serif text-xl">{title}</h2><span className="text-xs text-on-photo/60">{infraStatus ? infraStatus[id] ? "Configured" : "Missing / not detected" : "Status unavailable"}</span></div>\n                  <button type="button" className={primary + " mt-3"} disabled={Boolean(infraRunning)} onClick={() => void runInfrastructure(id)}>{infraRunning === id ? "Testing…" : id === "cdn" || id === "stream" ? "Check status" : "Test connection"}</button>\n                  <Result value={infraResults[id]} />\n                </article>\n              ))}\n            </div>\n            <p className="mt-4 text-xs text-on-photo/60">Some checks are configuration/reachability checks, not full feature acceptance tests. In particular, CDN cache policy and RealtimeKit presenter/viewer permissions require dedicated end-to-end tests.</p>\n          </>\n        ) : null}\n        {section === "configuration" ? <ConfigurationPanel configuration={configuration} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
+        {section === "infrastructure" ? (
+          <>
+            <h1 className="mt-2 font-serif text-4xl">Infrastructure</h1>
+            <p className="mt-2 max-w-3xl text-sm text-on-photo/70">Read-only diagnostics use the Worker’s existing secrets, variables and bindings. No credential entry fields are used here. A failed check is shown below its service.</p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {INFRASTRUCTURE_CHECKS.map(([id, title]) => (
+                <article key={id} className="rounded-card border border-on-photo/15 p-4">
+                  <div className="flex items-start justify-between gap-3"><h2 className="font-serif text-xl">{title}</h2><span className="text-xs text-on-photo/60">{infraStatus ? infraStatus[id] ? "Configured" : "Missing / not detected" : "Status unavailable"}</span></div>
+                  <button type="button" className={primary + " mt-3"} disabled={Boolean(infraRunning)} onClick={() => void runInfrastructure(id)}>{infraRunning === id ? "Testing…" : id === "cdn" || id === "stream" ? "Check status" : "Test connection"}</button>
+                  <Result value={infraResults[id]} />
+                </article>
+              ))}
+            </div>
+            <p className="mt-4 text-xs text-on-photo/60">Some checks are configuration/reachability checks, not full feature acceptance tests. In particular, CDN cache policy and RealtimeKit presenter/viewer permissions require dedicated end-to-end tests.</p>
+          </>
+        ) : null}
+        {section === "configuration" ? <ConfigurationPanel configuration={configuration} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
         {section === "database" ? (
           <>
             <h1 className="mt-2 font-serif text-4xl">Database setup & hosting</h1>
