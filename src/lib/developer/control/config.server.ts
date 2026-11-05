@@ -1,14 +1,16 @@
 import { parse } from "pg-connection-string";
 import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } from "./model";
 import { safeSupabaseUri } from "../supabase-connect";
+import { serverEnvironment } from "@/lib/env.server";
 
 const prefix = "WC_DEVELOPER_";
 // Cloudflare Worker variables are the source of truth. The prefixed names remain
 // as a compatibility fallback for previously staged Developer Center values.
-const secret = (name: ConfigName) => process.env[name]?.trim() || process.env[prefix + name]?.trim() || "";
+const secret = (name: ConfigName, environment: Record<string, string | undefined>) =>
+  environment[name]?.trim() || environment[prefix + name]?.trim() || "";
 
-export function readControlConfig() {
-  return Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, secret(name)])) as Record<ConfigName, string>;
+export function readControlConfig(environment: Record<string, string | undefined> = process.env) {
+  return Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, secret(name, environment)])) as Record<ConfigName, string>;
 }
 
 export function projectUrl(value: string) {
@@ -40,18 +42,18 @@ function validate(name: ConfigName, value: string, project: string) {
   return "Use the matching key type from the Supabase dashboard.";
 }
 
-function secretWriter() {
-  const account = process.env.DEVELOPER_CLOUDFLARE_ACCOUNT_ID?.trim();
-  const worker = process.env.DEVELOPER_CLOUDFLARE_WORKER_NAME?.trim();
-  const token = process.env.DEVELOPER_CLOUDFLARE_API_TOKEN?.trim();
+function secretWriter(environment: Record<string, string | undefined>) {
+  const account = environment.DEVELOPER_CLOUDFLARE_ACCOUNT_ID?.trim();
+  const worker = environment.DEVELOPER_CLOUDFLARE_WORKER_NAME?.trim();
+  const token = environment.DEVELOPER_CLOUDFLARE_API_TOKEN?.trim();
   if (!account || !/^[a-f0-9]{32}$/i.test(account) || !worker || !/^[a-z0-9][a-z0-9_-]{0,62}$/i.test(worker) || !token) return null;
   return { account, worker, token };
 }
 
 export async function configurationStatus() {
-  const config = readControlConfig();
-  // Cloudflare supplies this module in the Worker runtime. A normal Node
-  // process has no binding; it never reads process.env.HYPERDRIVE.
+  const environment = await serverEnvironment();
+  const config = readControlConfig(environment);
+  // A normal Node process has no Cloudflare runtime binding.
   let cloudflare = false;
   let hyperdrive = false;
   try {
@@ -64,14 +66,15 @@ export async function configurationStatus() {
     databaseConfigured: Boolean(config.SUPABASE_DB_URL),
     cloudflare,
     hyperdrive,
-    canStage: Boolean(secretWriter()),
+    canStage: Boolean(secretWriter(environment)),
   };
 }
 
 export async function stageConfiguration(draft: ConfigDraft, clear: boolean): Promise<Diagnostic> {
-  const writer = secretWriter();
+  const environment = await serverEnvironment();
+  const writer = secretWriter(environment);
   if (!writer) return { ok: false, message: "Cloudflare secret management is not configured. Add the Developer Center Worker secrets through Cloudflare." };
-  const current = readControlConfig();
+  const current = readControlConfig(environment);
   const project = projectUrl(draft.SUPABASE_URL || current.SUPABASE_URL);
   const secrets: Record<string, { name: string; type: "secret_text"; text: string } | null> = {};
   for (const { name } of CONFIG_FIELDS) {
@@ -111,7 +114,7 @@ export async function stageConfiguration(draft: ConfigDraft, clear: boolean): Pr
 }
 
 export async function testSupabaseApi(): Promise<Diagnostic> {
-  const config = readControlConfig();
+  const config = readControlConfig(await serverEnvironment());
   const url = projectUrl(config.SUPABASE_URL);
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable key first." };

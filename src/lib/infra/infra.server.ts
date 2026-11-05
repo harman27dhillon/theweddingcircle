@@ -83,18 +83,14 @@ function vaultKey() {
 	return infraVaultKey();
 }
 async function resolvedEnv() {
+	const resolved = await resolvedInfraEnv();
 	try {
 		const sql = await getSql();
 		await ensure(sql);
 	} catch {
-		return {
-			env: { ...process.env },
-			saved: {},
-			unreadable: true,
-			locked: false
-		};
+		return { ...resolved, unreadable: true, locked: false };
 	}
-	return resolvedInfraEnv();
+	return resolved;
 }
 function allow(bucket, limit = 30) {
 	const now = Date.now();

@@ -1,25 +1,27 @@
 import { pendingMigrations } from "../../scripts/migration-plan.mjs";
+import { serverEnvironment } from "@/lib/env.server";
 
 /** Which database backend is active. Supabase wins when its server URL is set. */
 export type DbSource = "supabase" | "neon" | "pglite";
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
 // "unset" — otherwise production would silently run on the PGLite fallback.
-const rawDatabaseUrl =
-  typeof process !== "undefined" ? process.env.DATABASE_URL : undefined;
-const databaseUrl =
-  rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl : undefined;
-const rawSupabaseUrl =
-  typeof process !== "undefined" ? process.env.SUPABASE_DB_URL : undefined;
-const supabaseUrl =
-  rawSupabaseUrl && rawSupabaseUrl.trim().startsWith("postgres") ? rawSupabaseUrl.trim() : undefined;
+function databaseSettings(environment: Record<string, string | undefined>) {
+  const rawDatabaseUrl = environment.DATABASE_URL;
+  const databaseUrl = rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl.trim() : undefined;
+  const rawSupabaseUrl = environment.SUPABASE_DB_URL;
+  const supabaseUrl = rawSupabaseUrl && rawSupabaseUrl.trim().startsWith("postgres")
+    ? rawSupabaseUrl.trim()
+    : undefined;
+  return { databaseUrl, supabaseUrl, source: supabaseUrl ? "supabase" as const : databaseUrl ? "neon" as const : "pglite" as const };
+}
 
 /**
  * Active backend. `SUPABASE_DB_URL` is the permanent database when it is set.
  * Otherwise Neon when `DATABASE_URL` is set, otherwise embedded PGLite for preview.
  * A failed Supabase connection is not replaced with Neon or PGLite.
  */
-export const dbSource: DbSource = supabaseUrl ? "supabase" : databaseUrl ? "neon" : "pglite";
+export let dbSource: DbSource = databaseSettings(process.env).source;
 
 /**
  * Minimal shared SQL surface, satisfied by both Neon and PGLite. Both the
@@ -88,7 +90,7 @@ function toSql(run: Run): Sql {
   return sql;
 }
 
-function createNeonSql(): Promise<Sql> {
+function createNeonSql(connectionString: string): Promise<Sql> {
   globalRef.__pgSqlPromise__ ??= (async () => {
     // Regular Postgres driver: node-postgres (`pg`) — works directly with Neon's
     // pooled endpoint. One pool per process; warm serverless instances reuse it.
@@ -96,7 +98,7 @@ function createNeonSql(): Promise<Sql> {
     types.setTypeParser(OID_INT8, Number);
     types.setTypeParser(OID_DATE, identity);
     types.setTypeParser(OID_INTERVAL, identity);
-    const pool = new Pool({ connectionString: databaseUrl });
+    const pool = new Pool({ connectionString });
     return toSql(async <T>(text: string, params: unknown[]) => {
       const res = await pool.query(text, params);
       return res.rows as T[];
@@ -172,7 +174,7 @@ async function createPgliteSql(): Promise<Sql> {
 
 let sqlPromise: Promise<Sql> | null = null;
 
-async function createSupabaseSql(): Promise<Sql> {
+async function createSupabaseSql(connectionString: string): Promise<Sql> {
   const { openSupabaseSql, runSupabaseSchema } = await import("@/lib/developer/supabase-pool.server");
   const migrations = import.meta.glob("/migrations/*.sql", {
     query: "?raw",
@@ -180,8 +182,8 @@ async function createSupabaseSql(): Promise<Sql> {
     eager: true,
   }) as Record<string, string>;
   const files = pendingMigrations(Object.keys(migrations), []).map(({ name, path }) => ({ name, sql: migrations[path] }));
-  await runSupabaseSchema(files);
-  const opened = await openSupabaseSql();
+  await runSupabaseSchema(files, connectionString);
+  const opened = await openSupabaseSql(connectionString);
   if (!opened.ok) throw new Error(opened.error);
   return opened.sql;
 }
@@ -193,8 +195,10 @@ async function createSql(): Promise<Sql> {
         "or a server route loader, never from client code.",
     );
   }
-  if (dbSource === "supabase") return createSupabaseSql();
-  return dbSource === "neon" ? createNeonSql() : createPgliteSql();
+  const settings = databaseSettings(await serverEnvironment());
+  dbSource = settings.source;
+  if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl);
+  return settings.databaseUrl ? createNeonSql(settings.databaseUrl) : createPgliteSql();
 }
 
 /**
@@ -218,10 +222,10 @@ export function getSql(): Promise<Sql> {
  * Kysely dialect). Throws when `DATABASE_URL` is set (that path uses Neon).
  */
 export async function getPglite(): Promise<import("@electric-sql/pglite").PGlite> {
+  await getSql();
   if (dbSource !== "pglite") {
     throw new Error("getPglite() is only available when neither SUPABASE_DB_URL nor DATABASE_URL is set.");
   }
-  await getSql();
   const pg = await globalRef.__pgliteInstance__;
   if (!pg) throw new Error("PGLite instance failed to initialize");
   return pg;

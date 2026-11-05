@@ -51,8 +51,8 @@ function toSql(run: <T>(text: string, params: unknown[]) => Promise<T[]>): Sql {
 }
 
 /** Apply versioned app migrations once. Does not drop, truncate, or rewrite existing rows. */
-export async function runSupabaseSchema(files: { name: string; sql: string }[]) {
-  const raw = env("SUPABASE_DB_URL") || "";
+export async function runSupabaseSchema(files: { name: string; sql: string }[], connectionString = env("SUPABASE_DB_URL") || "") {
+  const raw = connectionString;
   const uri = safeSupabaseUri(raw);
   if (uri.status !== "ready") throw new Error(uri.detail);
   const pool = await openPool(raw, 1);
@@ -98,8 +98,8 @@ export async function withSupabase<T>(fn: (query: Query) => Promise<T>): Promise
 }
 
 /** Long-lived wedding pool. Used only after an explicit cutover. */
-export async function openSupabaseSql(): Promise<{ ok: true; sql: Sql } | { ok: false; error: string }> {
-  const raw = env("SUPABASE_DB_URL") || "";
+export async function openSupabaseSql(connectionString = env("SUPABASE_DB_URL") || ""): Promise<{ ok: true; sql: Sql } | { ok: false; error: string }> {
+  const raw = connectionString;
   const uri = safeSupabaseUri(raw);
   if (uri.status !== "ready") return { ok: false, error: uri.detail };
   const key = createHash("sha256").update(raw).digest("hex").slice(0, 20);

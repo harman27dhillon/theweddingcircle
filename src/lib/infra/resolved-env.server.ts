@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { getSql } from "@/lib/db";
-import { env, isWorkspacePreview } from "@/lib/env.server";
+import { env, isWorkspacePreview, serverEnvironment } from "@/lib/env.server";
 import { effectiveInfraEnv } from "@/lib/infra/config";
 import { openJson } from "@/lib/wedding/affiliate.crypto";
 
@@ -26,7 +26,7 @@ export function infraVaultKey() {
  * A database or vault failure leaves process.env in place and does not invent saved fields.
  */
 export async function resolvedInfraEnv(): Promise<ResolvedInfraEnv> {
-  const base: Record<string, string | undefined> = { ...process.env };
+  const base = await serverEnvironment();
   try {
     const sql = await getSql();
     await sql`

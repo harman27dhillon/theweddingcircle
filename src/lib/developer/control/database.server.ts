@@ -7,6 +7,7 @@ import accountMigration from "../../../../migrations/supabase/0029_circle_accoun
 import { CORE_COLUMNS, CORE_PRIMARY_KEYS, CORE_TABLES } from "../core-migration";
 import { trustedSupabaseSsl } from "../supabase-connect";
 import { projectUrl, readControlConfig, validateDatabaseUrl } from "./config.server";
+import { serverEnvironment } from "@/lib/env.server";
 import type { Check, Diagnostic } from "./model";
 
 const auditTable = "wc_developer_verification";
@@ -145,7 +146,7 @@ function failure(error: unknown, opened: boolean): Diagnostic {
 }
 
 export async function runDatabaseCheck(check: Exclude<Check, "api">): Promise<Diagnostic> {
-  const config = readControlConfig();
+  const config = readControlConfig(await serverEnvironment());
   if (!config.SUPABASE_DB_URL) return { ok: false, message: "Configure SUPABASE_DB_URL to run a Postgres check." };
   const project = projectUrl(config.SUPABASE_URL);
   if (!project) return { ok: false, message: "Configure SUPABASE_URL so the database check can verify the intended project." };
