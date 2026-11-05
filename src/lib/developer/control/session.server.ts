@@ -1,15 +1,17 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getCookie, getRequest, setCookie } from "@tanstack/react-start/server";
 import { assertSameSiteRequest } from "@/lib/auth/isolation.server";
+import { serverEnvironment } from "@/lib/env.server";
 
 const lifetime = 3600;
 let failures = 0;
 let windowEnds = 0;
 
-function settings() {
-  const email = process.env.DEVELOPER_ADMIN_EMAIL?.trim().toLowerCase();
-  const password = process.env.DEVELOPER_ADMIN_PASSWORD;
-  const secret = process.env.DEVELOPER_SESSION_SECRET?.trim();
+async function settings() {
+  const runtime = await serverEnvironment();
+  const email = runtime.DEVELOPER_ADMIN_EMAIL?.trim().toLowerCase();
+  const password = runtime.DEVELOPER_ADMIN_PASSWORD;
+  const secret = runtime.DEVELOPER_SESSION_SECRET?.trim();
   return email && password && password.length >= 16 && secret && secret.length >= 32 ? { email, password, secret } : null;
 }
 
@@ -27,9 +29,9 @@ function cookieOptions() {
   return { name: secure ? "__Host-wc_developer" : "wc_developer_local", secure };
 }
 
-export function controlSession() {
+export async function controlSession() {
   assertSameSiteRequest();
-  const config = settings();
+  const config = await settings();
   const token = getCookie(cookieOptions().name) || "";
   const match = /^(\d{13}\.[a-f0-9]{32})\.([a-f0-9]{64})$/.exec(token);
   const email = config && match && Number(match[1].split(".")[0]) > Date.now() && equal(match[2], signature(match[1], config))
@@ -37,9 +39,9 @@ export function controlSession() {
   return { configured: Boolean(config), email };
 }
 
-export function controlSignIn(email: string, password: string) {
+export async function controlSignIn(email: string, password: string) {
   assertSameSiteRequest();
-  const config = settings();
+  const config = await settings();
   if (!config) return { ok: false as const, message: "Developer sign-in needs its three server secrets. Set them on the Worker before opening this page." };
   const now = Date.now();
   if (now >= windowEnds) {
@@ -64,6 +66,6 @@ export function controlSignOut() {
   setCookie(name, "", { secure, httpOnly: true, sameSite: "strict", path: "/", maxAge: 0 });
 }
 
-export function requireControlSession() {
-  if (!controlSession().email) throw new Error("Developer sign-in required.");
+export async function requireControlSession() {
+  if (!(await controlSession()).email) throw new Error("Developer sign-in required.");
 }
