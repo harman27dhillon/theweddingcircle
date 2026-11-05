@@ -10,7 +10,7 @@ function text(input: unknown, limit: number) {
 
 export const developerControlStatus = createServerFn({ method: "POST" }).handler(async () => {
   const { controlSession } = await import("./session.server");
-  const session = controlSession();
+  const session = await controlSession();
   if (!session.email) return { ...session, configuration: null };
   const { configurationStatus } = await import("./config.server");
   return { ...session, configuration: await configurationStatus() };
@@ -23,7 +23,7 @@ export const developerControlLogin = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { controlSignIn } = await import("./session.server");
-    return controlSignIn(data.email, data.password);
+    return await controlSignIn(data.email, data.password);
   });
 
 export const developerControlLogout = createServerFn({ method: "POST" }).handler(async () => {
@@ -45,7 +45,7 @@ export const developerControlConfiguration = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { requireControlSession } = await import("./session.server");
-    requireControlSession();
+    await requireControlSession();
     if (data.clear && !data.confirm) return { ok: false, message: "Confirm removal before clearing the Developer Center configuration." };
     const { stageConfiguration } = await import("./config.server");
     return stageConfiguration(data.draft, data.clear);
