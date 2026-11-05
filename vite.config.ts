@@ -213,6 +213,9 @@ export default defineConfig(({ command, isPreview }) => ({
             cloudflare: {
               wrangler: {
                 name: "theweddingcircle",
+                observability: {
+                  enabled: true,
+                },
                 vars: {
                   CLOUDFLARE_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
                   CLOUDFLARE_REALTIME_APP_ID: "d59fd1e8-4e0b-48b6-b11c-510594e0327c",
@@ -223,7 +226,6 @@ export default defineConfig(({ command, isPreview }) => ({
                   R2_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
                   R2_BUCKET: "wedding-circle-media",
                   SUPABASE_URL: "https://vyto1hwepbtzinvceucf.supabase.co",
-
                 },
                 hyperdrive: [
                   {
