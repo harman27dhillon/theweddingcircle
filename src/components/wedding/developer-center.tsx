@@ -1,14 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
-  developerControlCheck, developerControlConfiguration, developerControlLogin,
+  developerControlCheck, developerControlLogin, developerInfrastructureCheck, developerInfrastructureStatus,
   developerControlLogout, developerControlStatus,
 } from "@/lib/developer/control/actions.functions";
-import { CHECKS, CONFIG_FIELDS, type Check, type ConfigName, type Diagnostic } from "@/lib/developer/control/model";
+import { CHECKS, INFRASTRUCTURE_CHECKS, type Check, type Diagnostic, type InfrastructureCheck } from "@/lib/developer/control/model";
 
 const sections = [
   ["overview", "Infrastructure overview"],
-  ["configuration", "Supabase configuration"],
+  ["infrastructure", "Infrastructure"],
+  ["configuration", "Supabase status"],
   ["database", "Database setup & hosting"],
 ] as const;
 
@@ -16,6 +17,8 @@ type Section = typeof sections[number][0];
 type Status = Awaited<ReturnType<typeof developerControlStatus>>;
 type Configuration = NonNullable<Status["configuration"]>;
 type DatabaseState = "idle" | "checking" | "verified" | "failed";
+type InfraStatus = Awaited<ReturnType<typeof developerInfrastructureStatus>>;
+type InfraResults = Partial<Record<InfrastructureCheck, Diagnostic>>;
 const modes: Record<DatabaseState, string> = {
   idle: "Code-Based Mode — Database Not Connected",
   checking: "Connecting / Verification Required",
@@ -109,6 +112,9 @@ function Dashboard({ email, configuration, message, onLogout }: {
   const [lastConnected, setLastConnected] = useState("");
   const [running, setRunning] = useState<Check | null>(null);
   const [initialize, setInitialize] = useState(false);
+  const [infraStatus, setInfraStatus] = useState<InfraStatus | null>(null);
+  const [infraResults, setInfraResults] = useState<InfraResults>({});
+  const [infraRunning, setInfraRunning] = useState<InfrastructureCheck | null>(null);
 
   async function run(check: Check) {
     setRunning(check);
@@ -149,7 +155,7 @@ function Dashboard({ email, configuration, message, onLogout }: {
     return () => { active = false; clearInterval(timer); };
   }, [state, running]);
 
-  const apiResult = results.api;
+  useEffect(() => { void developerInfrastructureStatus().then(setInfraStatus).catch(() => setInfraStatus(null)); }, []);\n\n  async function runInfrastructure(id: InfrastructureCheck) {\n    setInfraRunning(id);\n    try {\n      const result = await developerInfrastructureCheck({ data: { id } });\n      setInfraResults((current) => ({ ...current, [id]: result }));\n    } catch {\n      setInfraResults((current) => ({ ...current, [id]: { ok: false, message: "Diagnostic request failed. Reopen Developer Center if the session expired." } }));\n    } finally { setInfraRunning(null); }\n  }\n\n  const apiResult = results.api;
   const latestDb = results.connect;
   return (
     <div className="min-h-dvh bg-ink text-on-photo md:grid md:grid-cols-[15rem_minmax(0,1fr)]">
@@ -181,7 +187,7 @@ function Dashboard({ email, configuration, message, onLogout }: {
           </>
         ) : null}
 
-        {section === "configuration" ? <ConfigurationPanel configuration={configuration} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
+        {section === "infrastructure" ? (\n          <>\n            <h1 className="mt-2 font-serif text-4xl">Infrastructure</h1>\n            <p className="mt-2 max-w-3xl text-sm text-on-photo/70">Read-only diagnostics use the Worker’s existing secrets, variables and bindings. No credential entry fields are used here. A failed check is shown below its service.</p>\n            <div className="mt-6 grid gap-3 sm:grid-cols-2">\n              {INFRASTRUCTURE_CHECKS.map(([id, title]) => (\n                <article key={id} className="rounded-card border border-on-photo/15 p-4">\n                  <div className="flex items-start justify-between gap-3"><h2 className="font-serif text-xl">{title}</h2><span className="text-xs text-on-photo/60">{infraStatus ? infraStatus[id] ? "Configured" : "Missing / not detected" : "Status unavailable"}</span></div>\n                  <button type="button" className={primary + " mt-3"} disabled={Boolean(infraRunning)} onClick={() => void runInfrastructure(id)}>{infraRunning === id ? "Testing…" : id === "cdn" || id === "stream" ? "Check status" : "Test connection"}</button>\n                  <Result value={infraResults[id]} />\n                </article>\n              ))}\n            </div>\n            <p className="mt-4 text-xs text-on-photo/60">Some checks are configuration/reachability checks, not full feature acceptance tests. In particular, CDN cache policy and RealtimeKit presenter/viewer permissions require dedicated end-to-end tests.</p>\n          </>\n        ) : null}\n        {section === "configuration" ? <ConfigurationPanel configuration={configuration} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
         {section === "database" ? (
           <>
             <h1 className="mt-2 font-serif text-4xl">Database setup & hosting</h1>
@@ -223,64 +229,22 @@ function Result({ value }: { value?: Diagnostic }) {
 function ConfigurationPanel({ configuration, apiResult, dbResult, running, run }: {
   configuration: Configuration; apiResult?: Diagnostic; dbResult?: Diagnostic; running: Check | null; run: (id: Check) => Promise<void>;
 }) {
-  const [shown, setShown] = useState<Partial<Record<ConfigName, boolean>>>({});
-  const [busy, setBusy] = useState(false);
-  const [clear, setClear] = useState(false);
-  const [result, setResult] = useState<Diagnostic>();
-
-  async function save(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const fields = new FormData(form);
-    const values = Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, fields.get(name)]));
-    const clearRequested = (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value") === "clear";
-    setBusy(true);
-    setResult(undefined);
-    try {
-      const response = await developerControlConfiguration({ data: { values: clearRequested ? {} : values, clear: clearRequested, confirm: clear } });
-      setResult(response);
-      if (response.ok) {
-        form.reset();
-        setShown({});
-        setClear(false);
-      }
-    } catch {
-      setResult({ ok: false, message: "The configuration request did not finish. Check Worker Versions before retrying." });
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <>
-      <h1 className="mt-2 font-serif text-4xl">Supabase configuration</h1>
-      <p className="mt-2 max-w-2xl text-sm text-on-photo/70">Values entered here are sent to the server to stage Developer Center secrets in Cloudflare. Blank fields leave deployed values in place. Review and deploy the staged version in Cloudflare to use the changes.</p>
-      {!configuration.canStage ? <p className="mt-3 text-sm text-gold">Secret management is unavailable. Set the Developer Center secrets directly in Cloudflare or configure its secret management token.</p> : null}
-      <form className="mt-6 grid max-w-2xl gap-4 rounded-card border border-on-photo/15 p-4 sm:p-6" onSubmit={(event) => void save(event)} autoComplete="off">
-        {CONFIG_FIELDS.map(({ name, secret }) => (
-          <div key={name}>
-            <label htmlFor={name} className="block break-all text-sm">{name}</label>
-            <p className="mb-2 mt-1 text-xs text-on-photo/65">{configuration.configured[name] ? "Configured on this Worker" : "Missing"}</p>
-            <div className="flex gap-2">
-              <input id={name} name={name} type={secret && !shown[name] ? "password" : "text"} className={field} autoComplete="off" spellCheck={false} maxLength={8192} />
-              {secret ? <button type="button" className={button} aria-label={`${shown[name] ? "Hide" : "Show"} ${name}`} onClick={() => setShown((current) => ({ ...current, [name]: !current[name] }))}>{shown[name] ? "Hide" : "Show"}</button> : null}
-            </div>
-          </div>
-        ))}
-        <StatusCard title="HYPERDRIVE">{configuration.hyperdrive ? "Cloudflare runtime binding detected" : "Optional Cloudflare runtime binding not configured"}</StatusCard>
-        <div className="flex flex-wrap gap-2">
-          <button className={primary} disabled={busy || !configuration.canStage}>Save Configuration</button>
-          <button type="button" className={button} disabled={busy || !configuration.canStage} onClick={() => setClear((value) => !value)}>Clear Configuration</button>
-        </div>
-        {clear ? <div className="rounded-xl border border-gold/40 p-3 text-sm"><p>Stage removal of the four Developer Center secrets? Wedding app secrets are separate.</p><button type="submit" value="clear" className={`mt-2 ${button}`} disabled={busy}>Confirm clear</button></div> : null}
-        <Result value={result} />
-      </form>
+      <h1 className="mt-2 font-serif text-4xl">Supabase status</h1>
+      <p className="mt-2 max-w-2xl text-sm text-on-photo/70">Supabase configuration is read directly from the existing Worker environment. This page is read-only; manage secrets in Cloudflare Worker Settings. Secret values are never displayed or edited here.</p>
       <div className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2">
-        <StatusCard title="HTTPS API test"><button type="button" className={button} disabled={Boolean(running)} onClick={() => void run("api")}>{running === "api" ? "Testing…" : "Test Supabase API connection"}</button></StatusCard>
-        <StatusCard title="Postgres connection test"><button type="button" className={button} disabled={Boolean(running)} onClick={() => void run("connect")}>{running === "connect" ? "Testing…" : "Test database connectivity"}</button></StatusCard>
-        <Result value={apiResult} />
-        <Result value={dbResult} />
+        <StatusCard title="SUPABASE_URL">{configuration.configured.SUPABASE_URL ? "Configured" : "Missing"}</StatusCard>
+        <StatusCard title="SUPABASE_PUBLISHABLE_KEY">{configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured (masked)" : "Missing"}</StatusCard>
+        <StatusCard title="SUPABASE_SERVICE_ROLE_KEY">{configuration.configured.SUPABASE_SERVICE_ROLE_KEY ? "Configured (server secret)" : "Missing"}</StatusCard>
+        <StatusCard title="SUPABASE_DB_URL">{configuration.configured.SUPABASE_DB_URL ? "Configured (masked)" : "Missing"}</StatusCard>
+        <StatusCard title="Hyperdrive">{configuration.hyperdrive ? "Worker binding detected" : "Not detected"}</StatusCard>
       </div>
+      <div className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2">
+        <article className="rounded-card border border-on-photo/15 p-4"><h2 className="font-serif text-lg">Supabase API</h2><button type="button" className={button + " mt-3"} disabled={Boolean(running)} onClick={() => void run("api")}>{running === "api" ? "Testing…" : "Test Supabase API"}</button><Result value={apiResult} /></article>
+        <article className="rounded-card border border-on-photo/15 p-4"><h2 className="font-serif text-lg">Database connection</h2><button type="button" className={button + " mt-3"} disabled={Boolean(running)} onClick={() => void run("connect")}>{running === "connect" ? "Testing…" : "Test database connection"}</button><Result value={dbResult} /></article>
+      </div>
+      <p className="mt-4 text-xs text-on-photo/60">No values can be entered, replaced or cleared here. This avoids creating a second source of truth for secrets.</p>
     </>
   );
 }
