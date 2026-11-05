@@ -226,6 +226,40 @@ async function remember(sql: Sql, provider: string, capability: string, state: s
 export async function cloudBoard(token: string) {
   const session = await requireDeveloper(token);
   if (!session.ok) return session;
+  try {
+    return { ...(await persistedCloudBoard()), persisted: true as const };
+  } catch {
+    const publicSupabase = cleanSupabaseInput(supabaseRaw());
+    const publicFirebase = cleanFirebaseInput(firebaseRawFromEnv());
+    const supabase: Record<string, string> = publicSupabase.ok ? publicSupabase.fields : {};
+    const firebase: Record<string, string> = publicFirebase.ok ? publicFirebase.fields : {};
+    const board = buildCloudBoard({
+      databaseLabel: `${databaseLabel()} (unavailable)`,
+      supabase: {
+        fields: SUPABASE_FIELDS.map((field) => fieldView(field.id, field.label, field.env, field.secret, false, supabase[field.id] || "", "environment")),
+        capabilities: [],
+        savedAt: "",
+      },
+      firebase: {
+        fields: FIREBASE_FIELDS.map((field) => fieldView(field.id, field.label, field.env, field.secret, "optional" in field && field.optional === true, firebase[field.id] || "", "environment")),
+        capabilities: [],
+        vapid: Boolean(env("FIREBASE_VAPID_KEY")),
+        serviceAccount: serviceAccountConfigured(),
+      },
+      requests: [],
+      actives: { media: "", push: "", analytics: "" },
+      worker: true,
+      fcmReady: false,
+    });
+    return {
+      ...board,
+      persisted: false as const,
+      note: "The database is unavailable. This page shows server configuration only. Saved settings and connection history are unavailable.",
+    };
+  }
+}
+
+async function persistedCloudBoard() {
   const sql = await getSql();
   await ensure(sql);
   const supabase = await resolveSupabase(sql);

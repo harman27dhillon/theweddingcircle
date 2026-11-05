@@ -47,7 +47,7 @@ export function CoreMigration({ token }: { token: string }) {
     try {
       const result = await developerCoreProbe({ data: { token } });
       if (!result.ok) setNote(result.error);
-      else setNote(`${result.probe.status.replaceAll("_", " ")}. ${result.probe.detail} Routing stays ${result.cutover}. ${result.alternates}`);
+      else setNote(`${result.probe.status.replaceAll("_", " ")}. ${result.probe.detail} ${result.alternates}`);
     } catch {
       setNote("The connection test did not finish. Wedding traffic was not switched.");
     } finally {
@@ -78,7 +78,16 @@ export function CoreMigration({ token }: { token: string }) {
   }
 
   if (!board) return <p className="mt-8 text-sm text-on-photo/70">Loading core data migration…</p>;
-  if (!board.ok) return <p className="mt-8 text-sm">{board.error}</p>;
+  if (!board.ok) return (
+    <section className="mt-10 max-w-6xl border-t border-on-photo/10 pt-8">
+      <h2 className="font-serif text-3xl">Core data migration</h2>
+      <p className="mt-2 text-sm text-on-photo/70">{board.error}</p>
+      <button type="button" disabled={busy} onClick={() => void testConnection()} className="mt-4 min-h-11 rounded-full border border-on-photo/20 px-4 text-sm">
+        {busy ? "Checking…" : "Test Supabase connection"}
+      </button>
+      {note ? <p role="status" className="mt-3 text-sm text-on-photo/75">{note}</p> : null}
+    </section>
+  );
 
   return (
     <section className="mt-10 max-w-6xl border-t border-on-photo/10 pt-8">

@@ -40,8 +40,9 @@ export function CloudConnections({ token }: { token: string }) {
       <p className="mt-2 max-w-3xl text-sm text-on-photo/70">{board.note}</p>
       <p className="mt-3 text-sm">Database in use · {board.databaseLabel}</p>
       {note ? <p className="mt-3 text-sm text-gold">{note}</p> : null}
+      <fieldset disabled={!board.persisted} className="min-w-0">
       <div className="mt-6 grid gap-4">
-        {board.services.map((service) => (
+        {(board.persisted ? board.services : []).map((service) => (
           <ServiceCard key={service.id} token={token} service={service} onDone={(message) => { setNote(message); void reload(); }} />
         ))}
       </div>
@@ -51,6 +52,7 @@ export function CloudConnections({ token }: { token: string }) {
           <ProviderCard key={provider.id} token={token} provider={provider} onDone={(message) => { setNote(message); void reload(); }} />
         ))}
       </div>
+      </fieldset>
       <CoreMigration token={token} />
     </section>
   );
