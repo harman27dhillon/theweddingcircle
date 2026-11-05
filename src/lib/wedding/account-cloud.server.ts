@@ -1,3 +1,4 @@
+import { developerEmails } from "@/lib/developer/gate.server";
 import { createHash } from "node:crypto";
 import { weddingDataSql } from "@/lib/developer/core-route.server";
 import { readFirebaseIdentity } from "@/lib/wedding/firebase-identity.server";
@@ -123,6 +124,9 @@ export async function linkFirebaseAccount(input: { idToken: string; name: string
   const verified = await readFirebaseIdentity(input.idToken);
   if (!verified.ok) return { ok: false as const, error: "bad" as const, reason: verified.reason };
   const email = emailOf(verified.identity.email);
+  if (developerEmails().includes(email)) {
+    return { ok: false as const, error: "developer-email" as const, reason: "Use Developer sign-in for this email." };
+  }
   const uid = verified.identity.uid.trim();
   if (!email || !uid) return { ok: false as const, error: "no-email" as const, reason: "This Firebase user has no email address." };
   const sql = await weddingDataSql();

@@ -68,7 +68,7 @@ export function AccountScreen() {
   const [authEmail, setAuthEmail] = useState("");
   const [joinTitle, setJoinTitle] = useState("");
 
-  async function completeVerified(address: string, secret = "") {
+  async function completeVerified(address: string) {
     const { adoptFirebaseSession } = await import("@/lib/wedding/account-cloud");
     const adopted = await adoptFirebaseSession({ name: name.trim(), country, phone: cleanPhone(phone) });
     if (adopted === "unverified") {
@@ -80,14 +80,6 @@ export function AccountScreen() {
     if (adopted !== "ok") {
       setNotice(adopted === "link-failed" ? "That email could not be linked. The existing account was not changed." : "Firebase did not open this account.");
       return;
-    }
-    if (secret && isDeveloperEmail(address)) {
-      try {
-        const unlocked = await developerUnlock({ data: { email: address.trim().toLowerCase(), password: secret } });
-        if (unlocked.ok) rememberDeveloperToken(unlocked.token);
-      } catch {
-        /* The wedding account is signed in. The command center can ask again. */
-      }
     }
     setPhase("form");
     setNotice("");
@@ -131,6 +123,10 @@ export function AccountScreen() {
 
   async function createAccount(e: FormEvent) {
     e.preventDefault();
+    if (isDeveloperEmail(email)) {
+      setNotice("Use Developer sign-in for this email.");
+      return;
+    }
     if (name.trim().length < 2) {
       toast("Add the name guests will see.");
       return;
@@ -179,6 +175,23 @@ export function AccountScreen() {
     }
     setBusy(true);
     setNotice("");
+    if (isDeveloperEmail(identifier)) {
+      try {
+        const result = await developerUnlock({ data: { email: identifier.trim().toLowerCase(), password: signPassword } });
+        if (!result.ok) {
+          setNotice(result.error);
+          return;
+        }
+        rememberDeveloperToken(result.token);
+        setSignPassword("");
+        void navigate({ to: "/developer" });
+      } catch {
+        setNotice("The Developer Center could not be opened. Please try again.");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     const { signInWithEmail } = await import("@/lib/wedding/firebase-auth.browser");
     const result = await signInWithEmail(identifier, signPassword);
     if (!result.ok) {
@@ -194,11 +207,15 @@ export function AccountScreen() {
       setNotice("Verify your email before opening a wedding.");
       return;
     }
-    await completeVerified(result.email, signPassword);
+    await completeVerified(result.email);
     setBusy(false);
   }
 
   async function sendReset() {
+    if (isDeveloperEmail(identifier)) {
+      setNotice("Use Developer sign-in for this email.");
+      return;
+    }
     if (!validEmail(identifier)) {
       toast("Enter the email on the account.");
       return;
@@ -238,7 +255,7 @@ export function AccountScreen() {
       toast(message);
       return;
     }
-    await completeVerified(session.email, signPassword || password);
+    await completeVerified(session.email);
     setBusy(false);
   }
 
@@ -264,6 +281,7 @@ export function AccountScreen() {
             ? `Sign in or create an account to continue to ${joinTitle}.`
             : "Create an account with your email. A verification link is required before a wedding opens."}
       </p>
+      <Link to="/developer" className="mt-3 inline-flex min-h-11 items-center text-sm text-maroon">Developer sign-in</Link>
       {notice ? <p className="mt-3 text-sm text-muted">{notice}</p> : null}
 
       {account ? (
