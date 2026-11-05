@@ -83,10 +83,10 @@ test("rollback cannot hide rows written after cutover", () => {
   assert.equal(writesPaused("reverse_verified"), true);
   assert.equal(writesPaused("syncing"), true);
   assert.equal(writesPaused("cutover"), false);
-  assert.equal(shouldAutoActivate("neon", "idle"), true);
-  assert.equal(shouldAutoActivate("neon", "invalid"), true);
-  assert.equal(shouldAutoActivate("supabase", "cutover"), false);
-  assert.equal(shouldAutoActivate("neon", "rolled_back"), false);
+  assert.equal(shouldAutoActivate("idle"), true);
+  assert.equal(shouldAutoActivate("invalid"), true);
+  assert.equal(shouldAutoActivate("cutover"), false);
+  assert.equal(shouldAutoActivate("rolled_back"), false);
 });
 
 test("record counts must match before a migration is treated as aligned", () => {
