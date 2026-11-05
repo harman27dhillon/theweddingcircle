@@ -218,6 +218,8 @@ export default defineConfig(({ command, isPreview }) => ({
                   CLOUDFLARE_REALTIME_APP_ID: "d59fd1e8-4e0b-48b6-b11c-510594e0327c",
                   R2_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
                   R2_BUCKET: "the-wedding-circle",
+                  SUPABASE_URL: "https://vyto1hwepbtzinvceucf.supabase.co",
+                  SUPABASE_PUBLISHABLE_KEY: "");
                 },
                 hyperdrive: [
                   {
