@@ -22,7 +22,7 @@ export async function infrastructureStatus() {
     r2: ["R2_ACCOUNT_ID", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"].every(present),
     cdn: present("R2_PUBLIC_DOMAIN") || present("MEDIA_CDN_BASE_URL"),
     stream: present("CLOUDFLARE_ACCOUNT_ID") && present("CLOUDFLARE_REALTIME_APP_ID") && present("CLOUDFLARE_REALTIME_API_TOKEN"),
-    gateway: present("MEDIA_GATEWAY_SECRET") && (present("MEDIA_GATEWAY_URL") || present("MEDIA_GATEWAY_ORIGIN")),
+    gateway: env.MEDIA_GATEWAY_ENABLED?.trim() === "yes" && present("MEDIA_GATEWAY_ORIGIN") && present("MEDIA_GATEWAY_SECRET"),
     hyperdrive,
     supabase: present("SUPABASE_URL") && (present("SUPABASE_PUBLISHABLE_KEY") || present("SUPABASE_ANON_KEY")),
   };
