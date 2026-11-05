@@ -81,6 +81,7 @@ export function DeveloperCenter() {
   const [busy, setBusy] = useState(false);
   const [overview, setOverview] = useState<Extract<Overview, { ok: true }> | null>(null);
   const [message, setMessage] = useState("");
+  const [overviewUnavailable, setOverviewUnavailable] = useState(false);
 
   useEffect(() => {
     const saved = developerToken();
@@ -89,13 +90,20 @@ export function DeveloperCenter() {
 
   useEffect(() => {
     if (!token) return;
+    let active = true;
     void developerOverview({ data: { token } }).then((result) => {
-      if (result.ok) setOverview(result);
-      else {
+      if (!active) return;
+      if (result.ok) {
+        setOverview(result);
+        setOverviewUnavailable(false);
+      } else {
         forgetDeveloperToken();
         setToken("");
       }
+    }).catch(() => {
+      if (active) setOverviewUnavailable(true);
     });
+    return () => { active = false; };
   }, [token, section]);
 
   if (!hydrated) return <main className="min-h-dvh bg-ink" />;
@@ -183,7 +191,11 @@ export function DeveloperCenter() {
         </nav>
       </aside>
       <main className="px-4 py-6 md:px-8">
-        {section === "overview" ? <OverviewPanel overview={overview} diagnosis={message} onDiagnose={() => void diagnose()} busy={busy} /> : null}
+        {section === "overview" ? (
+          overviewUnavailable ? (
+            <p role="status" className="text-sm text-on-photo/70">Live status is unavailable. Tools that need the database may be unavailable until it reconnects.</p>
+          ) : <OverviewPanel overview={overview} diagnosis={message} onDiagnose={() => void diagnose()} busy={busy} />
+        ) : null}
         {section === "users" ? <UsersPanel token={token} /> : null}
         {section === "weddings" ? <WeddingsPanel token={token} /> : null}
         {section === "pictures" ? <PicturesPanel token={token} /> : null}
