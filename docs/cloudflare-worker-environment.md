@@ -30,7 +30,7 @@ environment bindings and do not need duplicate declarations in Wrangler `vars`.
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_URL`
-- `SUPABASE_DB_URL)
+- `SUPABASE_DB_URL`
 
 ### Additional application settings to check before adding
 
