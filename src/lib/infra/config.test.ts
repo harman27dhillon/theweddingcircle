@@ -349,7 +349,7 @@ test("a normal RealtimeKit token is saved and a typed token without the provider
   assert.equal(blank.next.CLOUDFLARE_STREAM_API_TOKEN, previous.CLOUDFLARE_STREAM_API_TOKEN);
 });
 
-test("environment-only fields stay replaceable and vault values override them", () => {
+test("Cloudflare environment values take precedence over saved vault values", () => {
   const token = "f".repeat(40);
   const environment = {
     FIREBASE_PROJECT_ID: "env-id",
@@ -413,7 +413,7 @@ test("environment-only fields stay replaceable and vault values override them", 
   });
   assert.equal(blankKey.ok, true);
   if (blankKey.ok) assert.equal(blankKey.next.FIREBASE_API_KEY, other);
-  assert.equal(effectiveInfraEnv({ FIREBASE_API_KEY: other }, { FIREBASE_API_KEY: dirty }).FIREBASE_API_KEY, quoted);
+  assert.equal(effectiveInfraEnv({ FIREBASE_API_KEY: other }, { FIREBASE_API_KEY: dirty }).FIREBASE_API_KEY, other);
   const blank = mergeSavedConfig({
     provider: "livestream",
     incoming: { LIVESTREAM_PROVIDER: "cloudflare-realtimekit", CLOUDFLARE_ACCOUNT_ID: "a".repeat(32), CLOUDFLARE_REALTIME_APP_ID: "c".repeat(32), CLOUDFLARE_REALTIME_API_TOKEN: "" },
@@ -425,7 +425,7 @@ test("environment-only fields stay replaceable and vault values override them", 
   assert.equal(blank.next.CLOUDFLARE_REALTIME_API_TOKEN, replacement);
 });
 
-test("firebase identity, storage, and the infrastructure test use the resolved project number and vault", () => {
+test("Firebase identity and infrastructure checks use resolved Cloudflare configuration", () => {
   const identity = readFileSync(new URL("../wedding/firebase-identity.server.ts", import.meta.url), "utf8");
   const infra = readFileSync(new URL("./infra.server.ts", import.meta.url), "utf8");
   const cloud = readFileSync(new URL("../developer/cloud.server.ts", import.meta.url), "utf8");
