@@ -216,6 +216,9 @@ export default defineConfig(({ command, isPreview }) => ({
                 vars: {
                   MEDIA_GATEWAY_ENABLED: "yes",
                   MEDIA_GATEWAY_ORIGIN: "https://media.theweddingcircle.in",
+                  CDN_ENABLED: "yes",
+                  CDN_MEDIA_DOMAIN: "media.theweddingcircle.in",
+                  CDN_BASE_URL: "https://media.theweddingcircle.in",
                 },
               },
             },
