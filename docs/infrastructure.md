@@ -9,7 +9,7 @@ The app is a TanStack Start web app with a service worker. It is not a native An
 What already runs, and what this work does not replace:
 
 - Sign-in and wedding membership stay on the current account and member-key flow.
-- The app database is chosen by `src/lib/db.ts`: a Supabase URL if `SUPABASE_DB_URL` is set, otherwise the existing database URL if `DATABASE_URL` is set, otherwise an embedded preview database. A failed cloud connection is not silently replaced.
+- Supabase Postgres is the only persistent application database. `SUPABASE_DB_URL` or the Cloudflare `HYPERDRIVE` binding connects production; PGLite is disposable local preview only. A failed Supabase connection is never silently replaced.
 - Wedding media stays on the current library. Cloudflare R2 is an inactive adapter.
 - Live is the existing in-app camera until Cloudflare RealtimeKit is tested and armed. RealtimeKit is the only external live provider. It is not R2.
 - The one-time circle fee and theme lock stay as they are. Google Play Billing does not unlock anything by itself.
@@ -62,7 +62,7 @@ Set these on the server. Do not put secrets in frontend code. `.env.example` lis
 | `APP_ENV` | Public setting | Production mode | `development`, `test`, or `production`. Anything else is treated as development. |
 | `APP_PUBLIC_URL` | Public | Later links | Not required for the current app. |
 | `APP_API_URL` | Public | Later links | Not required for the current app. |
-| `DATABASE_URL` | Secret | Cloud database | Existing app database. Never printed. |
+| `SUPABASE_DB_URL` | Secret | Supabase Postgres | Persistent application database connection. Never printed. |
 | `SUPABASE_DB_URL` | Secret | Cloud database | If set to a Postgres URL, it is the database. Never printed. |
 | `FIREBASE_API_KEY` | Public web config, still not displayed | Firebase | Presence only. |
 | `FIREBASE_AUTH_DOMAIN` | Public web config | Firebase | Presence only. |
