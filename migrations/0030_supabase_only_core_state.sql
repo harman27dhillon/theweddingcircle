@@ -1,5 +1,5 @@
 -- Supabase is the only persistent application database. Normalize any
--- leftover migration flag so no runtime or operator view can imply a Neon route.
+-- leftover migration flag so the runtime and operator view both report Supabase as the persistent database.
 alter table public.developer_core_migration
   alter column cutover set default 'supabase';
 
