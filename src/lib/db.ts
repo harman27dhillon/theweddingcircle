@@ -181,8 +181,8 @@ async function createSupabaseSql(connectionString: string, mode: "direct" | "hyp
     eager: true,
   }) as Record<string, string>;
   const files = pendingMigrations(Object.keys(migrations), []).map(({ name, path }) => ({ name, sql: migrations[path] }));
-  await runSupabaseSchema(files, connectionString);
-  const opened = await openSupabaseSql(connectionString);
+  await runSupabaseSchema(files, connectionString, mode);
+  const opened = await openSupabaseSql(connectionString, mode);
   if (!opened.ok) throw new Error(opened.error);
   return opened.sql;
 }
