@@ -79,7 +79,10 @@ export function guardPausedWrites(sql: Sql): Sql {
 /** Wedding rows. When SUPABASE_DB_URL is set, this is the only database. A failure is not written to Neon. */
 export async function weddingDataSql(): Promise<Sql> {
   const production = !isWorkspacePreview() || Boolean(env("VERCEL"));
-  const supabaseConfigured = (env("SUPABASE_DB_URL") || "").startsWith("postgres");
+  // Cloudflare production uses Hyperdrive; local/preview may use the direct
+  // Supabase connection string. Either one means wedding data belongs on Supabase.
+  const hyperdrive = await (await import("@/lib/env.server")).hyperdriveConnectionString();
+  const supabaseConfigured = Boolean(hyperdrive) || (env("SUPABASE_DB_URL") || "").startsWith("postgres");
   const neonConfigured = dbSource === "neon";
   if (supabaseConfigured) {
     const opened = await openSupabaseSql();
