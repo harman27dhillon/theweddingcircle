@@ -22,6 +22,13 @@ export const CHECKS = [
 ] as const;
 
 export type Check = (typeof CHECKS)[number][0];
+
+export const INFRASTRUCTURE_CHECKS = [
+  ["firebase", "Firebase"], ["r2", "Cloudflare R2"], ["cdn", "Cloudflare CDN"],
+  ["stream", "Cloudflare Stream / RealtimeKit"], ["gateway", "Private Media Gateway"],
+  ["hyperdrive", "Hyperdrive"], ["supabase", "Supabase API"],
+] as const;
+export type InfrastructureCheck = (typeof INFRASTRUCTURE_CHECKS)[number][0];
 export type Diagnostic = {
   ok: boolean;
   message: string;
