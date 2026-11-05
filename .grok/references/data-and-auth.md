@@ -35,7 +35,7 @@ Full guides + snippets: the Supabase database configuration and the **`auth` ski
 ## Server functions
 
 `createServerFn` with input via `.validator()` — the current API on the
-installed version (`.inputValidator()` is deprecated). Examples in the `neon`
+installed version (`.inputValidator()` is deprecated). Examples in the Supabase database setup
 and `auth` skills.
 
 ## Auth wiring (only once §0.5 says accounts)
