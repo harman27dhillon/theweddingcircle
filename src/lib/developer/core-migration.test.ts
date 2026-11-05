@@ -71,7 +71,7 @@ test("cutover stays off until validation, a field compare, a database url, and e
 test("rollback cannot hide rows written after cutover", () => {
   const ready = { confirm: true, cutover: "supabase", frozen: true, reverseVerified: true, fieldCompareOk: true };
   assert.equal(decideRollback({ ...ready, confirm: false }).ok, false);
-  assert.equal(decideRollback({ ...ready, cutover: "neon" }).ok, false);
+  assert.equal(decideRollback({ ...ready, cutover: "not_supabase" }).ok, false);
   assert.equal(decideRollback({ ...ready, frozen: false }).ok, false);
   assert.equal(decideRollback({ ...ready, reverseVerified: false }).ok, false);
   assert.equal(decideRollback({ ...ready, fieldCompareOk: false }).ok, false);
