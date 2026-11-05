@@ -129,7 +129,25 @@ export async function testSupabaseApi(): Promise<Diagnostic> {
     if (response.status === 401 || response.status === 403) return { ok: false, message: "Supabase reached, but it refused the publishable key or API access." };
     if (!response.ok) return { ok: false, message: `The Supabase API answered with HTTP ${response.status}.` };
     return { ok: true, message: "Supabase accepted the publishable key. This checks HTTPS API access only.", checkedAt: new Date().toISOString() };
-  } catch {
-    return { ok: false, message: "The Supabase HTTPS API could not be reached." };
+  } catch (error) {
+    // Report only safe network diagnostics. Never expose request headers, keys,
+    // full URLs, or arbitrary exception messages in the Developer Center.
+    const cause = error && typeof error === "object" && "cause" in error
+      ? (error as { cause?: unknown }).cause
+      : undefined;
+    const causeCode = cause && typeof cause === "object" && "code" in cause
+      ? String((cause as { code?: unknown }).code ?? "")
+      : "";
+    const safeCode = /^[a-z0-9_:-]{1,64}$/i.test(causeCode) ? causeCode : "";
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    if (errorName === "TimeoutError" || errorName === "AbortError") {
+      return { ok: false, message: "Supabase request timed out after 8 seconds. Check Worker outbound connectivity and Supabase availability." };
+    }
+    return {
+      ok: false,
+      message: safeCode
+        ? `Supabase network request failed (${safeCode}).`
+        : `Supabase network request failed (${errorName}). The underlying fetch error was safely redacted.`,
+    };
   }
 }
