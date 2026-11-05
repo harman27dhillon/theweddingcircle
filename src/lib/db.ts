@@ -3,8 +3,6 @@ import { pendingMigrations } from "../../scripts/migration-plan.mjs";
 /** Which database backend is active. Supabase wins when its server URL is set. */
 export type DbSource = "supabase" | "pglite";
 
-// An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
-// "unset" — otherwise production would silently run on the PGLite fallback.
 function databaseSettings(environment: Record<string, string | undefined>, hasHyperdrive = false) {
   const rawSupabaseUrl = environment.SUPABASE_DB_URL;
   const supabaseUrl = rawSupabaseUrl && rawSupabaseUrl.trim().startsWith("postgres")
@@ -199,7 +197,7 @@ export function getSql(): Promise<Sql> {
 /**
  * The shared PGLite instance (preview only), with `migrations/*.sql` applied.
  * Lets Better Auth persist to the SAME embedded DB as app data in preview (via a
- * Kysely dialect). Throws when `DATABASE_URL` is set (that path uses Neon).
+ * Kysely dialect). Throws when Supabase is configured (the persistent database path).
  */
 export async function getPglite(): Promise<import("@electric-sql/pglite").PGlite> {
   await getSql();
