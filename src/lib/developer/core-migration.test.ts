@@ -45,7 +45,7 @@ test("supabase schema does not copy passwords, sessions or media bytes", () => {
   assert.doesNotMatch(SUPABASE_CORE_SQL, /circle_media_part|library_blobs|password|session/i);
 });
 
-test("additive supabase sql is not a Neon migration", () => {
+test("Supabase additive schema is maintained separately from root migrations", () => {
   const root = join(process.cwd(), "migrations");
   const top = readdirSync(root);
   assert.equal(top.includes("0017_wedding_core_additive.sql"), false);
@@ -171,33 +171,20 @@ test("public policies are rejected and sign-in stays off the wedding cutover", (
   const signIn = FEATURE_PATHS.find((item) => item.feature === "sign-in");
   const chat = FEATURE_PATHS.find((item) => item.feature === "chat");
   const media = FEATURE_PATHS.find((item) => item.feature === "media-bytes");
-  assert.equal(signIn?.storage, "neon");
+  assert.equal(signIn?.storage, "supabase");
   assert.equal(chat?.storage, "wedding-data");
-  assert.equal(media?.storage, "neon");
-  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "session")?.intended, "neon");
+  assert.equal(media?.storage, "supabase");
+  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "session")?.intended, "supabase");
   assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "circles")?.intended, "supabase");
-  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "circle_live")?.intended, "neon");
+  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "circle_live")?.intended, "supabase");
 });
 
-test("published wedding traffic does not fall back to the previous database", () => {
-  const open = {
-    production: true,
-    supabaseConfigured: true,
-    neonConfigured: true,
-    cutover: "supabase" as const,
-    phase: "cutover",
-    supabaseOpen: true,
-    activation: "not_needed" as const,
-  };
-  assert.equal(chooseWeddingRoute(open).use, "supabase");
-  assert.equal(chooseWeddingRoute({ ...open, supabaseOpen: false }).use, "refuse");
-  assert.equal(chooseWeddingRoute({ ...open, production: false, cutover: "neon" }).use, "supabase");
-  assert.equal(chooseWeddingRoute({ ...open, production: false, supabaseConfigured: false, cutover: "neon" }).use, "preview");
-  assert.equal(chooseWeddingRoute({ ...open, supabaseConfigured: false, neonConfigured: true, cutover: "neon" }).use, "neon");
-  assert.equal(chooseWeddingRoute({ ...open, supabaseConfigured: false, neonConfigured: false, production: true }).use, "refuse");
-  assert.equal(chooseWeddingRoute({ ...open, cutover: "neon", phase: "rolled_back", activation: "passed" }).use, "supabase");
-  assert.equal(chooseWeddingRoute({ ...open, cutover: "neon", phase: "idle", activation: "blocked", supabaseOpen: false }).use, "refuse");
-  assert.equal(chooseWeddingRoute({ ...open, cutover: "neon", phase: "idle", activation: "passed" }).use, "supabase");
+test("persistent routing is Supabase-only and fails closed when unavailable", () => {
+  assert.equal(chooseWeddingRoute({ production: true, supabaseConfigured: true, supabaseOpen: true }).use, "supabase");
+  assert.equal(chooseWeddingRoute({ production: true, supabaseConfigured: true, supabaseOpen: false }).use, "refuse");
+  assert.equal(chooseWeddingRoute({ production: true, supabaseConfigured: false, supabaseOpen: false }).use, "refuse");
+  assert.equal(chooseWeddingRoute({ production: false, supabaseConfigured: false, supabaseOpen: false }).use, "preview");
+  assert.equal(chooseWeddingRoute({ production: false, supabaseConfigured: true, supabaseOpen: false }).use, "refuse");
   assert.equal(reviewGrants([{ table: "circles", grantee: "anon", privilege: "SELECT" }]).ok, false);
   assert.equal(reviewGrants([]).ok, true);
 });
