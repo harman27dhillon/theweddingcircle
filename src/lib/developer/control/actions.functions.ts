@@ -60,7 +60,7 @@ export const developerControlCheck = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { requireControlSession } = await import("./session.server");
-    requireControlSession();
+    await requireControlSession();
     const check: Check = data.check;
     if (check === "initialize" && !data.confirm) return { ok: false, message: "Confirm schema initialization first." };
     if (check === "api") {
