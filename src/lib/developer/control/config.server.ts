@@ -114,11 +114,12 @@ export async function stageConfiguration(draft: ConfigDraft, clear: boolean): Pr
   }
 }
 
-export async function testSupabaseApi(): Promise<Diagnostic> {
+export async function testSupabaseApi(environment?: Record<string, string | undefined>): Promise<Diagnostic> {
   // Infrastructure credentials may be stored in the encrypted Infrastructure vault,
-  // not in the Developer Center's separate WC_DEVELOPER_* settings.
-  const resolved = await resolvedInfraEnv();
-  const config = readControlConfig(resolved.env);
+  // not in the Developer Center's separate WC_DEVELOPER_* settings. Callers that
+  // already resolved the vault can pass that environment to avoid a second DB lookup.
+  const resolvedEnvironment = environment ?? (await resolvedInfraEnv()).env;
+  const config = readControlConfig(resolvedEnvironment);
   const url = projectUrl(config.SUPABASE_URL);
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable key in Infrastructure settings first." };
