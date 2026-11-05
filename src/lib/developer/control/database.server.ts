@@ -147,21 +147,32 @@ function failure(error: unknown, opened: boolean): Diagnostic {
 
 export async function runDatabaseCheck(check: Exclude<Check, "api">): Promise<Diagnostic> {
   const config = readControlConfig(await serverEnvironment());
-  if (!config.SUPABASE_DB_URL) return { ok: false, message: "Configure SUPABASE_DB_URL to run a Postgres check." };
-  const project = projectUrl(config.SUPABASE_URL);
-  if (!project) return { ok: false, message: "Configure SUPABASE_URL so the database check can verify the intended project." };
-  const invalid = validateDatabaseUrl(config.SUPABASE_DB_URL, project);
-  if (invalid) return { ok: false, message: invalid };
-  const parsed = parse(config.SUPABASE_DB_URL);
+  let hyperdriveConnectionString = "";
+  try {
+    const runtime = await import("cloudflare:workers");
+    hyperdriveConnectionString = runtime.env.HYPERDRIVE?.connectionString || "";
+  } catch {}
+  const usingHyperdrive = Boolean(hyperdriveConnectionString);
+  const connectionString = hyperdriveConnectionString || config.SUPABASE_DB_URL;
+  if (!connectionString) return { ok: false, message: "Neither the HYPERDRIVE binding nor SUPABASE_DB_URL is configured." };
+  if (!usingHyperdrive) {
+    const project = projectUrl(config.SUPABASE_URL);
+    if (!project) return { ok: false, message: "Configure SUPABASE_URL so the direct database check can verify the intended project." };
+    const invalid = validateDatabaseUrl(connectionString, project);
+    if (invalid) return { ok: false, message: invalid };
+  }
+  const parsed = usingHyperdrive ? null : parse(connectionString);
   let db: Client | undefined;
   let opened = false;
   try {
     const { Client } = await import("pg");
-    db = new Client({
-      host: parsed.host || undefined, port: Number(parsed.port), database: parsed.database || undefined,
-      user: parsed.user || undefined, password: parsed.password || undefined, ssl: trustedSupabaseSsl(),
-      connectionTimeoutMillis: 8_000, query_timeout: 10_000,
-    });
+    db = new Client(usingHyperdrive
+      ? { connectionString, connectionTimeoutMillis: 8_000, query_timeout: 10_000 }
+      : {
+          host: parsed!.host || undefined, port: Number(parsed!.port), database: parsed!.database || undefined,
+          user: parsed!.user || undefined, password: parsed!.password || undefined, ssl: trustedSupabaseSsl(),
+          connectionTimeoutMillis: 8_000, query_timeout: 10_000,
+        });
     await db.connect();
     opened = true;
     await db.query("set statement_timeout = '8s'");
