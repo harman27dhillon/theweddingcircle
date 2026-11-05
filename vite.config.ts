@@ -213,6 +213,9 @@ export default defineConfig(({ command, isPreview }) => ({
             cloudflare: {
               wrangler: {
                 name: "theweddingcircle",
+                vars: {
+                  CLOUDFLARE_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
+                },
                 hyperdrive: [
                   {
                     binding: "HYPERDRIVE",
