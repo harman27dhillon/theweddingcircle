@@ -17,6 +17,20 @@ export async function serverEnvironment(): Promise<Record<string, string | undef
   return values;
 }
 
+/** Read the non-string Hyperdrive binding from the Cloudflare Worker runtime. */
+export async function hyperdriveConnectionString(): Promise<string | undefined> {
+  try {
+    const runtime = await import("cloudflare:workers");
+    const binding = (runtime.env as { HYPERDRIVE?: { connectionString?: unknown } }).HYPERDRIVE;
+    return typeof binding?.connectionString === "string" && binding.connectionString.trim()
+      ? binding.connectionString
+      : undefined;
+  } catch {
+    // Local Node and preview runtimes use SUPABASE_DB_URL directly.
+    return undefined;
+  }
+}
+
 /**
  * Workspace preview vs deployed app. The deployer writes GROK_PROJECT_ID on
  * every publish; the sandbox preview never has it. Single source of truth for
