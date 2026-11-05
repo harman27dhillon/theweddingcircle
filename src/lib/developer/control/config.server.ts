@@ -63,7 +63,7 @@ export async function configurationStatus() {
   } catch { /* non-Worker runtime */ }
   return {
     configured: Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, Boolean(config[name])])) as Record<ConfigName, boolean>,
-    databaseConfigured: Boolean(config.SUPABASE_DB_URL),
+    databaseConfigured: Boolean(config.SUPABASE_DB_URL) || hyperdrive,
     cloudflare,
     hyperdrive,
     canStage: Boolean(secretWriter(environment)),
