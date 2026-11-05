@@ -42,7 +42,7 @@ rejects every visitor — auth-off apps use neither it nor `authMiddleware`.
 
 Everything is **preinstalled and pre-wired in `src/lib/auth/`** — do not
 `npm install` anything; `better-auth` is the only auth package (never
-`@neondatabase/*`, `@stackframe/*`, or `@clerk/*`). **Do not edit or rewrite any
+`@stackframe/*` or `@clerk/*`). **Do not edit or rewrite any
 file under `src/lib/auth/`** — `server.ts` least of all — except
 `email-password.ts` for its one flag. Per-file map:
 `references/prewired-and-env.md`.
