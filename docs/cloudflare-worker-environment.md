@@ -71,7 +71,6 @@ Do not add any of the following:
 - `LIVEKIT_API_KEY`
 - `LIVEKIT_API_SECRET`
 - `OPENAI_API_KEY`
-- `NEON_AUTH_BASE_URL`
 - `GOOGLE_OAUTH_CLIENT_ID`
 - `GOOGLE_OAUTH_CLIENT_SECRET`
 
@@ -94,7 +93,7 @@ name before deploying that separate Worker.
 - Non-secret values belong in Wrangler `vars` only when their real production values
   are known. Do not deploy blank placeholders over existing working values.
 - Supabase has two distinct settings: `SUPABASE_URL` / keys for its API and
-  `SUPABASE_DB_URL` for direct PostgreSQL fallback. The app prefers the Hyperdrive
+  `SUPABASE_DB_URL` for direct PostgreSQL access. The app prefers the Hyperdrive
   connection when that binding exists.
 - Do not switch traffic, enable a provider, or deploy the media-gateway Worker as part
   of this inventory change.
