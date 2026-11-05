@@ -148,13 +148,13 @@ export const SCHEMA_INVENTORY = [
   { name: "developer_cloud_requests", current: "supabase", intended: "supabase", kind: "table", holds: "Cloud choice requests" },
   { name: "developer_cloud_active", current: "supabase", intended: "supabase", kind: "table", holds: "Active cloud choices" },
   { name: "developer_secret_vault", current: "supabase", intended: "supabase", kind: "table", holds: "Encrypted affiliate secrets" },
-  { name: "developer_core_migration", current: "supabase", intended: "supabase", kind: "table", holds: "Cutover flag. Must stay on Neon so routing can be read before Supabase is used." },
+  { name: "developer_core_migration", current: "supabase", intended: "supabase", kind: "table", holds: "Legacy migration-state metadata; routing is now fixed to Supabase." },
   { name: "push_devices", current: "supabase", intended: "supabase", kind: "table", holds: "Push device tokens" },
   { name: "discover_bots", current: "supabase", intended: "supabase", kind: "table", holds: "Discover crawler config" },
   { name: "discover_runs", current: "supabase", intended: "supabase", kind: "table", holds: "Discover run history" },
   { name: "discover_products", current: "supabase", intended: "supabase", kind: "table", holds: "Discover product rows" },
   { name: "affiliate_link_status", current: "supabase", intended: "supabase", kind: "table", holds: "Affiliate link status" },
-  { name: "_migrations", current: "supabase", intended: "supabase", kind: "table", holds: "Applied Neon migration names" },
+  { name: "_migrations", current: "supabase", intended: "supabase", kind: "table", holds: "Applied application migration names" },
 ] as const;
 
 export const FEATURE_PATHS = [
