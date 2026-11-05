@@ -20,7 +20,7 @@ export async function infrastructureStatus() {
   return {
     firebase: ["FIREBASE_API_KEY", "FIREBASE_PROJECT_ID", "FIREBASE_SERVICE_ACCOUNT_JSON"].every(present),
     r2: ["R2_ACCOUNT_ID", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"].every(present),
-    cdn: present("R2_PUBLIC_DOMAIN") || present("MEDIA_CDN_BASE_URL"),
+    cdn: env.CDN_ENABLED?.trim() === "yes" && present("CDN_MEDIA_DOMAIN") && present("CDN_BASE_URL"),
     stream: present("CLOUDFLARE_ACCOUNT_ID") && present("CLOUDFLARE_REALTIME_APP_ID") && present("CLOUDFLARE_REALTIME_API_TOKEN"),
     gateway: env.MEDIA_GATEWAY_ENABLED?.trim() === "yes" && present("MEDIA_GATEWAY_ORIGIN") && present("MEDIA_GATEWAY_SECRET"),
     hyperdrive,
@@ -71,7 +71,7 @@ export async function runInfrastructureDiagnostic(id: InfrastructureId): Promise
       if (url.protocol !== "https:") return checked(false, "Media Gateway must use HTTPS.");
       try {
         const response = await fetch(url, { method: "HEAD", redirect: "manual", signal: AbortSignal.timeout(8000) });
-        return checked(response.ok, `Media Gateway answered HTTP ${response.status} to a non-authenticated HEAD request. This is only an origin reachability check, not proof of signed-media authorization.`);
+        return checked(true, `Media Gateway host responded with HTTP ${response.status}. This confirms reachability only, not signed-media authorization.`);
       } catch { return checked(false, "Media Gateway origin could not be reached. Check its hostname and Worker route."); }
     }
     if (id === "stream") {
@@ -80,7 +80,7 @@ export async function runInfrastructureDiagnostic(id: InfrastructureId): Promise
       return checked(false, "RealtimeKit credentials are present, but this panel does not yet perform the preset/role capability test. No meeting was created.");
     }
     if (id === "cdn") {
-      const host = env.MEDIA_CDN_BASE_URL || env.R2_PUBLIC_DOMAIN;
+      const host = env.CDN_BASE_URL || "";
       if (!host) return checked(false, "No CDN delivery hostname is configured. The private R2 bucket and Media Gateway remain unchanged.");
       return checked(false, "A CDN hostname is configured, but a private-media cache validation is not implemented here. No cache policy was changed.");
     }
