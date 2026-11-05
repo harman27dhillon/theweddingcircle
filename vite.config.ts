@@ -210,7 +210,17 @@ export default defineConfig(({ command, isPreview }) => ({
       ? [
           nitro({
             preset: "cloudflare-module",
-            cloudflare: { wrangler: { name: "theweddingcircle" } },
+            cloudflare: {
+              wrangler: {
+                name: "theweddingcircle",
+                hyperdrive: [
+                  {
+                    binding: "HYPERDRIVE",
+                    id: "7cc99881548c416db610ead45c7b0f51",
+                  },
+                ],
+              },
+            },
             // Auto-registers server/middleware/* (the PWA install page +
             // manifest + head-tag middleware). Nitro v3 defaults serverDir to
             // false, so removing this silently unwires /?install=1 on deploys.
