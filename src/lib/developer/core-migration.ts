@@ -2,7 +2,7 @@ export const CORE_TABLES = ["circles", "circle_members", "circle_auth", "ceremon
 
 export type CoreTable = (typeof CORE_TABLES)[number];
 
-/** Applied only to Supabase, never to Neon. RLS stays on with no public policies. */
+/** Supabase wedding schema. RLS stays on with no public policies. */
 export const SUPABASE_CORE_SQL = `
 create table if not exists public.circles (
   slug text primary key,
@@ -112,56 +112,54 @@ export const CORE_PRIMARY_KEYS: Record<CoreTable, readonly string[]> = {
 const JSON_COLUMNS = new Set(["payload", "ceremonies"]);
 
 /**
- * Current database is Neon, or the embedded fallback when Neon is unset.
- * Intended database is where a future approved cutover may serve that data.
- * This list does not switch traffic.
+ * All persistent application tables are hosted in Supabase. PGLite is a disposable local preview only.
  */
 export const SCHEMA_INVENTORY = [
-  { name: "circles", current: "neon", intended: "supabase", kind: "table", holds: "Wedding record, including chat, posts and notes inside payload" },
-  { name: "circle_members", current: "neon", intended: "supabase", kind: "table", holds: "Membership rows" },
-  { name: "circle_auth", current: "neon", intended: "supabase", kind: "table", holds: "Host, family and guest access codes" },
-  { name: "ceremony_invites", current: "neon", intended: "supabase", kind: "table", holds: "Ceremony invitation tokens" },
-  { name: "couple_access", current: "neon", intended: "supabase", kind: "table", holds: "Bride and groom seat codes" },
-  { name: "circle_live", current: "neon", intended: "neon", kind: "table", holds: "Ephemeral live-room presence. Not part of this cutover." },
-  { name: "circle_live_signal", current: "neon", intended: "neon", kind: "table", holds: "Ephemeral live signaling. Not part of this cutover." },
-  { name: "circle_media", current: "neon", intended: "neon", kind: "table", holds: "Media metadata and storage pointer. Bytes stay on current storage." },
-  { name: "circle_media_part", current: "neon", intended: "neon", kind: "table", holds: "Media bytes stored as text chunks" },
-  { name: "circle_media_remote", current: "neon", intended: "neon", kind: "table", holds: "Remote media chunk sizes" },
-  { name: "library_assets", current: "neon", intended: "neon", kind: "table", holds: "Library file metadata" },
-  { name: "library_blobs", current: "neon", intended: "neon", kind: "table", holds: "Library file bytes" },
-  { name: "library_retired", current: "neon", intended: "neon", kind: "table", holds: "Retired library ids" },
-  { name: "google_connections", current: "neon", intended: "neon", kind: "table", holds: "Google Drive account link. Contains a refresh token." },
-  { name: "google_media", current: "neon", intended: "neon", kind: "table", holds: "Google Drive file ids, not file bytes" },
-  { name: "google_uploads", current: "neon", intended: "neon", kind: "table", holds: "In-progress Google upload URLs" },
-  { name: "google_app", current: "neon", intended: "neon", kind: "table", holds: "Google OAuth client secret" },
-  { name: "user", current: "neon", intended: "neon", kind: "table", holds: "Better Auth account" },
-  { name: "session", current: "neon", intended: "neon", kind: "table", holds: "Better Auth browser session" },
-  { name: "account", current: "neon", intended: "neon", kind: "table", holds: "Better Auth provider link" },
-  { name: "verification", current: "neon", intended: "neon", kind: "table", holds: "Better Auth verification token" },
-  { name: "developer_sessions", current: "neon", intended: "neon", kind: "table", holds: "Developer console session" },
-  { name: "developer_audit", current: "neon", intended: "neon", kind: "table", holds: "Developer audit log" },
-  { name: "developer_flags", current: "neon", intended: "neon", kind: "table", holds: "Developer flags" },
-  { name: "developer_config", current: "neon", intended: "neon", kind: "table", holds: "Developer config" },
-  { name: "developer_errors", current: "neon", intended: "neon", kind: "table", holds: "Developer error log" },
-  { name: "developer_proposals", current: "neon", intended: "neon", kind: "table", holds: "Developer proposals" },
-  { name: "developer_revisions", current: "neon", intended: "neon", kind: "table", holds: "Developer file revisions" },
-  { name: "developer_cloud_public", current: "neon", intended: "neon", kind: "table", holds: "Public cloud config" },
-  { name: "developer_cloud_tests", current: "neon", intended: "neon", kind: "table", holds: "Cloud connection tests" },
-  { name: "developer_cloud_requests", current: "neon", intended: "neon", kind: "table", holds: "Cloud choice requests" },
-  { name: "developer_cloud_active", current: "neon", intended: "neon", kind: "table", holds: "Active cloud choices" },
-  { name: "developer_secret_vault", current: "neon", intended: "neon", kind: "table", holds: "Encrypted affiliate secrets" },
-  { name: "developer_core_migration", current: "neon", intended: "neon", kind: "table", holds: "Cutover flag. Must stay on Neon so routing can be read before Supabase is used." },
-  { name: "push_devices", current: "neon", intended: "neon", kind: "table", holds: "Push device tokens" },
-  { name: "discover_bots", current: "neon", intended: "neon", kind: "table", holds: "Discover crawler config" },
-  { name: "discover_runs", current: "neon", intended: "neon", kind: "table", holds: "Discover run history" },
-  { name: "discover_products", current: "neon", intended: "neon", kind: "table", holds: "Discover product rows" },
-  { name: "affiliate_link_status", current: "neon", intended: "neon", kind: "table", holds: "Affiliate link status" },
-  { name: "_migrations", current: "neon", intended: "neon", kind: "table", holds: "Applied Neon migration names" },
+  { name: "circles", current: "supabase", intended: "supabase", kind: "table", holds: "Wedding record, including chat, posts and notes inside payload" },
+  { name: "circle_members", current: "supabase", intended: "supabase", kind: "table", holds: "Membership rows" },
+  { name: "circle_auth", current: "supabase", intended: "supabase", kind: "table", holds: "Host, family and guest access codes" },
+  { name: "ceremony_invites", current: "supabase", intended: "supabase", kind: "table", holds: "Ceremony invitation tokens" },
+  { name: "couple_access", current: "supabase", intended: "supabase", kind: "table", holds: "Bride and groom seat codes" },
+  { name: "circle_live", current: "supabase", intended: "supabase", kind: "table", holds: "Ephemeral live-room presence. Not part of this cutover." },
+  { name: "circle_live_signal", current: "supabase", intended: "supabase", kind: "table", holds: "Ephemeral live signaling. Not part of this cutover." },
+  { name: "circle_media", current: "supabase", intended: "supabase", kind: "table", holds: "Media metadata and storage pointer. Bytes stay on current storage." },
+  { name: "circle_media_part", current: "supabase", intended: "supabase", kind: "table", holds: "Media bytes stored as text chunks" },
+  { name: "circle_media_remote", current: "supabase", intended: "supabase", kind: "table", holds: "Remote media chunk sizes" },
+  { name: "library_assets", current: "supabase", intended: "supabase", kind: "table", holds: "Library file metadata" },
+  { name: "library_blobs", current: "supabase", intended: "supabase", kind: "table", holds: "Library file bytes" },
+  { name: "library_retired", current: "supabase", intended: "supabase", kind: "table", holds: "Retired library ids" },
+  { name: "google_connections", current: "supabase", intended: "supabase", kind: "table", holds: "Google Drive account link. Contains a refresh token." },
+  { name: "google_media", current: "supabase", intended: "supabase", kind: "table", holds: "Google Drive file ids, not file bytes" },
+  { name: "google_uploads", current: "supabase", intended: "supabase", kind: "table", holds: "In-progress Google upload URLs" },
+  { name: "google_app", current: "supabase", intended: "supabase", kind: "table", holds: "Google OAuth client secret" },
+  { name: "user", current: "supabase", intended: "supabase", kind: "table", holds: "Better Auth account" },
+  { name: "session", current: "supabase", intended: "supabase", kind: "table", holds: "Better Auth browser session" },
+  { name: "account", current: "supabase", intended: "supabase", kind: "table", holds: "Better Auth provider link" },
+  { name: "verification", current: "supabase", intended: "supabase", kind: "table", holds: "Better Auth verification token" },
+  { name: "developer_sessions", current: "supabase", intended: "supabase", kind: "table", holds: "Developer console session" },
+  { name: "developer_audit", current: "supabase", intended: "supabase", kind: "table", holds: "Developer audit log" },
+  { name: "developer_flags", current: "supabase", intended: "supabase", kind: "table", holds: "Developer flags" },
+  { name: "developer_config", current: "supabase", intended: "supabase", kind: "table", holds: "Developer config" },
+  { name: "developer_errors", current: "supabase", intended: "supabase", kind: "table", holds: "Developer error log" },
+  { name: "developer_proposals", current: "supabase", intended: "supabase", kind: "table", holds: "Developer proposals" },
+  { name: "developer_revisions", current: "supabase", intended: "supabase", kind: "table", holds: "Developer file revisions" },
+  { name: "developer_cloud_public", current: "supabase", intended: "supabase", kind: "table", holds: "Public cloud config" },
+  { name: "developer_cloud_tests", current: "supabase", intended: "supabase", kind: "table", holds: "Cloud connection tests" },
+  { name: "developer_cloud_requests", current: "supabase", intended: "supabase", kind: "table", holds: "Cloud choice requests" },
+  { name: "developer_cloud_active", current: "supabase", intended: "supabase", kind: "table", holds: "Active cloud choices" },
+  { name: "developer_secret_vault", current: "supabase", intended: "supabase", kind: "table", holds: "Encrypted affiliate secrets" },
+  { name: "developer_core_migration", current: "supabase", intended: "supabase", kind: "table", holds: "Cutover flag. Must stay on Neon so routing can be read before Supabase is used." },
+  { name: "push_devices", current: "supabase", intended: "supabase", kind: "table", holds: "Push device tokens" },
+  { name: "discover_bots", current: "supabase", intended: "supabase", kind: "table", holds: "Discover crawler config" },
+  { name: "discover_runs", current: "supabase", intended: "supabase", kind: "table", holds: "Discover run history" },
+  { name: "discover_products", current: "supabase", intended: "supabase", kind: "table", holds: "Discover product rows" },
+  { name: "affiliate_link_status", current: "supabase", intended: "supabase", kind: "table", holds: "Affiliate link status" },
+  { name: "_migrations", current: "supabase", intended: "supabase", kind: "table", holds: "Applied Neon migration names" },
 ] as const;
 
 export const FEATURE_PATHS = [
-  { feature: "sign-in", storage: "neon", tables: ["user", "account"] },
-  { feature: "account-session", storage: "neon", tables: ["session"] },
+  { feature: "sign-in", storage: "supabase", tables: ["user", "account"] },
+  { feature: "account-session", storage: "supabase", tables: ["session"] },
   { feature: "create-wedding", storage: "wedding-data", tables: ["circles", "circle_auth", "circle_members"] },
   { feature: "join-guest-or-family", storage: "wedding-data", tables: ["circle_auth", "circle_members"] },
   { feature: "membership", storage: "wedding-data", tables: ["circle_members"] },
@@ -169,14 +167,14 @@ export const FEATURE_PATHS = [
   { feature: "invitation", storage: "wedding-data", tables: ["ceremony_invites"] },
   { feature: "couple-permission", storage: "wedding-data", tables: ["couple_access", "circles"] },
   { feature: "chat", storage: "wedding-data", tables: ["circles"] },
-  { feature: "media-reference", storage: "neon", tables: ["circle_media", "google_media"] },
-  { feature: "media-bytes", storage: "neon", tables: ["circle_media_part", "library_blobs"] },
-  { feature: "live-room", storage: "neon", tables: ["circle_live", "circle_live_signal"] },
+  { feature: "media-reference", storage: "supabase", tables: ["circle_media", "google_media"] },
+  { feature: "media-bytes", storage: "supabase", tables: ["circle_media_part", "library_blobs"] },
+  { feature: "live-room", storage: "supabase", tables: ["circle_live", "circle_live_signal"] },
   { feature: "live-membership-check", storage: "wedding-data", tables: ["circle_members"] },
 ] as const;
 
 export const AUTH_NOTE =
-  "Wedding access codes in circle_auth and couple_access move with those rows. Better Auth password hashes, sessions, and Supabase Auth users are not copied. Account sign-in stays on the current database, and cutover does not reset sessions.";
+  "Wedding access codes, Better Auth accounts, and sessions use the configured Supabase Postgres database. No cross-database copy is performed.";
 
 export const MEDIA_NOTE =
   "Photos and videos stay in the current library. This migration copies their existing URLs inside the wedding record and does not copy file bytes or change those URLs.";
@@ -185,7 +183,7 @@ export const SETUP_NOTE =
   "Supabase Postgres reads only SUPABASE_DB_URL, exactly as stored. The server does not rewrite the username or decode the password a second time. Use the generated session-pooler URI. Do not paste it into this page or into chat.";
 
 export const ROLLBACK_NOTE =
-  "Rollback does not run by flipping a flag. Wedding writes are paused, Supabase rows are copied back onto the current database, and every core field is compared. Routing returns to the current database only after that compare matches. Neither database is deleted.";
+  "Supabase is the sole persistent database. There is no secondary database rollback route.";
 
 export function writesPaused(phase: string) {
   return phase === "frozen" || phase === "reverse_verified" || phase === "syncing";
@@ -404,43 +402,14 @@ export function shouldAutoActivate(cutover: string, phase: string) {
   return true;
 }
 
-export function chooseWeddingRoute(input: {
-  production: boolean;
-  supabaseConfigured: boolean;
-  neonConfigured: boolean;
-  cutover: "neon" | "supabase";
-  phase: string;
-  supabaseOpen: boolean;
-  activation: "not_needed" | "passed" | "blocked" | "waiting";
-}) {
-  if (input.supabaseConfigured) {
-    if (!input.supabaseOpen) {
-      return {
-        use: "refuse" as const,
-        reason: "Supabase is the configured database, but it could not be opened. Nothing was read from or written to another database.",
-      };
-    }
-    return {
-      use: "supabase" as const,
-      reason: "Wedding records use Supabase Postgres. A connection failure is not sent to another database.",
-    };
+export function chooseWeddingRoute(input: { production: boolean; supabaseConfigured: boolean; supabaseOpen: boolean }) {
+  if (input.supabaseConfigured && input.supabaseOpen) {
+    return { use: "supabase" as const, reason: "Persistent application data uses Supabase Postgres." };
   }
-  if (!input.production) {
-    return {
-      use: "preview" as const,
-      reason: "SUPABASE_DB_URL is not set, so this preview uses the local database.",
-    };
+  if (!input.production && !input.supabaseConfigured) {
+    return { use: "preview" as const, reason: "Local preview uses disposable PGLite." };
   }
-  if (input.neonConfigured) {
-    return {
-      use: "neon" as const,
-      reason: "SUPABASE_DB_URL is not set. Wedding traffic is still on the previous database. Set that server variable to move ordinary operation to Supabase. Nothing was copied.",
-    };
-  }
-  return {
-    use: "refuse" as const,
-    reason: "No database is configured for this published server. Set SUPABASE_DB_URL. Nothing was written to a substitute.",
-  };
+  return { use: "refuse" as const, reason: "Supabase is unavailable or not configured. No fallback database will be used." };
 }
 
 export function schemaLooksSafe(sql: string) {
