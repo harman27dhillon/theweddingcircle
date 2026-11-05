@@ -31,7 +31,7 @@ export async function infrastructureStatus() {
 export async function runInfrastructureDiagnostic(id: InfrastructureId): Promise<InfrastructureDiagnostic> {
   const { env } = await (await import("@/lib/infra/resolved-env.server")).resolvedInfraEnv();
   try {
-    if (id === "supabase") return testSupabaseApi();
+    if (id === "supabase") return testSupabaseApi(env);
     if (id === "hyperdrive") {
       const runtime = await import("cloudflare:workers");
       const connectionString = runtime.env.HYPERDRIVE?.connectionString;

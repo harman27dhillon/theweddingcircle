@@ -210,7 +210,33 @@ export default defineConfig(({ command, isPreview }) => ({
       ? [
           nitro({
             preset: "cloudflare-module",
-            cloudflare: { wrangler: { name: "theweddingcircle" } },
+            cloudflare: {
+              wrangler: {
+                name: "theweddingcircle",
+                observability: {
+                  enabled: true,
+                },
+                vars: {
+                  CLOUDFLARE_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
+                  CLOUDFLARE_REALTIME_APP_ID: "d59fd1e8-4e0b-48b6-b11c-510594e0327c",
+                  FIREBASE_PROJECT_ID: "the-wedding-circle-b316b",
+                  FIREBASE_APP_ID: "1:637941576967:web:485b3de1463dcd8895c1a2",
+                  FIREBASE_AUTH_DOMAIN: "the-wedding-circle-b316b.firebaseapp.com",
+                  FIREBASE_MESSAGING_SENDER_ID: "637941576967",
+                  MEDIA_GATEWAY_ENABLED: "yes",
+                  MEDIA_GATEWAY_ORIGIN: "https://media.theweddingcircle.in",
+                  R2_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
+                  R2_BUCKET: "wedding-circle-media",
+                  SUPABASE_URL: "https://vyto1hwepbtzinvceucf.supabase.co",
+                },
+                hyperdrive: [
+                  {
+                    binding: "HYPERDRIVE",
+                    id: "7cc99881548c416db610ead45c7b0f51",
+                  },
+                ],
+              },
+            },
             // Auto-registers server/middleware/* (the PWA install page +
             // manifest + head-tag middleware). Nitro v3 defaults serverDir to
             // false, so removing this silently unwires /?install=1 on deploys.

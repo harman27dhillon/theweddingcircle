@@ -45,7 +45,7 @@ test("supabase schema does not copy passwords, sessions or media bytes", () => {
   assert.doesNotMatch(SUPABASE_CORE_SQL, /circle_media_part|library_blobs|password|session/i);
 });
 
-test("additive supabase sql is not a Neon migration", () => {
+test("Supabase additive schema is maintained separately from root migrations", () => {
   const root = join(process.cwd(), "migrations");
   const top = readdirSync(root);
   assert.equal(top.includes("0017_wedding_core_additive.sql"), false);
@@ -71,7 +71,7 @@ test("cutover stays off until validation, a field compare, a database url, and e
 test("rollback cannot hide rows written after cutover", () => {
   const ready = { confirm: true, cutover: "supabase", frozen: true, reverseVerified: true, fieldCompareOk: true };
   assert.equal(decideRollback({ ...ready, confirm: false }).ok, false);
-  assert.equal(decideRollback({ ...ready, cutover: "neon" }).ok, false);
+  assert.equal(decideRollback({ ...ready, cutover: "not_supabase" }).ok, false);
   assert.equal(decideRollback({ ...ready, frozen: false }).ok, false);
   assert.equal(decideRollback({ ...ready, reverseVerified: false }).ok, false);
   assert.equal(decideRollback({ ...ready, fieldCompareOk: false }).ok, false);
@@ -83,10 +83,10 @@ test("rollback cannot hide rows written after cutover", () => {
   assert.equal(writesPaused("reverse_verified"), true);
   assert.equal(writesPaused("syncing"), true);
   assert.equal(writesPaused("cutover"), false);
-  assert.equal(shouldAutoActivate("neon", "idle"), true);
-  assert.equal(shouldAutoActivate("neon", "invalid"), true);
-  assert.equal(shouldAutoActivate("supabase", "cutover"), false);
-  assert.equal(shouldAutoActivate("neon", "rolled_back"), false);
+  assert.equal(shouldAutoActivate("idle"), true);
+  assert.equal(shouldAutoActivate("invalid"), true);
+  assert.equal(shouldAutoActivate("cutover"), false);
+  assert.equal(shouldAutoActivate("rolled_back"), false);
 });
 
 test("record counts must match before a migration is treated as aligned", () => {
@@ -171,33 +171,20 @@ test("public policies are rejected and sign-in stays off the wedding cutover", (
   const signIn = FEATURE_PATHS.find((item) => item.feature === "sign-in");
   const chat = FEATURE_PATHS.find((item) => item.feature === "chat");
   const media = FEATURE_PATHS.find((item) => item.feature === "media-bytes");
-  assert.equal(signIn?.storage, "neon");
+  assert.equal(signIn?.storage, "supabase");
   assert.equal(chat?.storage, "wedding-data");
-  assert.equal(media?.storage, "neon");
-  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "session")?.intended, "neon");
+  assert.equal(media?.storage, "supabase");
+  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "session")?.intended, "supabase");
   assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "circles")?.intended, "supabase");
-  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "circle_live")?.intended, "neon");
+  assert.equal(SCHEMA_INVENTORY.find((item) => item.name === "circle_live")?.intended, "supabase");
 });
 
-test("published wedding traffic does not fall back to the previous database", () => {
-  const open = {
-    production: true,
-    supabaseConfigured: true,
-    neonConfigured: true,
-    cutover: "supabase" as const,
-    phase: "cutover",
-    supabaseOpen: true,
-    activation: "not_needed" as const,
-  };
-  assert.equal(chooseWeddingRoute(open).use, "supabase");
-  assert.equal(chooseWeddingRoute({ ...open, supabaseOpen: false }).use, "refuse");
-  assert.equal(chooseWeddingRoute({ ...open, production: false, cutover: "neon" }).use, "supabase");
-  assert.equal(chooseWeddingRoute({ ...open, production: false, supabaseConfigured: false, cutover: "neon" }).use, "preview");
-  assert.equal(chooseWeddingRoute({ ...open, supabaseConfigured: false, neonConfigured: true, cutover: "neon" }).use, "neon");
-  assert.equal(chooseWeddingRoute({ ...open, supabaseConfigured: false, neonConfigured: false, production: true }).use, "refuse");
-  assert.equal(chooseWeddingRoute({ ...open, cutover: "neon", phase: "rolled_back", activation: "passed" }).use, "supabase");
-  assert.equal(chooseWeddingRoute({ ...open, cutover: "neon", phase: "idle", activation: "blocked", supabaseOpen: false }).use, "refuse");
-  assert.equal(chooseWeddingRoute({ ...open, cutover: "neon", phase: "idle", activation: "passed" }).use, "supabase");
+test("persistent routing is Supabase-only and fails closed when unavailable", () => {
+  assert.equal(chooseWeddingRoute({ production: true, supabaseConfigured: true, supabaseOpen: true }).use, "supabase");
+  assert.equal(chooseWeddingRoute({ production: true, supabaseConfigured: true, supabaseOpen: false }).use, "refuse");
+  assert.equal(chooseWeddingRoute({ production: true, supabaseConfigured: false, supabaseOpen: false }).use, "refuse");
+  assert.equal(chooseWeddingRoute({ production: false, supabaseConfigured: false, supabaseOpen: false }).use, "preview");
+  assert.equal(chooseWeddingRoute({ production: false, supabaseConfigured: true, supabaseOpen: false }).use, "refuse");
   assert.equal(reviewGrants([{ table: "circles", grantee: "anon", privilege: "SELECT" }]).ok, false);
   assert.equal(reviewGrants([]).ok, true);
 });
@@ -274,7 +261,7 @@ test("reconcile preserves destination-only rows until an explicit archive and co
 
 test("browser code does not contain database credentials", () => {
   const roots = [join(process.cwd(), "src", "components"), join(process.cwd(), "src", "routes")];
-  const banned = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_DB_URL", "DATABASE_URL", "postgres://", "postgresql://"];
+  const banned = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_DB_URL", "postgres://", "postgresql://"];
   const files: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {

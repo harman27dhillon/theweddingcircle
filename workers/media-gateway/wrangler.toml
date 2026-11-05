@@ -15,5 +15,6 @@ bucket_name = "set-this-to-the-existing-private-bucket"
 # Secret, set in the dashboard or with: wrangler secret put MEDIA_GATEWAY_SECRET
 # Never commit the value. The app server needs the same secret as MEDIA_GATEWAY_SECRET.
 #
-# [vars]
-# ALLOWED_ORIGINS = "https://theweddingcircle.in,https://www.theweddingcircle.in"
+[vars]
+ALLOWED_ORIGINS = "https://theweddingcircle.in,https://www.theweddingcircle.in"
+MEDIA_EDGE_CACHE = "disabled"

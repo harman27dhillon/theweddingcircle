@@ -2,6 +2,7 @@ import { parse } from "pg-connection-string";
 import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } from "./model";
 import { safeSupabaseUri } from "../supabase-connect";
 import { serverEnvironment } from "@/lib/env.server";
+import { resolvedInfraEnv } from "@/lib/infra/resolved-env.server";
 
 const prefix = "WC_DEVELOPER_";
 // Cloudflare Worker variables are the source of truth. The prefixed names remain
@@ -113,23 +114,64 @@ export async function stageConfiguration(draft: ConfigDraft, clear: boolean): Pr
   }
 }
 
-export async function testSupabaseApi(): Promise<Diagnostic> {
-  const config = readControlConfig(await serverEnvironment());
+export async function testSupabaseApi(environment?: Record<string, string | undefined>): Promise<Diagnostic> {
+  // Infrastructure credentials may be stored in the encrypted Infrastructure vault,
+  // not in the Developer Center's separate WC_DEVELOPER_* settings. Callers that
+  // already resolved the vault can pass that environment to avoid a second DB lookup.
+  const resolvedEnvironment = environment ?? (await resolvedInfraEnv()).env;
+  const config = readControlConfig(resolvedEnvironment);
   const url = projectUrl(config.SUPABASE_URL);
-  const key = config.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable key first." };
+  // Supabase still supports legacy anon keys. The status panel accepts either
+  // name, so the actual API diagnostic must resolve the same supported inputs.
+  const key = config.SUPABASE_PUBLISHABLE_KEY || resolvedEnvironment.SUPABASE_ANON_KEY?.trim() || resolvedEnvironment[`${prefix}SUPABASE_ANON_KEY`]?.trim() || "";
+  if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable (or legacy anon) key in Infrastructure settings first." };
   if (validate("SUPABASE_PUBLISHABLE_KEY", key, url)) return { ok: false, message: "The configured key is not a Supabase publishable key." };
+
   try {
-    const response = await fetch(`${url}/rest/v1/`, {
+    // Do not request /rest/v1/: Supabase now restricts the OpenAPI schema root
+    // to secret keys. Probe a real, known table endpoint instead. The app's
+    // circles table is deliberately server-only, so a Postgres permission
+    // denial is an expected proof that the publishable key reached PostgREST.
+    const response = await fetch(`${url}/rest/v1/circles?select=slug&limit=0`, {
       headers: { apikey: key },
       redirect: "error",
       signal: AbortSignal.timeout(8_000),
     });
-    await response.body?.cancel().catch(() => undefined);
-    if (response.status === 401 || response.status === 403) return { ok: false, message: "Supabase reached, but it refused the publishable key or API access." };
-    if (!response.ok) return { ok: false, message: `The Supabase API answered with HTTP ${response.status}.` };
-    return { ok: true, message: "Supabase accepted the publishable key. This checks HTTPS API access only.", checkedAt: new Date().toISOString() };
-  } catch {
-    return { ok: false, message: "The Supabase HTTPS API could not be reached." };
+    const bodyText = await response.text().catch(() => "");
+    let body: { code?: string; message?: string; hint?: string } = {};
+    try { body = JSON.parse(bodyText) as typeof body; } catch { /* non-JSON gateway response */ }
+
+    if (response.ok) {
+      return { ok: true, message: "Supabase Data API is reachable and accepted the publishable key. The circles endpoint responded successfully.", checkedAt: new Date().toISOString() };
+    }
+
+    const detail = `${body.message || ""} ${body.hint || ""}`.toLowerCase();
+    if (response.status === 401 || response.status === 403) {
+      if (body.code === "42501" || detail.includes("permission denied") || detail.includes("not have permission")) {
+        return { ok: true, message: "Supabase Data API is reachable and accepted the publishable key. The circles table correctly denies browser-role access.", details: ["This permission denial is expected: wedding data is accessed server-side, not directly with the publishable key."], checkedAt: new Date().toISOString() };
+      }
+      return { ok: false, message: "Supabase was reached, but rejected the publishable key. Verify the key belongs to this project." };
+    }
+    return { ok: false, message: `The Supabase Data API answered with HTTP ${response.status}.` };
+  } catch (error) {
+    // Report only safe network diagnostics. Never expose request headers, keys,
+    // full URLs, or arbitrary exception messages in the Developer Center.
+    const cause = error && typeof error === "object" && "cause" in error
+      ? (error as { cause?: unknown }).cause
+      : undefined;
+    const causeCode = cause && typeof cause === "object" && "code" in cause
+      ? String((cause as { code?: unknown }).code ?? "")
+      : "";
+    const safeCode = /^[a-z0-9_:-]{1,64}$/i.test(causeCode) ? causeCode : "";
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    if (errorName === "TimeoutError" || errorName === "AbortError") {
+      return { ok: false, message: "Supabase request timed out after 8 seconds. Check Worker outbound connectivity and Supabase availability." };
+    }
+    return {
+      ok: false,
+      message: safeCode
+        ? `Supabase network request failed (${safeCode}).`
+        : `Supabase network request failed (${errorName}). The underlying fetch error was safely redacted.`,
+    };
   }
 }

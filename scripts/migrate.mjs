@@ -2,8 +2,7 @@
 /**
  * Deploy-time database migrator (node-postgres, `pg`).
  *
- * Prefers SUPABASE_DB_URL. DATABASE_URL is used only when Supabase is not set,
- * so a deploy does not write the app schema onto Neon once Supabase is configured.
+ * Applies the application schema only to Supabase Postgres.
  * Pending files in ../migrations are applied once each. Nothing is dropped.
  *
  * No database URL (local / preview builds) -> skip; PGLite applies the same
@@ -20,16 +19,13 @@ import { parse } from "pg-connection-string";
 import { pendingMigrations } from "./migration-plan.mjs";
 
 const supabaseUrl = process.env.SUPABASE_DB_URL?.trim() || "";
-const neonUrl = process.env.DATABASE_URL?.trim() || "";
 const target = supabaseUrl.startsWith("postgres")
-  ? { url: supabaseUrl, name: "SUPABASE_DB_URL", supabase: true }
-  : neonUrl
-    ? { url: neonUrl, name: "DATABASE_URL", supabase: false }
-    : null;
+  ? { url: supabaseUrl, name: "SUPABASE_DB_URL" }
+  : null;
 
 if (!target) {
   console.log(
-    "[migrate] SUPABASE_DB_URL is not set and DATABASE_URL is not set — skipping. Preview uses the local database. Set SUPABASE_DB_URL in the server environment for the permanent database.",
+    "[migrate] SUPABASE_DB_URL is not set — skipping. Local preview uses its disposable PGLite database. Set SUPABASE_DB_URL for the persistent database.",
   );
   process.exit(0);
 }
@@ -60,18 +56,16 @@ async function main() {
     return;
   }
 
-  const parsed = target.supabase ? parse(target.url) : null;
-  const pool = new pg.Pool(parsed
-    ? {
-        host: parsed.host || undefined,
-        port: parsed.port ? Number(parsed.port) : undefined,
-        user: parsed.user || undefined,
-        password: parsed.password || undefined,
-        database: parsed.database || undefined,
-        max: 1,
-        ssl: { rejectUnauthorized: true, ca: [...tls.rootCertificates, supabaseCa()].filter(Boolean) },
-      }
-    : { connectionString: target.url, max: 1 });
+  const parsed = parse(target.url);
+  const pool = new pg.Pool({
+    host: parsed.host || undefined,
+    port: parsed.port ? Number(parsed.port) : undefined,
+    user: parsed.user || undefined,
+    password: parsed.password || undefined,
+    database: parsed.database || undefined,
+    max: 1,
+    ssl: { rejectUnauthorized: true, ca: [...tls.rootCertificates, supabaseCa()].filter(Boolean) },
+  });
   const client = await pool.connect();
   try {
     await client.query(
