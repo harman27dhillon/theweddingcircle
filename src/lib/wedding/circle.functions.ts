@@ -998,11 +998,6 @@ export const saveCircleMediaPart = createServerFn({ method: "POST" }).validator(
     `)[0];
 	if (!row) return { ok: false };
 	if (!(data.editKey.length >= 16 && row.edit_key === data.editKey || data.mediaKey.length >= 16 && row.media_key === data.mediaKey)) return { ok: false };
-	const { activeMediaDestination } = await import("@/lib/developer/media-destination.server");
-	if (await activeMediaDestination(media) === "firebase") {
-		const { saveFirebaseChunk } = await import("@/lib/developer/firebase-storage.server");
-		return saveFirebaseChunk(media, data, row.pay_status === "paid" && row.pay_verified === "true");
-	}
 	{
 		const used = (await media`
       select coalesce(sum(length(p.data)), 0) as bytes
@@ -1079,11 +1074,6 @@ export const fetchCircleMediaPart = createServerFn({ method: "GET" }).validator(
 	const sql = await mediaSql();
 	const meta = (await sql`select slug, mime, provider from circle_media where id = ${data.id} limit 1`)[0];
 	if (!meta || !(await audioReadable(meta, data))) return null;
-	if (meta.provider === "firebase") {
-		const { readFirebaseChunk } = await import("@/lib/developer/firebase-storage.server");
-		const remote = await readFirebaseChunk(String(meta.slug), data.id, data.idx);
-		return remote ? { data: remote } : null;
-	}
 	const row = (await sql`
       select data from circle_media_part where id = ${data.id} and idx = ${data.idx} limit 1
     `)[0];
@@ -1107,15 +1097,7 @@ export const deleteCircleMedia = createServerFn({ method: "POST" }).validator((i
 	if (!row) return { ok: false };
 	const allowed = data.editKey.length >= 16 && row.edit_key === data.editKey || data.mediaKey.length >= 16 && row.media_key === data.mediaKey;
 	if (!allowed) return { ok: false };
-	const stored = (await sql`select provider, chunks from circle_media where id = ${data.id} and slug = ${data.slug} limit 1`)[0];
-	if (stored?.provider === "firebase") {
-		const { ensureMediaProviderColumns } = await import("@/lib/developer/media-destination.server");
-		const { deleteFirebaseChunks } = await import("@/lib/developer/firebase-storage.server");
-		await ensureMediaProviderColumns(sql);
-		const removed = await deleteFirebaseChunks(data.slug, data.id, Number(stored.chunks) || 1);
-		if (!removed) return { ok: false };
-		await sql`delete from circle_media_remote where id = ${data.id}`;
-	}
+	await sql`delete from circle_media_remote where id = ${data.id}`;
 	await sql`delete from circle_media_part where id = ${data.id}`;
 	await sql`delete from circle_media where id = ${data.id} and slug = ${data.slug}`;
 	return { ok: true };

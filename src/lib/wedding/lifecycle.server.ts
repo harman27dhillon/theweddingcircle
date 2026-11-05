@@ -101,28 +101,8 @@ async function audit(sql: Sql, slug: string, action: string, detail = "") {
 
 async function purgeStorage(slug: string) {
   const media = await getSql();
-  let files: { id: string; provider: string; chunks: number }[] = [];
-  try {
-    files = await media`select id, provider, chunks from circle_media where slug = ${slug}`;
-  } catch (error) {
-    const message = String((error as { message?: string })?.message || error);
-    if (!/does not exist|column/i.test(message)) throw error;
-    try {
-      const plain = await media<{ id: string }>`select id from circle_media where slug = ${slug}`;
-      files = plain.map((row) => ({ id: row.id, provider: "library", chunks: 1 }));
-    } catch (again) {
-      const text = String((again as { message?: string })?.message || again);
-      if (!/does not exist/i.test(text)) throw again;
-    }
-  }
-  const remote = files.filter((file) => file.provider === "firebase");
-  if (remote.length) {
-    const { deleteFirebaseChunks } = await import("@/lib/developer/firebase-storage.server");
-    for (const file of remote) {
-      const removed = await deleteFirebaseChunks(slug, file.id, Number(file.chunks) || 1);
-      if (!removed) throw new Error("Cloud media could not be deleted.");
-    }
-  }
+  // File objects are stored in R2 or in the legacy library; database rows are
+  // removed below without contacting Firebase Storage.
   const steps = [
     () => media`delete from circle_media_part where id in (select id from circle_media where slug = ${slug})`,
     () => media`delete from circle_media_remote where id in (select id from circle_media where slug = ${slug})`,
