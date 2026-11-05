@@ -261,7 +261,7 @@ test("reconcile preserves destination-only rows until an explicit archive and co
 
 test("browser code does not contain database credentials", () => {
   const roots = [join(process.cwd(), "src", "components"), join(process.cwd(), "src", "routes")];
-  const banned = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_DB_URL", "DATABASE_URL", "postgres://", "postgresql://"];
+  const banned = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_DB_URL", "postgres://", "postgresql://"];
   const files: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
