@@ -219,7 +219,7 @@ export default defineConfig(({ command, isPreview }) => ({
                   R2_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
                   R2_BUCKET: "the-wedding-circle",
                   SUPABASE_URL: "https://vyto1hwepbtzinvceucf.supabase.co",
-                  SUPABASE_PUBLISHABLE_KEY: "");
+
                 },
                 hyperdrive: [
                   {
