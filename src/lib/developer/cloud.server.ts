@@ -1,5 +1,5 @@
 import { getSql, type Sql } from "@/lib/db";
-import { env } from "@/lib/env.server";
+import { serverEnvironment } from "@/lib/env.server";
 import { FIREBASE_FIELDS, SUPABASE_FIELDS, cleanSupabaseInput, looksPrivileged, maskTail, publicRuntimeView, type CapabilityState, type FieldView } from "@/lib/developer/cloud";
 import { readFirebaseWebConfig } from "@/lib/wedding/firebase-web.server";
 
@@ -90,9 +90,10 @@ function fieldView(id: string, label: string, envName: string, secret: boolean, 
   };
 }
 
-function supabaseRaw() {
-  const projectUrl = env("SUPABASE_URL") || "";
-  const publishableKey = env("SUPABASE_PUBLISHABLE_KEY") || env("SUPABASE_ANON_KEY") || "";
+async function supabaseRaw() {
+  const runtime = await serverEnvironment();
+  const projectUrl = runtime.SUPABASE_URL?.trim() || "";
+  const publishableKey = runtime.SUPABASE_PUBLISHABLE_KEY?.trim() || runtime.SUPABASE_ANON_KEY?.trim() || "";
   return { projectUrl, publishableKey };
 }
 
@@ -112,7 +113,7 @@ async function resolveFirebase(_sql: Sql) {
 }
 
 async function resolveSupabase(sql: Sql) {
-  const fromEnv = supabaseRaw();
+  const fromEnv = await supabaseRaw();
   const envComplete = Boolean(fromEnv.projectUrl && fromEnv.publishableKey);
   const cleanEnv = envComplete ? cleanSupabaseInput(fromEnv) : null;
   if (cleanEnv?.ok) {
@@ -161,6 +162,7 @@ export async function cloudPublicRuntime() {
     const push = active.push === "fcm" ? "fcm" as const : "inbox" as const;
     if (!analytics && push !== "fcm") return quiet;
     const firebase = await resolveFirebase(sql);
+    const runtime = await serverEnvironment();
     return publicRuntimeView({
       analytics,
       push,
@@ -174,7 +176,7 @@ export async function cloudPublicRuntime() {
             measurementId: firebase.raw.measurementId || "",
           }
         : null,
-      vapid: env("FIREBASE_VAPID_KEY") || "",
+      vapid: runtime.FIREBASE_VAPID_KEY || "",
     });
   } catch {
     return quiet;
