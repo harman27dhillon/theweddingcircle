@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { CHECKS, CONFIG_FIELDS, type Check, type ConfigDraft } from "./model";
+import { CHECKS, CONFIG_FIELDS, INFRASTRUCTURE_CHECKS, type Check, type ConfigDraft, type InfrastructureCheck } from "./model";
 
 function body(input: unknown): Record<string, unknown> {
   return input && typeof input === "object" ? input as Record<string, unknown> : {};
@@ -69,4 +69,26 @@ export const developerControlCheck = createServerFn({ method: "POST" })
     }
     const { runDatabaseCheck } = await import("./database.server");
     return runDatabaseCheck(check);
+  });
+
+
+export const developerInfrastructureStatus = createServerFn({ method: "POST" }).handler(async () => {
+  const { requireControlSession } = await import("./session.server");
+  await requireControlSession();
+  const { infrastructureStatus } = await import("./infrastructure.server");
+  return infrastructureStatus();
+});
+
+export const developerInfrastructureCheck = createServerFn({ method: "POST" })
+  .validator((input: unknown) => {
+    const data = body(input);
+    const id = INFRASTRUCTURE_CHECKS.find(([key]) => key === data.id)?.[0];
+    if (!id) throw new Error("Unknown infrastructure diagnostic.");
+    return { id };
+  })
+  .handler(async ({ data }) => {
+    const { requireControlSession } = await import("./session.server");
+    await requireControlSession();
+    const { runInfrastructureDiagnostic } = await import("./infrastructure.server");
+    return runInfrastructureDiagnostic(data.id as InfrastructureCheck);
   });
