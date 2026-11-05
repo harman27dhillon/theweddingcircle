@@ -3,7 +3,9 @@ import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } fro
 import { safeSupabaseUri } from "../supabase-connect";
 
 const prefix = "WC_DEVELOPER_";
-const secret = (name: ConfigName) => process.env[prefix + name]?.trim() || "";
+// Cloudflare Worker variables are the source of truth. The prefixed names remain
+// as a compatibility fallback for previously staged Developer Center values.
+const secret = (name: ConfigName) => process.env[name]?.trim() || process.env[prefix + name]?.trim() || "";
 
 export function readControlConfig() {
   return Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, secret(name)])) as Record<ConfigName, string>;

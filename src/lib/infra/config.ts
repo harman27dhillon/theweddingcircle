@@ -321,18 +321,18 @@ export function resolveFirebaseApiKey(environment: string | undefined, saved: st
   const savedOk = webKeyOk(savedKey);
   let key = "";
   let source: "saved configuration" | "server environment" | "none" = "none";
-  if (savedOk) {
-    key = savedKey;
-    source = "saved configuration";
-  } else if (envOk) {
+  if (envOk) {
     key = envKey;
     source = "server environment";
-  } else if (savedKey) {
+  } else if (savedOk) {
     key = savedKey;
     source = "saved configuration";
   } else if (envKey) {
     key = envKey;
     source = "server environment";
+  } else if (savedKey) {
+    key = savedKey;
+    source = "saved configuration";
   }
   return {
     key,
@@ -341,7 +341,7 @@ export function resolveFirebaseApiKey(environment: string | undefined, saved: st
     last4: keyTail(key),
     envLast4: keyTail(envKey),
     savedLast4: keyTail(savedKey),
-    savedOverridesEnvironment: Boolean(savedOk && envOk && savedKey !== envKey),
+    savedOverridesEnvironment: false,
     malformedSavedIgnored: Boolean(savedKey && !savedOk && envOk),
   };
 }
@@ -395,7 +395,7 @@ export function publicConfigForms(input: { environment: Record<string, string | 
 export function effectiveInfraEnv(environment: Record<string, string | undefined>, saved: Record<string, string>) {
   const base: Record<string, string | undefined> = { ...environment };
   for (const [key, value] of Object.entries(saved)) {
-    if (key === "FIREBASE_API_KEY") continue;
+    if (key === "FIREBASE_API_KEY" || environment[key]?.trim()) continue;
     const next = value.trim();
     if (next) base[key] = next;
   }

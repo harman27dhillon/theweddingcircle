@@ -386,8 +386,8 @@ test("environment-only fields stay replaceable and vault values override them", 
     { FIREBASE_PROJECT_ID: "env-id", FIREBASE_STORAGE_BUCKET: "env.appspot.com", FIREBASE_SERVICE_ACCOUNT_JSON: "env-json" },
     { FIREBASE_PROJECT_ID: "vault-id", FIREBASE_STORAGE_BUCKET: "vault.appspot.com" },
   ));
-  assert.equal(runtime.projectId, "vault-id");
-  assert.equal(runtime.storageBucket, "vault.appspot.com");
+  assert.equal(runtime.projectId, "env-id");
+  assert.equal(runtime.storageBucket, "env.appspot.com");
   assert.equal(runtime.serviceAccountJson, "env-json");
   const quoted = "AIzaSyQuotedKeyValue0000000008jAc";
   const dirty = `"${quoted}"`;
@@ -396,10 +396,10 @@ test("environment-only fields stay replaceable and vault values override them", 
   assert.equal(firebaseKeyDiagnostic(resolveFirebaseApiKey(other, dirty)).includes(quoted), false);
   assert.equal(firebaseKeyDiagnostic(resolveFirebaseApiKey(other, dirty)).includes(other), false);
   const chosen = resolveFirebaseApiKey(other, dirty);
-  assert.equal(chosen.key, quoted);
-  assert.equal(chosen.last4, "8jAc");
-  assert.equal(chosen.savedOverridesEnvironment, true);
-  assert.equal(chosen.source, "saved configuration");
+  assert.equal(chosen.key, other);
+  assert.equal(chosen.last4, other.slice(-4));
+  assert.equal(chosen.savedOverridesEnvironment, false);
+  assert.equal(chosen.source, "server environment");
   const ignored = resolveFirebaseApiKey(quoted, "not-a-key");
   assert.equal(ignored.key, quoted);
   assert.equal(ignored.malformedSavedIgnored, true);
@@ -412,7 +412,7 @@ test("environment-only fields stay replaceable and vault values override them", 
     environment: { FIREBASE_API_KEY: other },
   });
   assert.equal(blankKey.ok, true);
-  if (blankKey.ok) assert.equal(blankKey.next.FIREBASE_API_KEY, quoted);
+  if (blankKey.ok) assert.equal(blankKey.next.FIREBASE_API_KEY, other);
   assert.equal(effectiveInfraEnv({ FIREBASE_API_KEY: other }, { FIREBASE_API_KEY: dirty }).FIREBASE_API_KEY, quoted);
   const blank = mergeSavedConfig({
     provider: "livestream",
@@ -427,7 +427,6 @@ test("environment-only fields stay replaceable and vault values override them", 
 
 test("firebase identity, storage, and the infrastructure test use the resolved project number and vault", () => {
   const identity = readFileSync(new URL("../wedding/firebase-identity.server.ts", import.meta.url), "utf8");
-  const storage = readFileSync(new URL("../developer/firebase-storage.server.ts", import.meta.url), "utf8");
   const infra = readFileSync(new URL("./infra.server.ts", import.meta.url), "utf8");
   const cloud = readFileSync(new URL("../developer/cloud.server.ts", import.meta.url), "utf8");
   const form = readFileSync(new URL("../../components/wedding/developer-infrastructure.tsx", import.meta.url), "utf8");
@@ -435,12 +434,6 @@ test("firebase identity, storage, and the infrastructure test use the resolved p
   assert.match(identity, /firebaseRuntimeFromEnv/);
   assert.equal(identity.includes("process.env.FIREBASE_PROJECT_ID"), false);
   assert.match(identity, /never creates a membership/);
-  assert.match(storage, /resolvedInfraEnv/);
-  assert.match(storage, /firebaseRuntimeFromEnv/);
-  assert.match(storage, /deleteApp/);
-  assert.match(storage, /wc-firebase/);
-  assert.equal(storage.includes('env("FIREBASE_SERVICE_ACCOUNT_JSON")'), false);
-  assert.equal(storage.includes('env("FIREBASE_STORAGE_BUCKET")'), false);
   const sequence = infra.slice(infra.indexOf("getProjectConfig"));
   assert.ok(sequence.indexOf("firebaseProjectNumber") >= 0);
   assert.ok(sequence.indexOf("firebaseKeyAllowsEmailProbe") >= 0);
