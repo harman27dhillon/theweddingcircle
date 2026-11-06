@@ -37,22 +37,7 @@ async function audit(email: string, command: string, interpretation: string, res
   `;
 }
 
-function payloadObject(value: unknown) {
-  if (!value) return null;
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value) as unknown;
-      return parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : null;
-    } catch {
-      return null;
-    }
-  }
-  return typeof value === "object" ? value as Record<string, unknown> : null;
-}
-
-export async function generateVouchers(token: string, count: number, expiresAt: string | null) {
-  const session = await requireDeveloper(token);
-  if (!session.ok) return { ok: false as const, error: session.error };
+export async function generateVouchers(email: string, count: number, expiresAt: string | null) {
   const total = Number.isInteger(count) ? Math.min(20, Math.max(1, count)) : 1;
   let expiry: string | null = null;
   if (expiresAt) {
@@ -63,33 +48,21 @@ export async function generateVouchers(token: string, count: number, expiresAt: 
     expiry = when.toISOString();
   }
   const sql = await getSql();
-  const created: { code: string; hint: string }[] = [];
-  for (let n = 0; n < total; n += 1) {
-    let stored = false;
-    for (let attempt = 0; attempt < 6 && !stored; attempt += 1) {
-      const code = newCode();
-      const hash = sha256(code);
-      try {
-        await sql`
-          insert into wedding_vouchers (id, code_hash, code_hint, status, expires_at, created_by)
-          values (${newId()}, ${hash}, ${voucherHint(code)}, ${"unused"}, ${expiry}, ${session.email})
-        `;
-        created.push({ code, hint: voucherHint(code) });
-        stored = true;
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "";
-        if (!/duplicate|unique/i.test(message)) throw error;
-      }
-    }
-    if (!stored) return { ok: false as const, error: "A voucher could not be generated. Try again." };
-  }
-  await audit(session.email, "Generate wedding vouchers", `${created.length} code${created.length === 1 ? "" : "s"} issued.`, "ok");
-  return { ok: true as const, vouchers: created };
+  const issued = Array.from({ length: total }, () => {
+    const code = newCode();
+    return { id: newId(), code, hint: voucherHint(code) };
+  });
+  const rows = issued.map(({ id, code, hint }) => ({ id, hash: sha256(code), hint }));
+  await sql`
+    insert into wedding_vouchers (id, code_hash, code_hint, status, expires_at, created_by)
+    select id, hash, hint, 'unused', ${expiry}::timestamptz, ${email}
+    from jsonb_to_recordset(${JSON.stringify(rows)}::jsonb) as batch(id text, hash text, hint text)
+  `;
+  await audit(email, "Generate wedding vouchers", `${issued.length} code${issued.length === 1 ? "" : "s"} issued.`, "ok").catch(() => undefined);
+  return { ok: true as const, vouchers: issued.map(({ code, hint }) => ({ code, hint })) };
 }
 
-export async function listVouchers(token: string) {
-  const session = await requireDeveloper(token);
-  if (!session.ok) return { ok: false as const, error: session.error };
+export async function listVouchers() {
   const sql = await getSql();
   const rows = await sql<VoucherRow>`
     select id, code_hint, status, created_at, expires_at, redeemed_at, wedding_id, wedding_slug, revoked_at
@@ -102,7 +75,7 @@ export async function listVouchers(token: string) {
     vouchers: rows.map((row) => ({
       id: row.id,
       hint: row.code_hint,
-      status: row.status,
+      status: row.status === "unused" && row.expires_at && new Date(row.expires_at).getTime() <= Date.now() ? "expired" : row.status,
       createdAt: row.created_at,
       expiresAt: row.expires_at,
       redeemedAt: row.redeemed_at,
@@ -150,55 +123,58 @@ export async function redeemVoucher(input: { code: string; slug: string; editKey
     return { ok: false as const, error: "That voucher code was not recognised." };
   }
   const sql = await getSql();
-  const circle = (await sql<{ edit_key: string; payload: unknown }>`
-    select edit_key, payload from circles where slug = ${slug} limit 1
-  `)[0];
-  if (!circle || circle.edit_key !== editKey) {
-    return { ok: false as const, error: "This wedding could not be updated with that voucher." };
-  }
-  const payload = payloadObject(circle.payload);
-  if (!payload) return { ok: false as const, error: "This wedding could not be updated with that voucher." };
   const hash = sha256(clean);
-  const claimed = await sql<{ id: string; code_hint: string }>`
-    update wedding_vouchers
-    set status = 'redeemed', redeemed_at = now(), wedding_slug = ${slug}, wedding_id = ${typeof payload.id === "string" ? payload.id : slug}
-    where code_hash = ${hash} and status = 'unused' and (expires_at is null or expires_at > now())
-    returning id, code_hint
-  `;
-  if (!claimed[0]) {
-    const existing = (await sql<{ status: string; expires_at: string | null }>`
-      select status, expires_at from wedding_vouchers where code_hash = ${hash} limit 1
-    `)[0];
-    const decision = redeemDecision(existing ?? null);
-    if (!decision.ok) return decision;
-    return { ok: false as const, error: "That voucher could not be used." };
-  }
-  const hint = claimed[0].code_hint;
-  const reference = `VOUCHER-${hint}`;
-  const payment = {
-    ...(payload.payment && typeof payload.payment === "object" ? payload.payment as Record<string, unknown> : {}),
-    status: "paid",
-    verified: true,
-    reference,
-    provider: "preview",
-  };
-  const next = { ...payload, payment };
-  try {
-    const saved = await sql<{ slug: string }>`
-      update circles
-      set payload = ${JSON.stringify(next)}::jsonb, updated_at = now()
+  const claimed = await sql<{ code_hint: string; wedding_id: string }>`
+    with target as (
+      select slug, coalesce(payload->>'id', slug) as wedding_id
+      from circles
       where slug = ${slug} and edit_key = ${editKey}
-      returning slug
+        and jsonb_typeof(payload) = 'object'
+        and (
+          (payload #> '{payment,verified}') is distinct from 'true'::jsonb
+          or payload #>> '{payment,status}' = 'failed'
+        )
+      for update
+    ), claimed as (
+      update wedding_vouchers v
+      set status = 'redeemed', redeemed_at = now(), wedding_slug = target.slug, wedding_id = target.wedding_id
+      from target
+      where v.code_hash = ${hash} and v.status = 'unused' and (v.expires_at is null or v.expires_at > now())
+      returning v.code_hint, v.wedding_id, v.wedding_slug
+    )
+    update circles c
+    set payload = jsonb_set(
+      c.payload, '{payment}',
+      (case when jsonb_typeof(c.payload->'payment') = 'object' then c.payload->'payment' else '{}'::jsonb end)
+      || jsonb_build_object('status', 'paid', 'verified', true, 'reference', 'VOUCHER-' || claimed.code_hint, 'provider', 'preview')
+    ), updated_at = now()
+    from claimed
+    where c.slug = claimed.wedding_slug
+    returning claimed.code_hint, claimed.wedding_id
+  `;
+  let applied = claimed[0];
+  if (!applied) {
+    const previous = await sql<{ code_hint: string; wedding_id: string }>`
+      select v.code_hint, v.wedding_id
+      from wedding_vouchers v join circles c on c.slug = v.wedding_slug
+      where v.code_hash = ${hash} and v.status = 'redeemed'
+        and c.slug = ${slug} and c.edit_key = ${editKey}
+        and c.payload #> '{payment,verified}' = 'true'::jsonb
+        and c.payload #>> '{payment,reference}' = 'VOUCHER-' || v.code_hint
+      limit 1
     `;
-    if (!saved[0]) throw new Error("missing");
-  } catch {
-    await sql`
-      update wedding_vouchers
-      set status = 'unused', redeemed_at = null, wedding_id = null, wedding_slug = null
-      where id = ${claimed[0].id} and wedding_slug = ${slug} and status = 'redeemed'
-    `;
-    return { ok: false as const, error: "The voucher was not used because the wedding could not be updated." };
+    applied = previous[0];
+    if (!applied) {
+      const [existing] = await sql<{ status: string; expires_at: string | null }>`
+        select status, expires_at from wedding_vouchers where code_hash = ${hash} limit 1
+      `;
+      const decision = redeemDecision(existing ?? null);
+      if (!decision.ok) return decision;
+      return { ok: false as const, error: "This wedding could not be upgraded with that voucher." };
+    }
+  } else {
+    await audit("voucher", "Redeem wedding voucher", `Hint ${applied.code_hint} on ${slug}.`, "ok").catch(() => undefined);
   }
-  await audit("voucher", "Redeem wedding voucher", `Hint ${hint} on ${slug}.`, "ok").catch(() => undefined);
-  return { ok: true as const, hint, reference, weddingId: typeof payload.id === "string" ? payload.id : slug };
+  const hint = applied.code_hint;
+  return { ok: true as const, hint, reference: `VOUCHER-${hint}`, weddingId: applied.wedding_id };
 }

@@ -1,3 +1,4 @@
+import { serverEnvironment } from "@/lib/env.server";
 import { cleanFirebaseInput, firebaseWebKeyChoice } from "@/lib/developer/cloud";
 import { firebaseRuntimeFromEnv } from "@/lib/infra/config";
 import { resolvedInfraEnv } from "@/lib/infra/resolved-env.server";
@@ -8,9 +9,12 @@ import { resolvedInfraEnv } from "@/lib/infra/resolved-env.server";
  * The service-account JSON stays on the server and is not part of the public result.
  */
 export async function readFirebaseWebConfig() {
-  const resolved = await resolvedInfraEnv();
-  const runtime = firebaseRuntimeFromEnv(resolved.env);
-  const choice = firebaseWebKeyChoice(runtime.apiKey, resolved.env.VITE_FIREBASE_API_KEY || "");
+  return firebaseWebConfigFromEnv((await resolvedInfraEnv()).env);
+}
+
+function firebaseWebConfigFromEnv(environment: Record<string, string | undefined>) {
+  const runtime = firebaseRuntimeFromEnv(environment);
+  const choice = firebaseWebKeyChoice(runtime.apiKey, environment.VITE_FIREBASE_API_KEY || "");
   const candidate = {
     apiKey: choice.key,
     authDomain: runtime.authDomain,
@@ -18,7 +22,7 @@ export async function readFirebaseWebConfig() {
     storageBucket: runtime.storageBucket,
     messagingSenderId: runtime.messagingSenderId,
     appId: runtime.appId,
-    measurementId: (resolved.env.FIREBASE_MEASUREMENT_ID || "").trim(),
+    measurementId: (environment.FIREBASE_MEASUREMENT_ID || "").trim(),
   };
   const clean = candidate.apiKey ? cleanFirebaseInput(candidate) : null;
   return {
@@ -30,10 +34,7 @@ export async function readFirebaseWebConfig() {
   };
 }
 
-/** Public web fields only. Never the service account, the Vite key, or a private key. */
-export async function publicFirebaseAuthConfig() {
-  const config = await readFirebaseWebConfig();
-  const raw = config.raw;
+function publicFields(raw: ReturnType<typeof firebaseWebConfigFromEnv>["raw"]) {
   if (!raw.apiKey || !raw.authDomain || !raw.projectId || !raw.appId || !raw.messagingSenderId) {
     return { ok: false as const, reason: "Firebase sign-in is not configured." };
   }
@@ -45,4 +46,10 @@ export async function publicFirebaseAuthConfig() {
     appId: raw.appId,
     messagingSenderId: raw.messagingSenderId,
   };
+}
+
+/** Returns the browser configuration without querying the vault when runtime settings are complete. */
+export async function publicFirebaseAuthConfig() {
+  const direct = publicFields(firebaseWebConfigFromEnv(await serverEnvironment()).raw);
+  return direct.ok ? direct : publicFields((await readFirebaseWebConfig()).raw);
 }

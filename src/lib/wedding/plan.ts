@@ -24,7 +24,7 @@ function sampleCircle(wedding: MediaCarrier | null | undefined) {
   return Boolean(wedding && (wedding.illustrated || wedding.id === "lila-nico" || wedding.slug === "lila-nico"));
 }
 
-/** Premium is a verified purchase only. A preview payment response does not qualify. */
+/** Premium requires a server-verified payment or redeemed voucher. */
 export function isPremiumWedding(wedding: MediaCarrier | null | undefined) {
   if (!wedding || sampleCircle(wedding)) return false;
   return verifiedPurchase(wedding.payment);

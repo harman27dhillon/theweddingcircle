@@ -6,21 +6,24 @@ function text(value: unknown, max = 200) {
 
 export const generateWeddingVouchers = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
-    const body = input && typeof input === "object" ? input as { token?: unknown; count?: unknown; expiresAt?: unknown } : {};
+    const body = input && typeof input === "object" ? input as { count?: unknown; expiresAt?: unknown } : {};
     const count = typeof body.count === "number" ? body.count : Number(body.count);
-    return { token: text(body.token, 200), count: Number.isFinite(count) ? count : 1, expiresAt: text(body.expiresAt, 40) };
+    return { count: Number.isFinite(count) ? count : 1, expiresAt: text(body.expiresAt, 40) };
   })
   .handler(async ({ data }) => {
+    const { controlSession } = await import("@/lib/developer/control/session.server");
+    const { email } = await controlSession();
+    if (!email) return { ok: false as const, error: "Sign in to Developer Center to generate vouchers." };
     const { generateVouchers } = await import("./vouchers.server");
-    return generateVouchers(data.token, data.count, data.expiresAt || null);
+    return generateVouchers(email, data.count, data.expiresAt || null);
   });
 
-export const listWeddingVouchers = createServerFn({ method: "POST" })
-  .validator((input: unknown) => ({ token: text((input as { token?: unknown } | null)?.token, 200) }))
-  .handler(async ({ data }) => {
-    const { listVouchers } = await import("./vouchers.server");
-    return listVouchers(data.token);
-  });
+export const listWeddingVouchers = createServerFn({ method: "POST" }).handler(async () => {
+  const { requireControlSession } = await import("@/lib/developer/control/session.server");
+  await requireControlSession();
+  const { listVouchers } = await import("./vouchers.server");
+  return listVouchers();
+});
 
 export const revokeWeddingVoucher = createServerFn({ method: "POST" })
   .validator((input: unknown) => {

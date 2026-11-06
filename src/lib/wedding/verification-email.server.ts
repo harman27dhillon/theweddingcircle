@@ -1,3 +1,4 @@
+import { serverEnvironment } from "@/lib/env.server";
 import { createHash, createHmac, randomInt } from "node:crypto";
 import { getSql } from "@/lib/db";
 import { firebaseRuntimeFromEnv } from "@/lib/infra/config";
@@ -141,9 +142,12 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
 export async function redeemFirebaseVerificationCode(idToken: string, code: string) {
   const invalid = { ok: false as const, message: "That code is incorrect, expired, or used. You can request a new code." };
   try {
-    const { env } = await resolvedInfraEnv(true);
-    const { projectId } = firebaseRuntimeFromEnv(env);
-    const key = env.RESEND_API_KEY?.trim();
+    const direct = await serverEnvironment();
+    const environment = direct.FIREBASE_PROJECT_ID?.trim() && direct.RESEND_API_KEY?.trim()
+      ? direct
+      : (await resolvedInfraEnv(true)).env;
+    const { projectId } = firebaseRuntimeFromEnv(environment);
+    const key = environment.RESEND_API_KEY?.trim();
     if (!key || !projectId) return invalid;
     const verified = await readFirebaseIdentity(idToken, projectId);
     if (!verified.ok || !verified.identity.email) {

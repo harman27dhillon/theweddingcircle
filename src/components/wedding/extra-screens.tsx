@@ -70,9 +70,10 @@ export function AccountScreen() {
   const [codeSent, setCodeSent] = useState(false);
   const [joinTitle, setJoinTitle] = useState("");
 
-  async function completeVerified(address: string) {
+  async function completeVerified(address: string, idToken: string) {
+    setNotice("Opening your account…");
     const { adoptFirebaseSession } = await import("@/lib/wedding/account-cloud");
-    const adopted = await adoptFirebaseSession({ name: name.trim(), country, phone: cleanPhone(phone) });
+    const adopted = await adoptFirebaseSession({ idToken, name: name.trim(), country, phone: cleanPhone(phone) });
     if (adopted.status === "unverified") {
       setPhase("verify");
       setAuthEmail(address);
@@ -80,7 +81,7 @@ export function AccountScreen() {
       return;
     }
     if (adopted.status !== "ok") {
-      setNotice(adopted.status === "link-failed" ? adopted.reason : adopted.status === "bad" && adopted.reason ? adopted.reason : "Firebase did not open this account. Sign in again and retry.");
+      setNotice(adopted.status === "link-failed" ? adopted.reason : "Firebase did not open this account. Sign in again and retry.");
       return;
     }
     setPhase("form");
@@ -125,6 +126,7 @@ export function AccountScreen() {
 
   async function createAccount(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
     if (isDeveloperEmail(email)) {
       setNotice("Use Developer sign-in for this email.");
       return;
@@ -151,22 +153,28 @@ export function AccountScreen() {
     }
     setBusy(true);
     setNotice("");
-    const { registerWithEmail } = await import("@/lib/wedding/firebase-auth.browser");
-    const result = await registerWithEmail(email, password);
-    setBusy(false);
-    if (!result.ok) {
-      setNotice(result.message);
-      toast(result.message);
-      return;
+    try {
+      const { registerWithEmail } = await import("@/lib/wedding/firebase-auth.browser");
+      const result = await registerWithEmail(email, password);
+      if (!result.ok) {
+        setNotice(result.message);
+        toast(result.message);
+        return;
+      }
+      setAuthEmail(result.email);
+      setPhase("verify");
+      setVerificationCode("");
+      setCodeSent(false);
+    } catch {
+      setNotice("We couldn’t finish creating your account. Try signing in or retry in a moment.");
+    } finally {
+      setBusy(false);
     }
-    setAuthEmail(result.email);
-    setPhase("verify");
-    setVerificationCode("");
-    setCodeSent(false);
   }
 
   async function signIn(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
     if (!validEmail(identifier)) {
       toast("Enter the email on the account.");
       return;
@@ -194,24 +202,27 @@ export function AccountScreen() {
       }
       return;
     }
-    const { signInWithEmail } = await import("@/lib/wedding/firebase-auth.browser");
-    const result = await signInWithEmail(identifier, signPassword);
-    if (!result.ok) {
+    try {
+      const { signInWithEmail } = await import("@/lib/wedding/firebase-auth.browser");
+      const result = await signInWithEmail(identifier, signPassword);
+      if (!result.ok) {
+        setNotice(result.message);
+        toast(result.message);
+        return;
+      }
+      if (!result.idToken) {
+        setAuthEmail(result.email);
+        setPhase("verify");
+        setVerificationCode("");
+        setCodeSent(false);
+        return;
+      }
+      await completeVerified(result.email, result.idToken);
+    } catch {
+      setNotice("We couldn’t finish signing in. Please try again.");
+    } finally {
       setBusy(false);
-      setNotice(result.message);
-      toast(result.message);
-      return;
     }
-    if (!result.emailVerified) {
-      setBusy(false);
-      setAuthEmail(result.email);
-      setPhase("verify");
-      setVerificationCode("");
-      setCodeSent(false);
-      return;
-    }
-    await completeVerified(result.email);
-    setBusy(false);
   }
 
   async function sendReset() {
@@ -266,7 +277,7 @@ export function AccountScreen() {
     event.preventDefault();
     if (busy || !/^\d{6}$/.test(verificationCode)) return;
     setBusy(true);
-    setNotice("");
+    setNotice("Verifying code…");
     try {
       const { verifyEmailCode } = await import("@/lib/wedding/firebase-auth.browser");
       const result = await verifyEmailCode(verificationCode);
@@ -274,14 +285,8 @@ export function AccountScreen() {
         setNotice(result.message);
         return;
       }
-      const { currentIdToken } = await import("@/lib/wedding/firebase-auth.browser");
-      const session = await currentIdToken(true);
-      if (session.status !== "token") {
-        setNotice(session.status === "error" ? session.message : "We couldn’t refresh your sign-in. Sign in again to continue.");
-        return;
-      }
       setVerificationCode("");
-      await completeVerified(session.email);
+      await completeVerified(result.email, result.idToken);
     } catch {
       setNotice("The verification check could not finish. Try again in a moment.");
     } finally {

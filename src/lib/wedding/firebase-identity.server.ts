@@ -1,3 +1,4 @@
+import { env } from "@/lib/env.server";
 import { requireVerifiedEmail, verifyFirebaseIdentity } from "@/lib/wedding/firebase-identity";
 import { membershipFromIdentity } from "@/lib/wedding/membership";
 import { firebaseRuntimeFromEnv } from "@/lib/infra/config";
@@ -23,7 +24,7 @@ async function firebaseCerts() {
 
 /** Verifies the Firebase ID token. It does not grant a wedding role and does not require a verified email. */
 export async function readFirebaseIdentity(idToken: string, project?: string) {
-  const projectId = project ?? firebaseRuntimeFromEnv((await resolvedInfraEnv()).env).projectId;
+  const projectId = project ?? (env("FIREBASE_PROJECT_ID") || firebaseRuntimeFromEnv((await resolvedInfraEnv(true)).env).projectId);
   if (!projectId) return { ok: false as const, reason: "Firebase project is not configured. No membership was granted." };
   let certs: Record<string, string> | null = null;
   try {

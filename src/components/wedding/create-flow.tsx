@@ -50,6 +50,8 @@ export function CreateFlow() {
   const [voucherCode, setVoucherCode] = useState("");
   const [voucherNote, setVoucherNote] = useState("");
   const [voucherOk, setVoucherOk] = useState(false);
+  const [voucherChecking, setVoucherChecking] = useState(false);
+  const voucherDraft = useRef("");
   const creating = useRef(false);
   const wentHome = useRef(false);
   const made = useWeddingStore((s) => s.weddings.find((item) => item.slug === madeSlug));
@@ -153,57 +155,41 @@ export function CreateFlow() {
   }
 
   async function openWithVoucher() {
-    if (creating.current || pay === "pending" || madeSlug || !voucherOk) return;
+    if (creating.current || pay === "pending" || voucherChecking || !voucherOk || (madeSlug && !voucherDraft.current)) return;
     creating.current = true;
     setPay("pending");
-    const slug = createWedding(draftFrom({ status: "pending", reference: "VOUCHER", provider: "preview" }));
-    if (!slug) {
-      creating.current = false;
-      setPay("idle");
-      toast("Sign in to create this wedding.");
-      return;
-    }
-    let settled: Awaited<ReturnType<typeof settle>>;
+    setVoucherNote("");
     try {
-      settled = await within(20000, settle(slug)) as Awaited<ReturnType<typeof settle>>;
-    } catch {
-      creating.current = false;
-      setPay("failed");
-      setMadeSlug(slug);
-      setStep(5);
-      toast("The wedding was not published, so the voucher is still unused.");
-      return;
-    }
-    const { wedding, published } = settled;
-    if (!wedding || published !== "ok") {
-      creating.current = false;
-      setPay("failed");
-      setStep(5);
-      toast("The wedding was not published, so the voucher is still unused.");
-      return;
-    }
-    try {
+      const slug = voucherDraft.current || createWedding(draftFrom({ status: "pending", reference: "VOUCHER", provider: "preview" }));
+      if (!slug) {
+        setVoucherNote("Sign in to create this wedding.");
+        return;
+      }
+      voucherDraft.current = slug;
+      const { wedding, published } = await within(20000, settle(slug)) as Awaited<ReturnType<typeof settle>>;
+      if (!wedding || published !== "ok") {
+        setVoucherNote("The draft couldn’t be published. Your voucher is still available. Try again.");
+        return;
+      }
       const result = await redeemWeddingVoucher({ data: { code: voucherCode, slug, editKey: circleKey(slug) } });
       if (!result.ok) {
-        creating.current = false;
-        setPay("failed");
-        setStep(5);
         setVoucherNote(result.error);
-        toast(result.error);
         return;
       }
       useWeddingStore.getState().applyVoucherPremium(wedding.id, result.reference);
       toast("This premium wedding is covered by your voucher.");
       await goHome();
     } catch {
+      setVoucherNote("We couldn’t confirm the upgrade. Try the same code again to finish this wedding.");
+    } finally {
       creating.current = false;
-      setPay("failed");
-      setStep(5);
-      toast("The voucher could not be checked. It was not used.");
+      setPay("idle");
     }
   }
 
   async function applyVoucher() {
+    if (voucherChecking || pay === "pending") return;
+    setVoucherChecking(true);
     setVoucherOk(false);
     setVoucherNote("");
     try {
@@ -215,7 +201,9 @@ export function CreateFlow() {
       setVoucherOk(true);
       setVoucherNote(result.label);
     } catch {
-      setVoucherNote("That voucher could not be checked. Nothing was used.");
+      setVoucherNote("That voucher could not be checked. Try again.");
+    } finally {
+      setVoucherChecking(false);
     }
   }
 
@@ -314,7 +302,8 @@ export function CreateFlow() {
   }
 
   const entryCodes = made ? codesOf(made) : [];
-  const busy = pay === "pending" || Boolean(madeSlug);
+  const busy = pay === "pending" || voucherChecking || Boolean(madeSlug);
+  const voucherBusy = pay === "pending" || voucherChecking || Boolean(madeSlug && !voucherDraft.current);
 
   return (
     <div className="min-h-dvh bg-ivory">
@@ -539,24 +528,26 @@ export function CreateFlow() {
                       maxLength={16}
                       placeholder="12-character code"
                       value={voucherCode}
+                      disabled={voucherBusy}
                       onChange={(event) => {
                         setVoucherCode(event.target.value.toUpperCase());
                         setVoucherOk(false);
+                        setVoucherNote("");
                       }}
                     />
-                    <Button type="button" variant="line" disabled={busy || voucherCode.trim().length < 12} onClick={() => void applyVoucher()}>
-                      Apply code
+                    <Button type="button" variant="line" disabled={voucherBusy || voucherCode.trim().length < 12} onClick={() => void applyVoucher()}>
+                      {voucherChecking ? "Checking…" : "Apply code"}
                     </Button>
                   </div>
-                  {voucherNote ? <p className="mt-2 text-sm text-maroon">{voucherNote}</p> : null}
+                  {voucherNote ? <p className="mt-2 text-sm text-maroon" role="status">{voucherNote}</p> : null}
                   {voucherOk ? <p className="mt-2 font-serif text-3xl">Amount due ₹0</p> : null}
                 </div>
                 {pay === "failed" ? (
                   <p className="mt-3 rounded-2xl border border-line bg-paper px-4 py-3 text-sm">Payment failed — your wedding has not been charged or created.</p>
                 ) : null}
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Button disabled={busy || !voucherOk} onClick={() => void openWithVoucher()}>
-                    Create premium wedding with voucher
+                  <Button disabled={voucherBusy || !voucherOk} onClick={() => void openWithVoucher()}>
+                    {pay === "pending" && voucherDraft.current ? "Creating Premium wedding…" : "Create Premium wedding with voucher"}
                   </Button>
                   <Button disabled={busy} onClick={() => void payAndOpen("paid")}>
                     {pay === "pending" ? "Processing" : pay === "failed" ? "Try again" : `Pay ${feeLabel} and create`}

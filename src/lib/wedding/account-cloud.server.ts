@@ -5,6 +5,7 @@ import { readFirebaseIdentity } from "@/lib/wedding/firebase-identity.server";
 import { requireVerifiedEmail } from "@/lib/wedding/firebase-identity";
 
 type Sql = Awaited<ReturnType<typeof weddingDataSql>>;
+const initializedSchemas = new WeakSet<Sql>();
 
 export type CloudAccount = {
   id: string;
@@ -34,6 +35,7 @@ function firebaseMarker(uid: string) {
 }
 
 async function ensure(sql: Sql) {
+  if (initializedSchemas.has(sql)) return;
   await sql`create table if not exists circle_accounts (
     id text primary key,
     email text not null default '',
@@ -47,6 +49,7 @@ async function ensure(sql: Sql) {
   await sql`create unique index if not exists circle_accounts_phone_idx on circle_accounts (phone) where phone <> ''`;
   await sql`alter table circle_accounts add column if not exists firebase_uid text not null default ''`;
   await sql`create unique index if not exists circle_accounts_firebase_uid_idx on circle_accounts (firebase_uid) where firebase_uid <> ''`;
+  initializedSchemas.add(sql);
 }
 
 async function find(sql: Sql, email: string, phone: string) {

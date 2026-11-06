@@ -5,12 +5,14 @@ import {
   developerControlLogout, developerControlStatus,
 } from "@/lib/developer/control/actions.functions";
 import { CHECKS, INFRASTRUCTURE_CHECKS, type Check, type Diagnostic, type InfrastructureCheck } from "@/lib/developer/control/model";
+import { generateWeddingVouchers, listWeddingVouchers } from "@/lib/wedding/vouchers.functions";
 
 const sections = [
   ["overview", "Infrastructure overview"],
   ["infrastructure", "Infrastructure"],
   ["configuration", "Supabase environments"],
   ["database", "Database setup & hosting"],
+  ["vouchers", "Wedding vouchers"],
 ] as const;
 
 type Section = typeof sections[number][0];
@@ -218,6 +220,7 @@ function Dashboard({ email, configuration, message, onLogout }: {
           </>
         ) : null}
         {section === "configuration" ? <ConfigurationPanel configuration={configuration} environment={configuration.environment} projectUrl={configuration.projectUrl} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
+        {section === "vouchers" ? <VouchersPanel /> : null}
         {section === "database" ? (
           <>
             <h1 className="mt-2 font-serif text-4xl">Database setup & hosting</h1>
@@ -290,5 +293,109 @@ function ConfigurationPanel({ configuration, environment, projectUrl, apiResult,
       </div>
       <p className="mt-4 text-xs text-on-photo/60">No values can be entered, replaced or cleared here. This avoids creating a second source of truth for secrets.</p>
     </>
+  );
+}
+
+function VouchersPanel() {
+  const [history, setHistory] = useState<Awaited<ReturnType<typeof listWeddingVouchers>>["vouchers"] | null>(null);
+  const [issued, setIssued] = useState<string[]>([]);
+  const [generating, setGenerating] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [historyError, setHistoryError] = useState(false);
+
+  async function refresh() {
+    setHistoryError(false);
+    try {
+      const result = await listWeddingVouchers();
+      setHistory(result.vouchers);
+    } catch {
+      setHistoryError(true);
+    }
+  }
+
+  useEffect(() => { void refresh(); }, []);
+
+  async function generate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (generating) return;
+    const form = new FormData(event.currentTarget);
+    const expires = String(form.get("expires") || "");
+    setGenerating(true);
+    setNotice("");
+    try {
+      const result = await generateWeddingVouchers({
+        data: { count: Number(form.get("count")), expiresAt: expires ? new Date(expires).toISOString() : "" },
+      });
+      if (!result.ok) {
+        setNotice(result.error);
+        return;
+      }
+      setIssued(result.vouchers.map(({ code }) => code));
+      setNotice(result.vouchers.length === 1 ? "One voucher generated." : `${result.vouchers.length} vouchers generated.`);
+      void refresh();
+    } catch {
+      setNotice("Voucher generation could not be confirmed. Check the recent vouchers before trying again.");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function copy(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      setNotice("Voucher code copied.");
+    } catch {
+      setNotice("Select the voucher code and copy it manually.");
+    }
+  }
+
+  return (
+    <section className="mt-2 max-w-3xl">
+      <h1 className="font-serif text-4xl">Wedding vouchers</h1>
+      <p className="mt-2 text-sm text-on-photo/75">Each code covers one ₹499 Premium wedding, including 10 GB of storage. Enter it at the payment step to bring the amount due to ₹0.</p>
+      <form className="mt-6 grid gap-4 rounded-card border border-on-photo/15 p-4 sm:grid-cols-2" onSubmit={(event) => void generate(event)}>
+        <label className="grid gap-1 text-sm">Number of codes
+          <input className={field} name="count" type="number" min={1} max={20} defaultValue={1} required disabled={generating} />
+        </label>
+        <label className="grid gap-1 text-sm">Expiry (optional)
+          <input className={field} name="expires" type="datetime-local" disabled={generating} />
+        </label>
+        <button type="submit" className={`${primary} sm:col-span-2 sm:justify-self-start`} disabled={generating}>
+          {generating ? "Generating…" : "Generate vouchers"}
+        </button>
+      </form>
+      {notice ? <p className="mt-3 text-sm text-on-photo/85" role="status">{notice}</p> : null}
+      {issued.length ? (
+        <div className="mt-5 rounded-card border border-on-photo/15 p-4">
+          <h2 className="font-serif text-xl">New codes</h2>
+          <p className="mt-1 text-sm text-on-photo/75">Copy the full codes before leaving this section. Recent vouchers show only the last four characters.</p>
+          <ul className="mt-3 divide-y divide-on-photo/15">
+            {issued.map((code) => (
+              <li key={code} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <code className="select-all font-mono text-base">{code}</code>
+                <button type="button" className={button} onClick={() => void copy(code)}>Copy code</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <h2 className="mt-6 font-serif text-xl">Recent vouchers</h2>
+      {historyError ? (
+        <p className="mt-2 text-sm text-on-photo/75">Recent vouchers could not be loaded. <button type="button" className="min-h-11 underline" onClick={() => void refresh()}>Retry</button></p>
+      ) : history === null ? (
+        <p className="mt-2 text-sm text-on-photo/75">Loading vouchers…</p>
+      ) : history.length ? (
+        <ul className="mt-2 divide-y divide-on-photo/15">
+          {history.map((voucher) => (
+            <li key={voucher.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-sm">
+              <code>•••• {voucher.hint}</code>
+              <span className="capitalize">{voucher.status}</span>
+              {voucher.weddingSlug ? <span className="break-all text-on-photo/75">{voucher.weddingSlug}</span> : null}
+              {voucher.expiresAt && voucher.status === "unused" ? <span className="text-on-photo/75">Expires {new Date(voucher.expiresAt).toLocaleString()}</span> : null}
+            </li>
+          ))}
+        </ul>
+      ) : <p className="mt-2 text-sm text-on-photo/75">No vouchers issued yet.</p>}
+    </section>
   );
 }

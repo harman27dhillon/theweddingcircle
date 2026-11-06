@@ -54,12 +54,14 @@ test("sign-in buttons call Firebase and the old hash path cannot succeed", () =>
   assert.match(account, /sendVerificationEmail/);
   assert.match(account, /resetPassword/);
   assert.match(account, /signOutFirebase/);
-  assert.match(account, /currentIdToken\(true\)/);
+  assert.match(account, /adoptFirebaseSession\(\{ idToken,/);
   const client = readFileSync(new URL("./firebase-auth.browser.ts", import.meta.url), "utf8");
   assert.match(client, /createUserWithEmailAndPassword/);
   assert.match(client, /signInWithEmailAndPassword/);
   assert.match(client, /browserLocalPersistence/);
   assert.match(client, /getIdToken\(force\)/);
+  assert.match(client, /getIdTokenResult\(true\)/);
+  assert.match(client, /claims\.email_verified !== true/);
   assert.match(client, /wc-auth/);
   assert.equal(client.includes("error.message"), false);
   const web = readFileSync(new URL("./firebase-web.server.ts", import.meta.url), "utf8");

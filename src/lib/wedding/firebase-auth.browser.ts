@@ -8,7 +8,6 @@ export type FirebaseSession =
   | { status: "error"; message: string };
 
 let authPromise: Promise<import("firebase/auth").Auth> | null = null;
-let configMark = "";
 
 function firebaseCode(error: unknown) {
   if (!error || typeof error !== "object" || !("code" in error)) return "";
@@ -43,38 +42,32 @@ export function mapFirebaseAuthError(error: unknown) {
   }
 }
 
-async function firebaseAuth() {
-  const config = await firebaseAuthConfig();
-  if (!config.ok) throw Object.assign(new Error("Firebase sign-in is not configured."), { code: "auth/not-configured" });
-  const mark = `${config.projectId}\0${config.appId}\0${config.apiKey.length}`;
-  if (!authPromise || configMark !== mark) {
-    configMark = mark;
-    authPromise = (async () => {
-      const { initializeApp, getApps, deleteApp } = await import("firebase/app");
-      const { getAuth, browserLocalPersistence, setPersistence } = await import("firebase/auth");
-      const existing = getApps().find((app) => app.name === "wc-auth");
-      if (existing) await deleteApp(existing);
-      const app = initializeApp(
-        {
-          apiKey: config.apiKey,
-          authDomain: config.authDomain,
-          projectId: config.projectId,
-          appId: config.appId,
-          messagingSenderId: config.messagingSenderId,
-        },
-        "wc-auth",
-      );
-      const auth = getAuth(app);
-      await setPersistence(auth, browserLocalPersistence);
-      return auth;
-    })();
-  }
-  try {
-    return await authPromise;
-  } catch (error) {
+function firebaseAuth() {
+  authPromise ??= (async () => {
+    const [config, { initializeApp, getApps, deleteApp }, { initializeAuth, browserLocalPersistence }] = await Promise.all([
+      firebaseAuthConfig(),
+      import("firebase/app"),
+      import("firebase/auth"),
+    ]);
+    if (!config.ok) throw Object.assign(new Error("Firebase sign-in is not configured."), { code: "auth/not-configured" });
+    const existing = getApps().find((app) => app.name === "wc-auth");
+    if (existing) await deleteApp(existing);
+    const app = initializeApp(
+      {
+        apiKey: config.apiKey,
+        authDomain: config.authDomain,
+        projectId: config.projectId,
+        appId: config.appId,
+        messagingSenderId: config.messagingSenderId,
+      },
+      "wc-auth",
+    );
+    return initializeAuth(app, { persistence: browserLocalPersistence });
+  })().catch((error) => {
     authPromise = null;
     throw error;
-  }
+  });
+  return authPromise;
 }
 
 export async function registerWithEmail(email: string, password: string) {
@@ -93,8 +86,8 @@ export async function signInWithEmail(email: string, password: string) {
     const auth = await firebaseAuth();
     const { signInWithEmailAndPassword } = await import("firebase/auth");
     const cred = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-    await cred.user.reload();
-    return { ok: true as const, email: cred.user.email || "", uid: cred.user.uid, emailVerified: cred.user.emailVerified === true };
+    const idToken = cred.user.emailVerified ? await cred.user.getIdToken() : "";
+    return { ok: true as const, email: cred.user.email || "", idToken };
   } catch (error) {
     return { ok: false as const, message: mapFirebaseAuthError(error) };
   }
@@ -102,7 +95,7 @@ export async function signInWithEmail(email: string, password: string) {
 
 export async function sendVerificationEmail(signal?: AbortSignal) {
   try {
-    const auth = await (authPromise ?? firebaseAuth());
+    const auth = await firebaseAuth();
     await auth.authStateReady();
     const user = auth.currentUser;
     if (!user) return { ok: false as const, message: "Sign in before sending a verification email." };
@@ -125,7 +118,11 @@ export async function verifyEmailCode(code: string) {
     if (auth.currentUser?.uid !== user.uid) return { ok: false as const, message: "Your signed-in account changed. Sign in again and retry." };
     const { applyActionCode } = await import("firebase/auth");
     await applyActionCode(auth, result.actionCode);
-    return { ok: true as const };
+    const verified = await user.getIdTokenResult(true);
+    if (auth.currentUser?.uid !== user.uid || verified.claims.email_verified !== true) {
+      return { ok: false as const, message: "Sign in again to refresh your verified account." };
+    }
+    return { ok: true as const, email: user.email, idToken: verified.token };
   } catch {
     return { ok: false as const, message: "The code could not be applied. Try requesting a new one." };
   }
@@ -162,13 +159,8 @@ export async function currentIdToken(force = false): Promise<FirebaseSession> {
     return { status: "none" };
   }
   try {
-    const { onAuthStateChanged } = await import("firebase/auth");
-    const user = await new Promise<import("firebase/auth").User | null>((resolve) => {
-      const stop = onAuthStateChanged(auth, (next) => {
-        stop();
-        resolve(next);
-      });
-    });
+    await auth.authStateReady();
+    const user = auth.currentUser;
     if (!user) return { status: "none" };
     await user.reload();
     const email = user.email || "";

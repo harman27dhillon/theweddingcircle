@@ -1,5 +1,4 @@
 import { linkFirebaseAccount, publishCircleAccount } from "@/lib/wedding/account-cloud.functions";
-import { currentIdToken } from "@/lib/wedding/firebase-auth.browser";
 import { useWeddingStore } from "@/lib/wedding/store";
 
 /** Saves the signed-in account on the wedding database and keeps one id across devices. */
@@ -32,22 +31,15 @@ export async function signInFromCloud(_identifier?: string, _passwordHash?: stri
 /** Stores the Firebase uid on the existing Supabase account. Does not open a wedding. */
 export type AdoptFirebaseSessionResult =
   | { status: "ok" }
-  | { status: "unverified" | "none" | "unconfigured" }
-  | { status: "bad"; reason?: string }
+  | { status: "unverified" | "bad" }
   | { status: "link-failed"; reason: string };
 
-/** Links only a freshly verified Firebase session and preserves a useful, safe failure reason. */
-export async function adoptFirebaseSession(input: { name: string; country: string; phone: string }): Promise<AdoptFirebaseSessionResult> {
-  const session = await currentIdToken(true);
-  if (session.status !== "token") {
-    return session.status === "unverified" || session.status === "none" || session.status === "unconfigured"
-      ? { status: session.status }
-      : { status: "bad", reason: session.status === "error" ? session.message : "Firebase sign-in could not be refreshed." };
-  }
+/** Sends the token from the completed Firebase action for server-side verification. */
+export async function adoptFirebaseSession(input: { idToken: string; name: string; country: string; phone: string }): Promise<AdoptFirebaseSessionResult> {
   let linked: Awaited<ReturnType<typeof linkFirebaseAccount>>;
   try {
     linked = await linkFirebaseAccount({
-      data: { idToken: session.token, name: input.name, country: input.country, phone: input.phone },
+      data: { idToken: input.idToken, name: input.name, country: input.country, phone: input.phone },
     });
   } catch {
     return { status: "link-failed", reason: "The account-link service could not be reached. Your Firebase sign-in is still active; try again." };
