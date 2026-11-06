@@ -24,7 +24,7 @@ export async function infrastructureStatus() {
     stream: present("CLOUDFLARE_ACCOUNT_ID") && present("CLOUDFLARE_REALTIME_APP_ID") && present("CLOUDFLARE_REALTIME_API_TOKEN"),
     gateway: env.MEDIA_GATEWAY_ENABLED?.trim() === "yes" && present("MEDIA_GATEWAY_ORIGIN") && present("MEDIA_GATEWAY_SECRET"),
     hyperdrive,
-    supabase: (present("WC_DEVELOPER_SUPABASE_URL") || present("SUPABASE_URL")) && (present("WC_DEVELOPER_SUPABASE_PUBLISHABLE_KEY") || present("SUPABASE_PUBLISHABLE_KEY") || present("SUPABASE_ANON_KEY")),
+    supabase: present("SUPABASE_URL") && (present("SUPABASE_PUBLISHABLE_KEY") || present("SUPABASE_ANON_KEY")),
   };
 }
 
