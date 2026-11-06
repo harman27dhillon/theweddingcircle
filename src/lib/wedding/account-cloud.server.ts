@@ -2,6 +2,7 @@ import { developerEmails } from "@/lib/developer/gate.server";
 import { createHash } from "node:crypto";
 import { weddingDataSql } from "@/lib/developer/core-route.server";
 import { readFirebaseIdentity } from "@/lib/wedding/firebase-identity.server";
+import { requireVerifiedEmail } from "@/lib/wedding/firebase-identity";
 
 type Sql = Awaited<ReturnType<typeof weddingDataSql>>;
 
@@ -123,6 +124,8 @@ export async function openCircleAccount(_input: { identifier: string; passwordHa
 export async function linkFirebaseAccount(input: { idToken: string; name: string; country: string; phone: string }) {
   const verified = await readFirebaseIdentity(input.idToken);
   if (!verified.ok) return { ok: false as const, error: "bad" as const, reason: verified.reason };
+  const emailGate = requireVerifiedEmail(verified.identity);
+  if (!emailGate.ok) return { ok: false as const, error: "unverified" as const, reason: emailGate.reason };
   const email = emailOf(verified.identity.email);
   if (developerEmails().includes(email)) {
     return { ok: false as const, error: "developer-email" as const, reason: "Use Developer sign-in for this email." };

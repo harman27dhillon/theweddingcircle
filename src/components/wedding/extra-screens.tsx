@@ -72,14 +72,14 @@ export function AccountScreen() {
   async function completeVerified(address: string) {
     const { adoptFirebaseSession } = await import("@/lib/wedding/account-cloud");
     const adopted = await adoptFirebaseSession({ name: name.trim(), country, phone: cleanPhone(phone) });
-    if (adopted === "unverified") {
+    if (adopted.status === "unverified") {
       setPhase("verify");
       setAuthEmail(address);
       setNotice("Verify your email before opening a wedding.");
       return;
     }
-    if (adopted !== "ok") {
-      setNotice(adopted === "link-failed" ? "That email could not be linked. The existing account was not changed." : "Firebase did not open this account.");
+    if (adopted.status !== "ok") {
+      setNotice(adopted.status === "link-failed" ? adopted.reason : adopted.status === "bad" && adopted.reason ? adopted.reason : "Firebase did not open this account. Sign in again and retry.");
       return;
     }
     setPhase("form");
