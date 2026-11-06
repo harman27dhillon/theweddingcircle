@@ -133,8 +133,22 @@ export async function verifyEmailLink(link: string) {
     return { ok: true as const };
   } catch (error) {
     const code = firebaseCode(error);
-    if (code === "auth/expired-action-code") return { ok: false as const, message: "Firebase says this link expired. Request a new email and copy its link before opening it." };
-    if (code === "auth/invalid-action-code") return { ok: false as const, message: "Firebase says this link is invalid or already used. Request a fresh email and copy the new link." };
+    if (code === "auth/expired-action-code" || code === "auth/invalid-action-code") {
+      // Firebase's hosted action page may already have consumed the one-time code.
+      // Treat that as success only when the currently signed-in account now reports
+      // emailVerified after a server refresh; otherwise preserve the real failure.
+      try {
+        const current = auth.currentUser;
+        if (current?.uid === user.uid) {
+          await current.reload();
+          if (current.emailVerified === true) return { ok: true as const };
+        }
+      } catch {
+        // Fall through to the original Firebase action-code error.
+      }
+      if (code === "auth/expired-action-code") return { ok: false as const, message: "Firebase says this link expired and this account is still unverified. Request a new email." };
+      return { ok: false as const, message: "Firebase says this link was already used or is invalid, but this account is still unverified. Request a new email." };
+    }
     return { ok: false as const, message: mapFirebaseAuthError(error) };
   }
 }
