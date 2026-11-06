@@ -1,4 +1,5 @@
 import { parse } from "pg-connection-string";
+import { probeSupabaseDataApi } from "./supabase-api";
 import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } from "./model";
 import { safeSupabaseUri } from "../supabase-connect";
 import { hyperdriveConnectionString, serverEnvironment, workerEnvironment } from "@/lib/env.server";
@@ -118,22 +119,5 @@ export async function testSupabaseApi(): Promise<Diagnostic> {
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return { ok: false, message: `Set SUPABASE_URL to the original Supabase project URL and set the matching SUPABASE_PUBLISHABLE_KEY on this Worker.` };
   if (validate("SUPABASE_PUBLISHABLE_KEY", key, url)) return { ok: false, message: "The configured key is not a Supabase publishable or legacy anon key." };
-  try {
-    const response = await fetch(`${url}/rest/v1/`, {
-      headers: { apikey: key },
-      redirect: "manual",
-      signal: AbortSignal.timeout(15_000),
-    });
-    await response.body?.cancel().catch(() => undefined);
-    if (response.status >= 300 && response.status < 400) return { ok: false, message: "Supabase redirected the API request. Check that the Worker uses the original Supabase project URL." };
-    if (response.status === 401 || response.status === 403) return { ok: false, message: "Supabase responded but refused the key or Data API access. Check that the URL and publishable key belong to the same project." };
-    if (!response.ok) return { ok: false, message: `The Supabase Data API returned HTTP ${response.status}.` };
-    if (!/json/i.test(response.headers.get("content-type") || "")) return { ok: false, message: "The Supabase endpoint answered without a JSON API response." };
-    return { ok: true, message: "Supabase accepted the Worker API key. This checks HTTPS API access.", checkedAt: new Date().toISOString() };
-  } catch (error) {
-    const timeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
-    return { ok: false, message: timeout
-      ? "The Supabase Data API did not respond within 15 seconds."
-      : "The Worker could not connect to the Supabase Data API. Check the project is active and reachable over HTTPS." };
-  }
+  return probeSupabaseDataApi(url, key);
 }

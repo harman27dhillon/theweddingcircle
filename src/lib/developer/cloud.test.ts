@@ -447,3 +447,36 @@ test("supabase form status separates saved config from a verified connection", (
   assert.equal(supabaseFormStatus({ configured: true, dirty: false, saving: false, projectState: "connected" }).label, "Connection verified");
   assert.equal(supabaseFormStatus({ configured: true, dirty: false, saving: false, projectState: "error" }).label, "Connection failed");
 });
+
+test("the Supabase Data API diagnostic uses a publishable key on a zero-row resource", async (context) => {
+  const { probeSupabaseDataApi } = await import("./control/supabase-api.ts");
+  const project = "https://exampleproject.supabase.co";
+  const key = "sb_publishable_test";
+  const providerResponses = [
+    () => Response.json({ code: "PGRST205", message: "Missing probe resource" }, { status: 404 }),
+    () => Response.json({ code: "PGRST302", message: key }, { status: 401 }),
+    () => Response.json({ code: "PGRST205" }, { status: 403 }),
+    () => Response.json({ message: key }, { status: 404 }),
+    () => Response.json([]),
+  ];
+  context.mock.method(globalThis, "fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = new URL(String(input));
+    assert.equal(url.origin, project);
+    assert.match(url.pathname, /^\/rest\/v1\/wc_api_probe_reserved_missing$/);
+    assert.equal(url.searchParams.get("limit"), "0");
+    assert.equal(init?.redirect, "manual");
+    const headers = new Headers(init?.headers);
+    assert.equal(headers.get("apikey"), key);
+    assert.equal(headers.has("authorization"), false);
+    return providerResponses.shift()!();
+  });
+
+  assert.equal((await probeSupabaseDataApi(project, key)).ok, true);
+  const restricted = await probeSupabaseDataApi(project, key);
+  assert.equal(restricted.ok, false);
+  assert.match(restricted.message, /HTTP 401, PGRST302/);
+  assert.doesNotMatch(restricted.message, /sb_publishable/);
+  assert.equal((await probeSupabaseDataApi(project, key)).ok, false);
+  assert.equal((await probeSupabaseDataApi(project, key)).ok, false);
+  assert.equal((await probeSupabaseDataApi(project, key)).ok, true);
+});
