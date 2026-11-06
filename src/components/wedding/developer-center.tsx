@@ -9,7 +9,7 @@ import { CHECKS, INFRASTRUCTURE_CHECKS, type Check, type Diagnostic, type Infras
 const sections = [
   ["overview", "Infrastructure overview"],
   ["infrastructure", "Infrastructure"],
-  ["configuration", "Supabase status"],
+  ["configuration", "Supabase environments"],
   ["database", "Database setup & hosting"],
 ] as const;
 
@@ -217,7 +217,7 @@ function Dashboard({ email, configuration, message, onLogout }: {
             <p className="mt-4 text-xs text-on-photo/60">These checks read provider settings and probe private access. Wedding uploads, playback and live meetings require separate end-to-end tests.</p>
           </>
         ) : null}
-        {section === "configuration" ? <ConfigurationPanel configuration={configuration} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
+        {section === "configuration" ? <ConfigurationPanel configuration={configuration} environment={configuration.environment} projectUrl={configuration.projectUrl} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}
         {section === "database" ? (
           <>
             <h1 className="mt-2 font-serif text-4xl">Database setup & hosting</h1>
@@ -256,13 +256,29 @@ function Result({ value }: { value?: Diagnostic }) {
   );
 }
 
-function ConfigurationPanel({ configuration, apiResult, dbResult, running, run }: {
-  configuration: Configuration; apiResult?: Diagnostic; dbResult?: Diagnostic; running: Check | null; run: (id: Check) => Promise<void>;
+function ConfigurationPanel({ configuration, environment, projectUrl, apiResult, dbResult, running, run }: {
+  configuration: Configuration; environment: "production" | "staging"; projectUrl: string; apiResult?: Diagnostic; dbResult?: Diagnostic; running: Check | null; run: (id: Check) => Promise<void>;
 }) {
+  const productionActive = environment === "production";
+  const activeName = productionActive ? "Production" : "Staging";
+  const inactiveName = productionActive ? "Staging" : "Production";
+  const inactiveUrl = productionActive ? "https://ezwusjnszklgsoachwfm.supabase.co" : "https://vytolhwepbtzinvceucf.supabase.co";
   return (
     <>
-      <h1 className="mt-2 font-serif text-4xl">Supabase status</h1>
-      <p className="mt-2 max-w-2xl text-sm text-on-photo/70">Supabase configuration is read directly from the existing Worker environment. This page is read-only; manage secrets in Cloudflare Worker Settings. Secret values are never displayed or edited here.</p>
+      <h1 className="mt-2 font-serif text-4xl">Supabase environments</h1>
+      <p className="mt-2 max-w-2xl text-sm text-on-photo/70">Production and Staging are isolated. This deployment can inspect and test only its own Worker secrets and database. The other environment is managed from its matching Cloudflare deployment; no credentials are shared between them.</p>
+      <div className="mt-6 grid max-w-4xl gap-3 md:grid-cols-2">
+        <article className={`rounded-card border p-4 ${productionActive ? "border-gold/70 bg-on-photo/5" : "border-on-photo/15"}`}>
+          <div className="flex items-center justify-between gap-2"><h2 className="font-serif text-2xl">Production Supabase</h2><span className="text-xs text-on-photo/65">{productionActive ? "Active deployment" : "Separate deployment"}</span></div>
+          <p className="mt-2 break-all text-xs text-on-photo/65">{productionActive ? (projectUrl || "Production project URL missing") : inactiveUrl}</p>
+          {productionActive ? <><p className="mt-3 text-sm text-on-photo/75">Project URL: {configuration.configured.SUPABASE_URL ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Publishable key: {configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Database: {configuration.hyperdrive ? "Production Hyperdrive" : configuration.configured.SUPABASE_DB_URL ? "Direct Postgres" : "Not configured"}</p></> : <p className="mt-3 text-sm text-on-photo/70">Production credentials and connection tests are available only on the production deployment.</p>}
+        </article>
+        <article className={`rounded-card border p-4 ${!productionActive ? "border-gold/70 bg-on-photo/5" : "border-on-photo/15"}`}>
+          <div className="flex items-center justify-between gap-2"><h2 className="font-serif text-2xl">Staging Supabase</h2><span className="text-xs text-on-photo/65">{!productionActive ? "Active deployment" : "Separate deployment"}</span></div>
+          <p className="mt-2 break-all text-xs text-on-photo/65">{!productionActive ? (projectUrl || "Staging project URL missing") : inactiveUrl}</p>
+          {!productionActive ? <><p className="mt-3 text-sm text-on-photo/75">Project URL: {configuration.configured.SUPABASE_URL ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Publishable key: {configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Database: {configuration.configured.SUPABASE_DB_URL ? "Staging direct Postgres" : "Not configured"}</p></> : <p className="mt-3 text-sm text-on-photo/70">Staging credentials and connection tests are available only on the staging Preview deployment.</p>}
+        </article>
+      </div>
       <div className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2">
         <StatusCard title="SUPABASE_URL">{configuration.configured.SUPABASE_URL ? "Configured" : "Missing"}</StatusCard>
         <StatusCard title="SUPABASE_PUBLISHABLE_KEY">{configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured (masked)" : "Missing"}</StatusCard>
