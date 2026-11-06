@@ -260,8 +260,6 @@ function ConfigurationPanel({ configuration, environment, projectUrl, apiResult,
   configuration: Configuration; environment: "production" | "staging"; projectUrl: string; apiResult?: Diagnostic; dbResult?: Diagnostic; running: Check | null; run: (id: Check) => Promise<void>;
 }) {
   const productionActive = environment === "production";
-  const activeName = productionActive ? "Production" : "Staging";
-  const inactiveName = productionActive ? "Staging" : "Production";
   const inactiveUrl = productionActive ? "https://ezwusjnszklgsoachwfm.supabase.co" : "https://vytolhwepbtzinvceucf.supabase.co";
   return (
     <>
