@@ -6,8 +6,13 @@ import { serverEnvironment } from "@/lib/env.server";
 const prefix = "WC_DEVELOPER_";
 // Cloudflare Worker variables are the source of truth. The prefixed names remain
 // as a compatibility fallback for previously staged Developer Center values.
-const secret = (name: ConfigName, environment: Record<string, string | undefined>) =>
-  environment[name]?.trim() || environment[prefix + name]?.trim() || "";
+const secret = (name: ConfigName, environment: Record<string, string | undefined>) => {
+  // Supabase project URL and publishable key use their standard Worker names.
+  if (name === "SUPABASE_URL" || name === "SUPABASE_PUBLISHABLE_KEY") {
+    return environment[name]?.trim() || "";
+  }
+  return environment[name]?.trim() || environment[prefix + name]?.trim() || "";
+};
 
 export function readControlConfig(environment: Record<string, string | undefined> = process.env) {
   return Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, secret(name, environment)])) as Record<ConfigName, string>;
@@ -78,7 +83,7 @@ export async function stageConfiguration(draft: ConfigDraft, clear: boolean): Pr
   const project = projectUrl(draft.SUPABASE_URL || current.SUPABASE_URL);
   const secrets: Record<string, { name: string; type: "secret_text"; text: string } | null> = {};
   for (const { name } of CONFIG_FIELDS) {
-    const key = prefix + name;
+    const key = name === "SUPABASE_URL" || name === "SUPABASE_PUBLISHABLE_KEY" ? name : prefix + name;
     const value = draft[name];
     if (clear) secrets[key] = null;
     else if (value) {
