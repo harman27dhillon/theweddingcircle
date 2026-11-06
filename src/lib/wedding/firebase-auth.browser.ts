@@ -1,5 +1,4 @@
-import { verificationCodeFromLink } from "./firebase-verification";
-import { firebaseAuthConfig } from "@/lib/wedding/firebase-auth.functions";
+import { firebaseAuthConfig, redeemVerificationCode, requestFirebaseVerificationEmail } from "@/lib/wedding/firebase-auth.functions";
 
 export type FirebaseSession =
   | { status: "none" }
@@ -81,10 +80,9 @@ async function firebaseAuth() {
 export async function registerWithEmail(email: string, password: string) {
   try {
     const auth = await firebaseAuth();
-    const { createUserWithEmailAndPassword, sendEmailVerification } = await import("firebase/auth");
+    const { createUserWithEmailAndPassword } = await import("firebase/auth");
     const cred = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-    await sendEmailVerification(cred.user);
-    return { ok: true as const, email: cred.user.email || email, emailVerified: cred.user.emailVerified === true };
+    return { ok: true as const, email: cred.user.email || email };
   } catch (error) {
     return { ok: false as const, message: mapFirebaseAuthError(error) };
   }
@@ -105,53 +103,29 @@ export async function signInWithEmail(email: string, password: string) {
 export async function sendVerificationEmail() {
   try {
     const auth = await firebaseAuth();
+    await auth.authStateReady();
     const user = auth.currentUser;
     if (!user) return { ok: false as const, message: "Sign in before sending a verification email." };
-    const { sendEmailVerification } = await import("firebase/auth");
-    await sendEmailVerification(user);
-    return { ok: true as const };
+    return await requestFirebaseVerificationEmail({ data: { idToken: await user.getIdToken() } });
   } catch (error) {
     return { ok: false as const, message: mapFirebaseAuthError(error) };
   }
 }
 
-export async function verifyEmailLink(link: string) {
-  let expectedUid = "";
+export async function verifyEmailCode(code: string) {
   try {
     const auth = await firebaseAuth();
     await auth.authStateReady();
     const user = auth.currentUser;
     if (!user?.email) return { ok: false as const, message: "Sign in with the account you want to verify." };
-    expectedUid = user.uid;
-    const code = verificationCodeFromLink(link, auth.config.authDomain || "");
-    if (!code) return { ok: false as const, message: "Copy the full Verify email link from the newest Firebase email." };
-    const { ActionCodeOperation, applyActionCode, checkActionCode } = await import("firebase/auth");
-    const info = await checkActionCode(auth, code);
-    if (info.operation !== ActionCodeOperation.VERIFY_EMAIL || info.data.email?.toLowerCase() !== user.email.toLowerCase()) {
-      return { ok: false as const, message: "That verification link belongs to a different email address." };
-    }
+    const result = await redeemVerificationCode({ data: { idToken: await user.getIdToken(), code } });
+    if (!result.ok) return result;
     if (auth.currentUser?.uid !== user.uid) return { ok: false as const, message: "Your signed-in account changed. Sign in again and retry." };
-    await applyActionCode(auth, code);
+    const { applyActionCode } = await import("firebase/auth");
+    await applyActionCode(auth, result.actionCode);
     return { ok: true as const };
-  } catch (error) {
-    const code = firebaseCode(error);
-    if (code === "auth/expired-action-code" || code === "auth/invalid-action-code") {
-      // Firebase's hosted action page may already have consumed the one-time code.
-      // Treat that as success only when the currently signed-in account now reports
-      // emailVerified after a server refresh; otherwise preserve the real failure.
-      try {
-        const current = auth.currentUser;
-        if (expectedUid && current?.uid === expectedUid) {
-          await current.reload();
-          if (current.emailVerified === true) return { ok: true as const };
-        }
-      } catch {
-        // Fall through to the original Firebase action-code error.
-      }
-      if (code === "auth/expired-action-code") return { ok: false as const, message: "Firebase says this link expired and this account is still unverified. Request a new email." };
-      return { ok: false as const, message: "Firebase says this link was already used or is invalid, but this account is still unverified. Request a new email." };
-    }
-    return { ok: false as const, message: mapFirebaseAuthError(error) };
+  } catch {
+    return { ok: false as const, message: "The code could not be applied. Try requesting a new one." };
   }
 }
 

@@ -213,6 +213,7 @@ export default defineConfig(({ command, isPreview }) => ({
             cloudflare: {
               wrangler: {
                 name: "theweddingcircle",
+                keep_vars: true,
                 hyperdrive: [
                   {
                     binding: "HYPERDRIVE",

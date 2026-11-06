@@ -121,6 +121,10 @@ Validation is presence, shape, and a live test. Missing optional providers do no
 
 Push, if you want it later: set the VAPID key, sender id, app id, and the same service account. Test connection on Push. The app still does not ask people for notification permission.
 
+**Send verification code** uses the server-side `RESEND_API_KEY` Cloud variable. Resend must show `mail.theweddingcircle.in` as verified for sending. The sender is `no-reply@mail.theweddingcircle.in`.
+
+Users request a code after creating an account or signing in with an unverified email. The email contains a six-digit code that expires after 10 minutes or five failed attempts. The Firebase service account needs the `firebaseauth.users.sendEmail` IAM permission to generate the underlying Firebase verification action. Keep `FIREBASE_AUTH_DOMAIN` set to the project's existing Firebase Auth host.
+
 ## 7. Cloudflare R2
 
 1. Create a private bucket. Do not turn on public listing.

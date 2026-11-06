@@ -22,8 +22,8 @@ async function firebaseCerts() {
 }
 
 /** Verifies the Firebase ID token. It does not grant a wedding role and does not require a verified email. */
-export async function readFirebaseIdentity(idToken: string) {
-  const projectId = firebaseRuntimeFromEnv((await resolvedInfraEnv()).env).projectId;
+export async function readFirebaseIdentity(idToken: string, project?: string) {
+  const projectId = project ?? firebaseRuntimeFromEnv((await resolvedInfraEnv()).env).projectId;
   if (!projectId) return { ok: false as const, reason: "Firebase project is not configured. No membership was granted." };
   let certs: Record<string, string> | null = null;
   try {
