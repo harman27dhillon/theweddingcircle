@@ -2,7 +2,7 @@ import { parse } from "pg-connection-string";
 import { probeSupabaseDataApi } from "./supabase-api";
 import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } from "./model";
 import { safeSupabaseUri } from "../supabase-connect";
-import { hyperdriveConnectionString, serverEnvironment, workerEnvironment } from "@/lib/env.server";
+import { env, hyperdriveConnectionString, serverEnvironment, workerEnvironment } from "@/lib/env.server";
 
 const prefix = "WC_DEVELOPER_";
 // Cloudflare Worker variables are the source of truth. The prefixed names remain
@@ -62,6 +62,8 @@ export async function configurationStatus() {
   const cloudflare = Boolean(workerEnvironment());
   const hyperdrive = Boolean(await hyperdriveConnectionString());
   return {
+    environment: env("APP_ENV") === "staging" ? "staging" as const : "production" as const,
+    projectUrl: projectUrl(config.SUPABASE_URL),
     configured: Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, Boolean(config[name])])) as Record<ConfigName, boolean>,
     databaseConfigured: Boolean(config.SUPABASE_DB_URL) || hyperdrive,
     cloudflare,
