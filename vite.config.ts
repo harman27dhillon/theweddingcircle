@@ -219,10 +219,17 @@ export default defineConfig(({ command, isPreview }) => ({
                     id: "7cc99881548c416db610ead45c7b0f51",
                   },
                 ],
-                // Cloudflare requires an explicit Preview config block.
-                // Keep it empty here: do not copy production secrets, variables,
-                // or the production Hyperdrive binding into Preview implicitly.
-                previews: {},
+                // Cloudflare Previews do not inherit production settings.
+                // Give staging its own Supabase project URL and intentionally
+                // omit the production HYPERDRIVE binding from Preview.
+                // Preview-only secrets (including SUPABASE_PUBLISHABLE_KEY and
+                // SUPABASE_DB_URL) must be configured in Cloudflare's Preview
+                // environment; never commit secret values here.
+                previews: {
+                  vars: {
+                    SUPABASE_URL: "https://ezwusjnszklgsoachwfm.supabase.co",
+                  },
+                },
                 vars: {
                   MEDIA_GATEWAY_ENABLED: "yes",
                   MEDIA_GATEWAY_ORIGIN: "https://media.theweddingcircle.in",
