@@ -366,3 +366,33 @@ test("R2 failures name the transport or S3 result without repeating a secret", (
   assert.match(explainR2Http(404, "<Error><Code>NoSuchBucket</Code></Error>"), /bucket/);
   assert.equal(explainR2Http(403, `<Error><Code>AccessDenied</Code><Message>${SECRET}</Message></Error>`).includes(SECRET), false);
 });
+
+test("R2 diagnostics and data requests use the same jurisdiction endpoint", async (context) => {
+  const { probeR2Bucket, openR2Read, putR2Object } = await import("./r2-sign.ts");
+  const accountId = "a".repeat(32);
+  const host = `${accountId}.eu.r2.cloudflarestorage.com`;
+  const creds = { accountId, bucket: "wedding-media", accessKeyId: "b".repeat(32), secretAccessKey: SECRET, jurisdiction: "eu" };
+  const key = "weddings/example/album/photo.jpg";
+  const fetch = context.mock.method(globalThis, "fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = new URL(String(input));
+    assert.equal(url.hostname, host);
+    assert.equal(init?.redirect, "manual");
+    assert.equal(url.href.includes(SECRET), false);
+    if (url.searchParams.has("location")) {
+      assert.equal(new Headers(init?.headers).has("authorization"), true);
+      return new Response('<LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">EU</LocationConstraint>');
+    }
+    if (init?.method === "PUT") return new Response(null, { status: 200 });
+    assert.equal(url.searchParams.has("X-Amz-Signature"), true);
+    return new Response("photo");
+  });
+
+  assert.equal((await probeR2Bucket(creds)).ok, true);
+  assert.equal((await putR2Object({ ...creds, key, contentType: "image/jpeg", body: new Uint8Array([1]) })).ok, true);
+  const opened = await openR2Read({ ...creds, key });
+  assert.equal(opened.ok, true);
+  if (opened.ok) await opened.body?.cancel();
+  assert.equal(fetch.mock.callCount(), 3);
+  assert.equal((await probeR2Bucket({ ...creds, jurisdiction: "example.invalid" })).ok, false);
+  assert.equal(fetch.mock.callCount(), 3);
+});

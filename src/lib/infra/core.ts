@@ -152,7 +152,7 @@ export function assessInfrastructure(env: EnvMap, checks: Partial<Record<Provide
 
   const firebaseMark = fingerprint(markers(env, [...FIREBASE_WEB, "FIREBASE_SERVICE_ACCOUNT_JSON"]));
   const databaseMark = fingerprint([database]);
-  const r2Mark = fingerprint(markers(env, [...R2_REQUIRED, "R2_PUBLIC_DOMAIN"]));
+  const r2Mark = fingerprint(markers(env, [...R2_REQUIRED, "R2_PUBLIC_DOMAIN", "R2_JURISDICTION"]));
   const firebaseSaved = checks.firebase?.fingerprint === firebaseMark ? checks.firebase.detail || "" : "";
   const databaseSaved = checks.database?.fingerprint === databaseMark ? checks.database.detail || "" : "";
   const r2Saved = checks.r2?.fingerprint === r2Mark ? checks.r2.detail || "" : "";
@@ -323,7 +323,7 @@ export function assessInfrastructure(env: EnvMap, checks: Partial<Record<Provide
       state: r2State,
       missing: r2Missing,
       detail: r2Detail,
-      presentKeys: markers(env, [...R2_REQUIRED, "R2_PUBLIC_DOMAIN"]),
+      presentKeys: markers(env, [...R2_REQUIRED, "R2_PUBLIC_DOMAIN", "R2_JURISDICTION"]),
       security: r2State === "not_configured" ? "na" : r2Private ? "operational" : "audit",
       checklist: [
         { label: "Account id, bucket, access key, and secret on the server", done: r2Missing.length === 0 },

@@ -368,7 +368,7 @@ async function storeUploadedRecording(row: MeetingRow, downloadUrl: string, seco
     return { ok: false as const, error: "Private storage is not configured. The recording was not stored." };
   }
   const key = recordingObjectKey(row.slug, row.recording_id || row.meeting_id);
-  const saved = await putR2Object({ accountId, bucket, key, accessKeyId, secretAccessKey, contentType: "video/mp4", body: bytes });
+  const saved = await putR2Object({ accountId, bucket, key, accessKeyId, secretAccessKey, jurisdiction: env.R2_JURISDICTION, contentType: "video/mp4", body: bytes });
   if (!saved.ok) return { ok: false as const, error: `The recording was downloaded but private storage refused it. ${saved.detail}`.slice(0, 300) };
   const sql = await getSql();
   await sql`

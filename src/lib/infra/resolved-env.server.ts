@@ -25,11 +25,11 @@ export function infraVaultKey() {
  * Process environment plus non-blank encrypted vault overrides.
  * A database or vault failure leaves process.env in place and does not invent saved fields.
  */
-export async function resolvedInfraEnv(): Promise<ResolvedInfraEnv> {
+export async function resolvedInfraEnv(readOnly = false): Promise<ResolvedInfraEnv> {
   const base = await serverEnvironment();
   try {
     const sql = await getSql();
-    await sql`
+    if (!readOnly) await sql`
       create table if not exists infra_config (
         id text primary key,
         cipher text not null,

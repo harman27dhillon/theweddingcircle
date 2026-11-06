@@ -3,32 +3,26 @@ export function env(key: string): string | undefined {
   return v || undefined;
 }
 
+/** Nitro attaches the current Worker's bindings before dispatching the request. */
+export function workerEnvironment() {
+  return (globalThis as { __env__?: Record<string, unknown> }).__env__;
+}
+
 /** Read Cloudflare Worker bindings first, with process.env as the local fallback. */
 export async function serverEnvironment(): Promise<Record<string, string | undefined>> {
   const values: Record<string, string | undefined> = { ...process.env };
-  try {
-    const runtime = await import("cloudflare:workers");
-    for (const [key, value] of Object.entries(runtime.env)) {
-      if (typeof value === "string") values[key] = value;
-    }
-  } catch {
-    // Local Node and preview runtimes do not provide Cloudflare bindings.
+  for (const [key, value] of Object.entries(workerEnvironment() ?? {})) {
+    if (typeof value === "string") values[key] = value;
   }
   return values;
 }
 
 /** Read the non-string Hyperdrive binding from the Cloudflare Worker runtime. */
 export async function hyperdriveConnectionString(): Promise<string | undefined> {
-  try {
-    const runtime = await import("cloudflare:workers");
-    const binding = (runtime.env as { HYPERDRIVE?: { connectionString?: unknown } }).HYPERDRIVE;
-    return typeof binding?.connectionString === "string" && binding.connectionString.trim()
-      ? binding.connectionString
-      : undefined;
-  } catch {
-    // Local Node and preview runtimes use SUPABASE_DB_URL directly.
-    return undefined;
-  }
+  const binding = workerEnvironment()?.HYPERDRIVE as { connectionString?: unknown } | undefined;
+  return typeof binding?.connectionString === "string" && binding.connectionString.trim()
+    ? binding.connectionString
+    : undefined;
 }
 
 /**

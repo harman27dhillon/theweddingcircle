@@ -20,7 +20,7 @@ function equal(a: string, b: string) {
   return timingSafeEqual(digest(a), digest(b));
 }
 
-function signature(payload: string, config: NonNullable<ReturnType<typeof settings>>) {
+function signature(payload: string, config: NonNullable<Awaited<ReturnType<typeof settings>>>) {
   return createHmac("sha256", config.secret).update(JSON.stringify(["developer-control", config.email, config.password, payload])).digest("hex");
 }
 

@@ -54,9 +54,20 @@ export function signS3(input: {
   return { authorization, signature, signedHeaders, headers: lower, canonical };
 }
 
+type R2Creds = { accountId: string; bucket: string; accessKeyId: string; secretAccessKey: string; jurisdiction?: string };
+
+function r2Host({ accountId, jurisdiction }: Pick<R2Creds, "accountId" | "jurisdiction">) {
+  const account = accountId.trim().toLowerCase();
+  const location = jurisdiction?.trim().toLowerCase() || "default";
+  if (!/^[a-f0-9]{32}$/.test(account)) throw new Error("Invalid R2 account ID");
+  if (!["default", "eu", "fedramp", "us"].includes(location)) throw new Error("Invalid R2 jurisdiction");
+  return `${account}${location === "default" ? "" : `.${location}`}.r2.cloudflarestorage.com`;
+}
+
 export function presignS3(input: {
   method: "GET" | "PUT" | "HEAD";
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   key: string;
   accessKeyId: string;
@@ -65,7 +76,7 @@ export function presignS3(input: {
   expiresSeconds: number;
   contentType?: string;
 }) {
-  const host = `${input.accountId}.r2.cloudflarestorage.com`;
+  const host = r2Host(input);
   const dateStamp = input.amzDate.slice(0, 8);
   const scope = `${dateStamp}/auto/s3/aws4_request`;
   const credential = `${input.accessKeyId}/${scope}`;
@@ -126,8 +137,7 @@ export function explainR2Transport(error: unknown) {
   if (haystack.includes("handshake") || haystack.includes("eproto") || haystack.includes("err_ssl") || haystack.includes("certificate") || haystack.includes("ssl") || haystack.includes("tls")) {
     return "Cloudflare closed the TLS connection before any access key was sent. This R2 account address has no certificate, so this is not a bad secret, a signature error, or a missing bucket. Confirm R2 is enabled and the account id matches the S3 endpoint. No file was uploaded.";
   }
-  const brief = causeText(error).replace(/fetch failed/gi, "").replace(/\s+/g, " ").trim().slice(0, 160);
-  return `The R2 connection failed before a response${code ? ` (${code})` : ""}. ${brief} No file was uploaded.`.replace(/\s+/g, " ").trim();
+  return "The R2 connection failed before a response. No file was uploaded.";
 }
 
 export function explainR2Http(status: number, body: string) {
@@ -150,41 +160,22 @@ export function explainR2Http(status: number, body: string) {
 
 export async function probeR2Bucket(input: {
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   accessKeyId: string;
   secretAccessKey: string;
   now?: Date;
 }) {
-  const accountId = input.accountId.trim().toLowerCase();
-  const bucket = input.bucket.trim();
-  const host = `${accountId}.r2.cloudflarestorage.com`;
-  const amzDate = (input.now ?? new Date()).toISOString().replace(/[:-]|\.\d{3}/g, "");
+  if (!/^[a-f0-9]{32}$/i.test(input.accountId.trim())) return { ok: false as const, detail: "Check R2_ACCOUNT_ID. Use the Cloudflare account ID for the bucket." };
+  if (!["", "default", "eu", "fedramp", "us"].includes(input.jurisdiction?.trim().toLowerCase() || "")) {
+    return { ok: false as const, detail: "R2_JURISDICTION must be default, eu, fedramp, or us." };
+  }
   try {
-    const signed = signS3({
-      method: "GET",
-      host,
-      path: `/${bucket}`,
-      query: { location: "" },
-      accessKeyId: input.accessKeyId.trim(),
-      secretAccessKey: input.secretAccessKey.trim(),
-      region: "auto",
-      amzDate,
-    });
-    const response = await fetch(`https://${host}/${encodeURIComponent(bucket)}?location=`, {
-      method: "GET",
-      redirect: "manual",
-      signal: AbortSignal.timeout(12_000),
-      headers: {
-        authorization: signed.authorization,
-        "x-amz-content-sha256": signed.headers["x-amz-content-sha256"],
-        "x-amz-date": signed.headers["x-amz-date"],
-      },
-    });
-    const body = await response.text().catch(() => "");
-    if (response.status !== 200 && response.status !== 204) {
-      return { ok: false as const, detail: explainR2Http(response.status, body) };
+    const result = await callR2({ ...input, method: "GET", query: { location: "" }, timeoutMs: 12_000 });
+    if (result.status !== 200 || !/<LocationConstraint(?:\s|>|\/)/.test(result.body)) {
+      return { ok: false as const, detail: result.status === 200 ? "The R2 endpoint did not return a bucket location." : explainR2Http(result.status, result.body) };
     }
-    return { ok: true as const, detail: "The private bucket accepted a location check. No file was uploaded and no wedding file was moved." };
+    return { ok: true as const, detail: "R2 accepted the signed bucket location request. Upload and browser CORS require separate tests." };
   } catch (error) {
     return { ok: false as const, detail: explainR2Transport(error) };
   }
@@ -225,6 +216,7 @@ export function corsAllowsBrowserPut(xml: string) {
 async function callR2(input: {
   method: "GET" | "PUT" | "HEAD" | "POST" | "DELETE";
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   key?: string;
   query?: Record<string, string>;
@@ -237,9 +229,8 @@ async function callR2(input: {
   now?: Date;
   timeoutMs?: number;
 }) {
-  const accountId = input.accountId.trim().toLowerCase();
   const bucket = input.bucket.trim();
-  const host = `${accountId}.r2.cloudflarestorage.com`;
+  const host = r2Host(input);
   const amzDate = (input.now ?? new Date()).toISOString().replace(/[:-]|\.\d{3}/g, "");
   const raw = typeof input.body === "string" ? Buffer.from(input.body) : input.body ? Buffer.from(input.body) : Buffer.alloc(0);
   const payloadHash = raw.length ? createHash("sha256").update(raw).digest("hex") : EMPTY_SHA256;
@@ -286,11 +277,12 @@ async function callR2(input: {
 
 export async function ensureR2BrowserCors(input: {
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   accessKeyId: string;
   secretAccessKey: string;
 }) {
-  const mark = `${input.accountId.trim().toLowerCase()}/${input.bucket.trim()}`;
+  const mark = `${r2Host(input)}/${input.bucket.trim()}`;
   if (corsReady.has(mark)) return { ok: true as const, detail: "Browser uploads are already allowed. The bucket stays private." };
   const blocked = corsBlockedUntil.get(mark) || 0;
   if (blocked > Date.now()) return { ok: false as const, detail: "Browser uploads are not allowed yet. The bucket stays private." };
@@ -325,6 +317,7 @@ export async function ensureR2BrowserCors(input: {
 
 export async function putR2Object(input: {
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   key: string;
   accessKeyId: string;
@@ -336,6 +329,7 @@ export async function putR2Object(input: {
     const result = await callR2({
       method: "PUT",
       accountId: input.accountId,
+      jurisdiction: input.jurisdiction,
       bucket: input.bucket,
       key: input.key,
       accessKeyId: input.accessKeyId,
@@ -359,6 +353,7 @@ export async function putR2Object(input: {
 
 export async function headR2Object(input: {
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   key: string;
   accessKeyId: string;
@@ -372,8 +367,6 @@ export async function headR2Object(input: {
     return { ok: false as const, detail: explainR2Transport(error) };
   }
 }
-
-type R2Creds = { accountId: string; bucket: string; accessKeyId: string; secretAccessKey: string };
 
 export async function getR2Object(input: R2Creds & { key: string }) {
   try {
@@ -464,6 +457,7 @@ export async function completeR2Multipart(input: R2Creds & { key: string; upload
 /** Read one private object without buffering it. The signed link is not logged. */
 export async function openR2Read(input: {
   accountId: string;
+  jurisdiction?: string;
   bucket: string;
   key: string;
   accessKeyId: string;
@@ -476,6 +470,7 @@ export async function openR2Read(input: {
   const signed = presignS3({
     method,
     accountId: input.accountId,
+    jurisdiction: input.jurisdiction,
     bucket: input.bucket,
     key: input.key,
     accessKeyId: input.accessKeyId,

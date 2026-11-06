@@ -209,12 +209,12 @@ function Dashboard({ email, configuration, message, onLogout }: {
               {INFRASTRUCTURE_CHECKS.map(([id, title]) => (
                 <article key={id} className="rounded-card border border-on-photo/15 p-4">
                   <div className="flex items-start justify-between gap-3"><h2 className="font-serif text-xl">{title}</h2><span className="text-xs text-on-photo/60">{infraStatus ? infraStatus[id] ? "Configured" : "Missing / not detected" : "Status unavailable"}</span></div>
-                  <button type="button" className={primary + " mt-3"} disabled={Boolean(infraRunning)} onClick={() => void runInfrastructure(id)}>{infraRunning === id ? "Testing…" : id === "cdn" || id === "stream" ? "Check status" : "Test connection"}</button>
+                  <button type="button" className={primary + " mt-3"} disabled={Boolean(infraRunning)} onClick={() => void runInfrastructure(id)}>{infraRunning === id ? "Testing…" : "Test connection"}</button>
                   <Result value={infraResults[id]} />
                 </article>
               ))}
             </div>
-            <p className="mt-4 text-xs text-on-photo/60">Some checks are configuration/reachability checks, not full feature acceptance tests. In particular, CDN cache policy and RealtimeKit presenter/viewer permissions require dedicated end-to-end tests.</p>
+            <p className="mt-4 text-xs text-on-photo/60">These checks read provider settings and probe private access. Wedding uploads, playback and live meetings require separate end-to-end tests.</p>
           </>
         ) : null}
         {section === "configuration" ? <ConfigurationPanel configuration={configuration} apiResult={apiResult} dbResult={latestDb} running={running} run={run} /> : null}

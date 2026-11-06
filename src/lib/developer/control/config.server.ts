@@ -1,7 +1,7 @@
 import { parse } from "pg-connection-string";
 import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } from "./model";
 import { safeSupabaseUri } from "../supabase-connect";
-import { serverEnvironment } from "@/lib/env.server";
+import { hyperdriveConnectionString, serverEnvironment, workerEnvironment } from "@/lib/env.server";
 
 const prefix = "WC_DEVELOPER_";
 // Cloudflare Worker variables are the source of truth. The prefixed names remain
@@ -9,7 +9,7 @@ const prefix = "WC_DEVELOPER_";
 const secret = (name: ConfigName, environment: Record<string, string | undefined>) => {
   // Supabase project URL and publishable key use their standard Worker names.
   if (name === "SUPABASE_URL" || name === "SUPABASE_PUBLISHABLE_KEY") {
-    return environment[name]?.trim() || "";
+    return environment[name]?.trim() || (name === "SUPABASE_PUBLISHABLE_KEY" ? environment.SUPABASE_ANON_KEY?.trim() : "") || "";
   }
   return environment[name]?.trim() || environment[prefix + name]?.trim() || "";
 };
@@ -58,14 +58,8 @@ function secretWriter(environment: Record<string, string | undefined>) {
 export async function configurationStatus() {
   const environment = await serverEnvironment();
   const config = readControlConfig(environment);
-  // A normal Node process has no Cloudflare runtime binding.
-  let cloudflare = false;
-  let hyperdrive = false;
-  try {
-    const runtime = await import("cloudflare:workers");
-    cloudflare = true;
-    hyperdrive = typeof runtime.env.HYPERDRIVE?.connectionString === "string";
-  } catch { /* non-Worker runtime */ }
+  const cloudflare = Boolean(workerEnvironment());
+  const hyperdrive = Boolean(await hyperdriveConnectionString());
   return {
     configured: Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, Boolean(config[name])])) as Record<ConfigName, boolean>,
     databaseConfigured: Boolean(config.SUPABASE_DB_URL) || hyperdrive,
@@ -122,19 +116,24 @@ export async function testSupabaseApi(): Promise<Diagnostic> {
   const config = readControlConfig(await serverEnvironment());
   const url = projectUrl(config.SUPABASE_URL);
   const key = config.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return { ok: false, message: "Configure the Supabase project URL and publishable key first." };
-  if (validate("SUPABASE_PUBLISHABLE_KEY", key, url)) return { ok: false, message: "The configured key is not a Supabase publishable key." };
+  if (!url || !key) return { ok: false, message: `Set SUPABASE_URL to the original Supabase project URL and set the matching SUPABASE_PUBLISHABLE_KEY on this Worker.` };
+  if (validate("SUPABASE_PUBLISHABLE_KEY", key, url)) return { ok: false, message: "The configured key is not a Supabase publishable or legacy anon key." };
   try {
     const response = await fetch(`${url}/rest/v1/`, {
       headers: { apikey: key },
-      redirect: "error",
-      signal: AbortSignal.timeout(8_000),
+      redirect: "manual",
+      signal: AbortSignal.timeout(15_000),
     });
     await response.body?.cancel().catch(() => undefined);
-    if (response.status === 401 || response.status === 403) return { ok: false, message: "Supabase reached, but it refused the publishable key or API access." };
-    if (!response.ok) return { ok: false, message: `The Supabase API answered with HTTP ${response.status}.` };
-    return { ok: true, message: "Supabase accepted the publishable key. This checks HTTPS API access only.", checkedAt: new Date().toISOString() };
-  } catch {
-    return { ok: false, message: "The Supabase HTTPS API could not be reached." };
+    if (response.status >= 300 && response.status < 400) return { ok: false, message: "Supabase redirected the API request. Check that the Worker uses the original Supabase project URL." };
+    if (response.status === 401 || response.status === 403) return { ok: false, message: "Supabase responded but refused the key or Data API access. Check that the URL and publishable key belong to the same project." };
+    if (!response.ok) return { ok: false, message: `The Supabase Data API returned HTTP ${response.status}.` };
+    if (!/json/i.test(response.headers.get("content-type") || "")) return { ok: false, message: "The Supabase endpoint answered without a JSON API response." };
+    return { ok: true, message: "Supabase accepted the Worker API key. This checks HTTPS API access.", checkedAt: new Date().toISOString() };
+  } catch (error) {
+    const timeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    return { ok: false, message: timeout
+      ? "The Supabase Data API did not respond within 15 seconds."
+      : "The Worker could not connect to the Supabase Data API. Check the project is active and reachable over HTTPS." };
   }
 }

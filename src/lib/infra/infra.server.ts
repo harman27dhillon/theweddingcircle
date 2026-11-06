@@ -117,7 +117,7 @@ async function readChecks(sql) {
 	};
 	return checks;
 }
-async function googleToken(raw, scope) {
+export async function googleToken(raw: string, scope: string): Promise<{ ok: true; token: string } | { ok: false; error: string }> {
 	const parsed = parseServiceAccount(raw);
 	if (!parsed.ok) return {
 		ok: false,
@@ -136,6 +136,8 @@ async function googleToken(raw, scope) {
 	try {
 		response = await fetch("https://oauth2.googleapis.com/token", {
 			method: "POST",
+			redirect: "error",
+			signal: AbortSignal.timeout(8000),
 			headers: { "content-type": "application/x-www-form-urlencoded" },
 			body: new URLSearchParams({
 				grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -166,15 +168,17 @@ async function memberRole(slug, memberKey) {
 function openPrivateBucket(env, state) {
 	const accountId = env.R2_ACCOUNT_ID?.trim() || "";
 	const bucket = env.R2_BUCKET?.trim() || "";
+	const jurisdiction = env.R2_JURISDICTION?.trim().toLowerCase() || "default";
 	const accessKeyId = env.R2_ACCESS_KEY_ID?.trim() || "";
 	const secretAccessKey = env.R2_SECRET_ACCESS_KEY?.trim() || "";
-	if (!accountId || !bucket || !accessKeyId || !secretAccessKey || state !== "ready" && state !== "verified") return {
+	if (!/^[a-f0-9]{32}$/i.test(accountId) || !["default", "eu", "fedramp", "us"].includes(jurisdiction) || !bucket || !accessKeyId || !secretAccessKey || state !== "ready" && state !== "verified") return {
 		ok: false,
 		error: "Private media storage is not configured. Nothing was uploaded."
 	};
 	return {
 		ok: true,
 		accountId,
+		jurisdiction,
 		bucket,
 		accessKeyId,
 		secretAccessKey
@@ -252,6 +256,7 @@ export async function infraPrepareUpload(input): Promise<any> {
 	const signed = presignS3({
 		method: "PUT",
 		accountId: bucket.accountId,
+		jurisdiction: bucket.jurisdiction,
 		bucket: bucket.bucket,
 		key,
 		accessKeyId: bucket.accessKeyId,
@@ -328,6 +333,7 @@ export async function infraConfirmUpload(input): Promise<any> {
 function storageCreds(bucket) {
 	return {
 		accountId: bucket.accountId,
+		jurisdiction: bucket.jurisdiction,
 		bucket: bucket.bucket,
 		accessKeyId: bucket.accessKeyId,
 		secretAccessKey: bucket.secretAccessKey
@@ -679,6 +685,7 @@ export async function infraPrepareDownload(input): Promise<any> {
 	const signed = presignS3({
 		method: "GET",
 		accountId: bucket.accountId,
+		jurisdiction: bucket.jurisdiction,
 		bucket: bucket.bucket,
 		key: objectKey,
 		accessKeyId: bucket.accessKeyId,

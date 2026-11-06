@@ -23,19 +23,26 @@ changes. Review the version and deploy it using the existing manual workflow.
 The panel never deploys a version itself. Alternatively, set the secrets
 directly in Cloudflare without granting the app a Worker management token.
 
-| Field shown in the form | Developer-only Worker secret |
+| Field shown in the form | Worker variable or secret |
 | --- | --- |
-| SUPABASE_URL | WC_DEVELOPER_SUPABASE_URL |
-| SUPABASE_PUBLISHABLE_KEY | WC_DEVELOPER_SUPABASE_PUBLISHABLE_KEY |
+| SUPABASE_URL | SUPABASE_URL |
+| SUPABASE_PUBLISHABLE_KEY | SUPABASE_PUBLISHABLE_KEY |
 | SUPABASE_SERVICE_ROLE_KEY | WC_DEVELOPER_SUPABASE_SERVICE_ROLE_KEY |
 | SUPABASE_DB_URL | WC_DEVELOPER_SUPABASE_DB_URL |
 
-The namespace keeps these changes separate from app-wide bindings, including
-the app's existing SUPABASE_DB_URL. Clear affects only these four names. Values
-are never returned to the browser. The optional HYPERDRIVE binding is detected
-from the Cloudflare runtime and has no text field or environment fallback.
-The database adapter currently uses a fresh TLS Postgres connection per
-diagnostic. The API test only checks the HTTPS endpoint and publishable key.
+The API check uses the plain Supabase URL and publishable key. A legacy
+`SUPABASE_ANON_KEY` can also be used. Hyperdrive is read from the Worker binding.
+
+## Infrastructure diagnostics
+
+The R2 test uses the same effective configuration as uploads, including any
+Worker variables that take precedence over saved settings. For a jurisdictional bucket,
+set `R2_JURISDICTION` to `eu`, `fedramp` or `us` and configure the matching
+jurisdiction on the separate media gateway's R2 binding.
+
+The private gateway and CDN checks verify signed and unsigned access.
+RealtimeKit reads the presenter and viewer preset permissions. These checks
+do not upload files, create meetings or switch production routing.
 
 ## Database preparation
 

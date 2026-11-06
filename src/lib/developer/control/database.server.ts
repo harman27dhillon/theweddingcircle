@@ -7,7 +7,7 @@ import accountMigration from "../../../../migrations/supabase/0029_circle_accoun
 import { CORE_COLUMNS, CORE_PRIMARY_KEYS, CORE_TABLES } from "../core-migration";
 import { trustedSupabaseSsl } from "../supabase-connect";
 import { projectUrl, readControlConfig, validateDatabaseUrl } from "./config.server";
-import { serverEnvironment } from "@/lib/env.server";
+import { hyperdriveConnectionString, serverEnvironment } from "@/lib/env.server";
 import type { Check, Diagnostic } from "./model";
 
 const auditTable = "wc_developer_verification";
@@ -147,13 +147,9 @@ function failure(error: unknown, opened: boolean): Diagnostic {
 
 export async function runDatabaseCheck(check: Exclude<Check, "api">): Promise<Diagnostic> {
   const config = readControlConfig(await serverEnvironment());
-  let hyperdriveConnectionString = "";
-  try {
-    const runtime = await import("cloudflare:workers");
-    hyperdriveConnectionString = runtime.env.HYPERDRIVE?.connectionString || "";
-  } catch {}
-  const usingHyperdrive = Boolean(hyperdriveConnectionString);
-  const connectionString = hyperdriveConnectionString || config.SUPABASE_DB_URL;
+  const hyperdrive = await hyperdriveConnectionString();
+  const usingHyperdrive = Boolean(hyperdrive);
+  const connectionString = hyperdrive || config.SUPABASE_DB_URL;
   if (!connectionString) return { ok: false, message: "Neither the HYPERDRIVE binding nor SUPABASE_DB_URL is configured." };
   if (!usingHyperdrive) {
     const project = projectUrl(config.SUPABASE_URL);
