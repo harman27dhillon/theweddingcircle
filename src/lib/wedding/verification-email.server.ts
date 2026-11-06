@@ -18,12 +18,19 @@ function codeDigest(key: string, account: string, code: string) {
 }
 
 export async function sendFirebaseVerificationEmail(idToken: string) {
+  let stage = "configuration";
   try {
     const { env } = await resolvedInfraEnv(true);
     const { projectId, serviceAccountJson } = firebaseRuntimeFromEnv(env);
     const resendKey = env.RESEND_API_KEY?.trim();
-    if (!resendKey || !projectId || !serviceAccountJson) return unavailable;
+    if (!resendKey || !projectId || !serviceAccountJson) {
+      console.warn("Resend verification configuration incomplete", {
+        resend: Boolean(resendKey), firebaseProject: Boolean(projectId), serviceAccount: Boolean(serviceAccountJson),
+      });
+      return unavailable;
+    }
 
+    stage = "identity";
     const verified = await readFirebaseIdentity(idToken, projectId);
     if (!verified.ok || !verified.identity.email) {
       return { ok: false as const, message: "Sign in again to send a verification email." };
@@ -32,6 +39,7 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
       return { ok: false as const, message: "This email is already verified. Sign in again to continue." };
     }
 
+    stage = "rate limit";
     const email = verified.identity.email;
     const recipient = createHash("sha256").update(email).digest("hex");
     const sql = await getSql();
@@ -59,9 +67,14 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
       return { ok: false as const, message: "Too many verification email requests. Please wait before trying again." };
     }
 
-    const access = await googleToken(serviceAccountJson, "https://www.googleapis.com/auth/identitytoolkit");
-    if (!access.ok) return unavailable;
+    stage = "Firebase OAuth";
+    const access = await googleToken(serviceAccountJson, "https://www.googleapis.com/auth/identitytoolkit", { retry: true });
+    if (!access.ok) {
+      console.warn("Firebase verification OAuth failed", access.error);
+      return unavailable;
+    }
 
+    stage = "Firebase verification action";
     const action = await fetch(
       `https://identitytoolkit.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/accounts:sendOobCode`,
       {
@@ -77,11 +90,14 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
       return unavailable;
     }
     const { oobLink } = await action.json() as { oobLink?: string };
-    if (!oobLink) return unavailable;
-    const link = new URL(oobLink);
-    const actionCode = link.searchParams.get("oobCode");
-    if (link.protocol !== "https:" || link.searchParams.get("mode") !== "verifyEmail" || !actionCode) return unavailable;
+    const link = oobLink ? new URL(oobLink) : null;
+    const actionCode = link?.searchParams.get("oobCode");
+    if (link?.protocol !== "https:" || link.searchParams.get("mode") !== "verifyEmail" || !actionCode) {
+      console.warn("Firebase verification action response was incomplete");
+      return unavailable;
+    }
 
+    stage = "code storage";
     const code = String(randomInt(1_000_000)).padStart(6, "0");
     const account = accountKey(projectId, verified.identity.uid, email);
     const digest = codeDigest(resendKey, account, code);
@@ -94,6 +110,7 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
         nonce = excluded.nonce, expires_at = excluded.expires_at, attempts_left = excluded.attempts_left
     `;
 
+    stage = "Resend request";
     const delivery = await fetch("https://api.resend.com/emails", {
       method: "POST",
       redirect: "error",
@@ -111,7 +128,9 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
       return unavailable;
     }
     return { ok: true as const };
-  } catch {
+  } catch (error) {
+    const code = (error as { code?: unknown } | null)?.code;
+    console.warn("Resend verification failed at " + stage, typeof code === "string" && /^[A-Z0-9_]{2,30}$/.test(code) ? code : "");
     return unavailable;
   }
 }
