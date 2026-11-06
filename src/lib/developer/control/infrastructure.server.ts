@@ -2,7 +2,7 @@ import { parseServiceAccount } from "../cloud";
 import { bareCloudflareToken } from "../../infra/config";
 import { cdnProbeToken, cleanCdnInput, combineCdnStatus, judgeCdnProbe, judgeZoneCheck } from "../../infra/cdn";
 import { probeMediaGateway } from "../../infra/gateway-probe";
-import { googleToken } from "../../infra/infra.server";
+import { googleRequestFailure, googleToken } from "../../infra/google-token";
 import { infraVaultKey, resolvedInfraEnv } from "../../infra/resolved-env.server";
 import { normalizeGatewayOrigin } from "../../infra/media-token";
 import { hyperdriveConnectionString, serverEnvironment } from "../../env.server";
@@ -25,13 +25,26 @@ async function firebase(env: RuntimeEnv): Promise<Diagnostic> {
   if (!account.ok) return { ok: false, message: "FIREBASE_SERVICE_ACCOUNT_JSON is missing or unreadable." };
   const project = value(env, "FIREBASE_PROJECT_ID") || account.projectId;
   if (project !== account.projectId) return { ok: false, message: "FIREBASE_PROJECT_ID and the service account JSON identify different projects." };
-  const token = await googleToken(raw, "https://www.googleapis.com/auth/firebase.readonly");
+  const token = await googleToken(raw, "https://www.googleapis.com/auth/firebase.readonly", { retry: true });
   if (!token.ok) return { ok: false, message: token.error };
-  const response = await fetch(`https://firebase.googleapis.com/v1beta1/projects/${encodeURIComponent(project)}`, {
-    headers: { authorization: `Bearer ${token.token}` }, redirect: "manual", signal: AbortSignal.timeout(8_000),
-  });
-  const body = await response.json().catch(() => null) as { projectId?: string } | null;
-  if (!response.ok) return { ok: false, message: `Google issued a service account token, but the Firebase project read returned HTTP ${response.status}.` };
+  let response: Response;
+  const signal = AbortSignal.timeout(10_000);
+  try {
+    response = await fetch(`https://firebase.googleapis.com/v1beta1/projects/${encodeURIComponent(project)}`, {
+      headers: { authorization: `Bearer ${token.token}` }, redirect: "manual", signal,
+    });
+  } catch (error) {
+    return { ok: false, message: `Google issued an access token. The Firebase project read failed because ${googleRequestFailure(signal.aborted ? signal.reason : error)}.` };
+  }
+  const body = await response.json().catch(() => null) as { projectId?: string; error?: { details?: { reason?: string }[] } } | null;
+  if (signal.aborted) return { ok: false, message: "Google issued an access token, but reading the Firebase project response timed out." };
+  if (!response.ok) {
+    const details = Array.isArray(body?.error?.details) ? body.error.details : [];
+    const next = details.some((item) => item?.reason === "SERVICE_DISABLED")
+      ? "Enable the Firebase Management API in the service account's Google Cloud project."
+      : response.status === 403 ? "Check that the service account has firebase.projects.get permission for this project." : "";
+    return { ok: false, message: `Google issued an access token, but the Firebase project read returned HTTP ${response.status}.`, details: next ? [next] : undefined };
+  }
   if (body?.projectId !== project) return { ok: false, message: "Firebase did not confirm the expected project." };
   return { ok: true, message: "Firebase confirmed project access for the service account. Sign-in, storage rules and push delivery are separate checks." };
 }

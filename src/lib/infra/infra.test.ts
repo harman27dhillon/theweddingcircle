@@ -396,3 +396,35 @@ test("R2 diagnostics and data requests use the same jurisdiction endpoint", asyn
   assert.equal((await probeR2Bucket({ ...creds, jurisdiction: "example.invalid" })).ok, false);
   assert.equal(fetch.mock.callCount(), 3);
 });
+
+test("Google OAuth sends an encoded assertion and recovers after a transport failure", async (context) => {
+  const { googleToken } = await import("./google-token.ts");
+  const pair = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const privateKey = pair.privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+  const publicKey = pair.publicKey.export({ type: "spki", format: "pem" }).toString();
+  const raw = JSON.stringify({ type: "service_account", project_id: "example-project", client_email: "test@example-project.iam.gserviceaccount.com", private_key: privateKey });
+  const scope = "https://www.googleapis.com/auth/firebase.readonly";
+  let calls = 0;
+  const request = context.mock.method(globalThis, "fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
+    assert.equal(String(input), "https://oauth2.googleapis.com/token");
+    assert.equal(init?.redirect, "manual");
+    assert.equal(typeof init?.body, "string");
+    const form = new URLSearchParams(String(init?.body));
+    assert.equal(form.get("grant_type"), "urn:ietf:params:oauth:grant-type:jwt-bearer");
+    const assertion = form.get("assertion") || "";
+    assert.equal(verifyServiceAccountJwt(assertion, publicKey), true);
+    assert.equal(JSON.parse(Buffer.from(assertion.split(".")[1], "base64url").toString()).scope, scope);
+    calls++;
+    if (calls === 1) throw new DOMException("test timeout", "TimeoutError");
+    if (calls === 2) return Response.json({ access_token: "test-token" });
+    if (calls === 3) return Response.json({ error: "invalid_grant", error_description: SECRET }, { status: 400 });
+    return new Response(null, { status: 302, headers: { location: "https://example.test/" } });
+  });
+
+  assert.deepEqual(await googleToken(raw, scope, { retry: true }), { ok: true, token: "test-token" });
+  const rejected = await googleToken(raw, scope, { retry: true });
+  assert.deepEqual(rejected, { ok: false, error: "Google OAuth refused the token request (HTTP 400, invalid_grant)." });
+  assert.equal(request.mock.callCount(), 3);
+  assert.deepEqual(await googleToken(raw, scope, { retry: true }), { ok: false, error: "Google OAuth redirected the token request (HTTP 302)." });
+  assert.equal(request.mock.callCount(), 4);
+});

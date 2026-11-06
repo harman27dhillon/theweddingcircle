@@ -3,11 +3,10 @@
 import { createHash, randomBytes } from "node:crypto";
 import { getSql } from "@/lib/db";
 import { weddingDataSql } from "@/lib/developer/core-route.server";
-import { parseServiceAccount } from "@/lib/developer/cloud";
 import { PLAY_CATALOG, decidePurchase, interpretPlayProduct, interpretPlaySubscription, purchaseTokenHash } from "@/lib/infra/billing";
 import { bareCloudflareToken } from "@/lib/infra/config";
 import { FLAG_IDS, assessInfrastructure, effectiveFlag, redactDetail } from "@/lib/infra/core";
-import { serviceAccountJwt } from "@/lib/infra/google-jwt";
+import { googleToken } from "@/lib/infra/google-token";
 import { decideLive } from "@/lib/infra/live";
 import { authorizeMedia, keyBelongsToWedding, mediaObjectKey, withinRate } from "@/lib/infra/media-policy";
 import { MULTIPART_PART_BYTES, UPLOAD_CHUNK_BYTES, pieceLength, uploadPieceCount } from "@/lib/infra/r2-browser";
@@ -116,47 +115,6 @@ async function readChecks(sql) {
 		checkedAt: displayText(row.checked_at)
 	};
 	return checks;
-}
-export async function googleToken(raw: string, scope: string): Promise<{ ok: true; token: string } | { ok: false; error: string }> {
-	const parsed = parseServiceAccount(raw);
-	if (!parsed.ok) return {
-		ok: false,
-		error: "The service account could not be read. The value was not shown."
-	};
-	let assertion = "";
-	try {
-		assertion = serviceAccountJwt({
-			clientEmail: parsed.clientEmail,
-			privateKey: parsed.privateKey
-		}, scope, Date.now());
-	} catch {
-		return { ok: false, error: "The service account private key could not be used. The value was not shown." };
-	}
-	let response;
-	try {
-		response = await fetch("https://oauth2.googleapis.com/token", {
-			method: "POST",
-			redirect: "error",
-			signal: AbortSignal.timeout(8000),
-			headers: { "content-type": "application/x-www-form-urlencoded" },
-			body: new URLSearchParams({
-				grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-				assertion
-			})
-		});
-	} catch {
-		return { ok: false, error: "Google could not be reached. No secret was stored." };
-	}
-	const body = await response.json().catch(() => null);
-	const code = body && typeof body.error === "string" && /^[a-z0-9_]+$/i.test(body.error) ? body.error : "";
-	if (!response.ok || !body?.access_token) return {
-		ok: false,
-		error: code ? `Google refused the service account (${code}). No secret was stored.` : "Google refused the service account. No secret was stored."
-	};
-	return {
-		ok: true,
-		token: body.access_token
-	};
 }
 async function memberRole(slug, memberKey) {
 	try {
