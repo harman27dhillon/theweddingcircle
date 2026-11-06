@@ -79,7 +79,7 @@ export function AccountScreen() {
       return;
     }
     if (adopted.status !== "ok") {
-      setNotice(adopted.status === "link-failed" ? adopted.reason : "Firebase did not open this account. Sign in again and retry.");
+      setNotice(adopted.status === "link-failed" ? adopted.reason : adopted.status === "bad" && adopted.reason ? adopted.reason : "Firebase did not open this account. Sign in again and retry.");
       return;
     }
     setPhase("form");
