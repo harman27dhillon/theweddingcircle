@@ -234,7 +234,7 @@ export default defineConfig(({ command, isPreview }) => ({
                   R2_ACCOUNT_ID: "c602d88743219605c0c56b769482dad",
                   R2_BUCKET: "wedding-circle-media",
                   R2_PUBLIC_DOMAIN: "media.theweddingcircle.in",
-                  WC_DEVELOPER_SUPABASE_URL: "https://vytolhwepbtzinvceucf.supabase.co",
+                  SUPABASE_URL: "https://vytolhwepbtzinvceucf.supabase.co",
                 },
               },
             },
