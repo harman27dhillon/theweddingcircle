@@ -79,3 +79,16 @@ test("sign-in buttons call Firebase and the old hash path cannot succeed", () =>
   const linker = accounts.slice(accounts.indexOf("export async function linkFirebaseAccount"));
   assert.equal(linker.includes("password_hash ="), false);
 });
+
+test("recovery accepts only a verification code from the configured Firebase action page", async () => {
+  const { verificationCodeFromLink } = await import("./firebase-verification.ts");
+  const host = "example-project.firebaseapp.com";
+  const link = `https://${host}/__/auth/action?mode=verifyEmail&oobCode=mock-code&apiKey=old-key`;
+  assert.equal(verificationCodeFromLink(link, host), "mock-code");
+  assert.equal(verificationCodeFromLink(link.replace(host, "another-project.firebaseapp.com"), host), "");
+  assert.equal(verificationCodeFromLink(link.replace("verifyEmail", "resetPassword"), host), "");
+  assert.equal(verificationCodeFromLink(`${link}&oobCode=another-code`, host), "");
+  assert.equal(verificationCodeFromLink(link.replace("https:", "http:"), host), "");
+  assert.equal(verificationCodeFromLink(link.replace("/__/auth/action", "/another-path"), host), "");
+  assert.equal(verificationCodeFromLink(link.replace("mock-code", "%20invalid"), host), "");
+});

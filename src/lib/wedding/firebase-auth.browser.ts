@@ -1,3 +1,4 @@
+import { verificationCodeFromLink } from "./firebase-verification";
 import { firebaseAuthConfig } from "@/lib/wedding/firebase-auth.functions";
 
 export type FirebaseSession =
@@ -110,6 +111,30 @@ export async function sendVerificationEmail() {
     await sendEmailVerification(user);
     return { ok: true as const };
   } catch (error) {
+    return { ok: false as const, message: mapFirebaseAuthError(error) };
+  }
+}
+
+export async function verifyEmailLink(link: string) {
+  try {
+    const auth = await firebaseAuth();
+    await auth.authStateReady();
+    const user = auth.currentUser;
+    if (!user?.email) return { ok: false as const, message: "Sign in with the account you want to verify." };
+    const code = verificationCodeFromLink(link, auth.config.authDomain || "");
+    if (!code) return { ok: false as const, message: "Copy the full Verify email link from the newest Firebase email." };
+    const { ActionCodeOperation, applyActionCode, checkActionCode } = await import("firebase/auth");
+    const info = await checkActionCode(auth, code);
+    if (info.operation !== ActionCodeOperation.VERIFY_EMAIL || info.data.email?.toLowerCase() !== user.email.toLowerCase()) {
+      return { ok: false as const, message: "That verification link belongs to a different email address." };
+    }
+    if (auth.currentUser?.uid !== user.uid) return { ok: false as const, message: "Your signed-in account changed. Sign in again and retry." };
+    await applyActionCode(auth, code);
+    return { ok: true as const };
+  } catch (error) {
+    const code = firebaseCode(error);
+    if (code === "auth/expired-action-code") return { ok: false as const, message: "Firebase says this link expired. Request a new email and copy its link before opening it." };
+    if (code === "auth/invalid-action-code") return { ok: false as const, message: "Firebase says this link is invalid or already used. Request a fresh email and copy the new link." };
     return { ok: false as const, message: mapFirebaseAuthError(error) };
   }
 }

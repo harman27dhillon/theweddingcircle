@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { useWedding } from "@/components/wedding/context";
 import { Button, Empty, fieldClass, Mark, PickList, Screen } from "@/components/wedding/ui";
@@ -66,6 +66,7 @@ export function AccountScreen() {
   const [notice, setNotice] = useState("");
   const [phase, setPhase] = useState<"form" | "verify">("form");
   const [authEmail, setAuthEmail] = useState("");
+  const verifyLinkField = useRef<HTMLInputElement>(null);
   const [joinTitle, setJoinTitle] = useState("");
 
   async function completeVerified(address: string) {
@@ -259,6 +260,26 @@ export function AccountScreen() {
     setBusy(false);
   }
 
+  async function verifyFromLink(event: FormEvent) {
+    event.preventDefault();
+    const field = verifyLinkField.current;
+    if (!field?.value || busy) return;
+    const link = field.value;
+    field.value = "";
+    setBusy(true);
+    setNotice("");
+    try {
+      const { verifyEmailLink } = await import("@/lib/wedding/firebase-auth.browser");
+      const result = await verifyEmailLink(link);
+      if (result.ok) await confirmVerified();
+      else setNotice(result.message);
+    } catch {
+      setNotice("The verification check could not finish. Try again in a moment.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function leaveAccount() {
     const { signOutFirebase } = await import("@/lib/wedding/firebase-auth.browser");
     await signOutFirebase();
@@ -282,7 +303,7 @@ export function AccountScreen() {
             : "Create an account with your email. A verification link is required before a wedding opens."}
       </p>
       <Link to="/developer" className="mt-3 inline-flex min-h-11 items-center text-sm text-maroon">Developer sign-in</Link>
-      {notice ? <p className="mt-3 text-sm text-muted">{notice}</p> : null}
+      {notice ? <p role="status" className="mt-3 text-sm text-muted">{notice}</p> : null}
 
       {account ? (
         <div className="mt-6">
@@ -311,10 +332,21 @@ export function AccountScreen() {
       ) : phase === "verify" ? (
         <div className="mt-6 grid gap-3">
           <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-sm">
-            Verify {authEmail || "your email"} before opening a wedding. The link is from Firebase. A code on this page is not accepted.
+            Verify {authEmail || "your email"} before opening a wedding. Open the link from Firebase, then return here.
           </p>
           <Button type="button" disabled={busy} onClick={() => void resendVerification()}>Resend verification email</Button>
           <Button type="button" variant="line" disabled={busy} onClick={() => void confirmVerified()}>I've verified</Button>
+          <details className="rounded-2xl border border-line bg-paper px-4">
+            <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium">Verification link won’t open?</summary>
+            <form className="grid gap-3 pb-4" autoComplete="off" onSubmit={(event) => void verifyFromLink(event)}>
+              <p className="text-sm text-muted">Copy the Verify email link from your newest email without opening it. Paste it below.</p>
+              <label className="grid gap-1 text-sm">
+                Firebase verification link
+                <input className={fieldClass} ref={verifyLinkField} type="password" maxLength={4096} required disabled={busy} />
+              </label>
+              <Button type="submit" variant="line" disabled={busy}>Verify from link</Button>
+            </form>
+          </details>
           <button type="button" className="text-sm text-muted" onClick={() => void leaveAccount()}>Use a different email</button>
         </div>
       ) : (
