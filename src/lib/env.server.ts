@@ -1,5 +1,9 @@
 export function env(key: string): string | undefined {
-  const v = process.env[key]?.trim();
+  // Cloudflare Worker secrets and vars live on the runtime environment, not
+  // necessarily in process.env. Prefer the active deployment's binding.
+  const workerValue = workerEnvironment()?.[key];
+  const value = typeof workerValue === "string" ? workerValue : process.env[key];
+  const v = value?.trim();
   return v || undefined;
 }
 
@@ -19,6 +23,9 @@ export async function serverEnvironment(): Promise<Record<string, string | undef
 
 /** Read the non-string Hyperdrive binding from the Cloudflare Worker runtime. */
 export async function hyperdriveConnectionString(): Promise<string | undefined> {
+  // Preview is deliberately isolated on its own Supabase project. Never let an
+  // inherited production Hyperdrive binding override its SUPABASE_DB_URL.
+  if (env("APP_ENV") === "staging") return undefined;
   const binding = workerEnvironment()?.HYPERDRIVE as { connectionString?: unknown } | undefined;
   return typeof binding?.connectionString === "string" && binding.connectionString.trim()
     ? binding.connectionString
