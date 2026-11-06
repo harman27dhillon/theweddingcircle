@@ -32,13 +32,18 @@ export async function signInFromCloud(_identifier?: string, _passwordHash?: stri
 /** Stores the Firebase uid on the existing Supabase account. Does not open a wedding. */
 export type AdoptFirebaseSessionResult =
   | { status: "ok" }
-  | { status: "unverified" | "none" | "unconfigured" | "bad" }
+  | { status: "unverified" | "none" | "unconfigured" }
+  | { status: "bad"; reason?: string }
   | { status: "link-failed"; reason: string };
 
 /** Links only a freshly verified Firebase session and preserves a useful, safe failure reason. */
 export async function adoptFirebaseSession(input: { name: string; country: string; phone: string }): Promise<AdoptFirebaseSessionResult> {
   const session = await currentIdToken(true);
-  if (session.status !== "token") return { status: session.status };
+  if (session.status !== "token") {
+    return session.status === "unverified" || session.status === "none" || session.status === "unconfigured"
+      ? { status: session.status }
+      : { status: "bad", reason: session.status === "error" ? session.message : "Firebase sign-in could not be refreshed." };
+  }
   let linked: Awaited<ReturnType<typeof linkFirebaseAccount>>;
   try {
     linked = await linkFirebaseAccount({
@@ -51,6 +56,7 @@ export async function adoptFirebaseSession(input: { name: string; country: strin
     const reason = "reason" in linked && linked.reason
       ? linked.reason
       : "The account could not be linked. No wedding access was granted.";
+    if ("error" in linked && linked.error === "unverified") return { status: "unverified" };
     return { status: "link-failed", reason };
   }
   const signed = useWeddingStore.getState().signInLinkedAccount({
