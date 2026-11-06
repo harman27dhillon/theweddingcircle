@@ -64,24 +64,30 @@ export async function runSupabaseSchema(files: { name: string; sql: string }[], 
   const uri = safeSupabaseUri(raw);
   if (uri.status !== "ready") throw new Error(uri.detail);
   const pool = await openPool(raw, 1, mode);
-  const client = await pool.connect();
   try {
-    await client.query("CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())");
-    const applied = new Set((await client.query<{ name: string }>("SELECT name FROM _migrations")).rows.map((row) => row.name));
-    for (const file of files) {
-      if (!file.name || applied.has(file.name)) continue;
-      try {
-        await client.query("BEGIN");
-        await client.query(file.sql);
-        await client.query("INSERT INTO _migrations (name) VALUES ($1)", [file.name]);
-        await client.query("COMMIT");
-      } catch (error) {
-        await client.query("ROLLBACK").catch(() => undefined);
-        throw error;
+    const client = await pool.connect();
+    try {
+      await client.query("CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())");
+      const applied = new Set((await client.query<{ name: string }>("SELECT name FROM _migrations")).rows.map((row) => row.name));
+      for (const file of files) {
+        if (!file.name || applied.has(file.name)) continue;
+        try {
+          await client.query("BEGIN");
+          const claim = await client.query(
+            "INSERT INTO _migrations (name) VALUES ($1) ON CONFLICT DO NOTHING",
+            [file.name],
+          );
+          if (claim.rowCount === 1) await client.query(file.sql);
+          await client.query("COMMIT");
+        } catch (error) {
+          await client.query("ROLLBACK").catch(() => undefined);
+          throw error;
+        }
       }
+    } finally {
+      client.release();
     }
   } finally {
-    client.release();
     await pool.end().catch(() => undefined);
   }
 }
@@ -114,6 +120,24 @@ export async function openSupabaseSql(connectionString?: string, requestedMode?:
   const mode = requestedMode || (hyperdrive ? "hyperdrive" : "direct");
   const uri = safeSupabaseUri(raw);
   if (uri.status !== "ready") return { ok: false, error: uri.detail };
+  if (mode === "hyperdrive") {
+    // Cache only the query function. Worker sockets belong to the request
+    // that created them, and Hyperdrive already pools origin connections.
+    const { Client, types } = await import("pg");
+    types.setTypeParser(20, Number);
+    types.setTypeParser(1082, (value) => value);
+    types.setTypeParser(1186, (value) => value);
+    const sql = toSql(async <T>(text: string, params: unknown[]) => {
+      const client = new Client({ connectionString: raw, connectionTimeoutMillis: 8_000, query_timeout: 8_000 });
+      try {
+        await client.connect();
+        return (await client.query(text, params)).rows as T[];
+      } finally {
+        await client.end().catch(() => undefined);
+      }
+    });
+    return { ok: true, sql };
+  }
   const key = createHash("sha256").update(raw).digest("hex").slice(0, 20);
   if (!globalRef.__wcSupabaseSql__ || globalRef.__wcSupabaseSql__.key !== key) {
     const opening = (async () => {

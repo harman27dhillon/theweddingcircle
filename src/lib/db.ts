@@ -5,14 +5,14 @@ export type DbSource = "supabase" | "neon" | "pglite";
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
 // "unset" — otherwise production would silently run on the PGLite fallback.
-function databaseSettings(environment: Record<string, string | undefined>, hasHyperdrive = false) {
+function databaseSettings(environment: Record<string, string | undefined>) {
   const rawDatabaseUrl = environment.DATABASE_URL;
   const databaseUrl = rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl.trim() : undefined;
   const rawSupabaseUrl = environment.SUPABASE_DB_URL;
   const supabaseUrl = rawSupabaseUrl && rawSupabaseUrl.trim().startsWith("postgres")
     ? rawSupabaseUrl.trim()
     : undefined;
-  return { databaseUrl, supabaseUrl, source: hasHyperdrive || supabaseUrl ? "supabase" as const : databaseUrl ? "neon" as const : "pglite" as const };
+  return { databaseUrl, supabaseUrl, source: supabaseUrl ? "supabase" as const : databaseUrl ? "neon" as const : "pglite" as const };
 }
 
 /**
@@ -173,7 +173,12 @@ async function createPgliteSql(): Promise<Sql> {
 
 let sqlPromise: Promise<Sql> | null = null;
 
+let hyperdriveSql: { connectionString: string; sql: Sql } | undefined;
+
 async function createSupabaseSql(connectionString: string, mode: "direct" | "hyperdrive" = "direct"): Promise<Sql> {
+  if (mode === "hyperdrive" && hyperdriveSql?.connectionString === connectionString) {
+    return hyperdriveSql.sql;
+  }
   const { openSupabaseSql, runSupabaseSchema } = await import("@/lib/developer/supabase-pool.server");
   const migrations = import.meta.glob("/migrations/*.sql", {
     query: "?raw",
@@ -184,6 +189,7 @@ async function createSupabaseSql(connectionString: string, mode: "direct" | "hyp
   await runSupabaseSchema(files, connectionString, mode);
   const opened = await openSupabaseSql(connectionString, mode);
   if (!opened.ok) throw new Error(opened.error);
+  if (mode === "hyperdrive") hyperdriveSql = { connectionString, sql: opened.sql };
   return opened.sql;
 }
 
@@ -194,11 +200,10 @@ async function createSql(): Promise<Sql> {
         "or a server route loader, never from client code.",
     );
   }
-  const { hyperdriveConnectionString, serverEnvironment } = await import("@/lib/env.server");
-  const [environment, hyperdrive] = await Promise.all([serverEnvironment(), hyperdriveConnectionString()]);
-  const settings = databaseSettings(environment, Boolean(hyperdrive));
+  const { serverEnvironment } = await import("@/lib/env.server");
+  const environment = await serverEnvironment();
+  const settings = databaseSettings(environment);
   dbSource = settings.source;
-  if (hyperdrive) return createSupabaseSql(hyperdrive, "hyperdrive");
   if (settings.supabaseUrl) return createSupabaseSql(settings.supabaseUrl, "direct");
   return settings.databaseUrl ? createNeonSql(settings.databaseUrl) : createPgliteSql();
 }
@@ -210,7 +215,13 @@ async function createSql(): Promise<Sql> {
  * Schema comes from `migrations/*.sql`, auto-applied before the first query on
  * both backends — define tables there, never inline in server functions.
  */
-export function getSql(): Promise<Sql> {
+export async function getSql(): Promise<Sql> {
+  const { hyperdriveConnectionString } = await import("@/lib/env.server");
+  const hyperdrive = await hyperdriveConnectionString();
+  if (hyperdrive) {
+    dbSource = "supabase";
+    return createSupabaseSql(hyperdrive, "hyperdrive");
+  }
   sqlPromise ??= createSql().catch((err) => {
     sqlPromise = null; // don't memoize failures — let the next call retry
     throw err;
