@@ -219,6 +219,10 @@ export default defineConfig(({ command, isPreview }) => ({
                     id: "7cc99881548c416db610ead45c7b0f51",
                   },
                 ],
+                // Cloudflare requires an explicit Preview config block.
+                // Keep it empty here: do not copy production secrets, variables,
+                // or the production Hyperdrive binding into Preview implicitly.
+                previews: {},
                 vars: {
                   MEDIA_GATEWAY_ENABLED: "yes",
                   MEDIA_GATEWAY_ORIGIN: "https://media.theweddingcircle.in",
