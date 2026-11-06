@@ -116,11 +116,13 @@ export async function sendVerificationEmail() {
 }
 
 export async function verifyEmailLink(link: string) {
+  let expectedUid = "";
   try {
     const auth = await firebaseAuth();
     await auth.authStateReady();
     const user = auth.currentUser;
     if (!user?.email) return { ok: false as const, message: "Sign in with the account you want to verify." };
+    expectedUid = user.uid;
     const code = verificationCodeFromLink(link, auth.config.authDomain || "");
     if (!code) return { ok: false as const, message: "Copy the full Verify email link from the newest Firebase email." };
     const { ActionCodeOperation, applyActionCode, checkActionCode } = await import("firebase/auth");
@@ -139,7 +141,7 @@ export async function verifyEmailLink(link: string) {
       // emailVerified after a server refresh; otherwise preserve the real failure.
       try {
         const current = auth.currentUser;
-        if (current?.uid === user.uid) {
+        if (expectedUid && current?.uid === expectedUid) {
           await current.reload();
           if (current.emailVerified === true) return { ok: true as const };
         }
