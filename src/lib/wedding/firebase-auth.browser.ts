@@ -100,13 +100,15 @@ export async function signInWithEmail(email: string, password: string) {
   }
 }
 
-export async function sendVerificationEmail() {
+export async function sendVerificationEmail(signal?: AbortSignal) {
   try {
-    const auth = await firebaseAuth();
+    const auth = await (authPromise ?? firebaseAuth());
     await auth.authStateReady();
     const user = auth.currentUser;
     if (!user) return { ok: false as const, message: "Sign in before sending a verification email." };
-    return await requestFirebaseVerificationEmail({ data: { idToken: await user.getIdToken() } });
+    const idToken = await user.getIdToken();
+    signal?.throwIfAborted();
+    return await requestFirebaseVerificationEmail({ data: { idToken }, signal });
   } catch (error) {
     return { ok: false as const, message: mapFirebaseAuthError(error) };
   }

@@ -124,9 +124,12 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
       }),
     });
     if (!delivery.ok) {
-      console.warn("Resend verification email request failed", delivery.status);
+      const detail = await delivery.json().catch(() => null) as { name?: unknown } | null;
+      const name = detail?.name;
+      console.warn("Resend verification email request failed", delivery.status, typeof name === "string" && /^[a-z_]{1,40}$/.test(name) ? name : "");
       return unavailable;
     }
+    console.info("Resend verification email accepted");
     return { ok: true as const };
   } catch (error) {
     const code = (error as { code?: unknown } | null)?.code;

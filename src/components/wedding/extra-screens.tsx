@@ -234,10 +234,19 @@ export function AccountScreen() {
   async function sendCode() {
     if (busy) return;
     setBusy(true);
-    setNotice("");
+    setNotice("Sending verification code…");
+    const controller = new AbortController();
+    let timer: number | undefined;
     try {
-      const { sendVerificationEmail } = await import("@/lib/wedding/firebase-auth.browser");
-      const result = await sendVerificationEmail();
+      const delivery = import("@/lib/wedding/firebase-auth.browser")
+        .then(({ sendVerificationEmail }) => sendVerificationEmail(controller.signal));
+      const deadline = new Promise<{ ok: false; message: string }>((resolve) => {
+        timer = window.setTimeout(() => {
+          resolve({ ok: false, message: "The send is taking longer than expected. Check your inbox, then try again in a minute if no code arrives." });
+          controller.abort();
+        }, 45_000);
+      });
+      const result = await Promise.race([delivery, deadline]);
       if (!result.ok) {
         setNotice(result.message);
         return;
@@ -248,6 +257,7 @@ export function AccountScreen() {
     } catch {
       setNotice("We couldn’t send a code. Please try again.");
     } finally {
+      window.clearTimeout(timer);
       setBusy(false);
     }
   }
