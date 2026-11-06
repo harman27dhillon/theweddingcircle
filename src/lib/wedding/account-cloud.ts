@@ -30,13 +30,29 @@ export async function signInFromCloud(_identifier?: string, _passwordHash?: stri
 }
 
 /** Stores the Firebase uid on the existing Supabase account. Does not open a wedding. */
-export async function adoptFirebaseSession(input: { name: string; country: string; phone: string }) {
+export type AdoptFirebaseSessionResult =
+  | { status: "ok" }
+  | { status: "unverified" | "none" | "unconfigured" | "bad" }
+  | { status: "link-failed"; reason: string };
+
+/** Links only a freshly verified Firebase session and preserves a useful, safe failure reason. */
+export async function adoptFirebaseSession(input: { name: string; country: string; phone: string }): Promise<AdoptFirebaseSessionResult> {
   const session = await currentIdToken(true);
-  if (session.status !== "token") return session.status;
-  const linked = await linkFirebaseAccount({
-    data: { idToken: session.token, name: input.name, country: input.country, phone: input.phone },
-  }).catch(() => null);
-  if (!linked?.ok) return "link-failed" as const;
+  if (session.status !== "token") return { status: session.status };
+  let linked: Awaited<ReturnType<typeof linkFirebaseAccount>>;
+  try {
+    linked = await linkFirebaseAccount({
+      data: { idToken: session.token, name: input.name, country: input.country, phone: input.phone },
+    });
+  } catch {
+    return { status: "link-failed", reason: "The account-link service could not be reached. Your Firebase sign-in is still active; try again." };
+  }
+  if (!linked?.ok) {
+    const reason = "reason" in linked && linked.reason
+      ? linked.reason
+      : "The account could not be linked. No wedding access was granted.";
+    return { status: "link-failed", reason };
+  }
   const signed = useWeddingStore.getState().signInLinkedAccount({
     id: linked.account.id,
     name: linked.account.name || input.name,
@@ -45,5 +61,5 @@ export async function adoptFirebaseSession(input: { name: string; country: strin
     phone: linked.account.phone || input.phone,
     firebaseUid: linked.uid,
   });
-  return signed === "ok" ? "ok" as const : "bad" as const;
+  return signed === "ok" ? { status: "ok" } : { status: "bad" };
 }
