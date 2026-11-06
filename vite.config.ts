@@ -227,6 +227,7 @@ export default defineConfig(({ command, isPreview }) => ({
                 // environment; never commit secret values here.
                 previews: {
                   vars: {
+                    APP_ENV: "staging",
                     SUPABASE_URL: "https://ezwusjnszklgsoachwfm.supabase.co",
                   },
                 },
