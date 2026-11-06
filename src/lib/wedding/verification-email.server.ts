@@ -79,7 +79,7 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
       `https://identitytoolkit.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/accounts:sendOobCode`,
       {
         method: "POST",
-        redirect: "error",
+        redirect: "manual",
         signal: AbortSignal.timeout(10_000),
         headers: { Authorization: `Bearer ${access.token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ requestType: "VERIFY_EMAIL", email, returnOobLink: true }),
@@ -113,7 +113,7 @@ export async function sendFirebaseVerificationEmail(idToken: string) {
     stage = "Resend request";
     const delivery = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      redirect: "error",
+      redirect: "manual",
       signal: AbortSignal.timeout(10_000),
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
