@@ -225,6 +225,8 @@ export default defineConfig(({ command, isPreview }) => ({
                   CDN_ENABLED: "yes",
                   CDN_MEDIA_DOMAIN: "media.theweddingcircle.in",
                   CDN_BASE_URL: "https://media.theweddingcircle.in",
+                  CLOUDFLARE_ACCOUNT_ID: "c602d88743219605c0c56b769482dad",
+                  CLOUDFLARE_REALTIME_APP_ID: "d59fd1e8-4e0b-48b6-b11c-510594e0327c",
                   FIREBASE_APP_ID: "1:637941576967:web:485b3ed1463dcd8895c1a2",
                   FIREBASE_AUTH_DOMAIN: "the-wedding-circle-b31b6.firebaseapp.com",
                   FIREBASE_MESSAGING_SENDER_ID: "637941576967",
