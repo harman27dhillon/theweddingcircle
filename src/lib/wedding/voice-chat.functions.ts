@@ -4,7 +4,7 @@ function text(value: unknown, max: number) {
   return typeof value === "string" ? value.slice(0, max) : "";
 }
 
-const ACTIONS = new Set(["token", "publish", "roster", "leave", "beat"]);
+const ACTIONS = new Set(["token", "roster", "leave", "beat"]);
 
 function input(value: unknown) {
   const body = value && typeof value === "object" ? value as Record<string, unknown> : {};
@@ -16,6 +16,7 @@ function input(value: unknown) {
     name: text(body.name, 80),
     action: ACTIONS.has(action) ? action : "",
     publish: body.publish === true,
+    connectionId: text(body.connectionId, 36),
   };
 }
 
@@ -27,10 +28,6 @@ async function run(data: ReturnType<typeof input>) {
 export const issueVoiceToken = createServerFn({ method: "POST" })
   .validator(input)
   .handler(async ({ data }) => run({ ...data, action: "token" }));
-
-export const allowVoicePublish = createServerFn({ method: "POST" })
-  .validator(input)
-  .handler(async ({ data }) => run({ ...data, action: "publish" }));
 
 export const readVoiceRoster = createServerFn({ method: "POST" })
   .validator(input)

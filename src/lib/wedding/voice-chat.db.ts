@@ -1,18 +1,13 @@
+import { randomUUID } from "node:crypto";
+import type { Sql } from "../db.ts";
 import {
-  ROSTER_CACHE_MS,
+  TOKEN_TTL_SEC,
   SESSION_STALE_MS,
   cleanName,
-  roomName,
   visibleMics,
   voiceSlug,
-  type RosterPerson,
 } from "./voice-chat.ts";
-import type { VoiceProvider } from "./voice-livekit.ts";
-
-type Sql = {
-  <T = Record<string, unknown>>(strings: TemplateStringsArray, ...values: unknown[]): Promise<T[]>;
-  query<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
-};
+import type { VoiceProvider } from "./voice-realtime.ts";
 
 export type VoiceInput = {
   slug: string;
@@ -21,15 +16,14 @@ export type VoiceInput = {
   name: string;
   action: string;
   publish: boolean;
+  connectionId: string;
 };
 
 const KEY = /^[A-Za-z0-9_-]{8,64}$/;
 const hits = new Map<string, number[]>();
-const speakerCache = new Map<string, { at: number; identities: string[] }>();
 
 const LIMITS: Record<string, number> = {
   token: 10,
-  publish: 20,
   roster: 40,
   beat: 20,
   leave: 20,
@@ -46,27 +40,6 @@ function limited(key: string, max: number) {
 
 function stamp(ms: number) {
   return new Date(ms).toISOString();
-}
-
-export async function ensureVoice(sql: Sql) {
-  await sql.query(`create table if not exists voice_sessions (
-    slug text not null,
-    member_key text not null,
-    name text not null default '',
-    connected boolean not null default false,
-    joined_at timestamptz not null default now(),
-    seen_at timestamptz not null default now(),
-    primary key (slug, member_key)
-  )`);
-  await sql.query(`create index if not exists voice_sessions_seen_idx on voice_sessions (seen_at)`);
-  await sql.query(`create table if not exists circle_members (
-    slug text not null,
-    member_key text not null,
-    email text not null default '',
-    name text not null default '',
-    role text not null,
-    primary key (slug, member_key)
-  )`);
 }
 
 async function actor(sql: Sql, input: VoiceInput) {
@@ -94,85 +67,67 @@ async function actor(sql: Sql, input: VoiceInput) {
 }
 
 async function upsertMember(sql: Sql, slug: string, key: string, name: string, role: string) {
-  const existing = (await sql<{ role: string }>`select role from circle_members where slug = ${slug} and member_key = ${key} limit 1`)[0];
-  if (existing) return;
-  await sql`insert into circle_members (slug, member_key, email, name, role) values (${slug}, ${key}, ${""}, ${name}, ${role})`;
-}
-
-async function touch(sql: Sql, slug: string, key: string, name: string, now: number, connected: boolean) {
-  const at = stamp(now);
-  await sql`
-    insert into voice_sessions (slug, member_key, name, connected, joined_at, seen_at)
-    values (${slug}, ${key}, ${name}, ${connected}, ${at}::timestamptz, ${at}::timestamptz)
-    on conflict (slug, member_key) do update
-      set name = excluded.name, connected = excluded.connected, seen_at = excluded.seen_at
-  `;
-}
-
-async function membersOf(sql: Sql, slug: string) {
-  return sql<{ member_key: string; name: string }>`select member_key, name from circle_members where slug = ${slug}`;
-}
-
-function peopleFrom(members: { member_key: string; name: string }[], identities: string[]) {
-  const names = new Map(members.map((member) => [member.member_key, cleanName(member.name) || "Guest"]));
-  const people: RosterPerson[] = [];
-  for (const identity of identities) {
-    const name = names.get(identity);
-    if (!name) continue;
-    people.push({ memberKey: identity, name });
-  }
-  return visibleMics(people);
+  await sql`insert into circle_members (slug, member_key, email, name, role)
+    values (${slug}, ${key}, ${""}, ${name}, ${role}) on conflict (slug, member_key) do nothing`;
 }
 
 export async function voiceOn(sql: Sql, provider: VoiceProvider, input: VoiceInput, now = Date.now()) {
-  await ensureVoice(sql);
   const who = await actor(sql, input);
   if ("error" in who) return { ok: false as const, error: who.error, configured: provider.configured };
   const cap = LIMITS[input.action] ?? 10;
   if (limited(`${who.slug}:${who.key}:${input.action}`, cap)) {
     return { ok: false as const, error: "Wait a moment, then try again.", configured: provider.configured };
   }
-  const room = roomName(who.slug);
-  if (input.action === "leave") {
-    await sql`delete from voice_sessions where slug = ${who.slug} and member_key = ${who.key}`;
-    return { ok: true as const, configured: provider.configured };
+
+  const app = provider.providerApp;
+  if (input.action === "roster") {
+    if (!provider.configured) return { ok: true as const, configured: false, people: [] };
+    const cutoff = stamp(now - SESSION_STALE_MS);
+    const rows = await sql<{ member_key: string; name: string }>`
+      select distinct m.member_key, m.name from voice_realtime_sessions s
+      join circle_members m on m.slug = s.slug and m.member_key = s.member_key
+      where s.slug = ${who.slug} and s.provider_app = ${app}
+        and s.seen_at >= ${cutoff}::timestamptz and s.mic_on
+    `;
+    return { ok: true as const, configured: true, people: visibleMics(rows.map((row) => ({ memberKey: row.member_key, name: cleanName(row.name) || "Guest" }))) };
   }
-  if (input.action === "beat") {
-    const at = stamp(now);
-    await sql`update voice_sessions set seen_at = ${at}::timestamptz where slug = ${who.slug} and member_key = ${who.key}`;
-    return { ok: true as const, configured: provider.configured };
-  }
+  if (!provider.configured) return { ok: false as const, error: "Voice chat isn't available in this wedding yet.", configured: false };
+
   if (input.action === "token") {
-    if (!provider.configured) {
-      return { ok: false as const, error: "Voice chat isn't available in this wedding yet.", configured: false };
+    const cutoff = stamp(now - TOKEN_TTL_SEC * 1000);
+    await sql`delete from voice_realtime_sessions where slug = ${who.slug} and seen_at < ${cutoff}::timestamptz`;
+    const connectionId = randomUUID();
+    const joined = await provider.join(who.slug, who.name, connectionId, now);
+    if (!joined.ok) return { ...joined, configured: true };
+    try {
+      await sql`
+        insert into voice_realtime_sessions (connection_id, slug, member_key, provider_app, meeting_id, participant_id, seen_at)
+        values (${connectionId}, ${who.slug}, ${who.key}, ${app}, ${joined.meetingId}, ${joined.participantId}, ${stamp(now)}::timestamptz)
+      `;
+    } catch (error) {
+      await provider.leave(joined.meetingId, joined.participantId);
+      throw error;
     }
-    const token = await provider.signMember(who.key, who.name, room);
-    await touch(sql, who.slug, who.key, who.name, now, true);
-    return { ok: true as const, configured: true, url: provider.url, token, room, expiresIn: 15 * 60 };
+    return { ok: true as const, configured: true, token: joined.token, connectionId, expiresIn: TOKEN_TTL_SEC };
   }
-  if (input.action === "publish") {
-    if (!provider.configured) return { ok: false as const, error: "Voice chat isn't available in this wedding yet.", configured: false };
-    const updated = await provider.allowPublish(room, who.key, input.publish);
-    if (!updated.ok) return { ok: false as const, error: updated.error, configured: true };
-    await touch(sql, who.slug, who.key, who.name, now, true);
+
+  if (input.action === "leave") {
+    const [left] = await sql<{ meeting_id: string; participant_id: string }>`
+      delete from voice_realtime_sessions where connection_id = ${input.connectionId}
+        and slug = ${who.slug} and member_key = ${who.key} and provider_app = ${app}
+      returning meeting_id, participant_id
+    `;
+    if (left) await provider.leave(left.meeting_id, left.participant_id);
     return { ok: true as const, configured: true };
   }
-  if (input.action === "roster") {
-    const cutoff = stamp(now - SESSION_STALE_MS);
-    await sql`delete from voice_sessions where seen_at < ${cutoff}::timestamptz`;
-    if (!provider.configured) return { ok: true as const, configured: false, people: [] as RosterPerson[] };
-    const listed = await provider.speakers(room);
-    let identities: string[] = [];
-    if (listed.ok) {
-      identities = listed.identities;
-      speakerCache.set(room, { at: now, identities });
-    } else {
-      const cached = speakerCache.get(room);
-      if (!cached || now - cached.at > ROSTER_CACHE_MS) return { ok: true as const, configured: true, people: [] as RosterPerson[], delayed: true };
-      identities = cached.identities;
-    }
-    const people = peopleFrom(await membersOf(sql, who.slug), identities);
-    return { ok: true as const, configured: true, people };
+  if (input.action === "beat") {
+    const [active] = await sql<{ connection_id: string }>`
+      update voice_realtime_sessions set seen_at = ${stamp(now)}::timestamptz, mic_on = ${input.publish}
+      where connection_id = ${input.connectionId} and slug = ${who.slug}
+        and member_key = ${who.key} and provider_app = ${app} returning connection_id
+    `;
+    if (active) return { ok: true as const, configured: true };
+    return { ok: false as const, configured: true, error: "Your voice connection ended. Join again." };
   }
-  return { ok: false as const, error: "That voice request was not recognised.", configured: provider.configured };
+  return { ok: false as const, error: "That voice request was not recognised.", configured: true };
 }

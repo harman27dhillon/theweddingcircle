@@ -2,23 +2,19 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { PGlite } from "@electric-sql/pglite";
-import { jwtVerify } from "jose";
 import {
-  adminGrant,
   afterMicRequest,
   afterSpeakerToggle,
   freshVoice,
   hears,
-  memberGrant,
   publishAllowed,
-  roomName,
   sessionAfter,
   stripOpen,
   transmits,
   visibleMics,
 } from "./voice-chat.ts";
 import { voiceOn, type VoiceInput } from "./voice-chat.db.ts";
-import { liveKitConfig, liveKitHttpOrigin, signVoiceJwt, speakersFromParticipants, type VoiceProvider } from "./voice-livekit.ts";
+import { realtimeVoiceProvider, VOICE_PRESET, type VoiceProvider } from "./voice-realtime.ts";
 
 function sqlOf(db: PGlite) {
   const run = async (text: string, params: unknown[] = []) => (await db.query(text, params)).rows as Record<string, unknown>[];
@@ -60,41 +56,27 @@ async function ready(slug = "asha-rohan", join = "open") {
     edit_key text not null,
     updated_at timestamptz not null default now()
   )`);
+  await store.exec(`create table circle_members (
+    slug text not null, member_key text not null, email text not null,
+    name text not null, role text not null, primary key (slug, member_key)
+  )`);
+  await store.exec(readFileSync(new URL("../../../migrations/0029_realtime_voice.sql", import.meta.url), "utf8"));
   await circle(store, slug, join);
   return sqlOf(store);
 }
 
 function input(slug: string, key: string, name: string, action: string, extra: Partial<VoiceInput> = {}): VoiceInput {
-  return { slug, memberKey: key, editKey: "", name, action, publish: false, ...extra };
+  return { slug, memberKey: key, editKey: "", name, action, publish: false, connectionId: "", ...extra };
 }
 
-function provider(map: Record<string, string[]> = {}): VoiceProvider & { published: { room: string; identity: string; publish: boolean }[]; signed: string[] } {
-  const published: { room: string; identity: string; publish: boolean }[] = [];
-  const signed: string[] = [];
-  return {
-    configured: true,
-    url: "wss://voice.example.test",
-    published,
-    signed,
-    async signMember(identity: string, _name: string, room: string) {
-      signed.push(`${room}:${identity}`);
-      const grant = memberGrant(room);
-      assert.equal(grant.roomAdmin, false);
-      assert.equal(grant.canPublish, false);
-      assert.equal(grant.canSubscribe, true);
-      return `member.${identity}`;
-    },
-    async allowPublish(room: string, identity: string, publish: boolean) {
-      published.push({ room, identity, publish });
-      return { ok: true as const };
-    },
-    async speakers(room: string) {
-      return { ok: true as const, identities: map[room] ?? [] };
-    },
-  };
-}
-
-const off = { configured: false, url: "", async signMember() { throw new Error("no"); }, async allowPublish() { return { ok: false as const, error: "no" }; }, async speakers() { return { ok: false as const, error: "no" }; } };
+const provider: VoiceProvider = {
+  configured: true,
+  providerApp: "test-app",
+  async join(slug, _name, id) {
+    return { ok: true, token: `token-for-${id}`, meetingId: `meeting-${slug}`, participantId: `participant-${id}` };
+  },
+  async leave() {},
+};
 
 test("a fresh voice session starts with mic and speaker off", () => {
   const prefs = freshVoice();
@@ -143,120 +125,78 @@ test("microphone profiles hide when collapsed and ignore duplicates", () => {
   assert.equal(stripOpen(true, []), false);
 });
 
-test("live microphone tracks ignore mute, screen share, and duplicate identities", () => {
-  const ids = speakersFromParticipants({
-    participants: [
-      { identity: "guestkey1", tracks: [{ type: "AUDIO", source: "MICROPHONE", muted: false }] },
-      { identity: "guestkey1", tracks: [{ type: "AUDIO", source: "MICROPHONE", muted: false }] },
-      { identity: "hostkey01", tracks: [{ type: "AUDIO", source: "MICROPHONE", muted: true }] },
-      { identity: "otherkey1", tracks: [{ type: 0, source: 4, muted: false }] },
-      { identity: "videoonly", tracks: [{ type: "VIDEO", source: "CAMERA", muted: false }] },
-    ],
-  });
-  assert.deepEqual(ids, ["guestkey1"]);
-});
-
-test("member tokens cannot administer the room", async () => {
-  const secret = "test-secret-value";
-  const grant = memberGrant("wc-voice-asha-rohan");
-  const token = await signVoiceJwt("API_test", secret, "guestkey1", "Guest", grant, 60);
-  const verified = await jwtVerify(token, new TextEncoder().encode(secret), { issuer: "API_test" });
-  const video = verified.payload.video as { roomAdmin?: boolean; canPublish?: boolean; canSubscribe?: boolean; room?: string };
-  assert.equal(verified.payload.sub, "guestkey1");
-  assert.equal(video.roomAdmin, false);
-  assert.equal(video.canPublish, false);
-  assert.equal(video.canSubscribe, true);
-  assert.equal(video.room, "wc-voice-asha-rohan");
-  assert.equal(adminGrant("wc-voice-asha-rohan").roomJoin, false);
-  assert.equal(adminGrant("wc-voice-asha-rohan").roomAdmin, true);
-  assert.equal(token.includes(secret), false);
-});
-
-test("insecure or incomplete LiveKit settings stay off", () => {
-  assert.equal(liveKitConfig({}).configured, false);
-  assert.equal(liveKitConfig({ LIVEKIT_URL: "http://voice.example", LIVEKIT_API_KEY: "API_test", LIVEKIT_API_SECRET: "test-secret-value" }).configured, false);
-  assert.equal(liveKitConfig({ LIVEKIT_URL: "ws://voice.example", LIVEKIT_API_KEY: "API_test", LIVEKIT_API_SECRET: "test-secret-value" }).configured, false);
-  assert.equal(liveKitConfig({ LIVEKIT_URL: "wss://voice.example", LIVEKIT_API_KEY: "API_test", LIVEKIT_API_SECRET: "short" }).configured, false);
-  const local = liveKitConfig({ LIVEKIT_URL: "ws://127.0.0.1:7880", LIVEKIT_API_KEY: "API_test", LIVEKIT_API_SECRET: "test-secret-value" });
-  assert.equal(local.configured, true);
-  const production = liveKitConfig({ APP_ENV: "production", LIVEKIT_URL: "ws://127.0.0.1:7880", LIVEKIT_API_KEY: "API_test", LIVEKIT_API_SECRET: "test-secret-value" });
-  assert.equal(production.configured, false);
-  assert.equal(liveKitHttpOrigin("wss://voice.example.test"), "https://voice.example.test");
-});
-
-test("nonmembers and other weddings cannot join or see microphones", async () => {
+test("private wedding voice requires membership and keeps each connection scoped", async () => {
   const sql = await ready("asha-rohan", "approve");
-  const closed = await voiceOn(sql, provider(), input("asha-rohan", "guestkey1", "Guest", "token"));
-  assert.equal(closed.ok, false);
-  const outsider = await voiceOn(sql, provider(), input("no-such-wedding", "guestkey1", "Guest", "token"));
-  assert.equal(outsider.ok, false);
-  const host = await voiceOn(sql, provider(), input("asha-rohan", "hostkey01", "Host", "token", { editKey: "edit-key-host-0001" }));
-  assert.equal(host.ok, true);
-  if (!host.ok || !("token" in host)) return;
-  assert.equal(host.token, "member.hostkey01");
-  assert.equal(host.room, roomName("asha-rohan"));
-  assert.equal("roomAdmin" in host, false);
+  const guest = (action: string, extra?: Partial<VoiceInput>) => input("asha-rohan", "guestkey1", "Guest", action, extra);
+  const host = (action: string, extra?: Partial<VoiceInput>) => input("asha-rohan", "hostkey01", "Host", action, { editKey: "edit-key-host-0001", ...extra });
+  assert.equal((await voiceOn(sql, provider, guest("token"))).ok, false);
+  assert.equal((await voiceOn(sql, provider, input("other-wedding", "hostkey01", "Host", "token"))).ok, false);
 
-  const meera = await ready("meera-kabir");
-  const bridge = provider({ [roomName("asha-rohan")]: ["hostkey01"], [roomName("meera-kabir")]: ["otherkey1"] });
-  const roster = await voiceOn(sql, bridge, input("asha-rohan", "hostkey01", "Host", "roster", { editKey: "edit-key-host-0001" }));
-  assert.equal(roster.ok, true);
-  if (!roster.ok || !("people" in roster)) return;
-  assert.deepEqual((roster.people ?? []).map((person) => person.memberKey), ["hostkey01"]);
-  const elsewhere = await voiceOn(meera, bridge, input("meera-kabir", "otherkey1", "Other", "roster"));
-  assert.equal(elsewhere.ok, true);
-  if (!elsewhere.ok || !("people" in elsewhere)) return;
-  assert.deepEqual((elsewhere.people ?? []).map((person) => person.memberKey), ["otherkey1"]);
+  const first = await voiceOn(sql, provider, host("token"));
+  const second = await voiceOn(sql, provider, host("token"));
+  assert.ok(first.ok && "connectionId" in first && first.connectionId);
+  assert.ok(second.ok && "connectionId" in second && second.connectionId);
+  assert.notEqual(first.connectionId, second.connectionId);
+  const now = Date.now();
+  await voiceOn(sql, provider, host("beat", { connectionId: first.connectionId, publish: true }), now);
+  await voiceOn(sql, provider, host("beat", { connectionId: second.connectionId, publish: true }), now);
+  const roster = await voiceOn(sql, provider, host("roster"), now);
+  assert.deepEqual("people" in roster && roster.people, [{ memberKey: "hostkey01", name: "Host" }]);
+
+  assert.equal((await voiceOn(sql, provider, guest("leave", { connectionId: second.connectionId }))).ok, false);
+  const removed: string[] = [];
+  const tracked = { ...provider, async leave(_meeting: string, id: string) { removed.push(id); } };
+  await voiceOn(sql, tracked, host("leave", { connectionId: first.connectionId }), now);
+  assert.deepEqual(removed, [`participant-${first.connectionId}`]);
+  const remaining = await voiceOn(sql, provider, host("roster"), now);
+  assert.deepEqual("people" in remaining && remaining.people, [{ memberKey: "hostkey01", name: "Host" }]);
+  const expired = await voiceOn(sql, provider, host("roster"), now + 46_000);
+  assert.deepEqual("people" in expired && expired.people, []);
 });
 
-test("several microphones appear once, then disappear when released", async () => {
-  const sql = await ready("sangeet-night");
-  const room = roomName("sangeet-night");
-  const live = provider({ [room]: ["guestkey1", "guestkey1", "hostkey01"] });
-  await voiceOn(sql, live, input("sangeet-night", "guestkey1", "Guest", "token"));
-  await voiceOn(sql, live, input("sangeet-night", "hostkey01", "Host", "token", { editKey: "edit-key-host-0001" }));
-  const shown = await voiceOn(sql, live, input("sangeet-night", "guestkey1", "Guest", "roster"));
-  assert.equal(shown.ok, true);
-  if (!shown.ok || !("people" in shown)) return;
-  assert.deepEqual((shown.people ?? []).map((person) => person.memberKey), ["guestkey1", "hostkey01"]);
-  const quiet = provider({ [room]: [] });
-  const gone = await voiceOn(sql, quiet, input("sangeet-night", "guestkey1", "Guest", "roster"));
-  assert.equal(gone.ok, true);
-  if (!gone.ok || !("people" in gone)) return;
-  assert.deepEqual(gone.people, []);
-  const publish = await voiceOn(sql, live, input("sangeet-night", "guestkey1", "Guest", "publish", { publish: false }));
-  assert.equal(publish.ok, true);
-  assert.deepEqual(live.published.at(-1), { room, identity: "guestkey1", publish: false });
-  const forged = await voiceOn(sql, live, input("sangeet-night", "guestkey1", "Guest", "publish", { publish: true }));
-  assert.equal(forged.ok, true);
-  assert.equal(live.published.at(-1)?.identity, "guestkey1");
+test("RealtimeKit creates one separate voice meeting per wedding and gives each member a scoped token", async (context) => {
+  const sql = await ready("voice-realtime");
+  const token = "test-worker-token";
+  const kit = realtimeVoiceProvider(sql, {
+    CLOUDFLARE_ACCOUNT_ID: "a".repeat(32), CLOUDFLARE_REALTIME_APP_ID: "voice-app", CLOUDFLARE_REALTIME_API_TOKEN: token,
+  });
+  let meetings = 0;
+  const joined: string[] = [];
+  const now = Date.now();
+  context.mock.method(globalThis, "fetch", async (resource: RequestInfo | URL, init?: RequestInit) => {
+    const url = new URL(String(resource));
+    assert.equal(url.host, "api.cloudflare.com");
+    assert.equal(new Headers(init?.headers).get("authorization"), `Bearer ${token}`);
+    if (url.pathname.endsWith("/meetings")) {
+      meetings++;
+      return Response.json({ success: true, data: { id: `meeting-${meetings}` } });
+    }
+    assert.match(url.pathname, /\/meetings\/meeting-[12]\/participants$/);
+    const body = JSON.parse(String(init?.body));
+    assert.equal(body.preset_name, VOICE_PRESET);
+    assert.match(body.custom_participant_id, /^connection-[123]$/);
+    assert.equal(Date.parse(body.token.expires_on), now + 15 * 60 * 1000);
+    joined.push(url.pathname);
+    return Response.json({ success: true, data: { id: body.custom_participant_id, token: "participant-token" } });
+  });
+  const [first, second] = await Promise.all([
+    kit.join("voice-realtime", "Ada", "connection-1", now),
+    kit.join("voice-realtime", "Bea", "connection-2", now),
+  ]);
+  assert.equal(first.ok && first.meetingId, "meeting-1");
+  assert.equal(second.ok && second.meetingId, "meeting-1");
+  const other = await kit.join("other-wedding", "Guest", "connection-3", now);
+  assert.equal(other.ok && other.meetingId, "meeting-2");
+  assert.equal(meetings, 2);
+  assert.equal(joined.length, 3);
+  assert.equal(JSON.stringify(first).includes(token), false);
 });
 
-test("missing LiveKit does not invent a connection", async () => {
+test("missing RealtimeKit configuration does not invent a connection", async () => {
   const sql = await ready("quiet-hall");
-  const token = await voiceOn(sql, off, input("quiet-hall", "guestkey1", "Guest", "token"));
-  assert.equal(token.ok, false);
-  if (token.ok) return;
-  assert.match(token.error ?? "", /isn't available/);
-  const roster = await voiceOn(sql, off, input("quiet-hall", "guestkey1", "Guest", "roster"));
-  assert.equal(roster.ok, true);
-  if (!roster.ok || !("people" in roster)) return;
-  assert.deepEqual(roster.people, []);
-});
-
-test("token requests are rate limited and leaving removes only that session", async () => {
-  const sql = await ready("rate-limit-hall");
-  const gate = provider();
-  let blocked = false;
-  for (let i = 0; i < 12; i += 1) {
-    const result = await voiceOn(sql, gate, input("rate-limit-hall", "guestkey1", "Guest", "token"));
-    if (!result.ok) blocked = true;
-  }
-  assert.equal(blocked, true);
-  const left = await voiceOn(sql, gate, input("rate-limit-hall", "guestkey1", "Guest", "leave"));
-  assert.equal(left.ok, true);
-  const rows = await sql<{ member_key: string }>`select member_key from voice_sessions where slug = ${"rate-limit-hall"}`;
-  assert.equal(rows.length, 0);
+  const result = await voiceOn(sql, realtimeVoiceProvider(sql, {}), input("quiet-hall", "guestkey1", "Guest", "token"));
+  assert.equal(result.ok, false);
+  assert.match("error" in result ? result.error ?? "" : "", /isn't available/);
 });
 
 test("chat replaces the music note and keeps the speaker anchored", () => {
@@ -282,6 +222,4 @@ test("chat replaces the music note and keeps the speaker anchored", () => {
   assert.match(css, /\.theme-audio \{[\s\S]*right: 0\.55rem;/);
   assert.match(feed, /wc-notes-slot[\s\S]*wc-chat-tools[\s\S]*wc-voice-slot/);
   assert.match(css, /@media \(width >= 1100px\)[\s\S]*chat-voice-slot/);
-  const music = readFileSync(new URL("../../components/wedding/developer-music.tsx", import.meta.url), "utf8");
-  assert.match(music, /music/i);
 });

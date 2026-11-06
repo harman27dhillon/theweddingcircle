@@ -1,44 +1,35 @@
 # Wedding Chat voice
 
-Live voice in Chat uses a LiveKit SFU. The app does not run the media server. Messages, themes, and the developer music library are unchanged. The old Chat music-note button is now the microphone.
+Chat uses Cloudflare RealtimeKit for group audio. Each wedding gets its own
+voice meeting, separate from its ceremony livestream. The Mic and Speaker
+controls operate independently and start off when opening Chat.
 
-## What you need to set
+## Cloudflare setup
 
-These are server environment variables. Do not put them in frontend code and do not prefix them with `VITE_`.
+Use the same RealtimeKit app and Worker configuration as the livestream.
+Set the Worker variables `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_REALTIME_APP_ID`
+and the Worker secret `CLOUDFLARE_REALTIME_API_TOKEN`. The token must allow
+creating meetings and adding and removing participants.
 
-| Variable | Example | Notes |
-|---|---|---|
-| `LIVEKIT_URL` | `wss://your-project.livekit.cloud` | WebSocket URL. Production must be `wss://`. `ws://127.0.0.1` is only for a local server. |
-| `LIVEKIT_API_KEY` | from LiveKit | API key. Not a secret to print. |
-| `LIVEKIT_API_SECRET` | from LiveKit | Used only to sign room tokens. At least 16 characters. |
+Create a preset called `wedding_voice_member` with the Voice (WebRTC) meeting
+type. Allow audio. Disable camera, screen sharing, recording and host controls,
+including Update Participant Preset. Leave the separate webinar presets for
+the livestream.
 
-Until all three are set, Chat still works. Mic and Speaker stay off, and turning one on explains that voice is not available. No fake audio is played.
+## Joining and leaving
 
-## LiveKit setup
+The Worker applies the wedding's existing membership rules before issuing a
+15-minute participant token. It creates the voice meeting on the first join
+and reuses it for later participants in the same wedding. It sends Cloudflare
+an opaque connection ID. The participant token is the only provider
+credential sent to the browser.
 
-1. Create a project at [LiveKit Cloud](https://cloud.livekit.com) or run the open-source LiveKit server on a machine that can accept WebRTC (UDP or TCP 7881, plus the signal port).
-2. Copy the WebSocket URL, API key, and API secret into the server environment.
-3. Redeploy. Ordinary wedding members receive a 15-minute room token. The token can subscribe, and it cannot publish, administer, or record.
-4. Publishing is turned on only after that person taps Mic, and only for their own identity. The server asks LiveKit to allow the microphone, then the browser publishes.
+The browser joins muted, publishes microphone audio when Mic is turned on,
+and plays incoming audio when Speaker is turned on. The mic strip uses a
+short-lived heartbeat from joined sessions and displays names from the
+wedding membership records. Leaving releases the microphone and asks
+RealtimeKit to remove that participant.
 
-LiveKit Cloud's Build plan includes a free monthly allowance and then charges for extra connection time. A self-hosted server has no LiveKit license fee; you pay for the machine and bandwidth. This app does not record or store audio.
-
-## What the server checks
-
-- The person has this wedding's edit key, or is already a member, or the wedding is open to guests.
-- The room name is `wc-voice-` plus that wedding's slug. A client cannot pick another wedding's room.
-- Roster names come from membership records. A microphone shows only when LiveKit reports an unmuted microphone track for that member.
-- Speaker on/off is local. It never changes anyone else's microphone.
-- Refresh, logout, leaving Chat, and hiding the phone start with the microphone off. A previous ON state is not restored.
-
-## Routes
-
-Server functions, not public unauthenticated URLs:
-
-- `issueVoiceToken`
-- `allowVoicePublish`
-- `readVoiceRoster`
-- `beatVoiceSession`
-- `leaveVoiceRoom`
-
-There is no recording endpoint.
+To verify deployment, join a test wedding on two devices. Test both directions
+of audio, independent Mic and Speaker controls, and leaving Chat. Confirm an
+unapproved guest cannot join a wedding that requires approval.

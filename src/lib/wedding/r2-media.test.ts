@@ -64,7 +64,7 @@ test("a signed upload does not contain the secret and signs the content type", (
 test("new uploads do not call Google Drive and livestream does not use R2", () => {
   const media = readFileSync(new URL("./media.ts", import.meta.url), "utf8");
   const live = readFileSync(new URL("../infra/live.ts", import.meta.url), "utf8");
-  const voice = readFileSync(new URL("./voice-livekit.ts", import.meta.url), "utf8");
+  const voice = readFileSync(new URL("./voice-realtime.ts", import.meta.url), "utf8");
   const upload = readFileSync(new URL("../google/upload.ts", import.meta.url), "utf8");
   assert.equal(media.includes("uploadToGoogle"), false);
   assert.equal(media.includes("googleapis.com"), false);

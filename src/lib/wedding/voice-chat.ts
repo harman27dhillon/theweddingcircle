@@ -1,7 +1,6 @@
 /** Pure voice-chat rules. No network, no microphone, no secrets. */
 
 export const TOKEN_TTL_SEC = 15 * 60;
-export const ROSTER_CACHE_MS = 20_000;
 export const SESSION_STALE_MS = 45_000;
 
 export type VoicePrefs = {
@@ -15,18 +14,6 @@ export type VoicePhase = VoicePrefs & {
 };
 
 export type MicPermission = "granted" | "denied" | "prompt";
-
-export type VoiceGrant = {
-  roomJoin: boolean;
-  room: string;
-  canPublish: boolean;
-  canSubscribe: boolean;
-  canPublishData: boolean;
-  roomAdmin: boolean;
-  roomCreate: boolean;
-  roomList: boolean;
-  roomRecord: boolean;
-};
 
 export type RosterPerson = {
   memberKey: string;
@@ -83,39 +70,6 @@ export function cleanName(value: string, max = 80) {
 export function voiceSlug(value: string) {
   const slug = value.trim().toLowerCase();
   return SLUG.test(slug) ? slug : "";
-}
-
-export function roomName(slug: string) {
-  return `wc-voice-${slug}`;
-}
-
-export function memberGrant(room: string): VoiceGrant {
-  return {
-    roomJoin: true,
-    room,
-    canPublish: false,
-    canSubscribe: true,
-    canPublishData: false,
-    roomAdmin: false,
-    roomCreate: false,
-    roomList: false,
-    roomRecord: false,
-  };
-}
-
-/** Server-only. Never send this grant to a browser. */
-export function adminGrant(room: string): VoiceGrant {
-  return {
-    roomJoin: false,
-    room,
-    canPublish: false,
-    canSubscribe: false,
-    canPublishData: false,
-    roomAdmin: true,
-    roomCreate: false,
-    roomList: false,
-    roomRecord: false,
-  };
 }
 
 export function visibleMics(people: RosterPerson[]) {
