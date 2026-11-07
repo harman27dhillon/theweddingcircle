@@ -77,7 +77,7 @@ export function JoinScreen({ code }: { code: string }) {
   const account = useWeddingStore((s) => s.account);
   const [name, setName] = useState(account?.name ?? "");
   const [rsvp, setRsvp] = useState<Rsvp>("yes");
-  const [relationship, setRelationship] = useState<(typeof RELATIONSHIPS)[number]>(RELATIONSHIPS[2]);
+  const [relationship, setRelationship] = useState<(typeof RELATIONSHIPS)[number]>(RELATIONSHIPS[1]);
   const [postingCode, setPostingCode] = useState("");
   const [note, setNote] = useState("");
 
@@ -159,7 +159,7 @@ export function JoinScreen({ code }: { code: string }) {
             </p>
           ) : (
             <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-sm">
-              You can enter with your name. A family code, if the host gave you one, marks you as family.{" "}
+              You can enter with your name. A Family/VIP-Guest code gives family access. A Guest code gives guest access.{" "}
               <Link to="/account" className="text-maroon">Sign in</Link>
             </p>
           )}
