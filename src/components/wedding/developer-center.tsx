@@ -1,3 +1,4 @@
+import { BILLING_SETUP } from "@/lib/developer/control/billing-setup";
 import { PRODUCTION_SUPABASE_URL, STAGING_SUPABASE_URL, STAGING_DEVELOPER_URL } from "@/lib/developer/supabase-projects";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
@@ -209,9 +210,20 @@ function Dashboard({ email, configuration, message, onLogout }: {
             <h1 className="mt-2 font-serif text-4xl">Infrastructure</h1>
             <p className="mt-2 max-w-3xl text-sm text-on-photo/70">Read-only diagnostics use the Worker’s existing secrets, variables and bindings. No credential entry fields are used here. A failed check is shown below its service.</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {INFRASTRUCTURE_CHECKS.map(([id, title]) => (
+              {INFRASTRUCTURE_CHECKS.filter(([id]) => configuration.environment === "production" || (id !== "play" && id !== "razorpay")).map(([id, title]) => (
                 <article key={id} className="rounded-card border border-on-photo/15 p-4">
                   <div className="flex items-start justify-between gap-3"><h2 className="font-serif text-xl">{title}</h2><span className="text-xs text-on-photo/60">{infraStatus ? infraStatus[id] ? "Configured" : "Missing / not detected" : "Status unavailable"}</span></div>
+                  {id === "play" || id === "razorpay" ? (
+                    <div className="mt-3 text-sm text-on-photo/75">
+                      <p>{BILLING_SETUP[id].description}</p>
+                      {id === "razorpay" ? <p className="mt-2">API mode {infraStatus?.razorpayMode || "Unconfigured"}</p> : null}
+                      <ul className="mt-3 space-y-2">
+                        {BILLING_SETUP[id].fields.map((key) => <li key={key} className="flex flex-wrap justify-between gap-2"><span className="break-all text-xs">{key}</span><span className="text-xs">{infraStatus?.billingSettings[key] ? "Configured" : (BILLING_SETUP[id].optional as readonly string[]).includes(key) ? "Optional" : "Missing"}</span></li>)}
+                      </ul>
+                      <p className="mt-3 text-xs leading-relaxed">{BILLING_SETUP[id].note}</p>
+                      <a className="mt-3 inline-block text-gold underline" href={BILLING_SETUP[id].guide} target="_blank" rel="noreferrer">Provider setup guide</a>
+                    </div>
+                  ) : null}
                   <button type="button" className={primary + " mt-3"} disabled={Boolean(infraRunning)} onClick={() => void runInfrastructure(id)}>{infraRunning === id ? "Testing…" : "Test connection"}</button>
                   <Result value={infraResults[id]} />
                 </article>

@@ -27,6 +27,7 @@ export const INFRASTRUCTURE_CHECKS = [
   ["firebase", "Firebase"], ["r2", "Cloudflare R2"], ["cdn", "Cloudflare CDN"],
   ["stream", "Cloudflare Stream"], ["realtimekit", "Cloudflare RealtimeKit"], ["gateway", "Private Media Gateway"],
   ["hyperdrive", "Hyperdrive"], ["supabase", "Supabase API"],
+  ["play", "Google Play Billing"], ["razorpay", "Razorpay Billing"],
 ] as const;
 export type InfrastructureCheck = (typeof INFRASTRUCTURE_CHECKS)[number][0];
 export type Diagnostic = {
