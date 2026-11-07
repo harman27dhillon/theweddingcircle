@@ -503,7 +503,7 @@ export function Landing() {
         else if (result.error === "claimed") setEntryNote("That code was already claimed by someone else.");
         else if (result.error === "both") setEntryNote("This account is already the other role for that wedding. One person cannot be both.");
         else if (result.error === "paused") setEntryNote("This wedding circle is paused. The host has closed it for now.");
-        else setEntryNote("That bride or groom code is not valid. If the wedding is not published yet, it only works on the phone that created it.");
+        else setEntryNote("That Bride/Groom code is not valid. If the wedding is not published yet, it only works on the phone that created it.");
         return;
       }
       const { loadCircle } = await import("@/lib/wedding/publish");
@@ -577,7 +577,7 @@ export function Landing() {
         /* A saved circle on this phone can still open if the lookup is offline. */
       }
       if (!found || !matched) {
-        setEntryNote("That code does not match a wedding circle. Check the family, guest, or couple code.");
+        setEntryNote("That code does not match a wedding circle. Check the Family/VIP-Guest, Guest, or Bride/Groom code.");
         return;
       }
       if (isSampleCircle(found)) {
