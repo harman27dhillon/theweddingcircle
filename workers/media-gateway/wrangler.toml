@@ -1,7 +1,13 @@
-name = "wedding-circle-media"
+name = "wedding-circle-media-gateway"
 main = "src/index.ts"
 compatibility_date = "2026-04-01"
 workers_dev = false
+preview_urls = false
+keep_vars = true
+
+[vars]
+ALLOWED_ORIGINS = "https://theweddingcircle.in,https://www.theweddingcircle.in"
+MEDIA_EDGE_CACHE = "authorized"
 
 # This file does not deploy, change DNS, or make a bucket public.
 # bucket_name MUST be the existing private bucket (the same name as R2_BUCKET).
@@ -10,10 +16,16 @@ workers_dev = false
 
 [[r2_buckets]]
 binding = "MEDIA"
-bucket_name = "set-this-to-the-existing-private-bucket"
+bucket_name = "wedding-circle-media"
 
 # Secret, set in the dashboard or with: wrangler secret put MEDIA_GATEWAY_SECRET
 # Never commit the value. The app server needs the same secret as MEDIA_GATEWAY_SECRET.
 #
 # [vars]
 # ALLOWED_ORIGINS = "https://theweddingcircle.in,https://www.theweddingcircle.in"
+
+[observability.logs]
+enabled = true
+
+[observability.issues]
+enabled = false
