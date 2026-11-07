@@ -154,7 +154,7 @@ export function canAnnounce(w: Wedding, viewer: Viewer) {
 }
 
 export function canManage(w: Wedding, viewer: Viewer) {
-  if (isSampleCircle(w)) return false;
+  if (isSampleCircle(w) || viewer.weddingId !== w.id) return false;
   return viewer.role === "host" || isCohost(w, viewer);
 }
 

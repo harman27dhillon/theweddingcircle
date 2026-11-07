@@ -1,3 +1,4 @@
+import { publicPlanPayment } from "./plan.ts";
 import { isDeletedSlug } from "./circle-key.ts";
 import { expiryPhase } from "./lifecycle.ts";
 import { parseR2Ref } from "./r2-ref.ts";
@@ -95,7 +96,7 @@ export function safeMediaRef(value: unknown) {
   return "";
 }
 
-/** A cache copy. Invite codes, couple codes, media keys and payments are omitted. */
+/** A cache copy. Invite codes, couple codes, media keys and payment details are omitted; verified plan status is retained. */
 export function snapshotWedding(wedding: Wedding): Wedding {
   const chats: ChatRoom[] = (wedding.chats ?? []).slice(0, 40).map((chat) => ({
     id: chat.id,
@@ -120,7 +121,7 @@ export function snapshotWedding(wedding: Wedding): Wedding {
     coverVideo: safeMediaRef(wedding.coverVideo),
     postingCodes: [],
     mediaKey: undefined,
-    payment: undefined,
+    payment: publicPlanPayment(wedding.payment),
     coupleAccess: wedding.coupleAccess
       ? {
           bride: wedding.coupleAccess.bride,

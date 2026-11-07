@@ -82,3 +82,13 @@ test("the creator is host from the owner id, and an ambiguous email is not grant
     true,
   );
 });
+
+test('host and co-host management belongs only to the current wedding', async () => {
+  const { canManage } = await import('./format.ts');
+  const { seedWedding } = await import('./seed.ts');
+  const wedding={...seedWedding,id:'owned',slug:'owned',illustrated:false};
+  assert.equal(canManage(wedding,{name:'Host',role:'host',weddingId:'owned'}),true);
+  assert.equal(canManage(wedding,{name:'Co-host',role:'cohost',weddingId:'owned'}),true);
+  assert.equal(canManage(wedding,{name:'Host elsewhere',role:'host',weddingId:'other'}),false);
+  assert.equal(canManage(wedding,{name:'Guest',role:'guest',weddingId:'owned'}),false);
+});

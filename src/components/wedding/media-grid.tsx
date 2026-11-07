@@ -25,6 +25,7 @@ function GridShell({
   renderExtra,
   overlays,
   onOpen,
+  downloadOnly = false,
 }: {
   tiles: GridMedia[];
   mine: boolean;
@@ -32,6 +33,7 @@ function GridShell({
   renderExtra?: (index: number) => ReactNode;
   overlays?: (index: number) => ReactNode;
   onOpen: (index: number) => void;
+  downloadOnly?: boolean;
 }) {
   const plan = mediaGridPlan(tiles.length);
   const shown = tiles.slice(0, plan.cells);
@@ -45,7 +47,7 @@ function GridShell({
             role="button"
             tabIndex={0}
             className="media-tile"
-            aria-label={more ? `Show ${plan.extra} more` : tile.kind === "video" ? "Play video" : "View photo"}
+            aria-label={downloadOnly ? "Download media" : more ? `Show ${plan.extra} more` : tile.kind === "video" ? "Play video" : "View photo"}
             onClick={() => onOpen(index)}
             onKeyDown={(event) => {
               if (event.key !== "Enter" && event.key !== " ") return;
@@ -65,12 +67,12 @@ function GridShell({
   );
 }
 
-export function MediaGrid({ tiles, mine = false }: { tiles: GridMedia[]; mine?: boolean }) {
+export function MediaGrid({ tiles, mine = false, downloadFirst }: { tiles: GridMedia[]; mine?: boolean; downloadFirst?: () => void }) {
   const [open, setOpen] = useState<number | null>(null);
   if (!tiles.length) return null;
   return (
     <>
-      <GridShell tiles={tiles} mine={mine} extraOn onOpen={setOpen} />
+      <GridShell tiles={tiles} mine={mine} extraOn downloadOnly={Boolean(downloadFirst)} onOpen={(index) => downloadFirst ? downloadFirst() : setOpen(index)} />
       {open !== null ? <MediaGroupView tiles={tiles} start={open} onClose={() => setOpen(null)} /> : null}
     </>
   );

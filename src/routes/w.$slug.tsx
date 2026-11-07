@@ -21,6 +21,8 @@ function WeddingLayout() {
   const { slug } = Route.useParams();
   const { status, wedding: raw, retry } = useCircle(slug);
   const viewer = useWeddingStore((s) => s.viewer);
+  const accountId = useWeddingStore((s) => s.account?.id || "");
+  const accountEmail = useWeddingStore((s) => s.account?.email || "");
   const applyRemoteCircle = useWeddingStore((s) => s.applyRemoteCircle);
   const wedding = raw ? normalizeWedding(raw) : undefined;
 
@@ -84,7 +86,7 @@ function WeddingLayout() {
       window.clearInterval(timer);
       unsub();
     };
-  }, [wedding?.id, wedding?.slug]);
+  }, [wedding?.id, wedding?.slug, accountId, accountEmail]);
 
   useEffect(() => {
     if (status !== "ready") return;

@@ -1,3 +1,4 @@
+import { publicPlanPayment } from "./plan.ts";
 import { coupleAccessForPublish } from "./couple-access.ts";
 import type { AccessRule, Role, Side, Wedding } from "@/lib/wedding/types";
 
@@ -44,7 +45,7 @@ export function redactWedding(wedding: Wedding, viewer: AccessViewer): Wedding {
     chats: viewer ? wedding.chats : [],
     mediaKey: undefined,
     postingCodes: [],
-    payment: undefined,
+    payment: publicPlanPayment(wedding.payment),
     ownerEmail: undefined,
     enquiries: [],
     tasks: [],

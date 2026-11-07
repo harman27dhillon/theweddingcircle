@@ -44,7 +44,7 @@ test("a guest or stranger does not receive codes, media keys, or private chat", 
   assert.equal(stranger.postingCodes?.length, 0);
   assert.equal(stranger.chats.length, 0);
   assert.equal(stranger.ownerEmail, undefined);
-  assert.equal(stranger.payment, undefined);
+  assert.deepEqual(stranger.payment, { status: "paid", verified: true, reference: "", provider: "preview" });
   assert.equal(stranger.coupleAccess?.brideCode?.code, "");
   const guest = redactWedding(wedding(), { name: "Asha", role: "guest" });
   assert.equal(guest.mediaKey, undefined);

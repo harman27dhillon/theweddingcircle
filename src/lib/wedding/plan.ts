@@ -129,3 +129,9 @@ export function overPlanStorage(wedding: MediaCarrier | null | undefined, used: 
   if (sampleCircle(wedding)) return false;
   return used + extra > storageLimitBytes(wedding);
 }
+
+/** Safe plan status for cached/public wedding copies, without transaction references or payment details. */
+export function publicPlanPayment(payment?: { status?: string; verified?: boolean } | null) {
+  if (!verifiedPurchase(payment)) return undefined;
+  return { status: "paid" as const, verified: true, reference: "", provider: "preview" as const };
+}

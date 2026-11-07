@@ -49,3 +49,18 @@ test("inline photos count toward the 500 MB free limit and a short note does not
   assert.equal(overPlanStorage({ slug: "a-b", payment: { status: "paid" } }, FREE_STORAGE_BYTES, 1), true);
   assert.equal(overPlanStorage({ slug: "a-b", payment: { status: "paid", verified: true } }, FREE_STORAGE_BYTES, 1), false);
 });
+test('voucher and paid Premium status survive public and offline copies without exposing references', async () => {
+  const { publicPlanPayment } = await import('./plan.ts');
+  const { snapshotWedding } = await import('./offline.ts');
+  const { redactWedding } = await import('./access.ts');
+  const { seedWedding } = await import('./seed.ts');
+  const wedding = { ...structuredClone(seedWedding), id:'premium-test', slug:'premium-test', illustrated:false,
+    payment:{status:'paid' as const,verified:true,reference:'VOUCHER-SECRET',provider:'preview' as const} };
+  for (const copy of [snapshotWedding(wedding),redactWedding(wedding,null),redactWedding(wedding,{name:'Co-host',role:'cohost'})]) {
+    assert.equal(isPremiumWedding(copy),true);assert.equal(storageLimitBytes(copy),PREMIUM_STORAGE_BYTES);
+  }
+  assert.equal(snapshotWedding(wedding).payment?.reference,'');
+  assert.equal(redactWedding(wedding,null).payment?.reference,'');
+  assert.equal(publicPlanPayment({status:'paid',verified:false}),undefined);
+  assert.equal(publicPlanPayment({status:'failed',verified:true}),undefined);
+});

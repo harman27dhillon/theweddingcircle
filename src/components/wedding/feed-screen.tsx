@@ -1,4 +1,4 @@
-import { Filter, Image as ImageIcon, Info, Mic, Plus, Send, Video } from "lucide-react";
+import { Download, Filter, Image as ImageIcon, Info, Mic, Plus, Send, Video } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -848,6 +848,7 @@ export function FeedScreen() {
           const separator = day && day !== previousDay ? chatSeparator(day, wedding, atmosphere) : "";
           const tiles = galleryOf(post);
           const caption = stockCaption(post.text);
+          const downloadSources = [...new Set([...(post.images ?? []), ...postClips(post).map((clip) => clip.src), ...(post.gallery ?? []).map((item) => item.src)])];
           const bubbleStyle = {
             "--feed-wash": mine ? "var(--wc-sent)" : "var(--wc-received)",
             "--feed-bar": "transparent",
@@ -934,25 +935,24 @@ export function FeedScreen() {
                     if (event.detail === 2) heart(post.id);
                   }}
                 >
-                  <MediaGrid tiles={tiles} mine={mine} />
-                  {caption ? <span className="chat-float-label">{post.text}</span> : null}
-                  {canDownload(wedding, viewer.role) ? (
-                    <button
-                      type="button"
-                      className="media-grid-save"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        post.images.forEach((src, photoIndex) => {
-                          void downloadStored(src, weddingDownloadName(src, photoIndex + 1));
-                        });
-                        postClips(post).forEach((clip, videoIndex) => {
-                          void downloadStored(clip.src, weddingDownloadName(clip.src, videoIndex + 1));
-                        });
-                      }}
-                    >
-                      Save
-                    </button>
-                  ) : null}
+                  <p className="chat-media-done" role="status">Done</p>
+                  <div className="chat-media-download-wrap">
+                    <MediaGrid tiles={tiles} mine={mine} downloadFirst={canDownload(wedding, viewer.role) ? () => {
+                      downloadSources.forEach((src, index) => void downloadStored(src, weddingDownloadName(src, index + 1)));
+                    } : undefined} />
+                    {canDownload(wedding, viewer.role) ? (
+                      <button
+                        type="button"
+                        className="chat-media-download"
+                        aria-label={downloadSources.length > 1 ? `Download ${downloadSources.length} files` : "Download file"}
+                        title="Download to view"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          downloadSources.forEach((src, index) => void downloadStored(src, weddingDownloadName(src, index + 1)));
+                        }}
+                      ><Download className="size-5" aria-hidden="true" /></button>
+                    ) : null}
+                  </div>
                 </div>
               ) : null}
               {(allowed && reply?.postId === post.id && !reply.commentId) || post.delivery ? (
@@ -1052,7 +1052,8 @@ export function FeedScreen() {
             <div className="chat-row is-mine">
             <div className="chat-message is-mine">
               <p className="sr-only">{viewer.name}</p>
-              <div className="chat-float has-tail">
+              <div className="chat-pending-media">
+                <p className="chat-media-uploading" role="status">{batch.items.some((item) => item.status === "failed") ? "Upload needs attention" : "Uploading…"}</p>
                 <PendingCollage batch={batch} />
               </div>
             </div>
@@ -1315,7 +1316,7 @@ function releaseComposerSend(event: PointerEvent<HTMLButtonElement>) {
 }
 
 function stockCaption(text: string) {
-  return text === "Shared a photo." || text === "Shared a video." || text === "Shared a voice note.";
+  return text === "Shared a photo." || text === "Shared a video." || text === "Shared a voice note." || /^Shared \d+ files\.$/.test(text);
 }
 
 function excerpt(text: string) {
