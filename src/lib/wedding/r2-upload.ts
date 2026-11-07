@@ -159,7 +159,7 @@ export async function uploadPreparedFile(
   if (!mime) throw new Error("That file type is not allowed.");
   const started = Date.now();
   onStatus?.("Preparing");
-  const key = memberKey(slug);
+  let key = memberKey(slug);
   const signStarted = Date.now();
   let plan: Awaited<ReturnType<typeof infraPrepareUpload>>;
   try {
@@ -170,6 +170,21 @@ export async function uploadPreparedFile(
     const unreachable = explainUploadRequestFailure(error);
     if (unreachable) throw new Error(unreachable);
     throw error;
+  }
+  if (!plan.ok && plan.error === "You are not in this wedding.") {
+    const [{ circleKey }, { useWeddingStore }, { registerHostAuthority }] = await Promise.all([
+      import("./circle-key"), import("./store"), import("./role-client"),
+    ]);
+    const wedding = useWeddingStore.getState().weddings.find((item) => item.slug === slug);
+    if (wedding && circleKey(slug).length >= 16) {
+      const restored = await registerHostAuthority(wedding);
+      if (restored.ok) {
+        key = memberKey(slug);
+        plan = await infraPrepareUpload({
+          data: { slug, memberKey: key, purpose, mime, bytes: file.size, fileName: headerName(file.name || "file") },
+        });
+      }
+    }
   }
   const signMs = Date.now() - signStarted;
   if (!plan.ok) throw new Error(plan.error || "Private storage did not keep that file. Nothing else was changed.");

@@ -24,7 +24,9 @@ export async function confirmWeddingRole(slug: string, name: string, code: strin
 }
 
 export async function refreshWeddingRole(slug: string) {
-  return resolveWeddingRole({ data: { slug, memberKey: memberKeyFor(slug), email: emailOf(), accountId: accountIdOf() } });
+  const result = await resolveWeddingRole({ data: { slug, memberKey: memberKeyFor(slug), email: emailOf(), accountId: accountIdOf() } });
+  if (result.ok && result.role && result.memberKey) rememberMemberKey(slug, result.memberKey);
+  return result;
 }
 
 export async function registerHostAuthority(wedding: Wedding) {

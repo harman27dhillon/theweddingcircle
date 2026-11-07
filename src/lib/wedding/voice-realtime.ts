@@ -21,7 +21,7 @@ export function realtimeVoiceProvider(sql: Sql, env: Record<string, string | und
       method,
       headers: { authorization: `Bearer ${token}`, ...(body ? { "content-type": "application/json" } : {}) },
       body: body ? JSON.stringify(body) : undefined,
-      redirect: "error",
+      redirect: "manual",
       signal: AbortSignal.timeout(8_000),
     });
     const data: unknown = await response.json().catch(() => null);

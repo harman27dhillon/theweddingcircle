@@ -98,7 +98,9 @@ export function ChatVoiceControls() {
     const hidden = () => pane.hidden || pane.hasAttribute("data-offstage");
     const pull = () => {
       if (stopped || hidden() || !memberKey) return;
-      const creds = { slug: wedding.slug, memberKey, editKey: circleKey(wedding.slug), name, action: "roster" as const, publish: false };
+      const currentKey = ownMemberKey(wedding.slug);
+      if (currentKey !== memberKey) setMemberKey(currentKey);
+      const creds = { slug: wedding.slug, memberKey: currentKey, editKey: circleKey(wedding.slug), name, action: "roster" as const, publish: false };
       void readVoiceRoster({ data: creds }).then((result) => {
         if (stopped || !result || !("ok" in result) || !result.ok || !("people" in result) || !result.people) return;
         const next = result.people.filter((person) => Boolean(person.memberKey));
@@ -130,7 +132,7 @@ export function ChatVoiceControls() {
   }
 
   function keyFor() {
-    const key = memberKey || ownMemberKey(wedding.slug);
+    const key = ownMemberKey(wedding.slug);
     if (key && key !== memberKey) setMemberKey(key);
     return key;
   }

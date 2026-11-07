@@ -166,6 +166,7 @@ test("RealtimeKit creates one separate voice meeting per wedding and gives each 
   context.mock.method(globalThis, "fetch", async (resource: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(resource));
     assert.equal(url.host, "api.cloudflare.com");
+    assert.equal(init?.redirect, "manual");
     assert.equal(new Headers(init?.headers).get("authorization"), `Bearer ${token}`);
     if (url.pathname.endsWith("/meetings")) {
       meetings++;
