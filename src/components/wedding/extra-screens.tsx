@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { useWedding } from "@/components/wedding/context";
-import { Button, Empty, fieldClass, Mark, PickList, Screen } from "@/components/wedding/ui";
+import { Button, Empty, fieldClass, Mark, PasswordField, PickList, Screen } from "@/components/wedding/ui";
 import { VENDORS } from "@/lib/wedding/catalog";
 import { cleanPhone, coupleTitle, isSampleCircle, longDate, todayISO, validEmail } from "@/lib/wedding/format";
 import { CIRCLE_FEE_LABEL } from "@/lib/wedding/payments";
