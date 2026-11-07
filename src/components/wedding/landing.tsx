@@ -92,7 +92,7 @@ const LANDING_EARLY_BARS = `(function(){
     var src = w.bar && typeof w.bar.cover === "string" ? w.bar.cover : (typeof w.cover === "string" ? w.cover : "");
     if (src.charAt(0) === "/" && src.indexOf("..") < 0 && src.length < 240) return src;
     if (src.indexOf("https://") === 0 && src.indexOf(" ") < 0 && src.length < 300) return src;
-    return "/card-themes/classic-default-cover.jpg";
+    return "/card-themes/classic-default-cover.webp";
   }
   var html = "";
   for (var n = 0; n < list.length; n++) {

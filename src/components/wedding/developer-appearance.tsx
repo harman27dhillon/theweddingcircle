@@ -14,7 +14,7 @@ import {
 } from "@/lib/wedding/classic-maker";
 import { loadAppearance, useClassicRegistry } from "@/lib/wedding/classic-registry";
 
-const ROSE_GARDEN_SRC = "/assets/developer/landing/rose-garden.png";
+const ROSE_GARDEN_SRC = "/assets/developer/landing/rose-garden.webp";
 
 type DraftFile = { mime: string; data: string; preview: string };
 

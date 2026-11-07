@@ -16,7 +16,7 @@ test("missing asset URLs become a no-store 404 and never keep the HTML shell", (
 test("real javascript and css responses are left alone", () => {
   assert.equal(rewriteMissingAsset({ pathname: "/assets/index-DFZdCwFD.js", status: 200, contentType: "text/javascript" }), null);
   assert.equal(rewriteMissingAsset({ pathname: "/assets/styles-Cj5jXX5R.css", status: 200, contentType: "text/css; charset=utf-8" }), null);
-  assert.equal(rewriteMissingAsset({ pathname: "/assets/developer/landing/rose-garden.png", status: 200, contentType: "image/png" }), null);
+  assert.equal(rewriteMissingAsset({ pathname: "/assets/developer/landing/rose-garden.webp", status: 200, contentType: "image/png" }), null);
   assert.equal(rewriteMissingAsset({ pathname: "/", status: 200, contentType: "text/html" }), null);
 });
 

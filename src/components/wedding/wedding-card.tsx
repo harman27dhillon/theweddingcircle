@@ -242,7 +242,7 @@ export function WeddingCard({
         onError={(event) => {
           if (event.currentTarget.dataset.fallback === "1") return;
           event.currentTarget.dataset.fallback = "1";
-          event.currentTarget.src = "/card-themes/classic-default-cover.jpg";
+          event.currentTarget.src = "/card-themes/classic-default-cover.webp";
         }}
       />
       {splitArt ? (

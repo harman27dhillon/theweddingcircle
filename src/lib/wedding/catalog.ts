@@ -30,7 +30,7 @@ export const VENDORS: Vendor[] = [
     featured: true,
     services: "Timeline, vendors, guest flow, and the day itself",
     contact: "hello@noorandco.example",
-    photo: "/media/hall.jpg",
+    photo: "/media/hall.webp",
     reviews: [
       { author: "Jasleen Kaur", text: "She kept both families on one timeline.", stars: 5 },
       { author: "June Park", text: "The arrival actually left when she said it would.", stars: 5 },

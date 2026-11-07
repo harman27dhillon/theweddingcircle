@@ -286,7 +286,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "butterfly-romance",
     "Butterfly Romance",
-    "/card-themes/butterfly-romance.jpg",
+    "/card-themes/butterfly-romance.webp",
     {
       "--color-ivory": "#FFF1F5",
       "--color-paper": "#FFF6F9",
@@ -329,7 +329,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "moonlight-reverie",
     "Moonlight Reverie",
-    "/card-themes/moonlight-reverie.jpg",
+    "/card-themes/moonlight-reverie.webp",
     {
       "--color-ivory": "#10182F",
       "--color-paper": "#1A2542",
@@ -372,7 +372,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "monsoon-romance",
     "Monsoon Romance",
-    "/card-themes/monsoon-romance.jpg",
+    "/card-themes/monsoon-romance.webp",
     {
       "--color-ivory": "#E9F1F0",
       "--color-paper": "#F3F8F7",
@@ -414,7 +414,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "anime-ever-after",
     "Anime Ever After",
-    "/card-themes/anime-ever-after.jpg",
+    "/card-themes/anime-ever-after.webp",
     {
       "--color-ivory": "#F4F0FF",
       "--color-paper": "#F8F5FF",
@@ -457,7 +457,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "royal-palace",
     "Royal Palace",
-    "/card-themes/royal-palace.jpg",
+    "/card-themes/royal-palace.webp",
     {
       "--color-ivory": "#2C1019",
       "--color-paper": "#3A1824",
@@ -500,7 +500,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "heavens-embrace",
     "Heaven's Embrace",
-    "/card-themes/heavens-embrace.jpg",
+    "/card-themes/heavens-embrace.webp",
     {
       "--color-ivory": "#F0F6FF",
       "--color-paper": "#F7FAFF",
@@ -543,7 +543,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "enchanted-garden",
     "Enchanted Garden",
-    "/card-themes/enchanted-garden.jpg",
+    "/card-themes/enchanted-garden.webp",
     {
       "--color-ivory": "#EAF0E6",
       "--color-paper": "#F3F7EF",
@@ -584,7 +584,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "cosmic-destiny",
     "Cosmic Destiny",
-    "/card-themes/cosmic-destiny.jpg",
+    "/card-themes/cosmic-destiny.webp",
     {
       "--color-ivory": "#17142F",
       "--color-paper": "#242044",
@@ -626,7 +626,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "velvet-rose",
     "Velvet Rose",
-    "/card-themes/velvet-rose.jpg",
+    "/card-themes/velvet-rose.webp",
     {
       "--color-ivory": "#3B1724",
       "--color-paper": "#4A2030",
@@ -669,7 +669,7 @@ const PREMIUM_THEMES: readonly CardTheme[] = [
   theme(
     "aurora-dreams",
     "Aurora Dreams",
-    "/card-themes/aurora-dreams.jpg",
+    "/card-themes/aurora-dreams.webp",
     {
       "--color-ivory": "#EAF5F3",
       "--color-paper": "#F3FAF8",
@@ -715,7 +715,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "royal-burgundy",
     "Royal Burgundy",
-    "/card-themes/royal-burgundy.jpg",
+    "/card-themes/royal-burgundy.webp",
     {
       "--color-ivory": "#4A101F",
       "--color-paper": "#5A1730",
@@ -769,7 +769,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "pastel-blush",
     "Pastel Blush",
-    "/card-themes/pastel-blush.jpg",
+    "/card-themes/pastel-blush.webp",
     {
       "--color-ivory": "#fbf1ec",
       "--color-paper": "#fff7f4",
@@ -823,7 +823,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "sage-green",
     "Sage Green",
-    "/card-themes/sage-green.jpg",
+    "/card-themes/sage-green.webp",
     {
       "--color-ivory": "#f1f4ec",
       "--color-paper": "#f7faf3",
@@ -877,7 +877,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "royal-blue",
     "Royal Blue",
-    "/card-themes/royal-blue.jpg",
+    "/card-themes/royal-blue.webp",
     {
       "--color-ivory": "#101C36",
       "--color-paper": "#182848",
@@ -931,7 +931,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "classic-ivory",
     "Classic Ivory",
-    "/card-themes/classic-ivory.jpg",
+    "/card-themes/classic-ivory.webp",
     {
       "--color-ivory": "#f6f2ea",
       "--color-paper": "#fbf8f2",
@@ -985,7 +985,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "midnight-emerald",
     "Midnight Emerald",
-    "/card-themes/midnight-emerald.jpg",
+    "/card-themes/midnight-emerald.webp",
     {
       "--color-ivory": "#0C2820",
       "--color-paper": "#14382C",
@@ -1039,7 +1039,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "terracotta-sunset",
     "Terracotta Sunset",
-    "/card-themes/terracotta-sunset.jpg",
+    "/card-themes/terracotta-sunset.webp",
     {
       "--color-ivory": "#f8efe6",
       "--color-paper": "#fbf6f0",
@@ -1093,7 +1093,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "lavender-dream",
     "Lavender Dream",
-    "/card-themes/lavender-dream.jpg",
+    "/card-themes/lavender-dream.webp",
     {
       "--color-ivory": "#f3eef6",
       "--color-paper": "#f8f5fb",
@@ -1147,7 +1147,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "classic-default",
     "Classic Default",
-    "/card-themes/classic-default-cover.jpg",
+    "/card-themes/classic-default-cover.webp",
     {
       "--color-ivory": "#f4efe8",
       "--color-paper": "#fbf8f4",
@@ -1201,7 +1201,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "blossom-pink",
     "Blossom Pink",
-    "/card-themes/blossom-pink.jpg",
+    "/card-themes/blossom-pink.webp",
     {
       "--color-ivory": "#fff1f5",
       "--color-paper": "#fff7fa",
@@ -1255,7 +1255,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "sky-blue",
     "Sky Blue",
-    "/card-themes/sky-blue.jpg",
+    "/card-themes/sky-blue.webp",
     {
       "--color-ivory": "#f3f7fb",
       "--color-paper": "#f8fbfe",
@@ -1309,7 +1309,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "rose-romance",
     "Rose Romance",
-    "/card-themes/rose-romance.jpg",
+    "/card-themes/rose-romance.webp",
     {
       "--color-ivory": "#f8eeec",
       "--color-paper": "#fbf6f4",
@@ -1363,7 +1363,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   theme(
     "peach-garden",
     "Peach Garden",
-    "/card-themes/peach-garden.jpg",
+    "/card-themes/peach-garden.webp",
     {
       "--color-ivory": "#fff3ea",
       "--color-paper": "#fff8f3",
@@ -1419,7 +1419,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
     theme(
       "classic-sunset-romance",
       "Classic Sunset Romance",
-      "/card-themes/classic-sunset-romance.jpg",
+      "/card-themes/classic-sunset-romance.webp",
       {
         "--color-ivory": "#FFF7F1",
         "--color-paper": "#FFF7F1",
@@ -1477,7 +1477,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
     theme(
       "classic-celestial-ivory",
       "Classic Celestial Ivory",
-      "/card-themes/classic-celestial-ivory.jpg",
+      "/card-themes/classic-celestial-ivory.webp",
       {
         "--color-ivory": "#FFFAF5",
         "--color-paper": "#FFFAF5",
@@ -1534,7 +1534,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   photoClassic(
     "classic-crimson-sunset",
     "Classic Crimson Sunset",
-    "/card-themes/classic-crimson-sunset.jpg",
+    "/card-themes/classic-crimson-sunset.webp",
     {
       ivory: "#FFF5F2",
       card: "#F9E5E5",
@@ -1553,7 +1553,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   photoClassic(
     "classic-marigold-palace",
     "Classic Marigold Palace",
-    "/card-themes/classic-marigold-palace.jpg",
+    "/card-themes/classic-marigold-palace.webp",
     {
       ivory: "#FFF8E9",
       card: "#F5E8D1",
@@ -1572,7 +1572,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   photoClassic(
     "classic-rose-bridal",
     "Classic Rose Bridal",
-    "/card-themes/classic-rose-bridal.jpg",
+    "/card-themes/classic-rose-bridal.webp",
     {
       ivory: "#FFF8F4",
       card: "#F8E8E3",
@@ -1591,7 +1591,7 @@ export const CARD_THEMES: readonly CardTheme[] = [
   photoClassic(
     "classic-royal-lakeside",
     "Classic Royal Lakeside",
-    "/card-themes/classic-royal-lakeside.jpg",
+    "/card-themes/classic-royal-lakeside.webp",
     {
       ivory: "#FFFAF4",
       card: "#F5EDE3",

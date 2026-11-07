@@ -2,28 +2,28 @@ import { themeUsesCeremonyCovers } from "./card-themes.ts";
 
 /** Built-in ceremony pictures. Each file belongs to one ceremony and is not reused. */
 export const CEREMONY_COVERS = {
-	haldi: "/ceremony-covers/haldi.jpg",
-	mehndi: "/ceremony-covers/mehndi.jpg",
-	engagement: "/ceremony-covers/engagement.jpg",
-	sangeet: "/ceremony-covers/sangeet.jpg",
-	jaggo: "/ceremony-covers/jaggo.jpg",
-	chooda: "/ceremony-covers/chooda.jpg",
-	shagun: "/ceremony-covers/shagun.jpg",
-	baraat: "/ceremony-covers/baraat.jpg",
-	nikah: "/ceremony-covers/nikah.jpg",
-	"anand-karaj": "/ceremony-covers/anand-karaj.jpg",
-	paath: "/ceremony-covers/paath.jpg",
-	church: "/ceremony-covers/church.jpg",
-	phere: "/ceremony-covers/phere.jpg",
-	walima: "/ceremony-covers/walima.jpg",
-	reception: "/ceremony-covers/reception.jpg",
-	doli: "/ceremony-covers/doli.jpg"
+	haldi: "/ceremony-covers/haldi.webp",
+	mehndi: "/ceremony-covers/mehndi.webp",
+	engagement: "/ceremony-covers/engagement.webp",
+	sangeet: "/ceremony-covers/sangeet.webp",
+	jaggo: "/ceremony-covers/jaggo.webp",
+	chooda: "/ceremony-covers/chooda.webp",
+	shagun: "/ceremony-covers/shagun.webp",
+	baraat: "/ceremony-covers/baraat.webp",
+	nikah: "/ceremony-covers/nikah.webp",
+	"anand-karaj": "/ceremony-covers/anand-karaj.webp",
+	paath: "/ceremony-covers/paath.webp",
+	church: "/ceremony-covers/church.webp",
+	phere: "/ceremony-covers/phere.webp",
+	walima: "/ceremony-covers/walima.webp",
+	reception: "/ceremony-covers/reception.webp",
+	doli: "/ceremony-covers/doli.webp"
 };
 /** Quiet floral picture for a ceremony name that matches none of the known ones. */
 export type CeremonyCoverKind = keyof typeof CEREMONY_COVERS;
 export type CeremonyCoverChoice = CeremonyCoverKind | "none";
 
-export const GENERIC_CEREMONY_COVER = "/ceremony-covers/generic.jpg";
+export const GENERIC_CEREMONY_COVER = "/ceremony-covers/generic.webp";
 export const CEREMONY_COVER_LIMIT = 350_000;
 export const CEREMONY_PICTURE_ORDER = [
 	"haldi",

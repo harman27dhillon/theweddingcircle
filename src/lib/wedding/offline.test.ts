@@ -18,9 +18,9 @@ test("shell worker bypasses private and dev requests and caches static files", (
   assert.equal(shellRequestPolicy("GET", "/assets/index-DFZdCwFD.js"), "immutable");
   assert.equal(shellRequestPolicy("GET", "/assets/styles-Cj5jXX5R.css"), "immutable");
   assert.equal(shellRequestPolicy("GET", "/favicon.svg"), "static");
-  assert.equal(shellRequestPolicy("GET", "/card-themes/pastel-blush.jpg"), "static");
+  assert.equal(shellRequestPolicy("GET", "/card-themes/pastel-blush.webp"), "static");
   assert.equal(shellRequestPolicy("GET", "/theme-music/pastel-blush.wav"), "bypass");
-  assert.equal(shellRequestPolicy("GET", "/media/ceremony.jpg"), "bypass");
+  assert.equal(shellRequestPolicy("GET", "/media/ceremony.webp"), "bypass");
   assert.equal(shellRequestPolicy("GET", "/live/index.m3u8"), "bypass");
   assert.equal(shellRequestPolicy("PUT", "/assets/index-DFZdCwFD.js"), "bypass");
   assert.equal(shellRequestPolicy("GET", "/wedding-shell-sw.js"), "bypass");

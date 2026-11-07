@@ -33,7 +33,7 @@ const INVITE_COVERS = [
   { id: "emerald", label: "Deep emerald and gold", src: "/covers/emerald.svg" },
 ] as const;
 
-const CLASSIC_COVER = "/card-themes/classic-default-cover.jpg";
+const CLASSIC_COVER = "/card-themes/classic-default-cover.webp";
 
 function CeremonyPhoto({ src }: { src: string }) {
   const { url } = useMediaUrl(src);

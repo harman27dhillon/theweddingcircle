@@ -1,9 +1,9 @@
 {
   "assets": [
     {
-      "path": "/assets/developer/landing/rose-garden.png",
+      "path": "/assets/developer/landing/rose-garden.webp",
       "slot": "landing/mobile",
-      "bytes": 509549
+      "bytes": 438180
     }
   ]
 }
