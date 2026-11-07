@@ -126,7 +126,7 @@ export function JoinScreen({ code }: { code: string }) {
             }
             const result = joinWedding(wedding.slug, guestName, rsvp, relationship, matched ? normalized : "", matched?.kind);
             if (result === "bad-code" || result === "wrong-kind") {
-              setNote("That code is not for this wedding. Family and guest codes are different.");
+              setNote("That code is not for this wedding. Family/VIP-Guest and Guest codes are different.");
               return;
             }
             if (result === "disabled") {
