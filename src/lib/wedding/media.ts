@@ -1,4 +1,4 @@
-import { optimiseLosslessly } from "./media-optimizer";
+import { optimiseMedia } from "./media-optimizer";
 import { MEDIA_LIMITS, type MediaPurpose } from "@/lib/infra/media-policy";
 import { appRuntime } from "@/lib/developer/runtime";
 import { parseR2Ref } from "@/lib/wedding/r2-ref";
@@ -111,7 +111,7 @@ export async function prepareUpload(
       ? "This phone could not prepare that HEIC photo. Choose a JPG or PNG instead. Nothing was uploaded."
       : "That file type is not allowed. Use JPG, PNG, WebP, GIF, MP4, MOV, or WebM.");
   }
-  if (kind === "image" && uploadFile.size > MEDIA_LIMITS.image) throw new Error("That photo is larger than the 12 MB photo limit. Choose a smaller file to preserve its quality.");
+  if (kind === "image" && uploadFile.size > MEDIA_LIMITS.image) throw new Error("That photo is larger than the 12 MB photo limit after preparation.");
   const typed = uploadFile.type === mime ? uploadFile : new File([uploadFile], uploadFile.name, { type: mime, lastModified: uploadFile.lastModified });
   const src = await uploadPreparedFile(typed, slug, purpose, onStatus, { originalBytes: file.size, compressMs });
   const parent = parseR2Ref(src);
@@ -206,9 +206,9 @@ function oneImageAtATime<T>(run: () => Promise<T>): Promise<T> {
   return next;
 }
 
-/** Lossless preparation always completes before the original is sent to private R2. */
+/** Photo compression completes locally before the prepared copy is sent to private R2. */
 export function optimiseUploadFile(file: File): Promise<File> {
-  return optimiseLosslessly(file);
+  return optimiseMedia(file);
 }
 
 async function canvasBlob(source: CanvasImageSource, width: number, height: number, mime: string) {

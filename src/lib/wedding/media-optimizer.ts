@@ -1,21 +1,31 @@
+import { compressPhoto } from './photo-compression';
 const prepared = new WeakMap<File, Promise<File>>();
 let work: Promise<unknown> = Promise.resolve();
-/** File blobs are cloned lazily to one worker. The UI never waits for pixel decoding. */
-export function optimiseLosslessly(file: File): Promise<File> {
+/** Serialize photo preparation to keep phone memory bounded; never upload an unprocessed large photo. */
+export function optimiseMedia(file: File): Promise<File> {
   const cached = prepared.get(file);
   if (cached) return cached;
-  const result = work.then(() => new Promise<File>((resolve) => {
-    if (typeof Worker === 'undefined' || !(/\.png$|\.(mp4|mov|m4v)$/i.test(file.name) || /image\/png|video\/(mp4|quicktime)/.test(file.type))) { resolve(file); return; }
+  const photo = file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif|avif|bmp|tiff?)$/i.test(file.name);
+  const result = work.then(() => new Promise<File>((resolve, reject) => {
+    const fallback = () => { if (photo) compressPhoto(file).then(resolve, reject); else resolve(file); };
+    if (typeof Worker === 'undefined') { fallback(); return; }
     let worker: Worker;
     try { worker = new Worker(new URL('./media-optimize.worker.ts', import.meta.url), { type: 'module' }); }
-    catch { resolve(file); return; }
-    const finish = (next: File) => { clearTimeout(timer); worker.terminate(); resolve(next.size < file.size ? next : file); };
-    const timer = setTimeout(() => finish(file), 1500);
-    worker.onmessage = (event: MessageEvent<File>) => finish(event.data);
-    worker.onerror = () => finish(file);
-    try { worker.postMessage(file); } catch { finish(file); }
+    catch { fallback(); return; }
+    const finish = (next?: File, error?: string) => {
+      clearTimeout(timer);worker.terminate();
+      if (error) reject(new Error(error)); else resolve(next || file);
+    };
+    const timer = setTimeout(() => photo ? finish(undefined, 'Photo preparation took too long. Try again. Nothing was uploaded.') : finish(file), photo ? 45_000 : 1500);
+    worker.onmessage = (event: MessageEvent<{ ok: boolean; file?: File; error?: string }>) => {
+      if (!event.data.ok || !(event.data.file instanceof File)) finish(undefined, event.data.error || 'Photo compression failed. Nothing was uploaded.');
+      else finish(event.data.file);
+    };
+    worker.onerror = (event) => { event.preventDefault();clearTimeout(timer);worker.terminate();fallback(); };
+    try { worker.postMessage(file); } catch { clearTimeout(timer);worker.terminate();fallback(); }
   }));
   work = result.catch(() => undefined);
   prepared.set(file, result);
+  void result.catch(() => prepared.delete(file));
   return result;
 }

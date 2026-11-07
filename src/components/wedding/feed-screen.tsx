@@ -505,7 +505,15 @@ export function FeedScreen() {
           window.setTimeout(() => URL.revokeObjectURL(item.preview), 1000);
           return { ...item, file: owned, preview };
         }));
-        void optimiseUploadFile(owned);
+        void optimiseUploadFile(owned).then((compressed) => {
+          if (!compressed.type.startsWith("image/") || compressed === owned) return;
+          setPicks((current) => current.map((item) => {
+            if (item.file !== owned) return item;
+            const preview = URL.createObjectURL(compressed);
+            window.setTimeout(() => URL.revokeObjectURL(item.preview), 1000);
+            return { ...item, preview, bytes: compressed.size };
+          }));
+        }).catch(() => undefined);
       }).catch((error) => {
         const message = error instanceof Error ? error.message : "That file could not be read. Choose it again.";
         setNotice(message);
