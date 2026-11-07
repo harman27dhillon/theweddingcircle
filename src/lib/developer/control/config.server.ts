@@ -51,9 +51,8 @@ export async function configurationStatus() {
   const cloudflare = Boolean(workerEnvironment());
   const hyperdrive = Boolean(await hyperdriveConnectionString());
   const staging = env("APP_ENV") === "staging";
-  const databaseConfigured = staging
-    ? Boolean(config.SUPABASE_DB_URL) && !validateDatabaseUrl(config.SUPABASE_DB_URL, STAGING_SUPABASE_URL)
-    : Boolean(config.SUPABASE_DB_URL) || hyperdrive;
+  const databaseUrl = staging ? environment.SUPABASE_DB_URL?.trim() : config.SUPABASE_DB_URL;
+  const databaseConfigured = hyperdrive || Boolean(databaseUrl && (!staging || !validateDatabaseUrl(databaseUrl, STAGING_SUPABASE_URL)));
   return {
     environment: staging ? "staging" as const : "production" as const,
     projectUrl: projectUrl(config.SUPABASE_URL),

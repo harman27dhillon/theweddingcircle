@@ -216,9 +216,10 @@ Rollback: turn the gateway off and save. New views return to the previous path. 
 
 Open the [Staging Developer Center](https://staging-theweddingcircle.labs-circle26.workers.dev/developer).
 The named Cloudflare Preview uses the separate staging Supabase project and
-requires its own `SUPABASE_DB_URL` and `SUPABASE_PUBLISHABLE_KEY`. Store these
-under the staging Preview’s secrets. The database URL must point to the staging
-project’s direct or session-pooler endpoint on port 5432.
+requires its own `SUPABASE_PUBLISHABLE_KEY` and database connection. Bind a
+Hyperdrive configuration for the staging project as `STAGING_HYPERDRIVE`, or
+store a staging `SUPABASE_DB_URL` using the direct or session-pooler endpoint
+on port 5432. The staging app ignores the production `HYPERDRIVE` binding.
 
 Configure the Developer Center email, password, and session signing secret in
 the same Preview. Use a distinct `DEVELOPER_SESSION_SECRET` for staging.

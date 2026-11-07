@@ -151,7 +151,7 @@ export async function runDatabaseCheck(check: Exclude<Check, "api">): Promise<Di
   const hyperdrive = await hyperdriveConnectionString();
   const usingHyperdrive = Boolean(hyperdrive);
   let connectionString = hyperdrive || config.SUPABASE_DB_URL;
-  if (environment.APP_ENV === "staging") {
+  if (environment.APP_ENV === "staging" && !usingHyperdrive) {
     try {
       connectionString = stagingDatabaseUrl(environment);
     } catch (error) {

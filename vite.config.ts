@@ -221,15 +221,13 @@ export default defineConfig(({ command, isPreview }) => ({
                     id: "7cc99881548c416db610ead45c7b0f51",
                   },
                 ],
-                // Cloudflare Previews do not inherit production settings.
-                // Give staging its own Supabase project URL and intentionally
-                // omit the production HYPERDRIVE binding from Preview.
-                // Preview-only secrets (including SUPABASE_PUBLISHABLE_KEY and
-                // SUPABASE_DB_URL) belong to the named staging
-                // Preview in Cloudflare; never commit secret values here.
+                // Staging secrets belong to the named Cloudflare Preview.
+                // Its optional STAGING_HYPERDRIVE binding is managed there.
+                // The application ignores the production binding in staging.
                 previews: {
                   vars: {
                     APP_ENV: "staging",
+                    DEVELOPER_ADMIN_EMAIL: "developer@weddingcircle.app",
                     SUPABASE_URL: STAGING_SUPABASE_URL,
                   },
                 },

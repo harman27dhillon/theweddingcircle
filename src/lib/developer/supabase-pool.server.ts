@@ -47,9 +47,9 @@ async function openPool(raw: string, max: number, mode: "direct" | "hyperdrive" 
   return new Pool({ ...connection, ...queryLimits, max, idleTimeoutMillis: 10_000 });
 }
 
-function databaseUri(raw: string) {
+function databaseUri(raw: string, mode: "direct" | "hyperdrive") {
   const uri = safeSupabaseUri(raw);
-  if (env("APP_ENV") !== "staging") return uri;
+  if (mode === "hyperdrive" || env("APP_ENV") !== "staging") return uri;
   try {
     stagingDatabaseUrl({ SUPABASE_DB_URL: raw });
     return uri;
@@ -71,7 +71,7 @@ function toSql(run: <T>(text: string, params: unknown[]) => Promise<T[]>): Sql {
 /** Apply versioned app migrations once. Does not drop, truncate, or rewrite existing rows. */
 export async function runSupabaseSchema(files: { name: string; sql: string }[], connectionString = env("SUPABASE_DB_URL") || "", mode: "direct" | "hyperdrive" = "direct") {
   const raw = connectionString;
-  const uri = databaseUri(raw);
+  const uri = databaseUri(raw, mode);
   if (uri.status !== "ready") throw new Error(uri.detail);
   const pool = await openPool(raw, 1, mode);
   try {
@@ -107,7 +107,7 @@ export async function withSupabase<T>(fn: (query: Query) => Promise<T>): Promise
   const hyperdrive = await hyperdriveConnectionString();
   const raw = hyperdrive || env("SUPABASE_DB_URL") || "";
   const mode = hyperdrive ? "hyperdrive" as const : "direct" as const;
-  const uri = databaseUri(raw);
+  const uri = databaseUri(raw, mode);
   if (uri.status !== "ready") return { ok: false, error: uri.detail };
   const pool = await openPool(raw, 1, mode);
   try {
@@ -128,7 +128,7 @@ export async function openSupabaseSql(connectionString?: string, requestedMode?:
   const hyperdrive = connectionString ? undefined : await hyperdriveConnectionString();
   const raw = connectionString || hyperdrive || env("SUPABASE_DB_URL") || "";
   const mode = requestedMode || (hyperdrive ? "hyperdrive" : "direct");
-  const uri = databaseUri(raw);
+  const uri = databaseUri(raw, mode);
   if (uri.status !== "ready") return { ok: false, error: uri.detail };
   if (mode === "hyperdrive" || env("APP_ENV") === "staging") {
     // Cache only the query function. Worker sockets belong to the request
@@ -175,7 +175,7 @@ export async function probeSupabaseConnection(): Promise<SafeDbUri & { tested: b
   const hyperdrive = await hyperdriveConnectionString();
   const raw = hyperdrive || env("SUPABASE_DB_URL") || "";
   const mode = hyperdrive ? "hyperdrive" as const : "direct" as const;
-  const uri = databaseUri(raw);
+  const uri = databaseUri(raw, mode);
   if (uri.status !== "ready") return { ...uri, tested: false, code: "" };
   const pool = await openPool(raw, 1, mode);
   try {

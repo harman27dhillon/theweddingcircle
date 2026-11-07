@@ -218,15 +218,15 @@ async function createSql(): Promise<Sql> {
  */
 export async function getSql(): Promise<Sql> {
   const { env, hyperdriveConnectionString } = await import("@/lib/env.server");
-  if (env("APP_ENV") === "staging") {
-    const { stagingDatabaseUrl } = await import("@/lib/developer/supabase-connect");
-    dbSource = "supabase";
-    return createSupabaseSql(stagingDatabaseUrl({ SUPABASE_DB_URL: env("SUPABASE_DB_URL") }), "staging");
-  }
   const hyperdrive = await hyperdriveConnectionString();
   if (hyperdrive) {
     dbSource = "supabase";
     return createSupabaseSql(hyperdrive, "hyperdrive");
+  }
+  if (env("APP_ENV") === "staging") {
+    const { stagingDatabaseUrl } = await import("@/lib/developer/supabase-connect");
+    dbSource = "supabase";
+    return createSupabaseSql(stagingDatabaseUrl({ SUPABASE_DB_URL: env("SUPABASE_DB_URL") }), "staging");
   }
   sqlPromise ??= createSql().catch((err) => {
     sqlPromise = null; // don't memoize failures — let the next call retry
