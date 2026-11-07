@@ -1,11 +1,10 @@
+import { optimiseLosslessly } from "./media-optimizer";
 import { MEDIA_LIMITS, type MediaPurpose } from "@/lib/infra/media-policy";
 import { appRuntime } from "@/lib/developer/runtime";
 import { parseR2Ref } from "@/lib/wedding/r2-ref";
 import { uploadPreparedFile, uploadPreviewBlob } from "@/lib/wedding/r2-upload";
 import { needsOwnedPickerBytes } from "@/lib/wedding/picker-file";
 
-export const IMAGE_MAX_EDGE = 2560;
-export const IMAGE_QUALITY = 0.82;
 export const PREVIEW_EDGE = 480;
 let uploadLimit = 3;
 export function uploadConcurrency() {
@@ -112,7 +111,7 @@ export async function prepareUpload(
       ? "This phone could not prepare that HEIC photo. Choose a JPG or PNG instead. Nothing was uploaded."
       : "That file type is not allowed. Use JPG, PNG, WebP, GIF, MP4, MOV, or WebM.");
   }
-  if (kind === "image" && uploadFile.size > MEDIA_LIMITS.image) throw new Error("That photo is larger than 12 MB after preparation.");
+  if (kind === "image" && uploadFile.size > MEDIA_LIMITS.image) throw new Error("That photo is larger than the 12 MB photo limit. Choose a smaller file to preserve its quality.");
   const typed = uploadFile.type === mime ? uploadFile : new File([uploadFile], uploadFile.name, { type: mime, lastModified: uploadFile.lastModified });
   const src = await uploadPreparedFile(typed, slug, purpose, onStatus, { originalBytes: file.size, compressMs });
   const parent = parseR2Ref(src);
@@ -197,9 +196,6 @@ export async function prepareMany(files: File[], onPercent: (percent: number) =>
   return { items: ready, limited, errors, outcomes };
 }
 
-const KEEP_UNDER = 1_200_000;
-const REENCODE_OVER = 6_000_000;
-
 let imageWork: Promise<void> = Promise.resolve();
 
 /** Chrome Android runs out of memory if several photos are decoded together. Other browsers are unchanged. */
@@ -210,57 +206,9 @@ function oneImageAtATime<T>(run: () => Promise<T>): Promise<T> {
   return next;
 }
 
-function efficientImage(file: File) {
-  const type = file.type.toLowerCase();
-  return type === "image/jpeg" || type === "image/jpg" || type === "image/png" || type === "image/webp" || /\.(jpe?g|png|webp)$/i.test(file.name);
-}
-
-/**
- * Optimise an upload copy. Small or already-efficient photos are left alone.
- * Videos are not re-encoded in the browser (that drops audio and quality).
- * If decoding or encoding fails, or the copy is not smaller, the original is kept.
- */
-export async function optimiseUploadFile(file: File): Promise<File> {
-  if (mediaKindOf(file) !== "image") return file;
-  if (typeof document === "undefined" || typeof createImageBitmap !== "function") return file;
-  const type = file.type.toLowerCase();
-  if (type === "image/gif" || /\.gif$/i.test(file.name)) return file;
-  if (efficientImage(file) && file.size > 0 && file.size < KEEP_UNDER) return file;
-  return oneImageAtATime(async () => {
-  let bitmap: ImageBitmap | null = null;
-  try {
-    bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  } catch {
-    return file;
-  }
-  try {
-    const edge = Math.max(bitmap.width, bitmap.height);
-    if (edge < 2) return file;
-    if (efficientImage(file) && edge <= IMAGE_MAX_EDGE && file.size < REENCODE_OVER) return file;
-    const scale = Math.min(1, IMAGE_MAX_EDGE / edge);
-    const width = Math.max(1, Math.round(bitmap.width * scale));
-    const height = Math.max(1, Math.round(bitmap.height * scale));
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return file;
-    ctx.drawImage(bitmap, 0, 0, width, height);
-    const keepAlpha = type === "image/png" || type === "image/webp" || /\.(png|webp)$/i.test(file.name);
-    const mime = keepAlpha ? "image/webp" : "image/jpeg";
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob((next) => resolve(next), mime, IMAGE_QUALITY));
-    if (!blob) return file;
-    const resized = scale < 1;
-    if (blob.size >= file.size && !(resized && blob.size <= file.size * 1.15)) return file;
-    const base = file.name.replace(/\.[^.]+$/, "") || "photo";
-    const ext = mime === "image/webp" ? "webp" : "jpg";
-    return new File([blob], `${base}.${ext}`, { type: mime, lastModified: file.lastModified });
-  } catch {
-    return file;
-  } finally {
-    bitmap.close();
-  }
-  });
+/** Lossless preparation always completes before the original is sent to private R2. */
+export function optimiseUploadFile(file: File): Promise<File> {
+  return optimiseLosslessly(file);
 }
 
 async function canvasBlob(source: CanvasImageSource, width: number, height: number, mime: string) {

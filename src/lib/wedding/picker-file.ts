@@ -96,3 +96,19 @@ export async function ownPickerFiles(files: File[]) {
   }
   return { files: ready, errors };
 }
+
+const ownedSelections = new WeakMap<File, Promise<File>>();
+let copyQueue: Promise<unknown> = Promise.resolve();
+/** Start safe phone-file ownership after the preview is queued; share it with Send. */
+export function ownSelectedFile(file: File): Promise<File> {
+  const cached = ownedSelections.get(file);
+  if (cached) return cached;
+  const result = copyQueue.then(async () => {
+    const owned = await ownPickerFiles([file]);
+    if (!owned.files[0]) throw new Error(owned.errors[0] || 'That file could not be read. Choose it again.');
+    return owned.files[0];
+  });
+  copyQueue = result.catch(() => undefined);
+  ownedSelections.set(file, result);
+  return result;
+}

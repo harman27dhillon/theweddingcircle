@@ -16,9 +16,9 @@ import { composerFieldHeight } from "@/lib/wedding/capture";
 import { canView } from "@/lib/wedding/access";
 import type { AccessKind, AccessRule, FeedPost } from "@/lib/wedding/types";
 import { feedSidesOf, schemeForSide } from "@/lib/wedding/feed-sides";
-import { MAX_PHOTOS, MAX_VIDEOS, MEDIA_ACCEPT, mediaKindOf, prepareUpload, unsupportedMediaMessage, uploadConcurrency, uploadProgressPercent } from "@/lib/wedding/media";
-import { ownPickerFiles } from "@/lib/wedding/picker-file";
-import { appRuntime } from "@/lib/developer/runtime";
+import { MAX_PHOTOS, MAX_VIDEOS, MEDIA_ACCEPT, mediaKindOf, optimiseUploadFile, prepareUpload, unsupportedMediaMessage, uploadConcurrency, uploadProgressPercent } from "@/lib/wedding/media";
+import { ownSelectedFile } from "@/lib/wedding/picker-file";
+import { useAppRuntime } from "@/lib/developer/runtime";
 import { downloadStored } from "@/lib/wedding/media-db";
 import { weddingDownloadName } from "@/lib/wedding/download-name";
 import { signalTyping } from "@/lib/wedding/publish";
@@ -359,6 +359,7 @@ type MediaPick = {
   name: string;
   bytes: number;
   mark: string;
+  ready: Promise<File>;
 };
 
 function formatBytes(bytes: number) {
@@ -415,6 +416,8 @@ export function FeedScreen() {
   const typingBeat = useRef(0);
   const typingNames = pulse.slug === wedding.slug ? pulse.feed : [];
   const [picks, setPicks] = useState<MediaPick[]>([]);
+  const [sendingPicks, setSendingPicks] = useState(false);
+  const runtime = useAppRuntime();
 
   function noteTyping(active: boolean) {
     window.clearTimeout(typingTimer.current);
@@ -447,10 +450,9 @@ export function FeedScreen() {
     });
   }, [wedding.id, text, images, videos, functionId, audience, audienceNames]);
 
-  async function onFiles(chosen: File[]) {
+  function onFiles(chosen: File[]) {
     if (chosen.length === 0) return;
     setNotice("");
-    const runtime = await appRuntime();
     if (!runtime.flags.photoUploads) {
       const message = "Photo and video uploads are turned off.";
       setNotice(message);
@@ -494,6 +496,27 @@ export function FeedScreen() {
       toast(rejected[0]);
     }
     if (!files.length) return;
+    for (const entry of files) {
+      void ownSelectedFile(entry.file).then((owned) => {
+        // Replace the phone-backed URL before clearing its picker permission.
+        setPicks((current) => current.map((item) => {
+          if (item.file !== entry.file || owned === entry.file) return item;
+          const preview = URL.createObjectURL(owned);
+          window.setTimeout(() => URL.revokeObjectURL(item.preview), 1000);
+          return { ...item, file: owned, preview };
+        }));
+        void optimiseUploadFile(owned);
+      }).catch((error) => {
+        const message = error instanceof Error ? error.message : "That file could not be read. Choose it again.";
+        setNotice(message);
+        toast(message);
+        setPicks((current) => current.filter((item) => {
+          if (item.file !== entry.file) return true;
+          URL.revokeObjectURL(item.preview);
+          return false;
+        }));
+      });
+    }
     setPicks((current) => {
       const next = [...current];
       let duplicate = false;
@@ -511,6 +534,7 @@ export function FeedScreen() {
           name: entry.file.name || (entry.kind === "video" ? "Video" : "Photo"),
           bytes: entry.file.size,
           mark,
+          ready: ownSelectedFile(entry.file),
         });
       }
       if (duplicate) toast("That file is already selected.");
@@ -526,9 +550,16 @@ export function FeedScreen() {
     });
   }
 
-  function sendPicks() {
-    if (!picks.length) return;
-    enqueueChatMedia(picks.map((item) => ({ file: item.file, kind: item.kind })), {
+  async function sendPicks() {
+    if (!picks.length || sendingPicks) return;
+    setSendingPicks(true);
+    const selected = picks;
+    const ready = await Promise.all(selected.map(async (item) => {
+      try { return { file: await item.ready, kind: item.kind }; }
+      catch { return null; }
+    }));
+    const files = ready.filter((item): item is { file: File; kind: "image" | "video" } => Boolean(item));
+    if (files.length) enqueueChatMedia(files, {
       weddingId: wedding.id,
       slug: wedding.slug,
       author: viewer.name,
@@ -537,8 +568,10 @@ export function FeedScreen() {
       functionId: functionId || undefined,
       accessRule: audience === "people" ? { kind: "people", names: audienceNames } : audience === "all" ? undefined : { kind: audience },
     });
-    for (const item of picks) URL.revokeObjectURL(item.preview);
-    setPicks([]);
+    for (const item of selected) URL.revokeObjectURL(item.preview);
+    const selectedIds = new Set(selected.map((item) => item.id));
+    setPicks((current) => current.filter((item) => !selectedIds.has(item.id)));
+    setSendingPicks(false);
     stickRef.current = true;
   }
 
@@ -1089,7 +1122,7 @@ export function FeedScreen() {
                 {picks.map((item) => (
                   <figure key={item.id} className="w-24 shrink-0">
                     {item.kind === "video" ? (
-                      <video src={item.preview} className="h-20 w-full rounded-xl bg-ink object-cover" muted playsInline />
+                      <video src={item.preview} preload="metadata" className="h-20 w-full rounded-xl bg-ink object-cover" muted playsInline />
                     ) : (
                       <img src={item.preview} alt="" className="h-20 w-full rounded-xl object-cover" />
                     )}
@@ -1101,7 +1134,7 @@ export function FeedScreen() {
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button type="button" className="min-h-11 rounded-full border border-line px-3 text-sm" onClick={() => fileRef.current?.click()}>Add more</button>
-                <button type="button" className="min-h-11 rounded-full bg-maroon px-4 text-sm text-on-photo" onClick={sendPicks}>Send</button>
+                <button type="button" className="min-h-11 rounded-full bg-maroon px-4 text-sm text-on-photo" disabled={sendingPicks} onClick={() => void sendPicks()}>{sendingPicks ? "Preparing…" : "Send"}</button>
               </div>
             </div>
           ) : null}
@@ -1162,13 +1195,10 @@ export function FeedScreen() {
                   const input = e.target;
                   const chosen = Array.from(input.files ?? []);
                   if (!chosen.length) return;
-                  void ownPickerFiles(chosen).then((owned) => {
+                  onFiles(chosen);
+                  // The preview is visible before phone file copies or compression finish.
+                  void Promise.allSettled(chosen.map(ownSelectedFile)).then(() => {
                     input.value = "";
-                    if (owned.errors[0]) {
-                      setNotice(owned.errors[0]);
-                      toast(owned.errors[0]);
-                    }
-                    if (owned.files.length) void onFiles(owned.files);
                   });
                 }}
               />

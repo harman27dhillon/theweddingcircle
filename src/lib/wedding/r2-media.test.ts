@@ -200,8 +200,7 @@ test("a download stays on the app and keeps the real file name", () => {
   assert.equal(retryDelayMs(0), 400);
   assert.equal(retryDelayMs(1), 800);
   const media = readFileSync(new URL("./media.ts", import.meta.url), "utf8");
-  assert.match(media, /export const IMAGE_MAX_EDGE = 2560/);
-  assert.match(media, /export const IMAGE_QUALITY = 0\.82/);
+  assert.match(media, /return optimiseLosslessly\(file\)/);
   assert.match(media, /imageOrientation: "from-image"/);
   assert.match(media, /uploadLimit = 3/);
   assert.equal(media.includes("uploadPreparedFile"), true);
