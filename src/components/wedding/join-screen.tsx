@@ -116,10 +116,15 @@ export function JoinScreen({ code }: { code: string }) {
               compactCode(normalized) === compactCode(wedding.slug) ||
               typed.toLowerCase().includes(`/w/${wedding.slug}`) ||
               typed.toLowerCase().includes(`/join/${wedding.slug}`);
-            const matched = sameCircle ? undefined : codeMatch(wedding, normalized);
+            let matched = sameCircle ? undefined : codeMatch(wedding, normalized);
+            let roleAuth: Awaited<ReturnType<typeof confirmWeddingRole>> | undefined;
             if (!sameCircle && !matched) {
-              setNote("That code does not match this wedding. Check the family or guest code, or clear it to enter with the invitation.");
-              return;
+              roleAuth = await confirmWeddingRole(wedding.slug, guestName, normalized);
+              if (!roleAuth.ok) {
+                setNote(roleAuth.error || "That code does not match this wedding.");
+                return;
+              }
+              matched = { id: "server-validated", code: normalized, kind: roleAuth.role === "family" ? "family" : "guest" };
             }
             const result = joinWedding(wedding.slug, guestName, rsvp, relationship, matched ? normalized : "", matched?.kind);
             if (result === "bad-code" || result === "wrong-kind") {
@@ -139,7 +144,7 @@ export function JoinScreen({ code }: { code: string }) {
               return;
             }
             if (matched) {
-              const auth = await confirmWeddingRole(wedding.slug, guestName, normalized);
+              const auth = roleAuth ?? await confirmWeddingRole(wedding.slug, guestName, normalized);
               if (auth.ok) applyRole(wedding.id, auth.role);
               else if (matched.kind === "family") {
                 setNote(auth.error);
