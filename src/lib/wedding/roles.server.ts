@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { weddingDataSql } from "@/lib/developer/core-route.server";
-import { compactCode, normalizeCode } from "@/lib/wedding/format";
+import { codeMatch, compactCode, normalizeCode } from "@/lib/wedding/format";
+import type { Wedding } from "@/lib/wedding/types";
 import { pickMembership } from "@/lib/wedding/host-identity";
 
 export type AuthorizedRole = "guest" | "family" | "cohost" | "host";
@@ -195,12 +196,22 @@ export async function claimWeddingRole(input: { slug: string; memberKey: string;
   const sql = await ensureTables();
   const rows = await sql<AuthRow>`select host_code, cohost_code, family_codes, guest_codes, edit_key from circle_auth where slug = ${slug} limit 1`;
   const auth = rows[0];
-  if (!auth) return { ok: false as const, error: "This wedding is not ready to check codes yet." };
-  const granted = roleFromCode(
-    { hostCode: auth.host_code, cohostCode: auth.cohost_code, familyCodes: parseList(auth.family_codes), guestCodes: parseList(auth.guest_codes) },
-    code,
-  );
-  if (!granted) return { ok: false as const, error: "That code does not change your role." };
+  let granted: AuthorizedRole | null = auth
+    ? roleFromCode(
+        { hostCode: auth.host_code, cohostCode: auth.cohost_code, familyCodes: parseList(auth.family_codes), guestCodes: parseList(auth.guest_codes) },
+        code,
+      )
+    : null;
+  if (!granted) {
+    const circles = await sql<{ payload: unknown }>`select payload from circles where slug = ${slug} limit 1`;
+    const raw = circles[0]?.payload;
+    const wedding = raw
+      ? (typeof raw === "string" ? JSON.parse(raw) : raw) as Wedding
+      : null;
+    const matched = wedding ? codeMatch(wedding, code) : undefined;
+    if (matched) granted = matched.kind;
+  }
+  if (!granted) return { ok: false as const, error: "That code does not match this wedding." };
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim().slice(0, 80) || "Guest";
   const key = input.memberKey.trim();
