@@ -11,7 +11,7 @@ import { mergeParkedMemberships, mergeParkedWeddings, parkSignedOutSession, take
 import { fontsFromRemote, sanitizeFonts } from "./fonts.ts";
 import { assignCoupleSeat, claimAcrossWeddings, mergeCoupleAccess } from "./couple-access.ts";
 import { overPlanStorage, retainVerifiedPayment, storageMessage, storedMediaBytes, weddingStorageBytes } from "./plan.ts";
-import { canManage, canPost, codeMatch, codesOf, googleMapsLink, isCircleOwner, isSampleCircle, nowLabel, slugify, uid } from "./format.ts";
+import { canManage, canPost, codeMatch, codesOf, googleMapsLink, isCircleOwner, isSampleCircle, nowLabel, normalizeCode, slugify, uid } from "./format.ts";
 import { accountSenderId } from "./identity.ts";
 import { dropNamed, mergeProfiles, ownMemberKey, prepareProfile } from "./guest-profile.ts";
 import { canEnterWedding, landingUserKey } from "./landing-pin.ts";
