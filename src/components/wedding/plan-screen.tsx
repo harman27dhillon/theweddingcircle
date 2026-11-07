@@ -47,7 +47,8 @@ export function MoreScreen() {
   const owner = isCircleOwner(wedding);
   const manager = (canManage(wedding, viewer) || verified) && !wedding.ownerReview;
   const [hostOpen, setHostOpen] = useState(false);
-  const tiles = moreTiles;
+  const guestOnly = viewer.role === "guest" && !viewer.coded;
+  const tiles = guestOnly ? moreTiles.filter((item) => item.href !== "/settings") : moreTiles;
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 py-4 md:px-8 md:py-8 lg:max-w-6xl">
       <div className={`more-stage flex min-h-0 flex-1 flex-col ${entrance}`}>
@@ -290,6 +291,7 @@ function HostControl({ owner }: { owner: boolean }) {
             <Link to="/w/$slug/memories" params={{ slug: wedding.slug }} className="min-h-11 text-maroon">Album</Link>
           </div>
         </Fold>
+        {!guestOnly ? (
         <Fold id="privacy" title="Privacy & Permissions" icon={Shield} open={open === "privacy"} onToggle={() => toggle("privacy")}>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="line" onClick={() => updatePrivacy(wedding.id, { ...wedding.privacy, join: wedding.privacy.join === "link" ? "approve" : "link" })}>
@@ -311,6 +313,7 @@ function HostControl({ owner }: { owner: boolean }) {
           ) : null}
           <Link to="/w/$slug/settings" params={{ slug: wedding.slug }} className="mt-3 inline-flex min-h-11 items-center text-sm text-maroon">Family access and ceremony privacy</Link>
         </Fold>
+        ) : null}
         <Fold id="manage" title="Wedding Management" icon={Crown} open={open === "manage"} onToggle={() => toggle("manage")} danger>
           {owner ? (
             <div>
@@ -956,11 +959,11 @@ export function InviteScreen() {
       ) : null}
       {family ? (
         <div className="mt-8 rounded-card border border-line bg-paper p-4">
-          <h2 className="font-serif text-2xl">Family and guest codes</h2>
+          <h2 className="font-serif text-2xl">Family/VIP-Guest and Guest codes</h2>
           <p className="mt-1 text-sm text-muted">
-            Share the family code with family. Share the guest code with everyone else. People can also enter from the home page with those codes.
+            Share the Family/VIP-Guest code with family and VIP guests. Share the Guest code with everyone else. People can also enter from the home page with those codes.
           </p>
-          <h3 className="mt-4 font-medium">Family</h3>
+          <h3 className="mt-4 font-medium">Family/VIP-Guest code</h3>
           <ul className="mt-1 text-sm">
             {codesOf(wedding).filter((item) => item.kind === "family").map((item) => (
               <li key={item.id} className="mt-2 flex items-center justify-between gap-2">
@@ -969,7 +972,7 @@ export function InviteScreen() {
               </li>
             ))}
           </ul>
-          <h3 className="mt-4 font-medium">Guests</h3>
+          <h3 className="mt-4 font-medium">Guest code</h3>
           <ul className="mt-1 text-sm">
             {codesOf(wedding).filter((item) => item.kind === "guest").map((item) => (
               <li key={item.id} className="mt-2 flex items-center justify-between gap-2">
@@ -989,6 +992,11 @@ export function InviteScreen() {
 export function SettingsScreen() {
   const wedding = useWedding();
   const viewer = useWeddingStore((s) => s.viewer);
+  const navigate = useNavigate();
+  const guestOnly = viewer.role === "guest" && !viewer.coded;
+  useEffect(() => {
+    if (guestOnly) void navigate({ to: "/w/$slug/more", params: { slug: wedding.slug }, replace: true });
+  }, [guestOnly, navigate, wedding.slug]);
   const updatePrivacy = useWeddingStore((s) => s.updatePrivacy);
   const restoreSample = useWeddingStore((s) => s.restoreSample);
   const setCircleDisabled = useWeddingStore((s) => s.setCircleDisabled);
@@ -997,6 +1005,7 @@ export function SettingsScreen() {
   const setFunctionAccess = useWeddingStore((s) => s.setFunctionAccess);
   const host = canHost(viewer);
   const owner = isCircleOwner(wedding);
+  if (guestOnly) return null;
   function set<K extends keyof Privacy>(key: K, value: Privacy[K]) {
     updatePrivacy(wedding.id, { ...wedding.privacy, [key]: value });
   }
