@@ -13,7 +13,6 @@ import type { Rsvp } from "@/lib/wedding/types";
 export function CircleGate({ status, onRetry }: { status: CircleStatus; onRetry?: () => void }) {
   const navigate = useNavigate();
   const focusWedding = useWeddingStore((s) => s.focusWedding);
-  const setViewerSide = useWeddingStore((s) => s.setViewerSide);
   const restoreSample = useWeddingStore((s) => s.restoreSample);
 
   if (status === "loading") {
@@ -56,7 +55,6 @@ export function CircleGate({ status, onRetry }: { status: CircleStatus; onRetry?
             const sample = useWeddingStore.getState().weddings.find((item) => item.id === SEED_ID);
             if (!sample) return;
             focusWedding(sample.id, "guest");
-            setViewerSide("Bride");
             void navigate({ to: "/w/$slug", params: { slug: sample.slug } });
           }}
         >
