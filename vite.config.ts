@@ -215,6 +215,9 @@ export default defineConfig(({ command, isPreview }) => ({
             cloudflare: {
               wrangler: {
                 name: "theweddingcircle",
+                // node-postgres (pg) requires Node.js compatibility in Cloudflare Workers.
+                compatibility_date: "2026-11-07",
+                compatibility_flags: ["nodejs_compat"],
                 keep_vars: true,
                 hyperdrive: [
                   {
