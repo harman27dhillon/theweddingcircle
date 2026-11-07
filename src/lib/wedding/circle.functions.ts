@@ -588,7 +588,24 @@ export const findCircleByCode = createServerFn({ method: "GET" }).validator((inp
 	}
 	for (const row of rows) {
 		const wedding = asWedding(row.payload, row.slug);
-		const matched = wedding ? codeMatch(wedding, code) : undefined;
+		let matched = wedding ? codeMatch(wedding, code) : undefined;
+		if (wedding && !matched) {
+			try {
+				const auth = (await sql`select family_codes, guest_codes from circle_auth where slug = ${wedding.slug} limit 1`)[0];
+				if (auth) {
+					const { roleFromCode } = await import("@/lib/wedding/roles.server");
+					const role = roleFromCode({
+						hostCode: "",
+						cohostCode: "",
+						familyCodes: parseList(auth.family_codes),
+						guestCodes: parseList(auth.guest_codes),
+					}, code);
+					if (role === "family" || role === "guest") matched = { id: `auth-${role}`, code, kind: role };
+				}
+			} catch {
+				/* Older weddings may not have the separate role-code table. */
+			}
+		}
 		if (wedding && matched) return { ...redactWedding(wedding, null), entryCodeKind: matched.kind, entryCodeId: matched.id };
 	}
 	return null;
