@@ -88,8 +88,7 @@ export const CHECKLIST: { category: string; title: string }[] = [
 ];
 
 export const RELATIONSHIPS = [
-  "Bride's family",
-  "Groom's family",
+  "Family",
   "Friends",
   "College friends",
   "Cousins",
