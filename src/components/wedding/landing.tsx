@@ -564,10 +564,13 @@ export function Landing() {
       try {
         const { loadCircleByCode } = await import("@/lib/wedding/publish");
         const remote = await loadCircleByCode(code);
-        const remoteMatch = remote ? codeMatch(remote, code) : undefined;
+        const remoteMatch = remote?.entryCodeKind
+          ? { id: remote.entryCodeId ?? "", code, kind: remote.entryCodeKind }
+          : remote ? codeMatch(remote, code) : undefined;
         if (remote && remoteMatch) {
-          useWeddingStore.getState().adoptCircle(remote);
-          found = useWeddingStore.getState().weddings.find((item) => item.slug === remote.slug) ?? remote;
+          const { entryCodeKind: _entryCodeKind, entryCodeId: _entryCodeId, ...safeRemote } = remote;
+          useWeddingStore.getState().adoptCircle(safeRemote);
+          found = useWeddingStore.getState().weddings.find((item) => item.slug === remote.slug) ?? safeRemote;
           matched = codeMatch(found, code) ?? remoteMatch;
         }
       } catch {
