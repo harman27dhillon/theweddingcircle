@@ -74,12 +74,10 @@ export function JoinScreen({ code }: { code: string }) {
   const navigate = useNavigate();
   const wedding = useWeddingStore((s) => s.weddings.find((w) => w.slug === code.trim().toLowerCase()));
   const joinWedding = useWeddingStore((s) => s.joinWedding);
-  const setViewerSide = useWeddingStore((s) => s.setViewerSide);
   const account = useWeddingStore((s) => s.account);
   const [name, setName] = useState(account?.name ?? "");
   const [rsvp, setRsvp] = useState<Rsvp>("yes");
   const [relationship, setRelationship] = useState<(typeof RELATIONSHIPS)[number]>(RELATIONSHIPS[2]);
-  const [party, setParty] = useState<"Bride" | "Groom" | "">("");
   const [postingCode, setPostingCode] = useState("");
   const [note, setNote] = useState("");
 
@@ -105,10 +103,6 @@ export function JoinScreen({ code }: { code: string }) {
           onSubmit={(e) => {
             e.preventDefault();
             void (async () => {
-            if (!party) {
-              setNote("Choose bride's side or groom's side.");
-              return;
-            }
             const guestName = account?.name ?? name.trim();
             if (!guestName) {
               setNote("Add your name.");
@@ -144,7 +138,6 @@ export function JoinScreen({ code }: { code: string }) {
               setNote("This invitation link is invalid or expired.");
               return;
             }
-            setViewerSide(party);
             if (matched) {
               const auth = await confirmWeddingRole(wedding.slug, guestName, normalized);
               if (auth.ok) applyRole(wedding.id, auth.role);
@@ -177,19 +170,9 @@ export function JoinScreen({ code }: { code: string }) {
             readOnly={Boolean(account)}
             onChange={(e) => setName(e.target.value)}
           />
-          <PickList
-            label="Which side"
-            value={party}
-            onChange={setParty}
-            options={[
-              { value: "", label: "Choose a side" },
-              { value: "Bride", label: "Bride's side" },
-              { value: "Groom", label: "Groom's side" },
-            ]}
-          />
           <input
             className={fieldClass}
-            placeholder="Family or guest code, optional"
+            placeholder="Family/VIP-Guest code or Guest code, optional"
             value={postingCode}
             onChange={(e) => setPostingCode(e.target.value)}
           />
