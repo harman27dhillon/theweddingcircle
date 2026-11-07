@@ -358,7 +358,21 @@ function typingSnapshot(slug, selfKey) {
 		chats
 	};
 }
+const planRestoreAt = new Map();
+async function restoreStoredPlan(sql, wedding) {
+  if (!wedding || wedding.payment?.verified === true || wedding.slug === "lila-nico") return wedding;
+  if (Date.now() - (planRestoreAt.get(wedding.slug) || 0) < 30_000) return wedding;
+  planRestoreAt.set(wedding.slug, Date.now());
+  try {
+    const [{ getSql }, { restoreVoucherEntitlement }] = await Promise.all([
+      import("@/lib/db"), import("@/lib/wedding/voucher-entitlement.server"),
+    ]);
+    const restored = await restoreVoucherEntitlement(sql, await getSql(), wedding);
+    return asWedding(restored, wedding.slug) || wedding;
+  } catch { return wedding; }
+}
 async function visibleWedding(sql, wedding, memberKey) {
+  wedding = await restoreStoredPlan(sql, wedding);
 	if (!memberKey) return redactWedding(wedding, null);
 	try {
 		await ensureMembers(sql);
@@ -379,7 +393,7 @@ async function visibleWedding(sql, wedding, memberKey) {
 export const fetchCircle = createServerFn({ method: "GET" }).validator((slug) => cleanSlug(slug)).handler(async ({ data: slug }) => {
 	const sql = await coreSql();
 	const wedding = asWedding((await sql`select payload from circles where slug = ${slug} limit 1`)[0]?.payload, slug);
-	return wedding ? redactWedding(wedding, null) : null;
+	return wedding ? redactWedding(await restoreStoredPlan(sql, wedding), null) : null;
 });
 export const saveCircle = createServerFn({ method: "POST" }).validator((input) => {
 	if (!input || typeof input !== "object") throw new Error("The wedding could not be saved.");

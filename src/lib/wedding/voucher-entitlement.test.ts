@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { PGlite } from '@electric-sql/pglite';
+import { restoreVoucherEntitlement } from './voucher-entitlement.server.ts';
+import type { Sql } from '../db';
+test('a redeemed voucher restores only its exact wedding and never a revoked voucher or verified failure',async()=>{
+ const db=new PGlite();
+ await db.exec("create table circles(slug text primary key,payload jsonb,updated_at timestamptz);create table wedding_vouchers(code_hint text,wedding_id text,wedding_slug text,status text,redeemed_at timestamptz,revoked_at timestamptz);");
+ const core=(async(strings:TemplateStringsArray,...values:unknown[])=>{let text=strings[0];values.forEach((_,i)=>text+='$'+(i+1)+strings[i+1]);return (await db.query(text,values)).rows;}) as Sql;
+ core.query=async<T>(text:string,params:unknown[]=[]) => (await db.query<T>(text,params)).rows;
+ const wedding={id:'w1',slug:'voucher-wedding',payment:{status:'pending',verified:false}};
+ await core`insert into circles values(${wedding.slug},${JSON.stringify(wedding)}::jsonb,now())`;
+ await core`insert into wedding_vouchers values('HINT','w1',${wedding.slug},'redeemed',now(),null)`;
+ const fixed=await restoreVoucherEntitlement(core,core,wedding);assert.equal(fixed.payment?.verified,true);assert.equal(fixed.payment?.status,'paid');
+ const other={id:'other',slug:'free-wedding',payment:{status:'pending',verified:false}};assert.equal(await restoreVoucherEntitlement(core,core,other),other);
+ const failed={...wedding,payment:{status:'failed',verified:true}};assert.equal(await restoreVoucherEntitlement(core,core,failed),failed);
+ await core`update wedding_vouchers set status='revoked',revoked_at=now()`;
+ assert.equal(await restoreVoucherEntitlement(core,core,wedding),wedding);
+ await db.close();
+});
