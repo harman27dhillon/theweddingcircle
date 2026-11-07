@@ -298,6 +298,9 @@ export type Wedding = {
   illustrated?: boolean;
   cohostNames?: string[];
   postingCodes?: { id: string; code: string; kind?: CodeKind }[];
+  /** Short-lived lookup metadata returned only after a matching entry code is validated. */
+  entryCodeKind?: CodeKind;
+  entryCodeId?: string;
   youtubeUrl?: string;
   liveViewers?: string[];
   coverVideo?: string;
