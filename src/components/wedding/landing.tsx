@@ -16,7 +16,7 @@ import { useDismissible } from "@/lib/wedding/dismiss";
 import { readKept } from "@/lib/wedding/publish";
 import { ChevronRight, Compass, Crown, EllipsisVertical, Pin, UserRound } from "lucide-react";
 import { usePageEntrance } from "@/components/wedding/living";
-import { Mark, Button, fieldClass, PickList } from "@/components/wedding/ui";
+import { Mark, Button, fieldClass } from "@/components/wedding/ui";
 import { WeddingCard } from "@/components/wedding/wedding-card";
 import type { Account, Membership, Wedding } from "@/lib/wedding/types";
 
