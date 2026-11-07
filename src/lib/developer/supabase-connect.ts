@@ -1,5 +1,6 @@
 import { rootCertificates } from "node:tls";
 import { parse } from "pg-connection-string";
+import { STAGING_SUPABASE_URL } from "./supabase-projects.ts";
 import { SUPABASE_ROOT_CA } from "./supabase-root-ca.ts";
 
 export type DbConnectStatus =
@@ -197,4 +198,25 @@ export function classifyDatabaseError(error: { code?: string; message?: string }
     code: code || "error",
     detail: "The read-only connection did not succeed. No secret is included in this result. Nothing was copied and traffic did not move.",
   };
+}
+
+export function validateDatabaseUrl(value: string, project: string) {
+  const shape = safeSupabaseUri(value);
+  if (shape.status !== "ready") return "Enter a valid single-line Supabase Postgres URL with its password percent-encoded.";
+  const direct = /^db\.([a-z0-9]{8,64})\.supabase\.co$/.exec(shape.host);
+  const pool = /^[a-z0-9-]+\.pooler\.supabase\.com$/.test(shape.host);
+  if ((!direct && !pool) || shape.port !== 5432) return "Use the Supabase direct or session pooler endpoint on port 5432.";
+  const ref = /^https:\/\/([a-z0-9]{8,64})\.supabase\.co$/i.exec(project)?.[1];
+  const user = parse(value).user || "";
+  const selected = direct?.[1] || /^postgres\.([a-z0-9]{8,64})$/.exec(user)?.[1];
+  if (!selected || (ref && ref !== selected)) return "The Postgres endpoint and Supabase project URL must identify the same project.";
+  return "";
+}
+
+export function stagingDatabaseUrl(environment: Record<string, string | undefined>) {
+  const value = environment.SUPABASE_DB_URL?.trim() || "";
+  if (!value) throw new Error("Set SUPABASE_DB_URL on the Cloudflare staging Preview.");
+  const invalid = validateDatabaseUrl(value, STAGING_SUPABASE_URL);
+  if (invalid) throw new Error(invalid);
+  return value;
 }

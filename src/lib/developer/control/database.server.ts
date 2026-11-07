@@ -5,8 +5,8 @@ import coreMigration from "../../../../migrations/supabase/0017_wedding_core_add
 import developerMigration from "../../../../migrations/supabase/0028_developer_control.sql?raw";
 import accountMigration from "../../../../migrations/supabase/0029_circle_accounts_additive.sql?raw";
 import { CORE_COLUMNS, CORE_PRIMARY_KEYS, CORE_TABLES } from "../core-migration";
-import { trustedSupabaseSsl } from "../supabase-connect";
-import { projectUrl, readControlConfig, validateDatabaseUrl } from "./config.server";
+import { stagingDatabaseUrl, trustedSupabaseSsl, validateDatabaseUrl } from "../supabase-connect";
+import { projectUrl, readControlConfig } from "./config.server";
 import { hyperdriveConnectionString, serverEnvironment } from "@/lib/env.server";
 import type { Check, Diagnostic } from "./model";
 
@@ -146,10 +146,18 @@ function failure(error: unknown, opened: boolean): Diagnostic {
 }
 
 export async function runDatabaseCheck(check: Exclude<Check, "api">): Promise<Diagnostic> {
-  const config = readControlConfig(await serverEnvironment());
+  const environment = await serverEnvironment();
+  const config = readControlConfig(environment);
   const hyperdrive = await hyperdriveConnectionString();
   const usingHyperdrive = Boolean(hyperdrive);
-  const connectionString = hyperdrive || config.SUPABASE_DB_URL;
+  let connectionString = hyperdrive || config.SUPABASE_DB_URL;
+  if (environment.APP_ENV === "staging") {
+    try {
+      connectionString = stagingDatabaseUrl(environment);
+    } catch (error) {
+      return { ok: false, message: (error as Error).message };
+    }
+  }
   if (!connectionString) return { ok: false, message: "Neither the HYPERDRIVE binding nor SUPABASE_DB_URL is configured." };
   if (!usingHyperdrive) {
     const project = projectUrl(config.SUPABASE_URL);

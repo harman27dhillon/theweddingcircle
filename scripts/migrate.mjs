@@ -19,6 +19,12 @@ import pg from "pg";
 import { parse } from "pg-connection-string";
 import { pendingMigrations } from "./migration-plan.mjs";
 
+const previewBuild = process.env.WORKERS_CI === "1" && process.env.WORKERS_CI_BRANCH && process.env.WORKERS_CI_BRANCH !== "main";
+if (previewBuild || process.env.APP_ENV === "staging") {
+  console.log("[migrate] Preview builds use their own database settings at runtime. Skipping build-time migrations.");
+  process.exit(0);
+}
+
 const supabaseUrl = process.env.SUPABASE_DB_URL?.trim() || "";
 const neonUrl = process.env.DATABASE_URL?.trim() || "";
 const target = supabaseUrl.startsWith("postgres")

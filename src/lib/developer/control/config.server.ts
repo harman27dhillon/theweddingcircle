@@ -1,8 +1,9 @@
-import { parse } from "pg-connection-string";
 import { probeSupabaseDataApi } from "./supabase-api";
 import { CONFIG_FIELDS, type ConfigDraft, type ConfigName, type Diagnostic } from "./model";
-import { safeSupabaseUri } from "../supabase-connect";
+import { validateDatabaseUrl } from "../supabase-connect";
 import { env, hyperdriveConnectionString, serverEnvironment, workerEnvironment } from "@/lib/env.server";
+
+import { STAGING_SUPABASE_URL } from "../supabase-projects";
 
 const prefix = "WC_DEVELOPER_";
 // Cloudflare Worker variables are the source of truth. The prefixed names remain
@@ -23,18 +24,6 @@ export function projectUrl(value: string) {
   return /^https:\/\/[a-z0-9]{8,64}\.supabase\.co\/?$/i.test(value) ? value.replace(/\/$/, "").toLowerCase() : "";
 }
 
-export function validateDatabaseUrl(value: string, project: string) {
-  const shape = safeSupabaseUri(value);
-  if (shape.status !== "ready") return "Enter a valid single-line Supabase Postgres URL with its password percent-encoded.";
-  const direct = /^db\.([a-z0-9]{8,64})\.supabase\.co$/.exec(shape.host);
-  const pool = /^[a-z0-9-]+\.pooler\.supabase\.com$/.test(shape.host);
-  if ((!direct && !pool) || shape.port !== 5432) return "Use the Supabase direct or session pooler endpoint on port 5432.";
-  const ref = /^https:\/\/([a-z0-9]{8,64})\.supabase\.co$/i.exec(project)?.[1];
-  const user = parse(value).user || "";
-  const selected = direct?.[1] || /^postgres\.([a-z0-9]{8,64})$/.exec(user)?.[1];
-  if (!selected || (ref && ref !== selected)) return "The Postgres endpoint and Supabase project URL must identify the same project.";
-  return "";
-}
 
 function validate(name: ConfigName, value: string, project: string) {
   if (name === "SUPABASE_URL") return projectUrl(value) ? "" : "Use the HTTPS project URL from Supabase.";
@@ -61,18 +50,25 @@ export async function configurationStatus() {
   const config = readControlConfig(environment);
   const cloudflare = Boolean(workerEnvironment());
   const hyperdrive = Boolean(await hyperdriveConnectionString());
+  const staging = env("APP_ENV") === "staging";
+  const databaseConfigured = staging
+    ? Boolean(config.SUPABASE_DB_URL) && !validateDatabaseUrl(config.SUPABASE_DB_URL, STAGING_SUPABASE_URL)
+    : Boolean(config.SUPABASE_DB_URL) || hyperdrive;
   return {
-    environment: env("APP_ENV") === "staging" ? "staging" as const : "production" as const,
+    environment: staging ? "staging" as const : "production" as const,
     projectUrl: projectUrl(config.SUPABASE_URL),
     configured: Object.fromEntries(CONFIG_FIELDS.map(({ name }) => [name, Boolean(config[name])])) as Record<ConfigName, boolean>,
-    databaseConfigured: Boolean(config.SUPABASE_DB_URL) || hyperdrive,
+    databaseConfigured,
     cloudflare,
     hyperdrive,
-    canStage: Boolean(secretWriter(environment)),
+    canStage: !staging && Boolean(secretWriter(environment)),
   };
 }
 
 export async function stageConfiguration(draft: ConfigDraft, clear: boolean): Promise<Diagnostic> {
+  if (env("APP_ENV") === "staging") {
+    return { ok: false, message: "Manage staging secrets in Cloudflare’s staging Preview settings." };
+  }
   const environment = await serverEnvironment();
   const writer = secretWriter(environment);
   if (!writer) return { ok: false, message: "Cloudflare secret management is not configured. Add the Developer Center Worker secrets through Cloudflare." };
@@ -119,7 +115,10 @@ export async function testSupabaseApi(): Promise<Diagnostic> {
   const config = readControlConfig(await serverEnvironment());
   const url = projectUrl(config.SUPABASE_URL);
   const key = config.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return { ok: false, message: `Set SUPABASE_URL to the original Supabase project URL and set the matching SUPABASE_PUBLISHABLE_KEY on this Worker.` };
+  if (env("APP_ENV") === "staging" && url !== STAGING_SUPABASE_URL) {
+    return { ok: false, message: "SUPABASE_URL must identify the staging Supabase project." };
+  }
+  if (!url || !key) return { ok: false, message: `Set SUPABASE_URL to this deployment’s Supabase project URL and set the matching SUPABASE_PUBLISHABLE_KEY on this Worker.` };
   if (validate("SUPABASE_PUBLISHABLE_KEY", key, url)) return { ok: false, message: "The configured key is not a Supabase publishable or legacy anon key." };
   return probeSupabaseDataApi(url, key);
 }

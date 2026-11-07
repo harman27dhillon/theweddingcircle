@@ -1,3 +1,4 @@
+import { PRODUCTION_SUPABASE_URL, STAGING_SUPABASE_URL, STAGING_DEVELOPER_URL } from "@/lib/developer/supabase-projects";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
@@ -263,7 +264,7 @@ function ConfigurationPanel({ configuration, environment, projectUrl, apiResult,
   configuration: Configuration; environment: "production" | "staging"; projectUrl: string; apiResult?: Diagnostic; dbResult?: Diagnostic; running: Check | null; run: (id: Check) => Promise<void>;
 }) {
   const productionActive = environment === "production";
-  const inactiveUrl = productionActive ? "https://ezwusjnszklgsoachwfm.supabase.co" : "https://vytolhwepbtzinvceucf.supabase.co";
+  const inactiveUrl = productionActive ? STAGING_SUPABASE_URL : PRODUCTION_SUPABASE_URL;
   return (
     <>
       <h1 className="mt-2 font-serif text-4xl">Supabase environments</h1>
@@ -277,7 +278,7 @@ function ConfigurationPanel({ configuration, environment, projectUrl, apiResult,
         <article className={`rounded-card border p-4 ${!productionActive ? "border-gold/70 bg-on-photo/5" : "border-on-photo/15"}`}>
           <div className="flex items-center justify-between gap-2"><h2 className="font-serif text-2xl">Staging Supabase</h2><span className="text-xs text-on-photo/65">{!productionActive ? "Active deployment" : "Separate deployment"}</span></div>
           <p className="mt-2 break-all text-xs text-on-photo/65">{!productionActive ? (projectUrl || "Staging project URL missing") : inactiveUrl}</p>
-          {!productionActive ? <><p className="mt-3 text-sm text-on-photo/75">Project URL: {configuration.configured.SUPABASE_URL ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Publishable key: {configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Database: {configuration.configured.SUPABASE_DB_URL ? "Staging direct Postgres" : "Not configured"}</p></> : <p className="mt-3 text-sm text-on-photo/70">Staging credentials and connection tests are available only on the staging Preview deployment.</p>}
+          {!productionActive ? <><p className="mt-3 text-sm text-on-photo/75">Project URL: {configuration.configured.SUPABASE_URL ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Publishable key: {configuration.configured.SUPABASE_PUBLISHABLE_KEY ? "Configured" : "Missing"}</p><p className="text-sm text-on-photo/75">Database: {configuration.databaseConfigured ? "Staging direct Postgres" : "Staging connection required"}</p></> : <a href={STAGING_DEVELOPER_URL} className={button + " mt-3 inline-flex items-center"}>Open Staging Developer Center</a>}
         </article>
       </div>
       <div className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2">

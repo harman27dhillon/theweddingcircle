@@ -1,3 +1,4 @@
+import { PRODUCTION_SUPABASE_URL, STAGING_SUPABASE_URL } from "./src/lib/developer/supabase-projects";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin } from "vite";
@@ -224,12 +225,12 @@ export default defineConfig(({ command, isPreview }) => ({
                 // Give staging its own Supabase project URL and intentionally
                 // omit the production HYPERDRIVE binding from Preview.
                 // Preview-only secrets (including SUPABASE_PUBLISHABLE_KEY and
-                // SUPABASE_DB_URL) must be configured in Cloudflare's Preview
-                // environment; never commit secret values here.
+                // SUPABASE_DB_URL) belong to the named staging
+                // Preview in Cloudflare; never commit secret values here.
                 previews: {
                   vars: {
                     APP_ENV: "staging",
-                    SUPABASE_URL: "https://ezwusjnszklgsoachwfm.supabase.co",
+                    SUPABASE_URL: STAGING_SUPABASE_URL,
                   },
                 },
                 vars: {
@@ -247,7 +248,7 @@ export default defineConfig(({ command, isPreview }) => ({
                   R2_ACCOUNT_ID: "c602d88743219605cc0c56b769482dad",
                   R2_BUCKET: "wedding-circle-media",
                   R2_PUBLIC_DOMAIN: "media.theweddingcircle.in",
-                  SUPABASE_URL: "https://vytolhwepbtzinvceucf.supabase.co",
+                  SUPABASE_URL: PRODUCTION_SUPABASE_URL,
                 },
               },
             },

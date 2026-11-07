@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { X509Certificate } from "node:crypto";
 import test from "node:test";
-import { classifyDatabaseError, safeSupabaseUri, trustedSupabaseSsl } from "./supabase-connect.ts";
+import { classifyDatabaseError, safeSupabaseUri, stagingDatabaseUrl, trustedSupabaseSsl } from "./supabase-connect.ts";
+
+import { PRODUCTION_SUPABASE_URL, STAGING_SUPABASE_URL } from "./supabase-projects.ts";
 
 const REF = "abcdefghijabcdefghij";
 const PASSWORD = "S3cret-Password-Value";
@@ -77,4 +79,15 @@ test("malformed secrets are refused before a connection", () => {
   assert.equal(safeSupabaseUri(`https://${REF}.supabase.co`).status, "invalid_uri");
   assert.equal(safeSupabaseUri(`postgresql://postgres:[YOUR-PASSWORD]@db.${REF}.supabase.co:5432/postgres`).status, "invalid_uri");
   assert.equal(safeSupabaseUri(`postgresql://postgres:p@ss@db.${REF}.supabase.co:5432/postgres`).status, "invalid_uri");
+});
+
+
+test("staging requires an explicit Postgres connection to its own Supabase project", () => {
+  const ref = (url: string) => new URL(url).hostname.split(".")[0];
+  const pooler = (project: string) =>
+    `postgresql://postgres.${ref(project)}:fixture-password@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`;
+  const staging = pooler(STAGING_SUPABASE_URL);
+  assert.equal(stagingDatabaseUrl({ SUPABASE_DB_URL: staging }), staging);
+  assert.throws(() => stagingDatabaseUrl({ SUPABASE_DB_URL: pooler(PRODUCTION_SUPABASE_URL) }), /same project/);
+  assert.throws(() => stagingDatabaseUrl({ DATABASE_URL: staging }), /Set SUPABASE_DB_URL/);
 });

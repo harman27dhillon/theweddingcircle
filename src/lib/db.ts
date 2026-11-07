@@ -173,11 +173,11 @@ async function createPgliteSql(): Promise<Sql> {
 
 let sqlPromise: Promise<Sql> | null = null;
 
-let hyperdriveSql: { connectionString: string; sql: Sql } | undefined;
+let workerSql: { connectionString: string; sql: Sql } | undefined;
 
-async function createSupabaseSql(connectionString: string, mode: "direct" | "hyperdrive" = "direct"): Promise<Sql> {
-  if (mode === "hyperdrive" && hyperdriveSql?.connectionString === connectionString) {
-    return hyperdriveSql.sql;
+async function createSupabaseSql(connectionString: string, mode: "direct" | "hyperdrive" | "staging" = "direct"): Promise<Sql> {
+  if (mode !== "direct" && workerSql?.connectionString === connectionString) {
+    return workerSql.sql;
   }
   const { openSupabaseSql, runSupabaseSchema } = await import("@/lib/developer/supabase-pool.server");
   const migrations = import.meta.glob("/migrations/*.sql", {
@@ -186,10 +186,11 @@ async function createSupabaseSql(connectionString: string, mode: "direct" | "hyp
     eager: true,
   }) as Record<string, string>;
   const files = pendingMigrations(Object.keys(migrations), []).map(({ name, path }) => ({ name, sql: migrations[path] }));
-  await runSupabaseSchema(files, connectionString, mode);
-  const opened = await openSupabaseSql(connectionString, mode);
+  const connectionMode = mode === "hyperdrive" ? "hyperdrive" : "direct";
+  await runSupabaseSchema(files, connectionString, connectionMode);
+  const opened = await openSupabaseSql(connectionString, connectionMode);
   if (!opened.ok) throw new Error(opened.error);
-  if (mode === "hyperdrive") hyperdriveSql = { connectionString, sql: opened.sql };
+  if (mode !== "direct") workerSql = { connectionString, sql: opened.sql };
   return opened.sql;
 }
 
@@ -216,7 +217,12 @@ async function createSql(): Promise<Sql> {
  * both backends — define tables there, never inline in server functions.
  */
 export async function getSql(): Promise<Sql> {
-  const { hyperdriveConnectionString } = await import("@/lib/env.server");
+  const { env, hyperdriveConnectionString } = await import("@/lib/env.server");
+  if (env("APP_ENV") === "staging") {
+    const { stagingDatabaseUrl } = await import("@/lib/developer/supabase-connect");
+    dbSource = "supabase";
+    return createSupabaseSql(stagingDatabaseUrl({ SUPABASE_DB_URL: env("SUPABASE_DB_URL") }), "staging");
+  }
   const hyperdrive = await hyperdriveConnectionString();
   if (hyperdrive) {
     dbSource = "supabase";
@@ -264,7 +270,7 @@ export function ensureDbReady(): Promise<void> {
 const globalBoot = globalThis as typeof globalThis & {
   __pgBootstrapPromise__?: Promise<void>;
 };
-if (typeof window === "undefined" && dbSource !== "neon") {
+if (typeof window === "undefined" && globalThis.navigator?.userAgent !== "Cloudflare-Workers" && dbSource !== "neon") {
   globalBoot.__pgBootstrapPromise__ ??= ensureDbReady().catch((err) => {
     globalBoot.__pgBootstrapPromise__ = undefined;
     console.error("[db] PGLite bootstrap failed:", err);

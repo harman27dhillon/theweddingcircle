@@ -78,6 +78,11 @@ export function guardPausedWrites(sql: Sql): Sql {
 
 /** Wedding rows. When SUPABASE_DB_URL is set, this is the only database. A failure is not written to Neon. */
 export async function weddingDataSql(): Promise<Sql> {
+  if (env("APP_ENV") === "staging") {
+    const sql = await getSql();
+    globalRef.__wcCoreRoute__ = { wanted: "supabase", used: "supabase", reason: "Staging uses its dedicated Supabase database." };
+    return sql;
+  }
   const production = !isWorkspacePreview() || Boolean(env("VERCEL"));
   const supabaseConfigured = (env("SUPABASE_DB_URL") || "").startsWith("postgres");
   const neonConfigured = dbSource === "neon";

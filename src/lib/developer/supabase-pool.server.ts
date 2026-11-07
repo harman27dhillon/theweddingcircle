@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { parse } from "pg-connection-string";
 import type { Sql } from "@/lib/db";
 import { redactCloud } from "@/lib/developer/cloud";
-import { classifyDatabaseError, safeSupabaseUri, trustedSupabaseSsl, type SafeDbUri } from "@/lib/developer/supabase-connect";
+import { classifyDatabaseError, safeSupabaseUri, stagingDatabaseUrl, trustedSupabaseSsl, type SafeDbUri } from "@/lib/developer/supabase-connect";
 import { env, hyperdriveConnectionString } from "@/lib/env.server";
 
 export type Query = (text: string, params?: unknown[]) => Promise<Record<string, unknown>[]>;
@@ -17,35 +17,45 @@ function failureOf(error: unknown, uri: SafeDbUri, raw = "") {
   return redactCloud(classified.detail, [raw, env("SUPABASE_DB_URL") || ""].filter((item) => item.length > 6));
 }
 
-async function openPool(raw: string, max: number, mode: "direct" | "hyperdrive" = "direct") {
-  const { Pool, types } = await import("pg");
+function directConnectionOptions(raw: string) {
   const parsed = parse(raw);
-  types.setTypeParser(20, Number);
-  types.setTypeParser(1082, (value) => value);
-  types.setTypeParser(1186, (value) => value);
-  const limits = {
-    max,
-    connectionTimeoutMillis: 8_000,
-    query_timeout: 8_000,
-    idleTimeoutMillis: 10_000,
-  };
-  if (mode === "hyperdrive") {
-    // Hyperdrive supplies its own runtime connection string and TLS handling.
-    // Do not apply Supabase's origin certificate to the Hyperdrive endpoint.
-    return new Pool({ connectionString: raw, ...limits });
-  }
-  // Direct Supabase uses its published root CA; pass fields separately because
-  // pg's connectionString parsing can override an explicit ssl object.
-  return new Pool({
+  return {
     host: parsed.host || undefined,
     port: parsed.port ? Number(parsed.port) : undefined,
     user: parsed.user || undefined,
     password: parsed.password || undefined,
     database: parsed.database || undefined,
     ...(parsed.options ? { options: parsed.options } : {}),
-    ...limits,
     ssl: trustedSupabaseSsl(),
-  });
+  };
+}
+
+async function postgresDriver() {
+  const pg = await import("pg");
+  pg.types.setTypeParser(20, Number);
+  pg.types.setTypeParser(1082, (value) => value);
+  pg.types.setTypeParser(1186, (value) => value);
+  return pg;
+}
+
+const queryLimits = { connectionTimeoutMillis: 8_000, query_timeout: 8_000 };
+
+async function openPool(raw: string, max: number, mode: "direct" | "hyperdrive" = "direct") {
+  const { Pool } = await postgresDriver();
+  // Hyperdrive supplies its own TLS handling. Direct Supabase verifies its CA.
+  const connection = mode === "hyperdrive" ? { connectionString: raw } : directConnectionOptions(raw);
+  return new Pool({ ...connection, ...queryLimits, max, idleTimeoutMillis: 10_000 });
+}
+
+function databaseUri(raw: string) {
+  const uri = safeSupabaseUri(raw);
+  if (env("APP_ENV") !== "staging") return uri;
+  try {
+    stagingDatabaseUrl({ SUPABASE_DB_URL: raw });
+    return uri;
+  } catch (error) {
+    return { ...uri, status: "invalid_uri" as const, detail: (error as Error).message };
+  }
 }
 
 function toSql(run: <T>(text: string, params: unknown[]) => Promise<T[]>): Sql {
@@ -61,7 +71,7 @@ function toSql(run: <T>(text: string, params: unknown[]) => Promise<T[]>): Sql {
 /** Apply versioned app migrations once. Does not drop, truncate, or rewrite existing rows. */
 export async function runSupabaseSchema(files: { name: string; sql: string }[], connectionString = env("SUPABASE_DB_URL") || "", mode: "direct" | "hyperdrive" = "direct") {
   const raw = connectionString;
-  const uri = safeSupabaseUri(raw);
+  const uri = databaseUri(raw);
   if (uri.status !== "ready") throw new Error(uri.detail);
   const pool = await openPool(raw, 1, mode);
   try {
@@ -97,7 +107,7 @@ export async function withSupabase<T>(fn: (query: Query) => Promise<T>): Promise
   const hyperdrive = await hyperdriveConnectionString();
   const raw = hyperdrive || env("SUPABASE_DB_URL") || "";
   const mode = hyperdrive ? "hyperdrive" as const : "direct" as const;
-  const uri = safeSupabaseUri(raw);
+  const uri = databaseUri(raw);
   if (uri.status !== "ready") return { ok: false, error: uri.detail };
   const pool = await openPool(raw, 1, mode);
   try {
@@ -118,17 +128,15 @@ export async function openSupabaseSql(connectionString?: string, requestedMode?:
   const hyperdrive = connectionString ? undefined : await hyperdriveConnectionString();
   const raw = connectionString || hyperdrive || env("SUPABASE_DB_URL") || "";
   const mode = requestedMode || (hyperdrive ? "hyperdrive" : "direct");
-  const uri = safeSupabaseUri(raw);
+  const uri = databaseUri(raw);
   if (uri.status !== "ready") return { ok: false, error: uri.detail };
-  if (mode === "hyperdrive") {
+  if (mode === "hyperdrive" || env("APP_ENV") === "staging") {
     // Cache only the query function. Worker sockets belong to the request
-    // that created them, and Hyperdrive already pools origin connections.
-    const { Client, types } = await import("pg");
-    types.setTypeParser(20, Number);
-    types.setTypeParser(1082, (value) => value);
-    types.setTypeParser(1186, (value) => value);
+    // that created them. Staging uses the Supabase session pooler directly.
+    const { Client } = await postgresDriver();
+    const connection = mode === "hyperdrive" ? { connectionString: raw } : directConnectionOptions(raw);
     const sql = toSql(async <T>(text: string, params: unknown[]) => {
-      const client = new Client({ connectionString: raw, connectionTimeoutMillis: 8_000, query_timeout: 8_000 });
+      const client = new Client({ ...connection, ...queryLimits });
       try {
         await client.connect();
         return (await client.query(text, params)).rows as T[];
@@ -167,7 +175,7 @@ export async function probeSupabaseConnection(): Promise<SafeDbUri & { tested: b
   const hyperdrive = await hyperdriveConnectionString();
   const raw = hyperdrive || env("SUPABASE_DB_URL") || "";
   const mode = hyperdrive ? "hyperdrive" as const : "direct" as const;
-  const uri = safeSupabaseUri(raw);
+  const uri = databaseUri(raw);
   if (uri.status !== "ready") return { ...uri, tested: false, code: "" };
   const pool = await openPool(raw, 1, mode);
   try {

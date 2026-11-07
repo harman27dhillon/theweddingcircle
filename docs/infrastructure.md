@@ -210,3 +210,21 @@ Manual Cloudflare steps, only after you approve them:
 
 Rollback: turn the gateway off and save. New views return to the previous path. Unbind the hostname from the Worker if you added it. Do not delete objects.
 
+
+
+## Staging Supabase
+
+Open the [Staging Developer Center](https://staging-theweddingcircle.labs-circle26.workers.dev/developer).
+The named Cloudflare Preview uses the separate staging Supabase project and
+requires its own `SUPABASE_DB_URL` and `SUPABASE_PUBLISHABLE_KEY`. Store these
+under the staging Preview’s secrets. The database URL must point to the staging
+project’s direct or session-pooler endpoint on port 5432.
+
+Configure the Developer Center email, password, and session signing secret in
+the same Preview. Use a distinct `DEVELOPER_SESSION_SECRET` for staging.
+In **Supabase**, run the API and database connection checks. In **Database**,
+the write check inserts a test row, reads it back, and rolls back the transaction.
+
+Production builds from `main`. For a manual update of the existing staging
+Preview, build the desired commit and run `npx wrangler preview --name staging`.
+This updates the staging URL and preserves its existing Preview secrets.
