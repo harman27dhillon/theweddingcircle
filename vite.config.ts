@@ -222,9 +222,15 @@ export default defineConfig(({ command, isPreview }) => ({
                   },
                 ],
                 // Staging secrets belong to the named Cloudflare Preview.
-                // Its optional STAGING_HYPERDRIVE binding is managed there.
+                // Its dedicated database binding is pinned here for repeatable deploys.
                 // The application ignores the production binding in staging.
                 previews: {
+                  hyperdrive: [
+                    {
+                      binding: "STAGING_HYPERDRIVE",
+                      id: "e62f66d804814d598446bab4c1dce199",
+                    },
+                  ],
                   vars: {
                     APP_ENV: "staging",
                     DEVELOPER_ADMIN_EMAIL: "developer@weddingcircle.app",
