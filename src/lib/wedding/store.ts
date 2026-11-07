@@ -11,7 +11,7 @@ import { mergeParkedMemberships, mergeParkedWeddings, parkSignedOutSession, take
 import { fontsFromRemote, sanitizeFonts } from "./fonts.ts";
 import { assignCoupleSeat, claimAcrossWeddings, mergeCoupleAccess } from "./couple-access.ts";
 import { overPlanStorage, retainVerifiedPayment, storageMessage, storedMediaBytes, weddingStorageBytes } from "./plan.ts";
-import { canManage, canPost, codeMatch, codesOf, googleMapsLink, isCircleOwner, isSampleCircle, nowLabel, slugify, uid } from "./format.ts";
+import { canManage, canPost, codeMatch, codesOf, googleMapsLink, isCircleOwner, isSampleCircle, nowLabel, normalizeCode, slugify, uid } from "./format.ts";
 import { accountSenderId } from "./identity.ts";
 import { dropNamed, mergeProfiles, ownMemberKey, prepareProfile } from "./guest-profile.ts";
 import { canEnterWedding, landingUserKey } from "./landing-pin.ts";
@@ -1176,12 +1176,13 @@ const weddingStore = create()(persist((set, get) => ({
 			return "joined";
 		}
 		if (wedding.guests.find((g) => g.name.toLowerCase() === clean.toLowerCase())?.blocked) return "blocked";
-		const matched = codeMatch(wedding, code ?? "");
+		const localMatch = codeMatch(wedding, code ?? "");
+		const matched = localMatch ?? (entry ? { id: "server-validated", code: normalizeCode(code ?? ""), kind: entry } : undefined);
 		if ((entry || code?.trim()) && !matched) return "bad-code";
 		if (entry && matched && matched.kind !== entry) return "wrong-kind";
 		const family = matched?.kind === "family";
 		const pending = wedding.privacy.join === "approve" && !matched;
-		if (matched && !isSampleCircle(wedding)) rememberEntryCode(slug, matched.code);
+		if (matched && !isSampleCircle(wedding) && matched.code) rememberEntryCode(slug, matched.code);
 		const side = relationship.startsWith("Bride") ? "Bride" : relationship.startsWith("Groom") ? "Groom" : relationship === "Wedding team" ? "Team" : "Both";
 		set((s) => {
 			const guestLocks = { ...s.guestLocks ?? {} };
@@ -1221,7 +1222,7 @@ const weddingStore = create()(persist((set, get) => ({
 					role: "guest",
 					weddingId: wedding.id,
 					coded: false,
-					side: side === "Bride" || side === "Groom" ? side : s.viewer.side
+					side: undefined
 				},
 				memberships: upsertMembership(s.memberships, {
 					slug: wedding.slug,

@@ -16,7 +16,7 @@ import { useDismissible } from "@/lib/wedding/dismiss";
 import { readKept } from "@/lib/wedding/publish";
 import { ChevronRight, Compass, Crown, EllipsisVertical, Pin, UserRound } from "lucide-react";
 import { usePageEntrance } from "@/components/wedding/living";
-import { Mark, Button, fieldClass, PickList } from "@/components/wedding/ui";
+import { Mark, Button, fieldClass } from "@/components/wedding/ui";
 import { WeddingCard } from "@/components/wedding/wedding-card";
 import type { Account, Membership, Wedding } from "@/lib/wedding/types";
 
@@ -288,7 +288,6 @@ export function Landing() {
   const [codeOpen, setCodeOpen] = useState(false);
   const [entryCode, setEntryCode] = useState("");
   const [entryName, setEntryName] = useState("");
-  const [entrySide, setEntrySide] = useState<"" | "Bride" | "Groom">("");
   const [entryNote, setEntryNote] = useState("");
   const [entryBusy, setEntryBusy] = useState(false);
   const storeReady = usePersistedReady();
@@ -504,7 +503,7 @@ export function Landing() {
         else if (result.error === "claimed") setEntryNote("That code was already claimed by someone else.");
         else if (result.error === "both") setEntryNote("This account is already the other role for that wedding. One person cannot be both.");
         else if (result.error === "paused") setEntryNote("This wedding circle is paused. The host has closed it for now.");
-        else setEntryNote("That bride or groom code is not valid. If the wedding is not published yet, it only works on the phone that created it.");
+        else setEntryNote("That Bride/Groom code is not valid. If the wedding is not published yet, it only works on the phone that created it.");
         return;
       }
       const { loadCircle } = await import("@/lib/wedding/publish");
@@ -552,10 +551,6 @@ export function Landing() {
       setEntryNote("Add your name.");
       return;
     }
-    if (entrySide !== "Bride" && entrySide !== "Groom") {
-      setEntryNote("Choose bride's side or groom's side.");
-      return;
-    }
     const compact = compactCode(code);
     if (compact === "GLASSHALL" || compact === "OPENDOOR" || compact === "LILANICO") {
       openSample();
@@ -568,18 +563,21 @@ export function Landing() {
       let matched = found ? codeMatch(found, code) : undefined;
       try {
         const { loadCircleByCode } = await import("@/lib/wedding/publish");
-        const remote = await loadCircleByCode(entryCode);
-        const remoteMatch = remote ? codeMatch(remote, code) : undefined;
+        const remote = await loadCircleByCode(code);
+        const remoteMatch = remote?.entryCodeKind
+          ? { id: remote.entryCodeId ?? "", code, kind: remote.entryCodeKind }
+          : remote ? codeMatch(remote, code) : undefined;
         if (remote && remoteMatch) {
-          useWeddingStore.getState().adoptCircle(remote);
-          found = useWeddingStore.getState().weddings.find((item) => item.slug === remote.slug) ?? remote;
+          const { entryCodeKind: _entryCodeKind, entryCodeId: _entryCodeId, ...safeRemote } = remote;
+          useWeddingStore.getState().adoptCircle(safeRemote);
+          found = useWeddingStore.getState().weddings.find((item) => item.slug === remote.slug) ?? safeRemote;
           matched = codeMatch(found, code) ?? remoteMatch;
         }
       } catch {
         /* A saved circle on this phone can still open if the lookup is offline. */
       }
       if (!found || !matched) {
-        setEntryNote("That code does not match a wedding circle. Check the family, guest, or couple code.");
+        setEntryNote("That code does not match a wedding circle. Check the Family/VIP-Guest, Guest, or Bride/Groom code.");
         return;
       }
       if (isSampleCircle(found)) {
@@ -590,7 +588,7 @@ export function Landing() {
         setEntryNote("This wedding circle is paused. The host has closed it for now.");
         return;
       }
-      const relationship = entrySide === "Bride" ? "Bride's family" : "Groom's family";
+      const relationship = "Family";
       const result = useWeddingStore.getState().joinWedding(found.slug, person, "yes", relationship, code, matched.kind);
       if (result === "blocked") {
         setEntryNote("The host has removed that name from the circle.");
@@ -604,9 +602,8 @@ export function Landing() {
         setEntryNote("That code does not match a wedding circle.");
         return;
       }
-      useWeddingStore.getState().setViewerSide(entrySide);
       const { confirmWeddingRole } = await import("@/lib/wedding/role-client");
-      const auth = await confirmWeddingRole(found.slug, person, entryCode);
+      const auth = await confirmWeddingRole(found.slug, person, code);
       if (auth.ok) {
         const { applyRole } = await import("@/lib/wedding/role-client");
         applyRole(found.id, auth.role);
@@ -846,7 +843,7 @@ export function Landing() {
           {codeOpen ? (
             <form className="mt-6 max-w-lg" onSubmit={(event) => void enterDoor(event)}>
               <h3 className="font-serif text-2xl">Wedding code</h3>
-              <p className="mt-1 text-sm text-muted">Family, guest, and couple codes all go here. The circle opens with the access that code allows.</p>
+              <p className="mt-1 text-sm text-muted">Enter your wedding access code. Bride and groom codes remain available for their account access.</p>
               <input
                 className={`${fieldClass} mt-4`}
                 placeholder="Wedding code"
@@ -859,18 +856,6 @@ export function Landing() {
               ) : (
                 <input className={`${fieldClass} mt-3`} placeholder="Your name" value={entryName} onChange={(e) => setEntryName(e.target.value)} />
               )}
-              <div className="mt-3">
-                <PickList
-                  label="Which side"
-                  value={entrySide}
-                  onChange={setEntrySide}
-                  options={[
-                    { value: "", label: "Choose a side" },
-                    { value: "Bride", label: "Bride's side" },
-                    { value: "Groom", label: "Groom's side" },
-                  ]}
-                />
-              </div>
               {entryNote ? <p className="mt-3 text-sm text-maroon">{entryNote}</p> : null}
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button type="submit" disabled={entryBusy}>

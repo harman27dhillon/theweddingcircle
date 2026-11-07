@@ -551,14 +551,62 @@ export const saveWeddingBar = createServerFn({ method: "POST" }).validator((inpu
 export const findCircleByCode = createServerFn({ method: "GET" }).validator((input) => normalizeCode(typeof input === "string" ? input : "")).handler(async ({ data: code }) => {
 	const compact = compactCode(code);
 	if (compact.length < 4 || compact.length > 80) return null;
-	const rows = await (await coreSql())`
-      select slug, payload from circles
-      where regexp_replace(upper(payload::text), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
-      limit 20
-    `;
+	const prefix = compact.startsWith("FAMILY") ? "FAMILY" : compact.startsWith("GUEST") ? "GUEST" : "";
+	const tail = prefix ? compact.slice(prefix.length) : "";
+	const sql = await coreSql();
+	let rows = [];
+	try {
+		rows = await sql`
+			select c.slug, c.payload from circles c
+			left join circle_auth a on a.slug = c.slug
+			where regexp_replace(upper(c.payload::text), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
+			   or regexp_replace(upper(coalesce(a.family_codes, '') || ' ' || coalesce(a.guest_codes, '')), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
+			   or (
+					${tail.length === 4}
+					and (case
+						when length(regexp_replace(upper(c.slug), '[^A-Z0-9]', '', 'g')) >= 4
+						then right(regexp_replace(upper(c.slug), '[^A-Z0-9]', '', 'g'), 4)
+						else left(regexp_replace(upper(c.slug), '[^A-Z0-9]', '', 'g') || 'WXYZ', 4)
+					end) = ${tail}
+				)
+			limit 100
+		`;
+	} catch {
+		rows = await sql`
+			select slug, payload from circles
+			where regexp_replace(upper(payload::text), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
+			   or (
+					${tail.length === 4}
+					and (case
+						when length(regexp_replace(upper(slug), '[^A-Z0-9]', '', 'g')) >= 4
+						then right(regexp_replace(upper(slug), '[^A-Z0-9]', '', 'g'), 4)
+						else left(regexp_replace(upper(slug), '[^A-Z0-9]', '', 'g') || 'WXYZ', 4)
+					end) = ${tail}
+				)
+			limit 100
+		`;
+	}
 	for (const row of rows) {
 		const wedding = asWedding(row.payload, row.slug);
-		if (wedding && codeMatch(wedding, code)) return redactWedding(wedding, null);
+		let matched = wedding ? codeMatch(wedding, code) : undefined;
+		if (wedding && !matched) {
+			try {
+				const auth = (await sql`select family_codes, guest_codes from circle_auth where slug = ${wedding.slug} limit 1`)[0];
+				if (auth) {
+					const { roleFromCode } = await import("@/lib/wedding/roles.server");
+					const role = roleFromCode({
+						hostCode: "",
+						cohostCode: "",
+						familyCodes: parseList(auth.family_codes),
+						guestCodes: parseList(auth.guest_codes),
+					}, code);
+					if (role === "family" || role === "guest") matched = { id: `auth-${role}`, code, kind: role };
+				}
+			} catch {
+				/* Older weddings may not have the separate role-code table. */
+			}
+		}
+		if (wedding && matched) return { ...redactWedding(wedding, null), entryCodeKind: matched.kind, entryCodeId: matched.id };
 	}
 	return null;
 });

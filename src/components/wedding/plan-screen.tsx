@@ -22,7 +22,7 @@ import { TypographyPanel } from "@/components/wedding/typography-panel";
 import { CeremonyInviteButton } from "@/components/wedding/ceremony-invite";
 import { CoupleAccessPanel } from "@/components/wedding/couple-access-panel";
 import { WeddingBarPanel } from "@/components/wedding/wedding-bar-panel";
-import type { AccessKind, FunctionEvent, Privacy, Side } from "@/lib/wedding/types";
+import type { FunctionEvent, Privacy } from "@/lib/wedding/types";
 import { CEREMONY_PICTURE_LABELS, CEREMONY_PICTURE_ORDER, ceremonyCoverFor, matchCeremonyName } from "@/lib/wedding/ceremony-covers";
 import { PHOTO_ACCEPT } from "@/lib/wedding/media";
 
@@ -47,7 +47,8 @@ export function MoreScreen() {
   const owner = isCircleOwner(wedding);
   const manager = (canManage(wedding, viewer) || verified) && !wedding.ownerReview;
   const [hostOpen, setHostOpen] = useState(false);
-  const tiles = moreTiles;
+  const guestOnly = viewer.role === "guest" && !viewer.coded;
+  const tiles = guestOnly ? moreTiles.filter((item) => item.href !== "/settings") : moreTiles;
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 py-4 md:px-8 md:py-8 lg:max-w-6xl">
       <div className={`more-stage flex min-h-0 flex-1 flex-col ${entrance}`}>
@@ -956,11 +957,11 @@ export function InviteScreen() {
       ) : null}
       {family ? (
         <div className="mt-8 rounded-card border border-line bg-paper p-4">
-          <h2 className="font-serif text-2xl">Family and guest codes</h2>
+          <h2 className="font-serif text-2xl">Family/VIP-Guest and Guest codes</h2>
           <p className="mt-1 text-sm text-muted">
-            Share the family code with family. Share the guest code with everyone else. People can also enter from the home page with those codes.
+            Share the Family/VIP-Guest code with family and VIP guests. Share the Guest code with everyone else. People can also enter from the home page with those codes.
           </p>
-          <h3 className="mt-4 font-medium">Family</h3>
+          <h3 className="mt-4 font-medium">Family/VIP-Guest code</h3>
           <ul className="mt-1 text-sm">
             {codesOf(wedding).filter((item) => item.kind === "family").map((item) => (
               <li key={item.id} className="mt-2 flex items-center justify-between gap-2">
@@ -969,7 +970,7 @@ export function InviteScreen() {
               </li>
             ))}
           </ul>
-          <h3 className="mt-4 font-medium">Guests</h3>
+          <h3 className="mt-4 font-medium">Guest code</h3>
           <ul className="mt-1 text-sm">
             {codesOf(wedding).filter((item) => item.kind === "guest").map((item) => (
               <li key={item.id} className="mt-2 flex items-center justify-between gap-2">
@@ -980,7 +981,7 @@ export function InviteScreen() {
           </ul>
         </div>
       ) : (
-        <p className="mt-6 text-sm text-muted">Ask the host for a family code or a guest code if you are entering from the home page.</p>
+        <p className="mt-6 text-sm text-muted">Ask the host for a Family/VIP-Guest code or a Guest code if you are entering from the home page.</p>
       )}
     </Screen>
   );
@@ -989,14 +990,18 @@ export function InviteScreen() {
 export function SettingsScreen() {
   const wedding = useWedding();
   const viewer = useWeddingStore((s) => s.viewer);
+  const navigate = useNavigate();
+  const guestOnly = viewer.role === "guest" && !viewer.coded;
+  useEffect(() => {
+    if (guestOnly) void navigate({ to: "/w/$slug/more", params: { slug: wedding.slug }, replace: true });
+  }, [guestOnly, navigate, wedding.slug]);
   const updatePrivacy = useWeddingStore((s) => s.updatePrivacy);
   const restoreSample = useWeddingStore((s) => s.restoreSample);
   const setCircleDisabled = useWeddingStore((s) => s.setCircleDisabled);
-  const setGuestSide = useWeddingStore((s) => s.setGuestSide);
-  const setGuestGrant = useWeddingStore((s) => s.setGuestGrant);
   const setFunctionAccess = useWeddingStore((s) => s.setFunctionAccess);
   const host = canHost(viewer);
   const owner = isCircleOwner(wedding);
+  if (guestOnly) return null;
   function set<K extends keyof Privacy>(key: K, value: Privacy[K]) {
     updatePrivacy(wedding.id, { ...wedding.privacy, [key]: value });
   }
@@ -1027,56 +1032,26 @@ export function SettingsScreen() {
       )}
       {canManage(wedding, viewer) ? (
         <div className="mt-6">
-          <h2 className="font-serif text-2xl">Family access</h2>
-          <p className="mt-1 text-sm text-muted">Family labels do not open private posts by themselves. Choose who may see a private function or the other side.</p>
-          <ul className="mt-3 flex max-h-80 flex-col gap-3 overflow-y-auto">
-            {wedding.guests.map((guest) => (
-              <li key={guest.id} className="rounded-2xl border border-line bg-card px-3 py-2">
-                <p className="text-sm font-medium">{guest.name}</p>
-                <PickList
-                  label="Family"
-                  value={guest.side === "Team" ? "" : guest.side}
-                  onChange={(value) => {
-                    setGuestSide(wedding.id, guest.id, (value || "Team") as Side);
-                    toast(`${guest.name} is updated.`);
-                  }}
-                  className="mt-1 min-h-11"
-                  options={[
-                    { value: "Bride", label: "Bride's family" },
-                    { value: "Groom", label: "Groom's family" },
-                    { value: "Both", label: "Both families" },
-                    { value: "", label: "Unassigned" },
-                  ]}
-                />
-                <label className="mt-1 flex min-h-11 items-center gap-2 text-sm">
-                  <input type="checkbox" checked={Boolean(guest.allowBride)} onChange={(event) => { setGuestGrant(wedding.id, guest.id, { allowBride: event.target.checked }); toast("Access updated."); }} />
-                  Can see bride-side private posts
-                </label>
-                <label className="flex min-h-11 items-center gap-2 text-sm">
-                  <input type="checkbox" checked={Boolean(guest.allowGroom)} onChange={(event) => { setGuestGrant(wedding.id, guest.id, { allowGroom: event.target.checked }); toast("Access updated."); }} />
-                  Can see groom-side private posts
-                </label>
-              </li>
-            ))}
-          </ul>
+          <h2 className="font-serif text-2xl">Private ceremony access</h2>
+          <p className="mt-1 text-sm text-muted">Keep a ceremony open to all wedding members or limit it to selected people.</p>
           {wedding.functions.length > 0 ? (
             <div className="mt-4 flex flex-col gap-3">
               {wedding.functions.map((item) => (
                 <PickList
                   key={item.id}
                   label={`${item.name} audience`}
-                  value={item.accessRule?.kind ?? "all"}
+                  value={item.accessRule?.kind === "people" ? "people" : item.accessRule && item.accessRule.kind !== "all" ? "legacy" : "all"}
                   onChange={(value) => {
-                    const kind = value as AccessKind;
+                    if (value === "legacy") return;
+                    const kind = value as "all" | "people";
                     setFunctionAccess(wedding.id, item.id, kind === "all" ? undefined : { kind });
                     toast(`${item.name} is ${kind === "all" ? "open to the wedding" : "private"}.`);
                   }}
                   className="min-h-11"
                   options={[
                     { value: "all", label: "All wedding members" },
-                    { value: "bride", label: "Bride's family" },
-                    { value: "groom", label: "Groom's family" },
                     { value: "people", label: "Selected people" },
+                    { value: "legacy", label: "Existing private access" },
                   ]}
                 />
               ))}

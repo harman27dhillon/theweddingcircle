@@ -8,6 +8,7 @@ import {
 } from "@/lib/developer/control/actions.functions";
 import { CHECKS, INFRASTRUCTURE_CHECKS, type Check, type Diagnostic, type InfrastructureCheck } from "@/lib/developer/control/model";
 import { generateWeddingVouchers, listWeddingVouchers } from "@/lib/wedding/vouchers.functions";
+import { PasswordField } from "@/components/wedding/ui";
 
 const sections = [
   ["overview", "Infrastructure overview"],
@@ -95,7 +96,7 @@ export function DeveloperCenter() {
         {loading ? <p className="mt-4 text-sm" role="status">Checking developer access…</p> : status?.configured ? (
           <form className="mt-5 grid gap-4" onSubmit={(event) => void login(event)}>
             <label className="grid gap-1 text-sm">Developer email<input className={field} name="email" type="email" autoComplete="username" maxLength={254} required /></label>
-            <label className="grid gap-1 text-sm">Developer password<input className={field} name="password" type="password" autoComplete="current-password" maxLength={512} required /></label>
+            <label className="grid gap-1 text-sm">Developer password<PasswordField className={field} name="password" autoComplete="current-password" maxLength={512} required /></label>
             <button className={primary} disabled={busy}>{busy ? "Checking…" : "Unlock"}</button>
           </form>
         ) : status ? (

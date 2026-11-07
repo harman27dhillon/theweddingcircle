@@ -1,7 +1,7 @@
 import { saveCircle, fetchCircle, findCircleByCode, deleteCircle, contributeCircle, syncCircle, readCircleAsMember, saveCardTheme, saveWeddingBar } from "@/lib/wedding/circle.functions";
 import { circleKey, isDeletedSlug, rememberCircleKey, rememberDeletedSlug } from "@/lib/wedding/circle-key";
 import { voiceAttachment } from "@/lib/wedding/capture";
-import { codesOf, isSampleCircle } from "@/lib/wedding/format";
+import { codesOf, isSampleCircle, normalizeCode } from "@/lib/wedding/format";
 import { cleanPhoto } from "./guest-profile.ts";
 import { coupleAccessForPublish } from "@/lib/wedding/couple-access";
 import { entryCodeFor, memberKeyFor, memberKeyList, rememberMemberKey } from "@/lib/wedding/member-key";
@@ -145,7 +145,7 @@ export async function loadCircle(slug: string): Promise<Wedding | null> {
 }
 
 export async function loadCircleByCode(code: string): Promise<Wedding | null> {
-  return findCircleByCode({ data: code.trim().toUpperCase() });
+  return findCircleByCode({ data: normalizeCode(code) });
 }
 
 export type EraseStatus = "ok" | "denied" | "offline" | "partial";

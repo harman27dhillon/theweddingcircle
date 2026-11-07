@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, Fragment, memo } from "react";
 import { createPortal } from "react-dom";
-import { Button, Mark, PickList } from "@/components/wedding/ui";
+import { Button, Mark } from "@/components/wedding/ui";
 import { WeddingAvatar } from "@/components/wedding/guest-profile";
 import { PersonName } from "@/components/wedding/marks";
 import { useWedding, useCircleTheme } from "@/components/wedding/context";
@@ -85,7 +85,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const wedding = useWedding();
   const viewer = useWeddingStore((s) => s.viewer);
   const unread = useWeddingStore((s) => s.notices.filter((n) => !n.read).length);
-  const setViewerSide = useWeddingStore((s) => s.setViewerSide);
   const notices = useWeddingStore((s) => s.notices);
   const markNoticeRead = useWeddingStore((s) => s.markNoticeRead);
   const weddings = useWeddingStore((s) => s.weddings);
@@ -94,7 +93,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const [rolesOpen, setRolesOpen] = useState(false);
   const [roleCode, setRoleCode] = useState("");
   const [roleNote, setRoleNote] = useState("");
-  const [sideChoice, setSideChoice] = useState<"" | "Bride" | "Groom">("");
   const [notesOpen, setNotesOpen] = useState(false);
   const [memberKey, setMemberKey] = useState("");
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -767,29 +765,6 @@ export function Shell({ children }: { children: ReactNode }) {
         <main className={cn("relative z-[1] flex min-h-0 flex-1 flex-col pb-safe md:pb-0", split && active >= 0 && "desk-board")} data-glide={glide || undefined}>
           {active >= 0 ? <CircleSections active={active} split={split} panels={panels} /> : <div className="section-pane nested-pane">{children}</div>}
         </main>
-        {!viewer.side && viewer.name.trim().toLowerCase() !== wedding.bride.trim().toLowerCase() && viewer.name.trim().toLowerCase() !== wedding.groom.trim().toLowerCase() ? (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 md:items-center">
-            <div className="w-full max-w-md rounded-card border border-line bg-ivory p-6 text-ink">
-              <h2 className="font-serif text-3xl">Which side are you with?</h2>
-              <p className="mt-2 text-muted">This is how your name is marked in the chat.</p>
-              <div className="mt-6">
-                <PickList
-                  label="Which side"
-                  value={sideChoice}
-                  onChange={(value) => setSideChoice(value as "" | "Bride" | "Groom")}
-                  options={[
-                    { value: "", label: "Choose a side" },
-                    { value: "Bride", label: "Bride's side" },
-                    { value: "Groom", label: "Groom's side" },
-                  ]}
-                />
-              </div>
-              <Button className="mt-4" disabled={!sideChoice} onClick={() => sideChoice && setViewerSide(sideChoice)}>
-                Continue
-              </Button>
-            </div>
-          </div>
-        ) : null}
         <nav data-app-nav="" className="nav-safe app-tabbar fixed inset-x-0 bottom-0 z-30 md:hidden">
           <ul className="grid grid-cols-5">
             {primary.slice(0, 4).map((item) => (

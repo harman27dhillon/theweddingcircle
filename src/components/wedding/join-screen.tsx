@@ -13,7 +13,6 @@ import type { Rsvp } from "@/lib/wedding/types";
 export function CircleGate({ status, onRetry }: { status: CircleStatus; onRetry?: () => void }) {
   const navigate = useNavigate();
   const focusWedding = useWeddingStore((s) => s.focusWedding);
-  const setViewerSide = useWeddingStore((s) => s.setViewerSide);
   const restoreSample = useWeddingStore((s) => s.restoreSample);
 
   if (status === "loading") {
@@ -56,7 +55,6 @@ export function CircleGate({ status, onRetry }: { status: CircleStatus; onRetry?
             const sample = useWeddingStore.getState().weddings.find((item) => item.id === SEED_ID);
             if (!sample) return;
             focusWedding(sample.id, "guest");
-            setViewerSide("Bride");
             void navigate({ to: "/w/$slug", params: { slug: sample.slug } });
           }}
         >
@@ -74,12 +72,10 @@ export function JoinScreen({ code }: { code: string }) {
   const navigate = useNavigate();
   const wedding = useWeddingStore((s) => s.weddings.find((w) => w.slug === code.trim().toLowerCase()));
   const joinWedding = useWeddingStore((s) => s.joinWedding);
-  const setViewerSide = useWeddingStore((s) => s.setViewerSide);
   const account = useWeddingStore((s) => s.account);
   const [name, setName] = useState(account?.name ?? "");
   const [rsvp, setRsvp] = useState<Rsvp>("yes");
-  const [relationship, setRelationship] = useState<(typeof RELATIONSHIPS)[number]>(RELATIONSHIPS[2]);
-  const [party, setParty] = useState<"Bride" | "Groom" | "">("");
+  const [relationship, setRelationship] = useState<(typeof RELATIONSHIPS)[number]>(RELATIONSHIPS[1]);
   const [postingCode, setPostingCode] = useState("");
   const [note, setNote] = useState("");
 
@@ -105,10 +101,6 @@ export function JoinScreen({ code }: { code: string }) {
           onSubmit={(e) => {
             e.preventDefault();
             void (async () => {
-            if (!party) {
-              setNote("Choose bride's side or groom's side.");
-              return;
-            }
             const guestName = account?.name ?? name.trim();
             if (!guestName) {
               setNote("Add your name.");
@@ -122,14 +114,19 @@ export function JoinScreen({ code }: { code: string }) {
               compactCode(normalized) === compactCode(wedding.slug) ||
               typed.toLowerCase().includes(`/w/${wedding.slug}`) ||
               typed.toLowerCase().includes(`/join/${wedding.slug}`);
-            const matched = sameCircle ? undefined : codeMatch(wedding, normalized);
+            let matched = sameCircle ? undefined : codeMatch(wedding, normalized);
             if (!sameCircle && !matched) {
-              setNote("That code does not match this wedding. Check the family or guest code, or clear it to enter with the invitation.");
-              return;
+              const { loadCircleByCode } = await import("@/lib/wedding/publish");
+              const remote = await loadCircleByCode(normalized);
+              if (!remote || remote.slug !== wedding.slug || !remote.entryCodeKind) {
+                setNote("That code does not match this wedding. Check the Family/VIP-Guest or Guest code, or clear it to enter with the invitation.");
+                return;
+              }
+              matched = { id: remote.entryCodeId ?? "server-validated", code: normalized, kind: remote.entryCodeKind };
             }
             const result = joinWedding(wedding.slug, guestName, rsvp, relationship, matched ? normalized : "", matched?.kind);
             if (result === "bad-code" || result === "wrong-kind") {
-              setNote("That code is not for this wedding. Family and guest codes are different.");
+              setNote("That code is not for this wedding. Family/VIP-Guest and Guest codes are different.");
               return;
             }
             if (result === "disabled") {
@@ -144,7 +141,6 @@ export function JoinScreen({ code }: { code: string }) {
               setNote("This invitation link is invalid or expired.");
               return;
             }
-            setViewerSide(party);
             if (matched) {
               const auth = await confirmWeddingRole(wedding.slug, guestName, normalized);
               if (auth.ok) applyRole(wedding.id, auth.role);
@@ -166,7 +162,7 @@ export function JoinScreen({ code }: { code: string }) {
             </p>
           ) : (
             <p className="rounded-2xl border border-line bg-paper px-4 py-3 text-sm">
-              You can enter with your name. A family code, if the host gave you one, marks you as family.{" "}
+              You can enter with your name. A Family/VIP-Guest code gives family access. A Guest code gives guest access.{" "}
               <Link to="/account" className="text-maroon">Sign in</Link>
             </p>
           )}
@@ -177,19 +173,9 @@ export function JoinScreen({ code }: { code: string }) {
             readOnly={Boolean(account)}
             onChange={(e) => setName(e.target.value)}
           />
-          <PickList
-            label="Which side"
-            value={party}
-            onChange={setParty}
-            options={[
-              { value: "", label: "Choose a side" },
-              { value: "Bride", label: "Bride's side" },
-              { value: "Groom", label: "Groom's side" },
-            ]}
-          />
           <input
             className={fieldClass}
-            placeholder="Family or guest code, optional"
+            placeholder="Family/VIP-Guest code or Guest code, optional"
             value={postingCode}
             onChange={(e) => setPostingCode(e.target.value)}
           />
