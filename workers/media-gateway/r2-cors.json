@@ -1,0 +1,13 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": ["https://theweddingcircle.in", "https://www.theweddingcircle.in"],
+        "methods": ["GET", "HEAD", "PUT"],
+        "headers": ["content-type", "range"]
+      },
+      "exposeHeaders": ["ETag", "Content-Length", "Content-Range"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

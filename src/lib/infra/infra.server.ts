@@ -1,5 +1,6 @@
 // Recovered from the last server build after the typed source was overwritten.
 // @ts-nocheck
+import { getRequest } from "@tanstack/react-start/server";
 import { createHash, randomBytes } from "node:crypto";
 import { getSql } from "@/lib/db";
 import { weddingDataSql } from "@/lib/developer/core-route.server";
@@ -10,7 +11,7 @@ import { googleToken } from "@/lib/infra/google-token";
 import { decideLive } from "@/lib/infra/live";
 import { authorizeMedia, keyBelongsToWedding, mediaObjectKey, withinRate } from "@/lib/infra/media-policy";
 import { MULTIPART_PART_BYTES, UPLOAD_CHUNK_BYTES, pieceLength, uploadPieceCount } from "@/lib/infra/r2-browser";
-import { completeR2Multipart, createR2Multipart, deleteR2Object, ensureR2BrowserCors, getR2Object, headR2Object, openR2Read, presignS3, putR2Object, uploadR2Part } from "@/lib/infra/r2-sign";
+import { completeR2Multipart, createR2Multipart, deleteR2Object, getR2Object, headR2Object, openR2Read, presignS3, putR2Object, uploadR2Part } from "@/lib/infra/r2-sign";
 import { downloadExpiry, openDownloadTicket, sealDownloadTicket } from "@/lib/infra/download-ticket";
 import { contentDisposition, downloadMime, privacyAllowsDownload, safeDownloadName, weddingDownloadName } from "@/lib/wedding/download-name";
 import { overPlanStorage, storageMessage } from "@/lib/wedding/plan";
@@ -24,68 +25,14 @@ var hits = new Map();
 function amzDate(now = new Date()) {
 	return now.toISOString().replace(/[:-]|\.\d{3}/g, "");
 }
-async function ensure(sql) {
-	await sql`create table if not exists infra_flags (
-    key text primary key,
-    enabled boolean not null default false,
-    updated_by text not null default '',
-    updated_at timestamptz not null default now()
-  )`;
-	await sql`create table if not exists infra_checks (
-    provider text primary key,
-    state text not null,
-    detail text not null default '',
-    fingerprint text not null default '',
-    checked_at timestamptz not null default now()
-  )`;
-	await sql`alter table infra_checks add column if not exists diag text not null default ''`;
-	await sql`create table if not exists infra_purchases (
-    token_hash text primary key,
-    product_slot text not null,
-    state text not null,
-    updated_at timestamptz not null default now()
-  )`;
-	await sql`create table if not exists infra_config (
-    id text primary key,
-    cipher text not null,
-    nonce text not null,
-    updated_by text not null default '',
-    updated_at timestamptz not null default now()
-  )`;
-	await sql`create table if not exists r2_media (
-    object_key text primary key,
-    slug text not null,
-    purpose text not null,
-    mime text not null,
-    bytes integer not null,
-    created_at timestamptz not null default now()
-  )`;
-	await sql`create table if not exists r2_upload (
-    upload_id text primary key,
-    object_key text not null,
-    slug text not null,
-    purpose text not null,
-    mime text not null,
-    member_hash text not null,
-    total_bytes integer not null,
-    total_chunks integer not null,
-    received integer not null default 0,
-    flushed integer not null default 0,
-    multipart_id text not null default '',
-    next_part integer not null default 1,
-    etags text not null default '[]',
-    created_at timestamptz not null default now()
-  )`;
-	await sql`alter table r2_upload add column if not exists created_at timestamptz not null default now()`;
-}
+
 function vaultKey() {
 	return infraVaultKey();
 }
 async function resolvedEnv() {
 	const resolved = await resolvedInfraEnv();
 	try {
-		const sql = await getSql();
-		await ensure(sql);
+		await getSql();
 	} catch {
 		return { ...resolved, unreadable: true, locked: false };
 	}
@@ -163,7 +110,7 @@ async function assertStorageRoom(slug, bytes) {
 }
 async function forgetAbandonedUploads(sql, creds) {
 	try {
-		const rows = await sql`select upload_id, slug, received, created_at from r2_upload order by created_at asc limit 20`;
+		const rows = await sql`select upload_id, slug, received, created_at from r2_upload where created_at < now() - interval '1 day' order by created_at asc limit 20`;
 		const cutoff = Date.now() - 864e5;
 		for (const row of rows) {
 			const at = new Date(row.created_at).getTime();
@@ -177,6 +124,16 @@ async function forgetAbandonedUploads(sql, creds) {
 		}
 	} catch {}
 }
+const cleanupAt = new Map();
+async function scheduleUploadCleanup(sql, bucket) {
+  const mark = bucket.accountId + "/" + bucket.bucket;
+  if (Date.now() - (cleanupAt.get(mark) || 0) < 300_000) return;
+  cleanupAt.set(mark, Date.now());
+  const cleanup = forgetAbandonedUploads(sql, bucket);
+  const request = getRequest();
+  if (typeof request.waitUntil === "function") request.waitUntil(cleanup);
+  else await cleanup;
+}
 export async function infraPrepareUpload(input): Promise<any> {
 	const started = Date.now();
 	if (!allow(`up:${input.slug}:${createHash("sha256").update(input.memberKey).digest("hex").slice(0, 12)}`)) return {
@@ -184,7 +141,7 @@ export async function infraPrepareUpload(input): Promise<any> {
 		error: "Too many upload requests. Wait a moment and try again."
 	};
 	const sql = await getSql();
-	await ensure(sql);
+
 	const role = await memberRole(input.slug, input.memberKey);
 	const decision = authorizeMedia({
 		role,
@@ -195,21 +152,14 @@ export async function infraPrepareUpload(input): Promise<any> {
 		bytes: input.bytes
 	});
 	if (!decision.ok) return decision;
-	const room = await assertStorageRoom(input.slug, input.bytes);
+	const [room, resolved, checks] = await Promise.all([
+		assertStorageRoom(input.slug, input.bytes), resolvedEnv(), readChecks(sql),
+	]);
 	if (!room.ok) return room;
-	const env = (await resolvedEnv()).env;
-	const bucket = openPrivateBucket(env, assessInfrastructure(env, await readChecks(sql)).providers.find((item) => item.id === "r2")?.state);
+	const env = resolved.env;
+	const bucket = openPrivateBucket(env, assessInfrastructure(env, checks).providers.find((item) => item.id === "r2")?.state);
 	if (!bucket.ok) return bucket;
-	await forgetAbandonedUploads(sql, bucket);
-	const cors = await ensureR2BrowserCors(bucket);
-	if (!cors.ok) {
-		console.error("[media-upload] direct unavailable", cors.detail.slice(0, 180));
-		console.error("[media-upload] sign", Date.now() - started, "ms", input.bytes, "relay");
-		return {
-			ok: true,
-			mode: "relay"
-		};
-	}
+	await scheduleUploadCleanup(sql, bucket);
 	const key = mediaObjectKey(input.slug, input.purpose, input.fileName, randomBytes(8).toString("hex"));
 	const signed = presignS3({
 		method: "PUT",
@@ -253,7 +203,7 @@ export async function infraConfirmUpload(input): Promise<any> {
 		error: "Too many upload requests. Wait a moment and try again."
 	};
 	const sql = await getSql();
-	await ensure(sql);
+
 	const role = await memberRole(input.slug, input.memberKey);
 	const decision = authorizeMedia({
 		role,
@@ -366,7 +316,7 @@ export async function infraAcceptChunk(input): Promise<any> {
 			if (!room.ok) return room;
 		}
 		const sql = await getSql();
-		await ensure(sql);
+
 		const env = (await resolvedEnv()).env;
 		const opened = openPrivateBucket(env, assessInfrastructure(env, await readChecks(sql)).providers.find((item) => item.id === "r2")?.state);
 		if (!opened.ok) return opened;
@@ -592,7 +542,7 @@ export async function infraPrepareDownload(input): Promise<any> {
 		error: "That file is not in this wedding."
 	};
 	const sql = await getSql();
-	await ensure(sql);
+
 	if (!await memberRole(input.slug, input.memberKey)) return {
 		ok: false,
 		error: "You are not in this wedding."
@@ -690,7 +640,7 @@ export async function infraDropUnrecorded(input): Promise<any> {
 		error: "You are not in this wedding."
 	};
 	const sql = await getSql();
-	await ensure(sql);
+
 	if ((await sql`select object_key from r2_media where object_key = ${input.objectKey} limit 1`)[0]) return { ok: true };
 	const env = (await resolvedEnv()).env;
 	const bucket = openPrivateBucket(env, assessInfrastructure(env, await readChecks(sql)).providers.find((item) => item.id === "r2")?.state);
@@ -725,7 +675,7 @@ export async function infraStoreThumb(input): Promise<any> {
 	});
 	if (!decision.ok) return decision;
 	const sql = await getSql();
-	await ensure(sql);
+
 	if (!(await sql`select object_key from r2_media where object_key = ${input.objectKey} and slug = ${input.slug} limit 1`)[0]) return {
 		ok: false,
 		error: "That photo is not stored yet."
@@ -784,7 +734,7 @@ async function downloadAllowed(slug, memberKey, objectKey) {
 		error: "Downloads are turned off for this wedding."
 	};
 	const sql = await getSql();
-	await ensure(sql);
+
 	const media = await sql`select mime from r2_media where object_key = ${objectKey} and slug = ${slug} limit 1`;
 	if (!media[0]) return {
 		ok: false,
@@ -898,7 +848,7 @@ export async function infraStreamView(token, range, method, origin = ""): Promis
 		headers: { "cache-control": "private, no-store" }
 	});
 	const sql = await getSql();
-	await ensure(sql);
+
 	const media = await sql`select mime from r2_media where object_key = ${ticket.key} and slug = ${ticket.slug} limit 1`;
 	if (!media[0]) return Response.json({
 		ok: false,
@@ -971,7 +921,7 @@ export async function infraVerifyPurchase(input): Promise<any> {
 	const play = assessInfrastructure(env).providers.find((item) => item.id === "play");
 	const productId = env[slot.env]?.trim() || "";
 	const sql = await getSql();
-	await ensure(sql);
+
 	const flags = await readFlags(sql);
 	const checks = await readChecks(sql);
 	const shown = assessInfrastructure(env, checks).providers.find((item) => item.id === "play");

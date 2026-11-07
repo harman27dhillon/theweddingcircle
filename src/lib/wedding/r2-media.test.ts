@@ -146,10 +146,11 @@ test("an upload is split into small same-origin pieces and an R2 refusal is not 
   assert.equal(gate.includes("privacyAllowsDownload"), true);
   assert.equal(gate.includes("keyBelongsToWedding"), true);
   const prepare = server.slice(server.indexOf("export async function infraPrepareUpload"), server.indexOf("function sameWeddingObject"));
-  assert.equal(prepare.indexOf("ensureR2BrowserCors") < prepare.indexOf("presignS3"), true);
+  assert.equal(prepare.includes("ensureR2BrowserCors"), false);
+  assert.equal(prepare.includes("presignS3"), true);
   assert.equal(prepare.includes("assertStorageRoom"), true);
   assert.equal(server.slice(server.indexOf("async function assertStorageRoom"), server.indexOf("async function forgetAbandonedUploads")).includes("overPlanStorage"), true);
-  assert.equal(prepare.includes('mode: "relay"'), true);
+  assert.equal(prepare.includes('mode: "direct"'), true);
   const confirm = server.slice(server.indexOf("export async function infraConfirmUpload"), server.indexOf("export async function infraStoreUpload"));
   assert.equal(confirm.indexOf("headR2Object") < confirm.indexOf("recordStoredMedia"), true);
 });
