@@ -397,9 +397,7 @@ export function AccountScreen() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
               />
-              <input
-                className={fieldClass}
-                type="password"
+              <PasswordField
                 placeholder="Password"
                 autoComplete="current-password"
                 value={signPassword}
@@ -423,8 +421,8 @@ export function AccountScreen() {
                 onChange={setCountry}
                 options={[{ value: "", label: "Choose your country" }, ...COUNTRIES.map((item) => ({ value: item, label: item }))]}
               />
-              <input className={fieldClass} type="password" placeholder="Password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <input className={fieldClass} type="password" placeholder="Repeat password" value={again} onChange={(e) => setAgain(e.target.value)} />
+              <PasswordField placeholder="Password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <PasswordField placeholder="Repeat password" autoComplete="new-password" value={again} onChange={(e) => setAgain(e.target.value)} />
               <Button type="submit" disabled={busy}>
                 {busy ? "Creating account…" : "Sign up"}
               </Button>
