@@ -147,7 +147,8 @@ export async function redeemVoucher(input: { code: string; slug: string; editKey
       c.payload, '{payment}',
       (case when jsonb_typeof(c.payload->'payment') = 'object' then c.payload->'payment' else '{}'::jsonb end)
       || jsonb_build_object('status', 'paid', 'verified', true, 'reference', 'VOUCHER-' || claimed.code_hint, 'provider', 'preview')
-    ), updated_at = now()
+    ) || jsonb_build_object('rev', coalesce((c.payload->>'rev')::int, 0) + 1),
+      updated_at = now()
     from claimed
     where c.slug = claimed.wedding_slug
     returning claimed.code_hint, claimed.wedding_id

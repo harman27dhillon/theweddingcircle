@@ -89,8 +89,11 @@ export function CreateFlow() {
   async function settle(slug: string) {
     const wedding = useWeddingStore.getState().weddings.find((item) => item.slug === slug);
     if (!wedding) return { wedding: null, published: "offline" as const };
-    await registerHostAuthority(wedding);
     const published = await pushCircle(wedding);
+    if (published === "ok") {
+      const host = await registerHostAuthority(wedding);
+      if (!host.ok) return { wedding, published: "locked" as const };
+    }
     setShareReady(published === "ok");
     setMadeSlug(slug);
     return { wedding, published };
