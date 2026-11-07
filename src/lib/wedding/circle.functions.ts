@@ -551,14 +551,45 @@ export const saveWeddingBar = createServerFn({ method: "POST" }).validator((inpu
 export const findCircleByCode = createServerFn({ method: "GET" }).validator((input) => normalizeCode(typeof input === "string" ? input : "")).handler(async ({ data: code }) => {
 	const compact = compactCode(code);
 	if (compact.length < 4 || compact.length > 80) return null;
-	const rows = await (await coreSql())`
-      select slug, payload from circles
-      where regexp_replace(upper(payload::text), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
-      limit 20
-    `;
+	const prefix = compact.startsWith("FAMILY") ? "FAMILY" : compact.startsWith("GUEST") ? "GUEST" : "";
+	const tail = prefix ? compact.slice(prefix.length) : "";
+	const sql = await coreSql();
+	let rows = [];
+	try {
+		rows = await sql`
+			select c.slug, c.payload from circles c
+			left join circle_auth a on a.slug = c.slug
+			where regexp_replace(upper(c.payload::text), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
+			   or regexp_replace(upper(coalesce(a.family_codes, '') || ' ' || coalesce(a.guest_codes, '')), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
+			   or (
+					${tail.length === 4}
+					and (case
+						when length(regexp_replace(upper(c.slug), '[^A-Z0-9]', '', 'g')) >= 4
+						then right(regexp_replace(upper(c.slug), '[^A-Z0-9]', '', 'g'), 4)
+						else left(regexp_replace(upper(c.slug), '[^A-Z0-9]', '', 'g') || 'WXYZ', 4)
+					end) = ${tail}
+				)
+			limit 100
+		`;
+	} catch {
+		rows = await sql`
+			select slug, payload from circles
+			where regexp_replace(upper(payload::text), '[^A-Z0-9]', '', 'g') like ${"%" + compact + "%"}
+			   or (
+					${tail.length === 4}
+					and (case
+						when length(regexp_replace(upper(slug), '[^A-Z0-9]', '', 'g')) >= 4
+						then right(regexp_replace(upper(slug), '[^A-Z0-9]', '', 'g'), 4)
+						else left(regexp_replace(upper(slug), '[^A-Z0-9]', '', 'g') || 'WXYZ', 4)
+					end) = ${tail}
+				)
+			limit 100
+		`;
+	}
 	for (const row of rows) {
 		const wedding = asWedding(row.payload, row.slug);
-		if (wedding && codeMatch(wedding, code)) return redactWedding(wedding, null);
+		const matched = wedding ? codeMatch(wedding, code) : undefined;
+		if (wedding && matched) return { ...redactWedding(wedding, null), entryCodeKind: matched.kind, entryCodeId: matched.id };
 	}
 	return null;
 });
