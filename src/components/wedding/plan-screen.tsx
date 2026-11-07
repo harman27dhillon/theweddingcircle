@@ -291,7 +291,6 @@ function HostControl({ owner }: { owner: boolean }) {
             <Link to="/w/$slug/memories" params={{ slug: wedding.slug }} className="min-h-11 text-maroon">Album</Link>
           </div>
         </Fold>
-        {!guestOnly ? (
         <Fold id="privacy" title="Privacy & Permissions" icon={Shield} open={open === "privacy"} onToggle={() => toggle("privacy")}>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="line" onClick={() => updatePrivacy(wedding.id, { ...wedding.privacy, join: wedding.privacy.join === "link" ? "approve" : "link" })}>
@@ -313,7 +312,6 @@ function HostControl({ owner }: { owner: boolean }) {
           ) : null}
           <Link to="/w/$slug/settings" params={{ slug: wedding.slug }} className="mt-3 inline-flex min-h-11 items-center text-sm text-maroon">Family access and ceremony privacy</Link>
         </Fold>
-        ) : null}
         <Fold id="manage" title="Wedding Management" icon={Crown} open={open === "manage"} onToggle={() => toggle("manage")} danger>
           {owner ? (
             <div>
