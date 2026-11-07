@@ -369,7 +369,11 @@ async function restoreStoredPlan(sql, wedding) {
     ]);
     const restored = await restoreVoucherEntitlement(sql, await getSql(), wedding);
     return asWedding(restored, wedding.slug) || wedding;
-  } catch { return wedding; }
+  } catch (error) {
+    const code = typeof error?.code === "string" && /^[A-Z0-9_]{3,20}$/.test(error.code) ? error.code : "unavailable";
+    console.warn("[voucher-plan]", JSON.stringify({ slug: wedding.slug, outcome: "recovery-unavailable", code }));
+    return wedding;
+  }
 }
 async function visibleWedding(sql, wedding, memberKey) {
   wedding = await restoreStoredPlan(sql, wedding);

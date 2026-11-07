@@ -11,7 +11,10 @@ export async function restoreVoucherEntitlement<T extends StoredWedding>(core: S
       and status = 'redeemed' and redeemed_at is not null and revoked_at is null
     limit 1
   `)[0];
-  if (!proof) return wedding;
+  if (!proof) {
+    console.info("[voucher-plan]", JSON.stringify({ slug: wedding.slug, outcome: "no-bound-voucher" }));
+    return wedding;
+  }
   const [restored] = await core<{ payload: T }>`
     update circles
     set payload = jsonb_set(payload, '{payment}',
@@ -23,5 +26,6 @@ export async function restoreVoucherEntitlement<T extends StoredWedding>(core: S
       and (payload #> '{payment,verified}') is distinct from 'true'::jsonb
     returning payload
   `;
+  console.info("[voucher-plan]", JSON.stringify({ slug: wedding.slug, outcome: restored ? "restored" : "unchanged" }));
   return restored?.payload || wedding;
 }
