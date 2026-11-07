@@ -216,12 +216,21 @@ async function ensureMembers(sql) {
   )`;
 }
 function parseList(value) {
-	try {
-		const parsed = JSON.parse(value);
-		return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
-	} catch {
-		return [];
+	let parsed = value;
+	if (typeof value === "string") {
+		const raw = value.trim();
+		if (!raw) return [];
+		try {
+			parsed = JSON.parse(raw);
+		} catch {
+			parsed = raw.split(/[\\n,;]+/);
+		}
 	}
+	const values = Array.isArray(parsed) ? parsed : typeof parsed === "string" ? [parsed] : [];
+	return [...new Set(values
+		.filter((item) => typeof item === "string")
+		.map((item) => normalizeCode(item))
+		.filter((item) => item.length >= 4))];
 }
 async function upsertMember(sql, slug, memberKey, name, role, raise) {
 	if (!/^[A-Za-z0-9_-]{8,64}$/.test(memberKey)) return;
