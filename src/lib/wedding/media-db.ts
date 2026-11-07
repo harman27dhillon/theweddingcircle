@@ -109,16 +109,43 @@ export function localThumbId(objectKey: string) {
   return `r2thumb:${key}`;
 }
 
-/** Keep a small preview on this phone. Nothing is uploaded. */
+/** Synchronous hot cache for repeat chat renders. */
+export function cachedLocalThumbUrl(objectKey: string) {
+  return urls.get(localThumbId(objectKey)) || "";
+}
+
+/** Keep the preview in memory immediately; persist it across visits when device storage permits. */
 export async function saveLocalThumb(objectKey: string, blob: Blob) {
   const id = localThumbId(objectKey);
   if (!id || blob.size <= 0 || blob.size > 400_000) return "";
   const previous = urls.get(id);
-  if (previous) {
-    URL.revokeObjectURL(previous);
-    urls.delete(id);
-  }
-  return rememberBlob(id, blob);
+  if (previous) return previous;
+  const url = URL.createObjectURL(blob);
+  urls.set(id, url);
+  try { await rememberBlob(id, blob); } catch { /* The current chat can still use the memory preview. */ }
+  return url;
+}
+
+const thumbWork = new Set<string>();
+/** Cache viewed media too, so guests get local previews on their next chat visit. */
+export async function saveLoadedMediaThumb(src: string, source: CanvasImageSource, width: number, height: number) {
+  const key = parseR2Ref(src);
+  if (!key || !width || !height || thumbWork.has(key) || cachedLocalThumbUrl(key)) return;
+  thumbWork.add(key);
+  try {
+    if (await localThumbUrl(key)) return;
+    const scale = Math.min(1, 480 / Math.max(width, height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.72));
+    if (blob) await saveLocalThumb(key, blob);
+    canvas.width = 1; canvas.height = 1;
+  } catch { /* Preview storage and unsupported codecs never stop viewing. */ }
+  finally { thumbWork.delete(key); }
 }
 
 /** A thumbnail already on this phone, or an empty string. This does not contact storage. */

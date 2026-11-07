@@ -1,4 +1,4 @@
-import { PHOTO_MAX_BYTES, PHOTO_QUALITY, PHOTO_SMALL_BYTES, PHOTO_TARGET_BYTES, isHeicPhoto, nextPhotoDimensions, photoDimensions } from './photo-policy';
+import { PHOTO_QUALITY, PHOTO_SMALL_BYTES, PHOTO_TARGET_BYTES, isHeicPhoto, nextPhotoDimensions, photoDimensions } from './photo-policy';
 async function animated(file: File) {
   if (file.type === 'image/gif' || /\.gif$/i.test(file.name)) return true;
   const head = new Uint8Array(await file.slice(0, 65536).arrayBuffer());
@@ -39,28 +39,37 @@ async function encode(bitmap: ImageBitmap, width: number, height: number, mime: 
     return await new Promise<Blob>((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Photo compression failed.')), mime, PHOTO_QUALITY));
   } finally { canvas.width = 1;canvas.height = 1; }
 }
-/** Only optimized photos reach the uploader; a failed large conversion never falls back to its original. */
+/** Try high-quality encodings first; upload policy may keep a larger result when none reaches the target. */
 export async function compressPhoto(file: File): Promise<File> {
   if (await animated(file)) {
-    if (file.size > PHOTO_MAX_BYTES) throw new Error('This animation is too large. Choose one under 2 MB. Nothing was uploaded.');
     return file;
   }
   const heic = isHeicPhoto(file);
   if (!heic && file.size <= PHOTO_SMALL_BYTES && /image\/(jpeg|png|webp)/i.test(file.type)) return file;
   const bitmap = await decodePhoto(file);
   try {
-    let { width, height } = photoDimensions(bitmap.width, bitmap.height);
+    const dimensions = photoDimensions(bitmap.width, bitmap.height);
     const target = Math.min(PHOTO_TARGET_BYTES, Math.max(PHOTO_SMALL_BYTES, Math.round(file.size * 0.8)));
-    let result = await encode(bitmap, width, height, 'image/webp');
-    if (result.type !== 'image/webp') result = await encode(bitmap, width, height, /image\/(png|webp)/i.test(file.type) ? 'image/png' : 'image/jpeg');
-    for (let attempt = 0; attempt < 3 && result.size > target; attempt++) {
-      const next = nextPhotoDimensions(width, height, result.size, target);
-      if (next.width === width && next.height === height) break;
-      ({ width, height } = next);
-      result = await encode(bitmap, width, height, result.type);
+    const opaque = heic || /image\/jpe?g/i.test(file.type) || /\.jpe?g$/i.test(file.name);
+    const formats = opaque ? ['image/webp', 'image/jpeg', 'image/png'] : ['image/webp', 'image/png'];
+    let best: Blob | null = null;
+    for (const mime of formats) {
+      let { width, height } = dimensions;
+      try {
+        let candidate = await encode(bitmap, width, height, mime);
+        for (let attempt = 0; attempt < 3 && candidate.size > target; attempt++) {
+          const next = nextPhotoDimensions(width, height, candidate.size, target);
+          if (next.width === width && next.height === height) break;
+          ({ width, height } = next);
+          candidate = await encode(bitmap, width, height, candidate.type);
+        }
+        if (candidate.size > 0 && (!best || candidate.size < best.size)) best = candidate;
+        if (best && best.size <= target) break;
+      } catch { /* Try the next supported encoder before falling back. */ }
     }
-    if (!heic && result.size >= file.size && file.size <= PHOTO_MAX_BYTES && /image\/(jpeg|png|webp)/i.test(file.type)) return file;
-    if (result.size > PHOTO_MAX_BYTES) throw new Error('This photo could not be made small enough. Try a different photo. Nothing was uploaded.');
+    if (!best) throw new Error('Photo encoders could not prepare this file.');
+    const result = best;
+    if (!heic && result.size >= file.size) return file;
     const ext = result.type === 'image/webp' ? 'webp' : result.type === 'image/png' ? 'png' : 'jpg';
     return new File([result], `${file.name.replace(/\.[^.]+$/, '') || 'photo'}.${ext}`, { type: result.type, lastModified: file.lastModified });
   } finally { bitmap.close(); }

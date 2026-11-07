@@ -252,12 +252,13 @@ export async function resolveR2Media(src: string, variant: "full" | "preview" = 
   const slug = weddingSlugFromR2Key(key);
   if (!slug) return { url: "", note: "That file is not in this wedding." };
   const cacheKey = `${variant}:${key}`;
-  const cached = fresh.get(cacheKey);
-  if (cached && cached.until > Date.now()) return { url: cached.url, note: "" };
+  // Device thumbnails take precedence over signed URLs already fetched for this visit.
   if (variant === "preview") {
     const local = await localThumbUrl(key).catch(() => "");
     if (local) return { url: local, note: "" };
   }
+  const cached = fresh.get(cacheKey);
+  if (cached && cached.until > Date.now()) return { url: cached.url, note: "" };
   const savedKey = memberKeyFor(slug);
   if (!/^[A-Za-z0-9_-]{8,80}$/.test(savedKey)) return { url: "", note: "You are not in this wedding." };
   try {

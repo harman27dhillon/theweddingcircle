@@ -1,6 +1,5 @@
 export const PHOTO_QUALITY = 0.90;
 export const PHOTO_TARGET_BYTES = 1_500_000;
-export const PHOTO_MAX_BYTES = 2_000_000;
 export const PHOTO_MAX_EDGE = 4096;
 export const PHOTO_SMALL_BYTES = 128_000;
 export function photoDimensions(width: number, height: number, edge = PHOTO_MAX_EDGE) {

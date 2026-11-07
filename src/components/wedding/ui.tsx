@@ -169,6 +169,7 @@ function loadR2Upload() {
 
 export function useMediaUrl(src?: string, variant: "full" | "preview" = "full", reload = 0) {
   const [url, setUrl] = useState(() => {
+    if (src?.startsWith("r2:") && variant === "preview") return mediaDbMod?.cachedLocalThumbUrl(src.slice(3)) || "";
     if (!src || src.startsWith("gp:") || src.startsWith("r2:") || variant === "preview") return "";
     if (src.startsWith("idb:")) return mediaDbMod?.cachedMediaUrl(src) ?? "";
     return src;
@@ -184,9 +185,16 @@ export function useMediaUrl(src?: string, variant: "full" | "preview" = "full", 
     }
     if (src.startsWith("r2:")) {
       let cancel = false;
-      setUrl("");
+      setUrl(variant === "preview" ? mediaDbMod?.cachedLocalThumbUrl(src.slice(3)) || "" : "");
       setNote("");
-      const load = () => loadR2Upload().then((mod) => mod.resolveR2Media(src, variant));
+      const load = async () => {
+        if (variant === "preview") {
+          const db = await loadMediaDb();
+          const local = await db.localThumbUrl(src.slice(3)).catch(() => "");
+          if (local) return { url: local, note: "" };
+        }
+        return (await loadR2Upload()).resolveR2Media(src, variant);
+      };
       void load().then((next) => {
         if (cancel) return;
         setUrl(next.url);
@@ -321,7 +329,11 @@ export function Photo({
   }
   if (hold || !url) return <div className={cn("bg-paper", className)} aria-busy="true" aria-label="Loading" />;
   const inChat = className?.includes("chat-media-fit");
-  return <img src={url} alt={alt} className={cn(inChat ? "bg-transparent object-contain" : "bg-paper object-cover", className)} loading="lazy" decoding="async" onError={onBroken} />;
+  return <img src={url} alt={alt} className={cn(inChat ? "bg-transparent object-contain" : "bg-paper object-cover", className)} loading="lazy" decoding="async" crossOrigin={src.startsWith("r2:") && url.startsWith("http") ? "anonymous" : undefined} onLoad={(event) => {
+    if (!src.startsWith("r2:")) return;
+    const image = event.currentTarget;
+    void loadMediaDb().then((db) => db.saveLoadedMediaThumb(src, image, image.naturalWidth, image.naturalHeight));
+  }} onError={onBroken} />;
 }
 
 export function Clip({
@@ -365,6 +377,11 @@ export function Clip({
       loop={loop}
       muted={muted}
       playsInline
+      crossOrigin={src.startsWith("r2:") && url.startsWith("http") ? "anonymous" : undefined}
+      onLoadedData={(event) => {
+        const video = event.currentTarget;
+        void loadMediaDb().then((db) => db.saveLoadedMediaThumb(src, video, video.videoWidth, video.videoHeight));
+      }}
       onLoadedMetadata={(event) => {
         const video = event.currentTarget;
         if (video.videoWidth > 0 && video.videoHeight > 0) setRatio(`${video.videoWidth} / ${video.videoHeight}`);

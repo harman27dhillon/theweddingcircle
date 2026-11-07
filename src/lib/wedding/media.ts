@@ -56,9 +56,13 @@ const UPLOAD_MIME: Record<string, string> = {
   "image/png": "image/png",
   "image/webp": "image/webp",
   "image/gif": "image/gif",
+  "image/heic": "image/heic", "image/heif": "image/heif", "image/avif": "image/avif",
+  "image/bmp": "image/bmp", "image/tiff": "image/tiff",
   "video/mp4": "video/mp4",
   "video/webm": "video/webm",
   "video/quicktime": "video/quicktime",
+  "video/x-matroska": "video/x-matroska", "video/x-msvideo": "video/x-msvideo",
+  "video/3gpp": "video/3gpp", "video/mpeg": "video/mpeg", "video/ogg": "video/ogg",
 };
 
 function uploadMime(file: File) {
@@ -69,6 +73,16 @@ function uploadMime(file: File) {
   if (/\.png$/.test(name)) return "image/png";
   if (/\.webp$/.test(name)) return "image/webp";
   if (/\.gif$/.test(name)) return "image/gif";
+  if (/\.heic$/.test(name)) return "image/heic";
+  if (/\.heif$/.test(name)) return "image/heif";
+  if (/\.avif$/.test(name)) return "image/avif";
+  if (/\.bmp$/.test(name)) return "image/bmp";
+  if (/\.tiff?$/.test(name)) return "image/tiff";
+  if (/\.mkv$/.test(name)) return "video/x-matroska";
+  if (/\.avi$/.test(name)) return "video/x-msvideo";
+  if (/\.3gp$/.test(name)) return "video/3gpp";
+  if (/\.mpe?g$/.test(name)) return "video/mpeg";
+  if (/\.ogv$/.test(name)) return "video/ogg";
   if (/\.mp4$/.test(name) || /\.m4v$/.test(name)) return "video/mp4";
   if (/\.webm$/.test(name)) return "video/webm";
   if (/\.mov$/.test(name) || /\.qt$/.test(name)) return "video/quicktime";
@@ -113,13 +127,14 @@ export async function prepareUpload(
   }
   if (kind === "image" && uploadFile.size > MEDIA_LIMITS.image) throw new Error("That photo is larger than the 12 MB photo limit after preparation.");
   const typed = uploadFile.type === mime ? uploadFile : new File([uploadFile], uploadFile.name, { type: mime, lastModified: uploadFile.lastModified });
+  // Generate the small local preview during the network upload, rather than after the message is posted.
+  const thumbnail = previewBlob(kind === "video" ? file : typed).catch(() => null);
   const src = await uploadPreparedFile(typed, slug, purpose, onStatus, { originalBytes: file.size, compressMs });
   const parent = parseR2Ref(src);
   if (parent) {
-    void previewBlob(kind === "video" ? file : typed).then((blob) => {
-      if (blob) return uploadPreviewBlob(blob, slug, parent);
-      return undefined;
-    }).catch(() => undefined);
+    const kept = thumbnail.then((blob) => blob ? uploadPreviewBlob(blob, slug, parent) : undefined).catch(() => undefined);
+    // Usually already complete; don't hold up a successful upload if device storage is slow.
+    await Promise.race([kept, new Promise((resolve) => setTimeout(resolve, 350))]);
   }
   const seconds = await secondsPromise;
   if (kind === "video") return { kind: "video", src, seconds, temporary: false };
