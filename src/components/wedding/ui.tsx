@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode, type VideoHTMLAttributes } from "react";
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type VideoHTMLAttributes } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, EyeOff, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDismissible } from "@/lib/wedding/dismiss";
 import { mediaAfterImageError, type MediaAttempt } from "@/lib/wedding/media-load";
@@ -24,6 +24,24 @@ export function Button({ variant = "primary", className, type = "button", ...pro
       )}
       {...props}
     />
+  );
+}
+
+export function PasswordField({ className, ...props }: Omit<InputHTMLAttributes<HTMLInputElement>, "type">) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span className="relative block">
+      <input {...props} type={visible ? "text" : "password"} className={cn(fieldClass, "pr-12", className)} />
+      <button
+        type="button"
+        className="absolute inset-y-0 right-2 inline-flex min-w-10 items-center justify-center rounded-full text-muted hover:text-maroon"
+        aria-label={visible ? "Hide password" : "Show password"}
+        title={visible ? "Hide password" : "Show password"}
+        onClick={() => setVisible((value) => !value)}
+      >
+        {visible ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
+      </button>
+    </span>
   );
 }
 
