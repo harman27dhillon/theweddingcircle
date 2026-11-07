@@ -22,14 +22,22 @@ function memberKey() {
   return randomBytes(16).toString("hex");
 }
 
-function parseList(value: string) {
-  try {
-    const parsed = JSON.parse(value) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((item): item is string => typeof item === "string" && item.trim().length >= 4);
-  } catch {
-    return [];
+function parseList(value: string | string[]) {
+  let parsed: unknown = value;
+  if (typeof value === "string") {
+    const raw = value.trim();
+    if (!raw) return [];
+    try {
+      parsed = JSON.parse(raw) as unknown;
+    } catch {
+      parsed = raw.split(/[\\n,;]+/);
+    }
   }
+  const values = Array.isArray(parsed) ? parsed : typeof parsed === "string" ? [parsed] : [];
+  return [...new Set(values
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => normalizeCode(item))
+    .filter((item) => item.length >= 4))];
 }
 
 function sameCode(left: string, right: string) {
